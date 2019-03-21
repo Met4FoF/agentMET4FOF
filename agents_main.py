@@ -147,6 +147,11 @@ if __name__ == '__main__':
        time.sleep(1)
    data_requested = aggregator1.get_buffer_data()
    aggregator1.clear_buffer()
+
+   #print sensor info
+   print(sensor1.get_attr('type'),sensor1.get_attr('unit_v'),sensor1.get_attr('id'))
+
+   #print requested data
    print(data_requested)
 
    #list of agents in system
