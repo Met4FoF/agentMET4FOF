@@ -9,5 +9,5 @@ About
  
 Note
 ---
- - In the event that the server and agents do not terminate cleanly, run taskkill /f /im python.exe /t in Windows Command Prompt to terminate all background python processes.
+ - In the event that the server and agents do not terminate cleanly, run '''taskkill /f /im python.exe /t''' in Windows Command Prompt to terminate all background python processes.
 
