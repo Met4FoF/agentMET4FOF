@@ -1,5 +1,5 @@
 # agentMet4FoF Code
-This repository contains the code for Metrological Agent-based system (UCAM-Met4FoF project)
+This repository contains the code for Metrological Agent-based system (Met4FoF project)
 
 
 About
