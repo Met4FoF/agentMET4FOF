@@ -3,7 +3,7 @@ The research presented was supported by European Metrology Programme for Innovat
 
 About
 ---
- - How can metrological input be incorporated into an agent-based system for uncertainty of machine learning in future manufacturing?
+ - How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
  - Includes agent-based simulation and implementation
 
 
