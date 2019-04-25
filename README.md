@@ -11,7 +11,7 @@ Updates
 ---
  - Implemented Sensor Agent, Aggregator Agent, Predictor Agent, DecisionMaker Agent, Sensor Network Agent
  - Able to handle multiple Sensor Agents & Predictor Agents (each equipped with a different model)
- - Implemented with ZEMA Condition Monitoring of Hydraulic data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1323611.svg)](https://doi.org/10.5281/zenodo.1323611)
+ - Implemented with ZEMA condition monitoring of hydraulic system data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1323611.svg)](https://doi.org/10.5281/zenodo.1323611)
  - Implemented web visualization with user interface
 
 
