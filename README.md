@@ -14,10 +14,9 @@ Updates
  - Implemented with ZEMA condition monitoring of hydraulic system data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1323611.svg)](https://doi.org/10.5281/zenodo.1323611)
  - Implemented web visualization with user interface
 
-
+## Screenshot of web visualization
+![Web Screenshot](https://github.com/bangxiangyong/agentMet4FoF/blob/master/screenshot_met4fof.png)
 
 Note
 ---
  - In the event of agents not terminating cleanly, run ```taskkill /f /im python.exe /t``` in Windows Command Prompt to terminate all background python processes.
-## Screenshot of web visualization
-![Web Screenshot](https://github.com/bangxiangyong/agentMet4FoF/blob/master/screenshot_met4fof.png)
