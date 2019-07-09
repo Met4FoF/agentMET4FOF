@@ -3,3 +3,6 @@
 archived
 Dataset
 pickles
+venv
+__pycache__
+depracated
