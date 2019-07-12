@@ -1,0 +1,9 @@
+name: agentMet4FoF
+dependencies:
+    - ipykernel
+    - numpy
+    - scikit-learn
+    - scipy
+    - matplotlib
+    - pandas
+    - seaborn
