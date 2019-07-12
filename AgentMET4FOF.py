@@ -11,7 +11,17 @@ from skmultiflow.trees import HoeffdingTree
 from sklearn.model_selection import StratifiedKFold
 
 class AgentMET4FOF(Agent):
+    """
+    Base class for all agents with specific functions to be overridden/supplied by user.
+
+    Behavioural functions for users to provide are init_parameters, agent_loop and on_received_message.
+    Communicative functions are bind_output, unbind_output and send_output.
+
+    """
     def on_init(self):
+        """
+        Internal initialization to setup the agent: mainly on setting the dictionary of Inputs, Outputs, PubAddr.
+        """
         self.Inputs = {}
         self.Outputs = {}
         self.PubAddr_alias = self.name + "_PUB"
@@ -22,13 +32,31 @@ class AgentMET4FOF(Agent):
         self.current_state = self.states[0]
         self.init_parameters()
 
+
     def init_parameters(self):
+        """
+        User provided function to initialize parameters of choice.
+        """
         return 0
 
     def before_loop(self):
+        """
+        This action is executed before initiating the loop
+        """
         self.init_agent_loop(1.0)
 
     def init_agent_loop(self, loop_wait=1.0):
+        """
+        Initiates the agent loop, which iterates every loop_wait seconds
+
+        Stops every timers and initiate a new loop.
+
+        Parameters
+        ----------
+        loop_wait : int
+            The wait between each iteration of the loop
+
+        """
         self.stop_all_timers()
         #check if agent_loop is overriden by user
         if self.__class__.agent_loop == AgentMET4FOF.agent_loop:
@@ -41,21 +69,66 @@ class AgentMET4FOF(Agent):
         return 0
 
     def on_received_message(self, message):
+        """
+        User-defined method and is triggered to handle the message passed by Input.
+
+        Parameters
+        ----------
+        message : Dictionary
+            The message received is in form {'from':agent_name, 'data', data}
+            agent_name is the name of the Input agent which sent the message
+            data is the actual content of the message
+        """
         return message
 
     def pack_data(self,data):
+        """
+        Internal method to pack the data content into a dictionary before sending out.
+
+        Parameters
+        ----------
+        data : argument
+            Data content to be packed before sending out to agents.
+
+        Returns
+        -------
+        Message data packed in the form : {'from':agent_name, 'data', data}.
+
+        """
         return {"from":self.name,"data":data}
 
     def send_output(self, data):
-        self.send(self.PubAddr, self.pack_data(data), topic='data')
+        """
+        Sends message data to all connected agents in self.Outputs.
+
+        Output connection can first be formed by calling bind_output.
+        By default calls pack_data(data) before sending out.
+
+        Parameters
+        ----------
+        data : argument
+            Data content to be sent out
+
+        Returns
+        -------
+        dictionary
+            The packed data with details of sender and data content.
+        """
+        packed_data = self.pack_data(data)
+        self.send(self.PubAddr, packed_data, topic='data')
 
         # LOGGING
         if self.log_mode:
             self.log_info("Sending: "+str(data))
 
-        return data
+        return packed_data
 
     def handle_process_data(self, message):
+        """
+        Internal method to handle incoming message before calling user-defined on_received_message method.
+
+        """
+
         # LOGGING
         if self.log_mode:
             self.log_info("Received: "+str(message))
@@ -64,36 +137,57 @@ class AgentMET4FOF(Agent):
 
         return proc_msg
 
-    def bind_output(self, output_module):
-        output_module_id = output_module.get_attr('name')
+    def bind_output(self, output_agent):
+        """
+        Forms Output connection with another agent. Any call on send_output will reach this newly binded agent
+
+        Adds the agent to its list of Outputs.
+
+        Parameters
+        ----------
+        output_agent : AgentMET4FOF
+            Agent to be binded to this agent's output channel
+
+        """
+
+        output_module_id = output_agent.get_attr('name')
         if output_module_id not in self.Outputs:
             # update self.Outputs list and Inputs list of output_module
-            self.Outputs.update({output_module.get_attr('name'): output_module})
-            temp_updated_inputs= output_module.get_attr('Inputs')
+            self.Outputs.update({output_agent.get_attr('name'): output_agent})
+            temp_updated_inputs= output_agent.get_attr('Inputs')
             temp_updated_inputs.update({self.name: self})
-            output_module.set_attr(Inputs=temp_updated_inputs)
+            output_agent.set_attr(Inputs=temp_updated_inputs)
             # bind to the address
-            if output_module.has_socket(self.PubAddr_alias):
-                output_module.subscribe(self.PubAddr_alias, handler={'data': AgentMET4FOF.handle_process_data})
+            if output_agent.has_socket(self.PubAddr_alias):
+                output_agent.subscribe(self.PubAddr_alias, handler={'data': AgentMET4FOF.handle_process_data})
             else:
-                output_module.connect(self.PubAddr, alias=self.PubAddr_alias, handler={'data':AgentMET4FOF.handle_process_data})
+                output_agent.connect(self.PubAddr, alias=self.PubAddr_alias, handler={'data':AgentMET4FOF.handle_process_data})
 
             # LOGGING
             if self.log_mode:
                 self.log_info("Connected output module"+ output_module_id)
 
-    def unbind_output(self, target_module):
-        module_id = target_module.get_attr('name')
+    def unbind_output(self, output_agent):
+        """
+        Remove existing output connection with another agent. This reverses the bind_output method
+
+        Parameters
+        ----------
+        output_agent : AgentMET4FOF
+            Agent binded to this agent's output channel
+
+        """
+
+        module_id = output_agent.get_attr('name')
         if module_id in self.Outputs:
             self.Outputs.pop(module_id, None)
-            target_module.get_attr('Inputs').pop(self.name, None)
-            target_module.unsubscribe(self.PubAddr_alias,'data')
+            output_agent.get_attr('Inputs').pop(self.name, None)
+            output_agent.unsubscribe(self.PubAddr_alias, 'data')
 
             # LOGGING
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
-    def print_sockets(self):
-        self.log_info(self.socket)
+
 
 class AgentController(AgentMET4FOF):
     def init_parameters(self, ns=None):
