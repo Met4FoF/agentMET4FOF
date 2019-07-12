@@ -6,6 +6,27 @@ About
  - How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
  - Includes agent-based simulation and implementation
 
+Get started
+---
+First clone the repository to your local machine as described
+[here](https://help.github.com/en/articles/cloning-a-repository). To get started
+with your present *Anaconda* installation just go to *Anaconda
+prompt*, navigate to your local clone
+```
+cd /your/local/folder/agentMet4FoF
+```
+and execute
+```
+conda env create --name agentMet4FoF --file environment.yml 
+```
+This will create an *Anaconda* virtual environment with all dependencies
+satisfied. If you don't have *Anaconda* installed already follow [this guide
+](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/download.html)
+first, then create the virtual environment as stated above and then proceed.
+
+First take a look at the [tutorials](./tutorials/) or start hacking the
+[main_agents.py](main_agents.py) if you already are familiar with agentMet4FoF
+and want to customize your agents' network.
 
 Updates
 ---
