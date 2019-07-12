@@ -9,16 +9,6 @@ import numpy as np
 from skmultiflow.data import WaveformGenerator
 from skmultiflow.trees import HoeffdingTree
 from sklearn.model_selection import StratifiedKFold
-# ML dependencies
-import numpy as np
-from osbrain import Agent
-from osbrain import NSProxy
-from osbrain import run_agent
-from osbrain import run_nameserver
-from sklearn.model_selection import StratifiedKFold
-from skmultiflow.data import WaveformGenerator
-from skmultiflow.trees import HoeffdingTree
-
 
 class AgentMET4FOF(Agent):
     """
@@ -57,7 +47,7 @@ class AgentMET4FOF(Agent):
 
     def init_agent_loop(self, loop_wait=1.0):
         """
-        Initiates the agent loop, which iterates every `loop_wait` second
+        Initiates the agent loop, which iterates every`loop_wait` seconds
 
         Stops every timers and initiate a new loop.
 
