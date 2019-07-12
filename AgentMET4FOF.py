@@ -47,7 +47,7 @@ class AgentMET4FOF(Agent):
 
     def init_agent_loop(self, loop_wait=1.0):
         """
-        Initiates the agent loop, which iterates every loop_wait seconds
+        Initiates the agent loop, which iterates every loop_wait second
 
         Stops every timers and initiate a new loop.
 
@@ -190,6 +190,10 @@ class AgentMET4FOF(Agent):
 
 
 class AgentController(AgentMET4FOF):
+    """
+    Internal agent to provide control to other agents.
+
+    """
     def init_parameters(self, ns=None):
         self.ns = ns
 
