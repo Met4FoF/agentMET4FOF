@@ -1,0 +1,9 @@
+ipykernel
+numpy
+scikit-learn
+scikit-multiflow
+scipy
+matplotlib
+pandas
+seaborn
+osbrain
