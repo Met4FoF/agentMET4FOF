@@ -1,9 +1,12 @@
 name: agentMet4FoF
+channels:
+    - conda-forge
 dependencies:
     - python >= 3
     - ipykernel
     - numpy
     - scikit-learn
+    - scikit-multiflow
     - scipy
     - matplotlib
     - pandas
@@ -11,4 +14,3 @@ dependencies:
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
         - osbrain
-        - scikit-multiflow
