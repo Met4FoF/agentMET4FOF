@@ -16,7 +16,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-    AgentMET4FOF.rst
+   AgentMET4FOF.rst
 
 
 Indices and tables
