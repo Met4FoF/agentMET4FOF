@@ -360,7 +360,7 @@ class ML_Model(AgentMET4FOF):
             res = self.compute_accuracy(y_pred=y_pred, y_true=y)
             self.results.append(res)
 
-        # prequential: test & train
+        # holdout: test & train
         elif (self.mode == "holdout"):
             res_temp = []
             # begin kfold
