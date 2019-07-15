@@ -7,6 +7,9 @@ version: 2
 # Build all formats
 formats: all
 
+conda:
+  environment: environment.yml
+
 # Docker image to use for build process
 build:
   image: latest
@@ -15,9 +18,6 @@ build:
 python:
   version: 3
   install:
-    - requirements: requirements.txt
-    - method: pip
-      path: .
     - method: setuptools
       path: .
 
