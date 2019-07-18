@@ -1,0 +1,64 @@
+# Python CircleCI 2.1 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.1
+workflows:
+  build_and_test:
+    jobs:
+      - build
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3
+
+    working_directory: ~/repo
+
+    steps:
+      # Checkout code
+      - checkout
+
+      # Create folder for test results.
+      - run:
+          name: Create test result folder
+          command: |
+            mkdir test-reports
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v1-dependencies-
+
+      # Install dependencies and Codecov reporter if necessary.
+      - run:
+         name: Install dependencies
+         command: |
+           python3 -m venv venv
+           . venv/bin/activate
+           pip install -r requirements.txt
+           pip install coverage pytest-cov codecov
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      # Run tests with coverage report! We use pytest's test-runner.
+      - run:
+          name: Run agentMet4FoF tests
+          command: |
+            . venv/bin/activate
+            pytest -v --junitxml=test-reports/pytest.xml \
+            --cov-config=.coveragerc --cov=/ / > \
+            test-reports/agentMet4FoF.log
+
+      # Store test results.
+      - store_artifacts:
+         path: test-reports
+         destination: test-reports
+
+      - store_test_results:
+         path: test-reports
