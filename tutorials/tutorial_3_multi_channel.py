@@ -8,13 +8,21 @@ from skmultiflow.data import SineGenerator
 #We overload the on_received_message() function, which is called every time a message is received from the input agents
 #The received message is a dictionary with the format: {'sender':agent_name, 'data':data}
 
-def divide_by_two(data):
-    return data / 2
+def minus(data, minus_val):
+    return data-minus_val
+def plus(data,plus_val):
+    return data+plus_val
 
-class MathAgent(AgentMET4FOF):
+class MultiChannelMathAgent(AgentMET4FOF):
+    def init_parameters(self,minus_param=0.5,plus_param=0.5):
+        self.minus_param = minus_param
+        self.plus_param = plus_param
+
     def on_received_message(self, message):
-        data = divide_by_two(message['data'])
-        self.send_output(data)
+        minus_data = minus(message['data'], self.minus_param)
+        plus_data = plus(message['data'], self.plus_param)
+
+        self.send_output({'minus':minus_data,'plus':plus_data})
 
 class SineGeneratorAgent(AgentMET4FOF):
     def init_parameters(self):
@@ -27,7 +35,6 @@ class SineGeneratorAgent(AgentMET4FOF):
             self.send_output(sine_data[0][0][0])
 
 
-
 if __name__ == '__main__':
     # start agent network server
     agentNetwork = AgentNetwork()
@@ -35,13 +42,13 @@ if __name__ == '__main__':
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=SineGeneratorAgent)
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
-    math_agent = agentNetwork.add_agent(agentType=MathAgent)
+    multi_math_agent = agentNetwork.add_agent(agentType=MultiChannelMathAgent)
 
     # connect agents : We can connect multiple agents to any particular agent
     # However the agent needs to implement handling multiple inputs
-    agentNetwork.bind_agents(gen_agent, math_agent)
+    agentNetwork.bind_agents(gen_agent, multi_math_agent)
     agentNetwork.bind_agents(gen_agent, monitor_agent)
-    agentNetwork.bind_agents(math_agent, monitor_agent)
+    agentNetwork.bind_agents(multi_math_agent, monitor_agent)
 
     # set all agents states to "Running"
     agentNetwork.set_running_state()
