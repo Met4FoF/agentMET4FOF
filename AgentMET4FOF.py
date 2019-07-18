@@ -92,7 +92,8 @@ class AgentMET4FOF(Agent):
 
         Returns
         -------
-        Message data packed in the form : {'from':agent_name, 'data', data}.
+        packed Message data : dict of the form {'from':agent_name,
+        'data': data}.
 
         """
         return {"from":self.name,"data":data}
