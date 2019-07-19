@@ -139,4 +139,4 @@ def test_simpleAgent(agentType, expected_monitor_results):
 
     # shutdown agent network
     agentNetwork.shutdown()
-    time.sleep(test_timeout)
+    time.sleep(3)
