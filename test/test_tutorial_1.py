@@ -16,3 +16,9 @@ def test_tutorial_1():
 
     # 2) by the agent.bind_output()
     gen_agent.bind_output(monitor_agent)
+
+    # set all agents states to "Running"
+    agentNetwork.set_running_state()
+
+    # Shutdown network
+    agentNetwork.shutdown()
