@@ -415,7 +415,6 @@ class MonitorAgent(AgentMET4FOF):
         self.memory = {}
 
     def on_received_message(self, message):
-        self.log_info("Memory: "+ str(self.memory))
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for it
         if message['from'] not in self.memory:
@@ -423,24 +422,42 @@ class MonitorAgent(AgentMET4FOF):
             if type(message['data']).__name__ == "list":
                 self.memory.update({message['from']:message['data']})
 
+            # handle if data type is np.ndarray
+            elif type(message['data']).__name__ == "ndarray":
+                self.memory.update({message['from']:message['data']})
+
+            # handle if data type is pd.DataFrame
+            elif type(message['data']).__name__ == "DataFrame":
+                self.memory.update({message['from']:message['data']})
+
             # handle if data type is dict
             elif type(message['data']).__name__ == "dict":
                 # check for each value datatype
                 for key in message['data'].keys():
                     # if the value is not list types, turn it into a list
-                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "np.ndarray":
+                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray":
                         message['data'][key] = [message['data'][key]]
                     self.memory.update({message['from']:message['data']})
 
             else:
                 self.memory.update({message['from']:[message['data']]})
+            self.log_info("Memory: "+ str(self.memory))
             return 0
 
-        # handle appending
-        # acceptable data types : list, dict or float
+        # otherwise 'sender' exists in memory, handle appending
+        # acceptable data types : list, dict, ndarray, dataframe, single values
+
         # handle list
         if type(message['data']).__name__ == "list":
             self.memory[message['from']] += message['data']
+
+        # handle if data type is np.ndarray
+        elif type(message['data']).__name__ == "ndarray":
+            self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']))
+
+        # handle if data type is pd.DataFrame
+        elif type(message['data']).__name__ == "DataFrame":
+            self.memory[message['from']] = self.memory[message['from']].append(message['data']).reset_index(drop=True)
 
         # handle dict
         elif type(message['data']).__name__ == "dict":
@@ -450,7 +467,7 @@ class MonitorAgent(AgentMET4FOF):
                     self.memory[message['from']][key] += message['data'][key]
 
                 # handle : dict value is numpy array
-                elif type(message['data'][key]).__name__== "np.ndarray":
+                elif type(message['data'][key]).__name__== "ndarray":
                     self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]))
 
                 # handle: dict value is int/float/single value to be converted into list
@@ -458,4 +475,5 @@ class MonitorAgent(AgentMET4FOF):
                     self.memory[message['from']][key] += [message['data'][key]]
         else:
             self.memory[message['from']].append(message['data'])
+        self.log_info("Memory: "+ str(self.memory))
         return 0
