@@ -92,10 +92,10 @@ class AgentMET4FOF(Agent):
 
         Returns
         -------
-        Message data packed in the form : {'from':agent_name, 'data', data}.
+        Message data packed in the form : {'from':agent_name, 'data', data, 'senderType': agent_class}.
 
         """
-        return {"from":self.name,"data":data}
+        return {"from": self.name, "data": data, "senderType": type(self).__name__}
 
     def send_output(self, data):
         """
@@ -191,10 +191,13 @@ class AgentMET4FOF(Agent):
 
 class AgentController(AgentMET4FOF):
     """
-    Internal agent to provide control to other agents.
+    Unique internal agent to provide control to other agents. Automatically instantiated when starting server
+
 
     """
     def init_parameters(self, ns=None):
+        self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
+        self.current_state = "Idle"
         self.ns = ns
 
     def get_agentType_count(self, agentType):
@@ -224,30 +227,55 @@ class AgentController(AgentMET4FOF):
 
 #global control
 class AgentNetwork():
-    def __init__(self):
-        self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
-        self.current_state = "Idle"
-        self.controller = None
-    def connect(self, port = 3333):
+    """
+    Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
+
+    Provides function to add agents, (un)bind agents, query agent network state, set global agent states
+    """
+    def __init__(self, ip_addr="127.0.0.1", port=3333, mode="Start"):
+        """
+        Parameters
+        ----------
+        ip_addr: str
+            Ip address of server to connect/start
+        port: int
+            Port of server to connect/start
+        mode: str
+            "Connect" sets Agent network to connect mode and will connect to specified address
+            "Start" sets Agent network to start server mode and will start a new server at specified address
+            Anything else will not connect/start the server, and user will need to explicitly call functions to start/connect
+        """
+
+        self.ip_addr= ip_addr
+        self.port = port
+        self._controller = None
+
+        if mode == "Connect":
+            self.connect(ip_addr,port)
+        elif mode == "Start":
+            self.start_server(ip_addr,port)
+
+    def connect(self,ip_addr="127.0.0.1", port = 3333):
         try:
-            self.ns = NSProxy(nsaddr='127.0.0.1:' + str(port))
+            self.ns = NSProxy(nsaddr=ip_addr+':' + str(port))
         except:
             print("Unable to connect to existing NameServer...")
             self.ns = 0
 
-    def start_server(self, port = 3333):
+    def start_server(self,ip_addr="127.0.0.1", port = 3333):
         print("Starting NameServer...")
-        self.ns = run_nameserver(addr='127.0.0.1:' + str(port))
+        self.ns = run_nameserver(addr=ip_addr+':' + str(port))
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
-            self.ns = run_nameserver(addr='127.0.0.1:' + str(port))
+            self.ns = run_nameserver(addr=ip_addr+':' + str(port))
         controller= run_agent("AgentController", base=AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
         controller.init_parameters(self.ns)
 
     def set_mode(self, state):
-        self.current_state = state
+        self._get_controller().set_attr(current_state=state)
+
     def get_mode(self):
-        return self.current_state
+        return self._get_controller().get_attr('current_state')
 
     def set_running_state(self, filter_agent=None):
         self.set_agents_state(filter_agent=filter_agent,state="Running")
@@ -260,7 +288,7 @@ class AgentNetwork():
         for agent_name in self.agents():
             if (filter_agent is not None and filter_agent in agent_name) or (filter_agent is None):
                 agent = self.get_agent(agent_name)
-                agent.set_attr(current_state = state)
+                agent.set_attr(current_state=state)
         print("SET STATE:  ", state)
         return 0
 
@@ -272,32 +300,30 @@ class AgentNetwork():
         source.unbind_output(target)
         return 0
 
-    def get_controller(self):
-        if self.controller is None:
-            self.controller = self.ns.proxy('AgentController')
-        return self.controller
+    def _get_controller(self):
+        if self._controller is None:
+            self._controller = self.ns.proxy('AgentController')
+        return self._controller
 
     def get_agent(self,agent_name):
-        return self.get_controller().get_attr('ns').proxy(agent_name)
+        return self._get_controller().get_attr('ns').proxy(agent_name)
 
     def agents(self):
         #exclude_names = ["AgentController"]
         #agent_names = [name for name in self.ns.agents() if name not in exclude_names]
-        agent_names = self.get_controller().agents()
+        agent_names = self._get_controller().agents()
         return agent_names
 
     def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True):
-        agent = self.get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode)
-        #agent = run_agent(base=agentType, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode)
         return agent
 
     def shutdown(self):
-        self.get_controller().get_attr('ns').shutdown()
+        self._get_controller().get_attr('ns').shutdown()
         return 0
 
 class DataStream(AgentMET4FOF):
-
-    def init_parameters(self, n_wait=1.0, stream = WaveformGenerator(),pretrain_size = 100, max_samples = 100000, batch_size=100 ):
+    def init_parameters(self, n_wait=1.0, stream = WaveformGenerator(), pretrain_size = 100, max_samples = 100000, batch_size=100):
 
         # parameters
         # setup data stream
@@ -309,7 +335,6 @@ class DataStream(AgentMET4FOF):
 
         self.current_sample = 0
         self.first_time = True
-
 
     def agent_loop(self):
         #if is running
@@ -335,7 +360,8 @@ class DataStream(AgentMET4FOF):
 
         #log
         self.log_info(data)
-        return data
+        return {'x':data[0], 'y':data[1]}
+        #return data
 
 class ML_Model(AgentMET4FOF):
     def init_parameters(self, mode="prequential", ml_model= HoeffdingTree(), split_type=None):
@@ -346,10 +372,11 @@ class ML_Model(AgentMET4FOF):
             self.split_type = split_type
         else:
             self.split_type = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+
     def on_received_message(self, message):
         if len(message) >1:
-            x = message['data'][0]
-            y = message['data'][1]
+            x = message['data']['x']
+            y = message['data']['y']
         else:
             return -1
 
@@ -361,7 +388,7 @@ class ML_Model(AgentMET4FOF):
             self.results.append(res)
 
         # holdout: test & train
-        elif (self.mode == "holdout"):
+        elif self.mode == "holdout":
             res_temp = []
             # begin kfold
             for train_index, test_index in self.split_type.split(x, y):
@@ -388,10 +415,65 @@ class MonitorAgent(AgentMET4FOF):
         self.memory = {}
 
     def on_received_message(self, message):
-        self.log_info(message)
-        self.log_info(self.memory)
-        if message['from'] in self.memory:
-            self.memory[message['from']].append(message['data'])
+        # check if sender agent has sent any message before:
+        # if it did,then append, otherwise create new entry for it
+        if message['from'] not in self.memory:
+            # handle if data type is list
+            if type(message['data']).__name__ == "list":
+                self.memory.update({message['from']:message['data']})
+
+            # handle if data type is np.ndarray
+            elif type(message['data']).__name__ == "ndarray":
+                self.memory.update({message['from']:message['data']})
+
+            # handle if data type is pd.DataFrame
+            elif type(message['data']).__name__ == "DataFrame":
+                self.memory.update({message['from']:message['data']})
+
+            # handle if data type is dict
+            elif type(message['data']).__name__ == "dict":
+                # check for each value datatype
+                for key in message['data'].keys():
+                    # if the value is not list types, turn it into a list
+                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray":
+                        message['data'][key] = [message['data'][key]]
+                    self.memory.update({message['from']:message['data']})
+
+            else:
+                self.memory.update({message['from']:[message['data']]})
+            self.log_info("Memory: "+ str(self.memory))
+            return 0
+
+        # otherwise 'sender' exists in memory, handle appending
+        # acceptable data types : list, dict, ndarray, dataframe, single values
+
+        # handle list
+        if type(message['data']).__name__ == "list":
+            self.memory[message['from']] += message['data']
+
+        # handle if data type is np.ndarray
+        elif type(message['data']).__name__ == "ndarray":
+            self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']))
+
+        # handle if data type is pd.DataFrame
+        elif type(message['data']).__name__ == "DataFrame":
+            self.memory[message['from']] = self.memory[message['from']].append(message['data']).reset_index(drop=True)
+
+        # handle dict
+        elif type(message['data']).__name__ == "dict":
+            for key in message['data'].keys():
+                # handle : dict value is list
+                if type(message['data'][key]).__name__ == "list":
+                    self.memory[message['from']][key] += message['data'][key]
+
+                # handle : dict value is numpy array
+                elif type(message['data'][key]).__name__== "ndarray":
+                    self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]))
+
+                # handle: dict value is int/float/single value to be converted into list
+                else:
+                    self.memory[message['from']][key] += [message['data'][key]]
         else:
-            self.memory.update({message['from']:[message['data']]})
-        return message
+            self.memory[message['from']].append(message['data'])
+        self.log_info("Memory: "+ str(self.memory))
+        return 0

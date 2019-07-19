@@ -15,7 +15,6 @@ if __name__ == '__main__':
 
     #start agent network
     agentNetwork = AgentNetwork()
-    agentNetwork.start_server()
 
     #init agents
     data_stream_agent_1 = agentNetwork.add_agent(agentType=DataStream)
