@@ -478,3 +478,8 @@ class MonitorAgent(AgentMET4FOF):
             self.memory[message['from']].append(message['data'])
         self.log_info("Memory: "+ str(self.memory))
         return 0
+
+    def plot_graph(self, memory):
+
+        graph = 0
+        return graph
