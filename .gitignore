@@ -6,3 +6,8 @@ pickles
 venv
 __pycache__
 depracated
+dataset
+develop/.ipynb_checkpoints
+develop/ZeMA-machine-learning-tutorials-master
+
+
