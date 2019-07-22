@@ -9,6 +9,11 @@ import numpy as np
 from skmultiflow.data import WaveformGenerator
 from skmultiflow.trees import HoeffdingTree
 from sklearn.model_selection import StratifiedKFold
+import matplotlib.pyplot as plt
+import matplotlib.figure
+from plotly import tools as tls
+from io import BytesIO
+import base64
 
 class AgentMET4FOF(Agent):
     """
@@ -81,7 +86,7 @@ class AgentMET4FOF(Agent):
         """
         return message
 
-    def pack_data(self,data):
+    def pack_data(self,data, channel='data'):
         """
         Internal method to pack the data content into a dictionary before sending out.
 
@@ -90,32 +95,37 @@ class AgentMET4FOF(Agent):
         data : argument
             Data content to be packed before sending out to agents.
 
+        channel : str
+            Key of dictionary which stores data
+
         Returns
         -------
-        Message data packed in the form : {'from':agent_name, 'data', data, 'senderType': agent_class}.
-
-        packed Message data : dict of the form {'from':agent_name, 'data': data}.
+        Packed message data : dict of the form {'from':agent_name, channel: data, 'senderType': agent_class}.
         """
-        return {"from": self.name, "data": data, "senderType": type(self).__name__}
+        return {'from': self.name, 'data': data, 'senderType': type(self).__name__, 'channel': channel}
 
-    def send_output(self, data):
+    def send_output(self, data, channel='default'):
         """
         Sends message data to all connected agents in self.Outputs.
 
         Output connection can first be formed by calling bind_output.
         By default calls pack_data(data) before sending out.
+        Can specify specific channel as opposed to default 'data' channel.
 
         Parameters
         ----------
         data : argument
             Data content to be sent out
 
+        channel : str
+            Key of `message` dictionary which stores data
+
         Returns
         -------
-        dictionary
-            The packed data with details of sender and data content.
+        Packed message data : dict of the form {'from':agent_name, channel: data, 'senderType': agent_class}.
+
         """
-        packed_data = self.pack_data(data)
+        packed_data = self.pack_data(data, channel=channel)
         self.send(self.PubAddr, packed_data, topic='data')
 
         # LOGGING
@@ -189,6 +199,66 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
 
+    def _convert_to_plotly(self, matplotlib_fig):
+        """
+        Internal method to convert matplotlib figure to plotly figure
+
+        Parameters
+        ----------
+        matplotlib_fig: plt.Figure
+            Matplotlib figure to be converted
+
+        """
+        # convert to plotly format
+        matplotlib_fig.tight_layout()
+        plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+        plotly_fig['layout']['showlegend'] = True
+        return plotly_fig
+
+
+    def _fig_to_uri(self, matplotlib_fig = plt.figure()):
+        """
+        Internal method to convert matplotlib figure to base64 uri image for display
+
+        Parameters
+        ----------
+        matplotlib_fig : plt.Figure
+            Matplotlib figure to be converted
+
+        """
+        out_img = BytesIO()
+        matplotlib_fig.savefig(out_img, format='png')
+        matplotlib_fig.clf()
+        #plt.close('all')
+        out_img.seek(0)  # rewind file
+        encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
+        return "data:image/png;base64,{}".format(encoded)
+
+    def send_plot(self, fig=plt.Figure()):
+        """
+        Sends plot to agents connected to this agent's Output channel.
+
+        This method is different from send_output which will be sent to through the
+        'plot' channel to be handled.
+
+        Parameters
+        ----------
+
+        fig : Figure
+            Can be either matplotlib figure or plotly figure
+
+        Returns
+        -------
+        The message format is {'from':agent_name, 'plot': data, 'senderType': agent_class}.
+        """
+        if isinstance(fig, matplotlib.figure.Figure):
+            #graph = self._convert_to_plotly(fig)
+            graph = self._fig_to_uri(fig)
+
+        else:
+            graph = fig
+        self.send_output(graph, channel="plot")
+        return graph
 
 class AgentController(AgentMET4FOF):
     """
@@ -414,8 +484,27 @@ class MonitorAgent(AgentMET4FOF):
     def init_parameters(self):
         #dictionary of Inputs
         self.memory = {}
+        self.plots = {}
 
     def on_received_message(self, message):
+        """
+        Handles incoming data from 'default' and 'plot' channels.
+
+        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+
+        Parameters
+        ----------
+        message : dict
+            Acceptable channel values are 'default' or 'plot'
+
+        """
+        if message['channel'] == 'default':
+            self.update_data_memory(message)
+        elif message['channel'] == 'plot':
+            self.update_plot_memory(message)
+        return 0
+
+    def update_data_memory(self,message):
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for it
         if message['from'] not in self.memory:
@@ -477,9 +566,7 @@ class MonitorAgent(AgentMET4FOF):
         else:
             self.memory[message['from']].append(message['data'])
         self.log_info("Memory: "+ str(self.memory))
-        return 0
 
-    def plot_graph(self, memory):
-
-        graph = 0
-        return graph
+    def update_plot_memory(self, message):
+        plot_fig = message['data']
+        self.plots.update({message['from']:message['data']})
