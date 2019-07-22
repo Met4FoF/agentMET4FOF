@@ -14,6 +14,7 @@ import matplotlib.figure
 from plotly import tools as tls
 from io import BytesIO
 import base64
+import DataStreamMET4FOF
 
 class AgentMET4FOF(Agent):
     """
@@ -393,7 +394,7 @@ class AgentNetwork():
         self._get_controller().get_attr('ns').shutdown()
         return 0
 
-class DataStream(AgentMET4FOF):
+class DataStreamAgent(AgentMET4FOF):
     def init_parameters(self, n_wait=1.0, stream = WaveformGenerator(), pretrain_size = 100, max_samples = 100000, batch_size=100):
 
         # parameters

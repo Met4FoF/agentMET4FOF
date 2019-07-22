@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStream
+from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStreamAgent
 
 #We demonstrate the use of pre-made agents for machine learning : DataStream agent and ML_Model agent
 #The agents are compatible with scikit-multiflow package
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     agentNetwork = AgentNetwork()
 
     #init agents
-    data_stream_agent_1 = agentNetwork.add_agent(agentType=DataStream)
+    data_stream_agent_1 = agentNetwork.add_agent(agentType=DataStreamAgent)
     ml_agent_hoeffdingTree = agentNetwork.add_agent(agentType=ML_Model)
     ml_agent_neuralNets = agentNetwork.add_agent(agentType=ML_Model)
     monitor_agent_1 = agentNetwork.add_agent(agentType=MonitorAgent)

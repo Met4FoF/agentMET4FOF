@@ -1,6 +1,6 @@
 import numpy as np
 
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork ,DataStream, MonitorAgent
+from AgentMET4FOF import AgentMET4FOF, AgentNetwork ,DataStreamAgent, MonitorAgent
 
 #ML dependencies
 import numpy as np
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     agentNetwork = AgentNetwork()
 
     # init agents
-    gen_agent = agentNetwork.add_agent(agentType=DataStream)
+    gen_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
     trainer_agent = agentNetwork.add_agent(agentType=Trainer)
     predictor_agent = agentNetwork.add_agent(agentType=Predictor)
     evaluator_agent = agentNetwork.add_agent(agentType=Evaluator)

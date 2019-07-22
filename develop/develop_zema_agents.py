@@ -1,39 +1,29 @@
-from skmultiflow.data.base_stream import Stream
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStream
-
-from develop.develop_datastream import DataStreamMET4FOF, ZEMAGeneratorAgent, ConvertSIAgent
-from develop.develop_feature_extract import FFT_BFC, Pearson_FeatureSelection
+from AgentMET4FOF import AgentMET4FOF
+from DataStreamMET4FOF import DataStreamMET4FOF
+from develop.develop_zema_feature_extract import FFT_BFC, Pearson_FeatureSelection
 
 import numpy as np
-import pandas as pd
 import time
-#ZEMA DATA LOAD
-from pandas import Series
+
 from matplotlib import pyplot as plt
-import h5py
-
-from io import BytesIO
-import base64
-
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 
-def fig_to_uri(in_fig, close_all=True, **save_args):
-    # type: (plt.Figure) -> str
-    """
-    Save a figure as a URI
-    :param in_fig:
-    :return:
-    """
-    out_img = BytesIO()
-    in_fig.savefig(out_img, format='png', **save_args)
-    if close_all:
-        in_fig.clf()
-        plt.close('all')
-    out_img.seek(0)  # rewind file
-    encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
-    return "data:image/png;base64,{}".format(encoded)
+class ZEMA_DataStreamAgent(AgentMET4FOF):
+    def init_parameters(self, stream=DataStreamMET4FOF()):
+        self.stream = stream
 
+    def agent_loop(self):
+        if self.current_state == "Running":
+            self.send_next_sample()
+
+    def send_next_sample(self,num_samples=1):
+        data = self.stream.next_sample(num_samples) #tuple
+        self.send_output(data)
+
+    def send_all_sample(self):
+        self.send_next_sample(-1)
 
 class FFTAgent(AgentMET4FOF):
     def init_parameters(self, sampling_period=1):
@@ -47,8 +37,8 @@ class FFTAgent(AgentMET4FOF):
         self.send_output({"freq": freq, "x":np.abs(amp)})
 
 class FFT_BFCAgent(AgentMET4FOF):
-    def init_parameters(self):
-        self.fft_bfc = FFT_BFC()
+    def init_parameters(self, perc_feat=10):
+        self.fft_bfc = FFT_BFC(perc_feat=perc_feat)
 
     def on_received_message(self, message):
         if message['channel'] == 'train':
@@ -60,11 +50,8 @@ class FFT_BFCAgent(AgentMET4FOF):
             res = self.fft_bfc.transform(message['data']['x'])
             self.send_output({'x': res, 'y': message['data']['y']}, channel='test')
 
-
-from sklearn.model_selection import train_test_split
-
 class TrainTestSplitAgent(AgentMET4FOF):
-    def init_parameters(self, train_ratio = 0.8):
+    def init_parameters(self, train_ratio=0.8):
         self.train_ratio = train_ratio
 
     def on_received_message(self, message):
@@ -111,7 +98,6 @@ class LDA_Agent(AgentMET4FOF):
         return np.array(class_target_vector)
 
     def on_received_message(self, message):
-
         if message['channel'] == 'train':
             y_true = self.reformat_target(message['data']['y'])
             self.ml_model = self.ml_model.fit(message['data']['x'], y_true)
@@ -144,37 +130,3 @@ class EvaluatorAgent(AgentMET4FOF):
          ax.set_xlabel("Y True")
          ax.set_ylabel("Y Pred")
          return fig
-if __name__ == '__main__':
-    #start agent network server
-    agentNetwork = AgentNetwork()
-
-    #init agents by adding into the agent network
-    gen_agent = agentNetwork.add_agent(agentType=ZEMAGeneratorAgent)
-    convert_si_agent = agentNetwork.add_agent(agentType=ConvertSIAgent)
-    train_test_split_agent = agentNetwork.add_agent(agentType=TrainTestSplitAgent)
-    fft_bfc_agent = agentNetwork.add_agent(agentType=FFT_BFCAgent)
-    pearson_fs_agent = agentNetwork.add_agent(agentType=Pearson_FeatureSelectionAgent)
-    lda_agent = agentNetwork.add_agent(agentType=LDA_Agent)
-    evaluator_agent = agentNetwork.add_agent(agentType=EvaluatorAgent)
-
-    monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
-
-    #connect agents
-    agentNetwork.bind_agents(gen_agent, convert_si_agent)
-    agentNetwork.bind_agents(convert_si_agent, train_test_split_agent)
-    agentNetwork.bind_agents(train_test_split_agent, fft_bfc_agent)
-    agentNetwork.bind_agents(fft_bfc_agent, pearson_fs_agent)
-    agentNetwork.bind_agents(pearson_fs_agent, lda_agent)
-    agentNetwork.bind_agents(lda_agent, evaluator_agent)
-
-    #connect to monitor agents
-    agentNetwork.bind_agents(fft_bfc_agent, monitor_agent)
-    agentNetwork.bind_agents(pearson_fs_agent, monitor_agent)
-    agentNetwork.bind_agents(lda_agent, monitor_agent)
-    agentNetwork.bind_agents(evaluator_agent, monitor_agent)
-
-    # set all agents' state to "Running"
-    gen_agent.send_next_sample(5000)
-
-    #gen_agent.init_agent_loop(5)
-    #agentNetwork.set_running_state()

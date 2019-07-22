@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStream
+from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStreamAgent
 
 # -*- coding: utf-8 -*-
 class Addition(AgentMET4FOF):
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     agentNetwork = AgentNetwork()
 
     #init agents
-    data_stream_agent = agentNetwork.add_agent(agentType=DataStream)
+    data_stream_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
     ml_agent = agentNetwork.add_agent(agentType=ML_Model)
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
 

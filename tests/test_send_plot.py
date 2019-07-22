@@ -46,8 +46,7 @@ def test_send_plot():
 
     gen_agent.dummy_send_graph()
     time.sleep(3)
-    #assert str(monitor_agent.get_attr('plots')['GeneratorAgent_1']) == str(gen_plot)
-    #assert isinstance(monitor_agent.get_attr('plots')['GeneratorAgent_1'] ,plotly.graph_objs._figure.Figure)
+
     assert monitor_agent.get_attr('plots')['GeneratorAgent_1']
 
     agentNetwork.shutdown()

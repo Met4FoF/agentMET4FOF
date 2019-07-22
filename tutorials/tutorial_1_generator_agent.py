@@ -1,6 +1,6 @@
 
 import numpy as np
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStream
+from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, ML_Model, DataStreamAgent
 
 from skmultiflow.data import SineGenerator
 

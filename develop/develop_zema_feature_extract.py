@@ -1,69 +1,8 @@
-
-# coding: utf-8
-
-# In[1]:
-
-#
-# get_ipython().run_line_magic('reset', '')
 import numpy as np
 import pandas as pd
-import h5py
-# # f = h5py.File("dataset/Sensor_data_2kHz.h5", 'r')
-# f = h5py.File("F:/PhD Research/Github/agentMet4FoF/dataset/Sensor_data_2kHz.h5", 'r')
-#
-# #prepare sensor data
-# list(f.keys())
-# data= f['Sensor_Data']
-# data= data[:,:,:data.shape[2]-1] #drop last cycle
-# data_inputs_np = np.zeros([data.shape[2],data.shape[1],data.shape[0]])
-# for i in range(data.shape[0]):
-#     sensor_dt = data[i].transpose()
-#     data_inputs_np[:,:,i] = sensor_dt
-#
-# #prepare target var
-# target=list(np.zeros(data_inputs_np.shape[0]))          # Making the target list which takes into account number of cycles, which-
-# for i in range(data_inputs_np.shape[0]):                # goes from 0 to 100, and has number of elements same as number of cycles.
-#     target[i]=(i/(data_inputs_np.shape[0]-1))*100
-#
-#
-# # In[2]:
-#
-#
-# target_matrix = pd.DataFrame(target)        # Transforming list "target" into data frame "target matrix "
-#
-#
-# # ## Convert SI
-#
-# # In[3]:
-#
-#
-# #convert to SI unit
-# offset=[0, 0, 0, 0, 0.00488591, 0.00488591, 0.00488591,  0.00488591, 1.36e-2, 1.5e-2, 1.09e-2]
-# gain=[5.36e-9, 5.36e-9, 5.36e-9, 5.36e-9, 3.29e-4, 3.29e-4, 3.29e-4, 3.29e-4, 8.76e-5, 8.68e-5, 8.65e-5]
-# b=[1, 1, 1, 1, 1, 1, 1, 1, 5.299641744, 5.299641744, 5.299641744]
-# k=[250, 1, 10, 10, 1.25, 1, 30, 0.5, 2, 2, 2]
-# units=['[Pa]', '[g]', '[g]', '[g]', '[kN]', '[bar]', '[mm/s]', '[A]', '[A]', '[A]', '[A]']
-#
-# sensor=data_inputs_np
-#
-# for i in range(data_inputs_np.shape[2]):
-#     sensor[:,:,i]=((data_inputs_np[:,:,i]*gain[i])+offset[i])*b[i]*k[i]
-#
-# data_inputs_np = sensor
-#
-#
-# # In[4]:
-#
-#
-# data_inputs_np[:,:,0]
-
-
-# ## FFT BFC 
-
-# In[207]:
-
 
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
 
 class FFT_BFC():
     def __init__(self,perc_feat = 10):
@@ -306,14 +245,15 @@ class FFT_BFC():
         #plt.show()
         return fig
 
-from scipy.stats import pearsonr
-import matplotlib.pyplot as plt
-
 class Pearson_FeatureSelection():
-    def __init__(self):
+    def __init__(self, n_of_features = 500):
         self.sensor_indices = []
         self.feature_indices = []
-        
+
+        # Defining how much of features with biggest Pearson correllation coeff. will be selected.
+        # "How many features out of %s you want to select (recommended is 500): " % n_features_for_select)
+        self.n_of_features = n_of_features
+
     def fit(self, x_data, y_data):
         sorted_values_from_all_sensors = x_data
         n_sensors = len(sorted_values_from_all_sensors)
@@ -322,11 +262,6 @@ class Pearson_FeatureSelection():
         n_features_for_select=0
         for i in range(len(sorted_values_from_all_sensors)):
             n_features_for_select=n_features_for_select+int(len(sorted_values_from_all_sensors[i].iloc[0][:]))
-
-        # Defining how much of features with biggest Pearson correllation coeff. will be selected.
-        # "How many features out of %s you want to select (recommended is 500): " % n_features_for_select)
-        n_of_features = 500
-
 
         target_matrix = y_data
 
@@ -361,7 +296,7 @@ class Pearson_FeatureSelection():
 
         # sensor_indices is the index of the sensor number.
         # feature_indices is the index of the feature number for each sensor number.
-        sensor_indices, feature_indices = largest_indices(corr_array, n_of_features)
+        sensor_indices, feature_indices = largest_indices(corr_array, self.n_of_features)
 
         print("Sensor indices of location of features in >sorted_values_from_all_sensors< matrix: \n")
         print(sensor_indices)
