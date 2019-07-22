@@ -54,6 +54,7 @@ jobs:
             pytest -v --junitxml=test-reports/pytest.xml \
             --cov-config=.coveragerc --cov=/ / > \
             test-reports/agentMet4FoF.log
+            codecov
 
       # Store test results.
       - store_artifacts:
