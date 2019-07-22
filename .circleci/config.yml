@@ -51,10 +51,15 @@ jobs:
           name: Run agentMet4FoF tests
           command: |
             . venv/bin/activate
-            pytest -v --junitxml=test-reports/pytest.xml \
-            --cov-config=.coveragerc --cov=/ / > \
+            pytest -v --junitxml=test-reports/pytest.xml --cov=/ > \
             test-reports/agentMet4FoF.log
-            codecov
+
+      # Upload coverage report.
+      - run:
+          name: Upload coverage report
+          command: |
+            . venv/bin/activate
+            bash <(curl -s https://codecov.io/bash)
 
       # Store test results.
       - store_artifacts:
