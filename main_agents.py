@@ -57,7 +57,6 @@ class Sensor(AgentMET4FOF):
 if __name__ == '__main__':
     #start agent network
     agentNetwork = AgentNetwork()
-    agentNetwork.start_server()
 
     #init agents
     data_stream_agent = agentNetwork.add_agent(agentType=DataStream)

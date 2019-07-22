@@ -23,7 +23,6 @@ class SineGeneratorAgent(AgentMET4FOF):
 if __name__ == '__main__':
     #start agent network server
     agentNetwork = AgentNetwork()
-    agentNetwork.start_server()
 
     #init agents by adding into the agent network
     gen_agent = agentNetwork.add_agent(agentType=SineGeneratorAgent)

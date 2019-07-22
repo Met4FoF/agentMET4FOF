@@ -11,11 +11,7 @@ import plotly.graph_objs as go
 from plotly import tools
 
 import numpy as np
-import json
-import pickle
-import pandas as pd
 import networkx as nx
-
 
 from AgentMET4FOF import AgentMET4FOF, AgentNetwork
 import AgentMET4FOF as agentmet4fof_module
@@ -103,9 +99,9 @@ app.layout = html.Div(children=[
                 html.Div(className="card-content", children=[
 
                     html.Div(style={'margin-top': '20px'}, children=[
-                        html.H6(className="black-text", children="Add Module"),
+                        html.H6(className="black-text", children="Add Agent"),
                         dcc.Dropdown(id="add-modules-dropdown"),
-                        LayoutHelper.html_button(icon="add_to_queue",text="Add Module", id="add-module-button")
+                        LayoutHelper.html_button(icon="add_to_queue",text="Add Agent", id="add-module-button")
 
 
                     ]),
@@ -141,8 +137,8 @@ app.layout = html.Div(children=[
                     html.Div(style={'margin-top': '20px'}, children=[
                         html.H6(className="black-text", children="Select Output Module"),
                         dcc.Dropdown(id="connect-modules-dropdown"),
-                        LayoutHelper.html_button(icon="link",text="Connect Module", id="connect-module-button"),
-                        LayoutHelper.html_button(icon="highlight_off",text="Disconnect Module", id="disconnect-module-button")
+                        LayoutHelper.html_button(icon="link",text="Connect Agent", id="connect-module-button"),
+                        LayoutHelper.html_button(icon="highlight_off",text="Disconnect Agent", id="disconnect-module-button")
 
 
                     ]),
@@ -206,7 +202,7 @@ def create_edges(edges):
 
 #global variables access via 'dashboard_var'
 class Dashboard_Control():
-    def __init__(self, port=3333, modules = [main_agents]):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, modules = [main_agents]):
         super(Dashboard_Control, self).__init__()
         self.network_layout = {'name': 'grid'}
         self.current_selected_agent = " "
@@ -214,8 +210,7 @@ class Dashboard_Control():
         self.current_edges = []
         # get nameserver
         self.agent_graph = nx.Graph()
-        self.agentNetwork = AgentNetwork()
-        self.agentNetwork.connect(port=port)
+        self.agentNetwork = AgentNetwork(ip_addr=ip_addr,port=port,mode="Connect")
         self.modules = [agentmet4fof_module] + modules
 
     def get_agentTypes(self):
@@ -301,18 +296,18 @@ def stop_button_click(n_clicks):
         dashboard_ctrl.agentNetwork.set_stop_state()
     return LayoutHelper.html_icon("stop","Stop")
 
-#Add module button click
+#Add agent button click
 @app.callback( dash.dependencies.Output('add-module-button', 'children'),
               [dash.dependencies.Input('add-module-button', 'n_clicks')],
               [dash.dependencies.State('add-modules-dropdown', 'value')]
                )
 def add_module_button_click(n_clicks,add_dropdown_val):
-    #for add module button click
+    #for add agent button click
     if n_clicks is not None:
         agentTypes = dashboard_ctrl.get_agentTypes()
-        new_module = dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val])
+        new_agent = dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val])
 
-    return LayoutHelper.html_icon("add_to_queue","Add Module")
+    return LayoutHelper.html_icon("add_to_queue","Add Agent")
 
 @app.callback(dash.dependencies.Output('connect_placeholder', 'children') ,
               [dash.dependencies.Input('connect-module-button', 'n_clicks')],
@@ -377,46 +372,75 @@ def displayTapNodeData(data):
 def store_monitor_data(n_interval):
     # get nameserver
     agentNetwork = dashboard_ctrl.agentNetwork
+
+    # check if agent network is running and first_time running
+    # if it isn't, abort updating graphs
+    print("n_interval-monitor-graph",n_interval)
+    if agentNetwork.get_mode() != "Running" and n_interval > 0:
+        print(agentNetwork.get_mode())
+        raise PreventUpdate
+
     agent_names = agentNetwork.agents()
     agent_type ="Monitor"
     monitors_data = {}
-    #load data from Monitor agent's memory
+
+    # load data from Monitor agent's memory
     for agent_name in agent_names:
         if agent_type in agent_name:
             monitor_agent = agentNetwork.get_agent(agent_name)
             memory = monitor_agent.get_attr('memory')
             monitors_data.update({agent_name:memory})
 
-    #create a plot for each monitor
+    # now monitors_data = {'agent1_name':agent1_memory, 'agent2_name':agent2_memory }
+    # now create a plot for each monitor agent
+    # initialize necessary variables for plotting multi-graphs
     subplot_titles = tuple(list(monitors_data.keys()))
     num_graphs = len(list(monitors_data.keys()))
     monitor_graphs = tools.make_subplots(rows=num_graphs, cols=1, subplot_titles=subplot_titles)
+
+    # now loop through monitors_data's every agent memory
+    # build a graph from every agent's memory via create_monitor_graph()
     for count, agent_name in enumerate(monitors_data.keys()):
         monitor_data = monitors_data[agent_name]
 
-        #create a new graph for the agent
+        # create a new graph for every agent
         for monitor_agent_input in monitor_data:
+            # get the data relevant to 'monitor_agent_input'
             input_data = monitor_data[monitor_agent_input]
-            monitor_graph = create_monitor_graph(input_data)
-            monitor_graph.update(name=monitor_agent_input)
-            #append this graph into the master graphs list
-            monitor_graphs.append_trace(monitor_graph, count+1, 1)
+
+            # create a graph from it
+            # and update the graph's name according to the agent's name
+            if type(input_data).__name__ == 'list':
+                monitor_graph = create_monitor_graph(input_data)
+                monitor_graph.update(name=monitor_agent_input)
+                # lastly- append this graph into the master graphs list which is monitor_graphs
+                monitor_graphs.append_trace(monitor_graph, count+1, 1)
+            elif type(input_data).__name__ == 'dict':
+                print("LIST: ",monitor_agent_input,list(input_data.keys()))
+                print(input_data)
+                for channel in input_data.keys():
+                    monitor_graph = create_monitor_graph(input_data[channel])
+                    monitor_graph.update(name=monitor_agent_input+" : "+channel)
+                    # lastly- append this graph into the master graphs list which is monitor_graphs
+                    monitor_graphs.append_trace(monitor_graph, count+1, 1)
+
+    # set to show legend
     monitor_graphs['layout'].update(showlegend = True)
-    # draw
+
+    # set dimensions of each monitor agent's graph
     constant_height_px= 400
     height_px = num_graphs*constant_height_px
     style = {'height': height_px}
     return [monitor_graphs,style]
 
+
 def create_monitor_graph(data):
     y = data
     x = np.arange(len(y))
-    trace =  go.Scatter(x=x, y=y,mode="lines", name='Monitor Agent')
-
+    trace = go.Scatter(x=x, y=y,mode="lines", name='Monitor Agent')
     return trace
 
 if __name__ == '__main__':
     # get nameserver
-    dashboard_ctrl = Dashboard_Control(port=3333)
-
+    dashboard_ctrl = Dashboard_Control()
     app.run_server(debug=False)
