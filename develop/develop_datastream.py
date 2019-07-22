@@ -53,54 +53,6 @@ class DataStreamMET4FOF(Stream):
     def has_more_samples(self):
         return self.sample_idx < self.n_samples
 
-# # f = h5py.File("dataset/Sensor_data_2kHz.h5", 'r')
-# f = h5py.File("F:/PhD Research/Github/agentMet4FoF/dataset/Sensor_data_2kHz.h5", 'r')
-#
-# #prepare sensor data
-# list(f.keys())
-# data= f['Sensor_Data']
-# data= data[:,:,:data.shape[2]-1] #drop last cycle
-# data_inputs_np = np.zeros([data.shape[2],data.shape[1],data.shape[0]])
-# for i in range(data.shape[0]):
-#     sensor_dt = data[i].transpose()
-#     data_inputs_np[:,:,i] = sensor_dt
-#
-#     #plot one of the cycle from each sensor
-#     # plt.figure(0)
-#     # sensor_cycle_dt = Series(sensor_dt[0])
-#     # sensor_cycle_dt.plot()
-#     # plt.show()
-#
-# #prepare target var
-# target=list(np.zeros(data_inputs_np.shape[0]))          # Making the target list which takes into account number of cycles, which-
-# for i in range(data_inputs_np.shape[0]):                # goes from 0 to 100, and has number of elements same as number of cycles.
-#     target[i]=(i/(data_inputs_np.shape[0]-1))*100
-#
-#
-# target_matrix = pd.DataFrame(target)        # Transforming list "target" into data frame "target matrix "
-#
-#
-# zema_data = DataStreamMET4FOF(data_inputs_np,target_matrix)
-# print(zema_data.next_sample(6290))
-# print(zema_data.has_more_samples())
-# print(zema_data.next_sample())
-# print(zema_data.has_more_samples())
-
-# plt.figure(1)
-# plt.plot(target_matrix.index, target_matrix.values)
-# plt.title("Approximation of the wear of cylinder", fontsize=16)
-# plt.xlabel("Cycle number", fontsize=12)
-# plt.ylabel("Percentage of wear of EMC", fontsize=12)
-# plt.grid()
-# plt.plot(data_inputs_np.shape[0], 100, '.', color='b')
-# plt.plot(0, 0, '.', color='b')
-
-# plt.figure(2)
-# sensor_dt = data_inputs_np[1:5,:,3:6]
-# sensor_dt_flattened = sensor_dt.reshape(-1, sensor_dt.shape[-1])
-# plt.plot(sensor_dt_flattened[:,0])
-# plt.show()
-
 class ZEMAGeneratorAgent(AgentMET4FOF):
     def init_parameters(self):
         f = h5py.File("F:/PhD Research/Github/agentMet4FoF/dataset/Sensor_data_2kHz.h5", 'r')
@@ -149,19 +101,6 @@ class ConvertSIAgent(AgentMET4FOF):
         res = self.convert_SI(message['data']['x'])
         self.send_output({'x': res, 'y': message['data']['y']})
 
-class FFTAgent(AgentMET4FOF):
-    def init_parameters(self, sampling_period=1):
-        self.sampling_period = sampling_period                                                                   # sampling period 1 s                                      # sampling points
-
-    def on_received_message(self, message):
-        x_data = message['data']['x']
-        n_of_sampling_pts = x_data.shape[1]
-        freq = np.fft.rfftfreq(n_of_sampling_pts, float(self.sampling_period)/n_of_sampling_pts)   # frequency axis
-        amp = np.fft.rfft(x_data[0,:,0])                                                      # amplitude axis
-        self.send_output({"freq": freq, "x":np.abs(amp)})
-
-
-
 if __name__ == '__main__':
     #start agent network server
     agentNetwork = AgentNetwork()
@@ -180,9 +119,5 @@ if __name__ == '__main__':
     gen_agent.init_agent_loop(5)
     # # set all agents states to "Running"
     agentNetwork.set_running_state()
-
-    plt.plot(freq,np.abs(amp))
-    plt.xlabel("Frequency (Hz)")
-    plt.ylabel("Amplitude (Pa)")
 
 

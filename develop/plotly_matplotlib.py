@@ -72,11 +72,11 @@ axs[0].grid(True)
 
 cxy, f = axs[1].cohere(s1, s2, 256, 1. / dt)
 axs[1].set_ylabel('coherence')
-
 #convert to plotly
 fig.tight_layout()
 plotly_fig = tls.mpl_to_plotly( fig )
 plotly_fig['layout']['showlegend'] = True
+
 
 # ------------app layout------------
 app.layout = html.Div(children=[
