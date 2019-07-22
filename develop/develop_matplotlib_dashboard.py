@@ -131,8 +131,8 @@ app.layout = html.Div(children=[
                     html.H5("Agent Configuration"),
                     html.H5(id='selected-node', children="Not selected", className="flow-text", style={"font-weight": "bold"}),
 
-                    html.P(id='input-names', children="Not selected", className="flow-text"),
-                    html.P(id='output-names', children="Not selected", className="flow-text"),
+                    html.H6(id='input-names', children="Not selected", className="flow-text"),
+                    html.H6(id='output-names', children="Not selected", className="flow-text"),
 
                     html.Div(style={'margin-top': '20px'}, children=[
                         html.H6(className="black-text", children="Select Output Module"),
@@ -369,15 +369,15 @@ def displayTapNodeData(data):
 @app.callback( [dash.dependencies.Output('monitors-graph', 'figure'),
                 dash.dependencies.Output('monitors-graph', 'style')],
                [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
-def store_monitor_data(n_interval):
+def plot_monitor_memory(n_interval):
     # get nameserver
     agentNetwork = dashboard_ctrl.agentNetwork
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
     print("n_interval-monitor-graph",n_interval)
-    if agentNetwork.get_mode() != "Running" and n_interval > 0:
-        print(agentNetwork.get_mode())
+    if agentNetwork._get_mode() != "Running" and n_interval > 0:
+        print(agentNetwork._get_mode())
         raise PreventUpdate
 
     agent_names = agentNetwork.agents() # get all agent names
@@ -404,23 +404,23 @@ def store_monitor_data(n_interval):
         monitor_data = monitors_data[agent_name]
 
         # create a new graph for every 'Input agent' connected to Monitor Agent
-        for monitor_agent_input in monitor_data:
+        for from_agent_name in monitor_data:
             # get the 'data' relevant to 'monitor_agent_input'
-            input_data = monitor_data[monitor_agent_input]
+            input_data = monitor_data[from_agent_name]
 
             # create a graph from it
             # and update the graph's name according to the agent's name
             if type(input_data).__name__ == 'list':
                 monitor_graph = create_monitor_graph(input_data)
-                monitor_graph.update(name=monitor_agent_input)
+                monitor_graph.update(name=from_agent_name)
                 # lastly- append this graph into the master graphs list which is monitor_graphs
                 monitor_graphs.append_trace(monitor_graph, count+1, 1)
             elif type(input_data).__name__ == 'dict':
-                print("LIST: ",monitor_agent_input,list(input_data.keys()))
+                print("LIST: ",from_agent_name,list(input_data.keys()))
                 print(input_data)
                 for channel in input_data.keys():
                     monitor_graph = create_monitor_graph(input_data[channel])
-                    monitor_graph.update(name=monitor_agent_input+" : "+channel)
+                    monitor_graph.update(name=from_agent_name+" : "+channel)
                     # lastly- append this graph into the master graphs list which is monitor_graphs
                     monitor_graphs.append_trace(monitor_graph, count+1, 1)
 
@@ -436,15 +436,15 @@ def store_monitor_data(n_interval):
 #load Monitors data and draw - all at once
 @app.callback([dash.dependencies.Output('matplotlib-division', 'children')],
               [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
-def store_monitor_data(n_interval):
+def plot_monitor_graphs(n_interval):
     # get nameserver
     agentNetwork = dashboard_ctrl.agentNetwork
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
     print("n_interval-monitor-graph",n_interval)
-    if agentNetwork.get_mode() != "Running" and n_interval > 0:
-        print(agentNetwork.get_mode())
+    if agentNetwork._get_mode() != "Running" and n_interval > 0:
+        print(agentNetwork._get_mode())
         raise PreventUpdate
 
     agent_names = agentNetwork.agents() # get all agent names
@@ -465,20 +465,25 @@ def store_monitor_data(n_interval):
     num_graphs = len(list(plots_data.keys()))
     all_graphs = []
     # now loop through monitors_data's every monitor agent's memory
-    # build a graph from every agent's memory via create_monitor_graph()
+    # build a graph from every monitor agent's `plots`
     for count, agent_name in enumerate(plots_data.keys()):
         plot_data = plots_data[agent_name]
-
+        html_div_monitor =[]
+        html_div_monitor.append(html.H5(agent_name, style={"text-align": "center"}))
         # create a new graph for every agent
-        for monitor_agent_input in plot_data:
+        for from_agent_name in plot_data:
             # get the 'data' relevant to 'monitor_agent_input'
-            input_data = plot_data[monitor_agent_input]
+            input_data = plot_data[from_agent_name]
             print(input_data)
 
             #new_graph = dcc.Graph(figure=input_data)
-            new_graph = html.Img(src=input_data)
+            from_agent_title = html.Figcaption(from_agent_name)
+            new_graph = html.Img(src=input_data, title=from_agent_name)
 
-            all_graphs.append(new_graph)
+            # html_div_monitor.append(html.Div(children=[new_graph,from_agent_title]))
+            # html_div_monitor.append(from_agent_title)
+            html_div_monitor.append(new_graph)
+        all_graphs.append(html.Div(className="card",children=html_div_monitor))
 
     # set dimensions of each monitor agent's graph
     print(all_graphs)

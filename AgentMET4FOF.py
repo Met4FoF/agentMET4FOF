@@ -14,7 +14,7 @@ import matplotlib.figure
 from plotly import tools as tls
 from io import BytesIO
 import base64
-import DataStreamMET4FOF
+# from DataStreamMET4FOF import DataStreamMET4FOF
 
 class AgentMET4FOF(Agent):
     """
@@ -27,6 +27,33 @@ class AgentMET4FOF(Agent):
     def on_init(self):
         """
         Internal initialization to setup the agent: mainly on setting the dictionary of Inputs, Outputs, PubAddr.
+
+        Calls user-defined `init_parameters()` upon finishing.
+
+        Attributes
+        ----------
+
+        Inputs : dict
+            Dictionary of Agents connected to its input channels. Messages will arrive from agents in this dictionary.
+            Automatically updated when `bind_output()` function is called
+
+        Outputs : dict
+            Dictionary of Agents connected to its output channels. Messages will be sent to agents in this dictionary.
+            Automatically updated when `bind_output()` function is called
+
+        PubAddr_alias : str
+            Name of Publish address socket
+
+        PubAddr : str
+            Publish address socket handle
+
+        AgentType : str
+            Name of class
+
+        current_state : str
+            Current state of agent. Can be used to define different states of operation such as "Running", "Idle, "Stop", etc..
+            Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+
         """
         self.Inputs = {}
         self.Outputs = {}
@@ -36,8 +63,8 @@ class AgentMET4FOF(Agent):
         self.log_info("INITIALIZED")
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = self.states[0]
+        self.loop_wait = 1.0
         self.init_parameters()
-
 
     def init_parameters(self):
         """
@@ -61,17 +88,30 @@ class AgentMET4FOF(Agent):
         ----------
         loop_wait : int
             The wait between each iteration of the loop
-
         """
+        self.loop_wait = loop_wait
         self.stop_all_timers()
         #check if agent_loop is overriden by user
         if self.__class__.agent_loop == AgentMET4FOF.agent_loop:
             return 0
         else:
-            self.each(loop_wait, self.__class__.agent_loop)
+            self.each(self.loop_wait, self.__class__.agent_loop)
         return 0
 
+    def stop_agent_loop(self):
+        """
+        Stops agent_loop from running. Note that the agent will still be responding to messages
+
+        """
+        self.stop_all_timers()
+
     def agent_loop(self):
+        """
+        User defined method for the agent to execute for `loop_wait` seconds specified in `init_agent_loop(loop_wait)`
+
+        To start a new loop, call `init_agent_loop(loop_wait)` on the agent
+        Example of usage is to check the `current_state` of the agent and send data periodically
+        """
         return 0
 
     def on_received_message(self, message):
@@ -200,7 +240,7 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
 
-    def _convert_to_plotly(self, matplotlib_fig):
+    def convert_to_plotly(self, matplotlib_fig):
         """
         Internal method to convert matplotlib figure to plotly figure
 
@@ -217,7 +257,7 @@ class AgentMET4FOF(Agent):
         return plotly_fig
 
 
-    def _fig_to_uri(self, matplotlib_fig = plt.figure()):
+    def fig_to_uri(self, matplotlib_fig = plt.figure()):
         """
         Internal method to convert matplotlib figure to base64 uri image for display
 
@@ -261,12 +301,13 @@ class AgentMET4FOF(Agent):
         self.send_output(graph, channel="plot")
         return graph
 
-class AgentController(AgentMET4FOF):
+class _AgentController(AgentMET4FOF):
     """
-    Unique internal agent to provide control to other agents. Automatically instantiated when starting server
+    Unique internal agent to provide control to other agents. Automatically instantiated when starting server.
 
-
+    Provides global control to all agents in network.
     """
+
     def init_parameters(self, ns=None):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = "Idle"
@@ -297,8 +338,8 @@ class AgentController(AgentMET4FOF):
         agent_names = [name for name in self.ns.agents() if name not in exclude_names]
         return agent_names
 
-#global control
-class AgentNetwork():
+
+class AgentNetwork:
     """
     Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
 
@@ -328,35 +369,109 @@ class AgentNetwork():
             self.start_server(ip_addr,port)
 
     def connect(self,ip_addr="127.0.0.1", port = 3333):
+        """
+        Parameters
+        ----------
+        ip_addr: str
+            IP Address of server to connect to
+
+        port: int
+            Port of server to connect to
+        """
         try:
             self.ns = NSProxy(nsaddr=ip_addr+':' + str(port))
         except:
             print("Unable to connect to existing NameServer...")
             self.ns = 0
 
-    def start_server(self,ip_addr="127.0.0.1", port = 3333):
+    def start_server(self,ip_addr="127.0.0.1", port=3333):
+        """
+        Parameters
+        ----------
+        ip_addr: str
+            IP Address of server to start
+
+        port: int
+            Port of server to start
+        """
+
         print("Starting NameServer...")
         self.ns = run_nameserver(addr=ip_addr+':' + str(port))
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
             self.ns = run_nameserver(addr=ip_addr+':' + str(port))
-        controller= run_agent("AgentController", base=AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        controller= run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
         controller.init_parameters(self.ns)
 
-    def set_mode(self, state):
+    def _set_mode(self, state):
+        """
+        Internal method to set mode of Agent Controller
+        Parameters
+        ----------
+        state: str
+            State of AgentController to set.
+        """
+
         self._get_controller().set_attr(current_state=state)
 
-    def get_mode(self):
+    def _get_mode(self):
+        """
+        Returns
+        -------
+        state: str
+            State of Agent Network
+        """
+
         return self._get_controller().get_attr('current_state')
 
     def set_running_state(self, filter_agent=None):
+        """
+        Blanket operation on all agents to set their `current_state` attribute to "Running"
+
+        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+
+        Parameters
+        ----------
+        filter_agent : str
+            (Optional) Filter name of agents to set the states
+
+        """
+
         self.set_agents_state(filter_agent=filter_agent,state="Running")
 
     def set_stop_state(self, filter_agent=None):
+        """
+        Blanket operation on all agents to set their `current_state` attribute to "Stop"
+
+        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+
+        Parameters
+        ----------
+        filter_agent : str
+            (Optional) Filter name of agents to set the states
+
+        """
+
         self.set_agents_state(filter_agent=filter_agent, state="Stop")
 
     def set_agents_state(self, filter_agent=None, state="Idle"):
-        self.set_mode(state)
+        """
+        Blanket operation on all agents to set their `current_state` attribute to given state
+
+        Can be used to define different states of operation such as "Running", "Idle, "Stop", etc..
+        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+
+        Parameters
+        ----------
+        filter_agent : str
+            (Optional) Filter name of agents to set the states
+
+        state : str
+            State of agents to set
+
+        """
+
+        self._set_mode(state)
         for agent_name in self.agents():
             if (filter_agent is not None and filter_agent in agent_name) or (filter_agent is None):
                 agent = self.get_agent(agent_name)
@@ -365,32 +480,104 @@ class AgentNetwork():
         return 0
 
     def bind_agents(self, source, target):
+        """
+        Binds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
+
+        Any subsequent calls of `source.send_output()` will reach `target` Agent's message queue.
+
+        Parameters
+        ----------
+        source : AgentMET4FOF
+            Source agent whose Output channel will be binded to `target`
+
+        target : AgentMET4FOF
+            Target agent whose Input channel will be binded to `source`
+        """
         source.bind_output(target)
         return 0
 
     def unbind_agents(self, source, target):
+        """
+        Unbinds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
+
+        This is the reverse of `bind_agents()`
+
+        Parameters
+        ----------
+        source : AgentMET4FOF
+            Source agent whose Output channel will be unbinded from `target`
+
+        target : AgentMET4FOF
+            Target agent whose Input channel will be unbinded from `source`
+        """
+
         source.unbind_output(target)
         return 0
 
     def _get_controller(self):
+        """
+        Internal method to access the AgentController relative to the nameserver
+
+        """
         if self._controller is None:
             self._controller = self.ns.proxy('AgentController')
         return self._controller
 
     def get_agent(self,agent_name):
+        """
+        Returns a particular agent connected to Agent Network.
+
+        Parameters
+        ----------
+        agent_name : str
+            Name of agent to search for in the network
+
+        """
+
         return self._get_controller().get_attr('ns').proxy(agent_name)
 
     def agents(self):
-        #exclude_names = ["AgentController"]
-        #agent_names = [name for name in self.ns.agents() if name not in exclude_names]
+        """
+        Returns all agent names connected to Agent Network.
+
+        Returns
+        -------
+        list : names of all agents
+
+        """
         agent_names = self._get_controller().agents()
         return agent_names
 
     def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True):
+        """
+        Instantiates a new agent in the network.
+
+        Parameters
+        ----------
+        name : str
+            Unique name of agent. If left empty, the name will be automatically set to its class name.
+            There cannot be more than one agent with the same name.
+
+        agentType : AgentMET4FOF
+            Agent class to be instantiated in the network.
+
+        log_mode : bool
+            Default is True. Determines if messages will be logged.
+
+        Returns
+        -------
+        AgentMET4FOF : Newly instantiated agent
+
+        """
+
         agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode)
         return agent
 
     def shutdown(self):
+        """
+        Shutdowns the entire agent network and all agents
+        """
+
         self._get_controller().get_attr('ns').shutdown()
         return 0
 
@@ -482,8 +669,23 @@ class ML_Model(AgentMET4FOF):
         return accuracy
 
 class MonitorAgent(AgentMET4FOF):
+    """
+    Unique Agent for storing plots and data from messages received from input agents.
+
+    The dashboard searches for Monitor Agents' `memory` and `plots` to draw the graphs
+    "plot" channel is used to receive base64 images from agents to plot on dashboard
+
+    Attributes
+    ----------
+    memory : dict
+        Dictionary of format `{agent1_name : agent1_data, agent2_name : agent2_data}`
+
+    plots : dict
+        Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
+
+    """
+
     def init_parameters(self):
-        #dictionary of Inputs
         self.memory = {}
         self.plots = {}
 
@@ -497,7 +699,6 @@ class MonitorAgent(AgentMET4FOF):
         ----------
         message : dict
             Acceptable channel values are 'default' or 'plot'
-
         """
         if message['channel'] == 'default':
             self.update_data_memory(message)
@@ -506,6 +707,19 @@ class MonitorAgent(AgentMET4FOF):
         return 0
 
     def update_data_memory(self,message):
+        """
+        Updates data stored in `self.memory` with the received message
+
+        Checks if sender agent has sent any message before
+        If it did,then append, otherwise create new entry for it
+
+        Parameters
+        ----------
+        message : dict
+            Standard message format specified by AgentMET4FOF class
+
+        """
+
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for it
         if message['from'] not in self.memory:
@@ -569,5 +783,13 @@ class MonitorAgent(AgentMET4FOF):
         self.log_info("Memory: "+ str(self.memory))
 
     def update_plot_memory(self, message):
+        """
+        Updates plot figures stored in `self.plots` with the received message
+
+        Parameters
+        ----------
+        message : dict
+            Standard message format specified by AgentMET4FOF class
+        """
         plot_fig = message['data']
         self.plots.update({message['from']:message['data']})
