@@ -1,0 +1,28 @@
+# .readthedocs.yml
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+version: 2
+
+# Build all formats
+formats: all
+
+conda:
+  environment: environment.yml
+
+# Docker image to use for build process
+build:
+  image: latest
+
+# Python environment to build the docs for installing the package
+python:
+  version: 3
+  install:
+    - method: setuptools
+      path: .
+
+# Sphinx configuration
+sphinx:
+  builder: html
+  configuration: docs/conf.py
+  fail_on_warning: false
