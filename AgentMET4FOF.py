@@ -579,6 +579,12 @@ class AgentNetwork:
         return 0
 
 class DataStreamAgent(AgentMET4FOF):
+    """
+    Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
+
+    Can be used in incremental training or batch training mode.
+    See `DataStreamMET4FOF` on loading your own data set as a data stream.
+    """
     def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100):
         self.stream = stream
         self.stream.prepare_for_use()
