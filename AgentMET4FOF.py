@@ -6,15 +6,12 @@ from osbrain import NSProxy
 
 #ML dependencies
 import numpy as np
-from skmultiflow.data import WaveformGenerator
-from skmultiflow.trees import HoeffdingTree
-from sklearn.model_selection import StratifiedKFold
 import matplotlib.pyplot as plt
 import matplotlib.figure
 from plotly import tools as tls
 from io import BytesIO
 import base64
-# from DataStreamMET4FOF import DataStreamMET4FOF
+from DataStreamMET4FOF import DataStreamMET4FOF, extract_x_y
 
 class AgentMET4FOF(Agent):
     """
@@ -141,7 +138,7 @@ class AgentMET4FOF(Agent):
 
         Returns
         -------
-        Packed message data : dict of the form {'from':agent_name, channel: data, 'senderType': agent_class}.
+        Packed message data : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
         """
         return {'from': self.name, 'data': data, 'senderType': type(self).__name__, 'channel': channel}
 
@@ -163,7 +160,7 @@ class AgentMET4FOF(Agent):
 
         Returns
         -------
-        Packed message data : dict of the form {'from':agent_name, channel: data, 'senderType': agent_class}.
+        message : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
 
         """
         packed_data = self.pack_data(data, channel=channel)
@@ -217,7 +214,7 @@ class AgentMET4FOF(Agent):
 
             # LOGGING
             if self.log_mode:
-                self.log_info("Connected output module"+ output_module_id)
+                self.log_info("Connected output module: "+ output_module_id)
 
     def unbind_output(self, output_agent):
         """
@@ -257,7 +254,7 @@ class AgentMET4FOF(Agent):
         return plotly_fig
 
 
-    def fig_to_uri(self, matplotlib_fig = plt.figure()):
+    def _fig_to_uri(self, matplotlib_fig = plt.figure()):
         """
         Internal method to convert matplotlib figure to base64 uri image for display
 
@@ -582,91 +579,34 @@ class AgentNetwork:
         return 0
 
 class DataStreamAgent(AgentMET4FOF):
-    def init_parameters(self, n_wait=1.0, stream = WaveformGenerator(), pretrain_size = 100, max_samples = 100000, batch_size=100):
-
-        # parameters
-        # setup data stream
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100):
         self.stream = stream
         self.stream.prepare_for_use()
-        self.pretrain_size = pretrain_size
-        self.max_samples = max_samples
         self.batch_size = batch_size
-
-        self.current_sample = 0
-        self.first_time = True
+        if pretrain_size is None:
+            self.pretrain_size = batch_size
+        else:
+            self.pretrain_size = pretrain_size
+        self.pretrain_done = False
 
     def agent_loop(self):
-        #if is running
-        if self.current_state == self.states[1]:
-            data = self.read_data()
-            if data is not None:
-                self.send_output(data)
-        else:
-            return 0
-
-    def read_data(self):
-        if self.current_sample < self.max_samples:
-            # get sample
-            if (self.first_time):
-                data = self.stream.next_sample(self.pretrain_size)
-                self.current_sample += self.pretrain_size
-                self.first_time = False
+        if self.current_state == "Running":
+            if self.pretrain_size is None:
+                self.send_next_sample(self.batch_size)
             else:
-                data = self.stream.next_sample(self.batch_size)
-                self.current_sample += self.batch_size
-        else:
-            data = None
+                #handle pre-training mode
+                if self.pretrain_done:
+                    self.send_next_sample(self.batch_size)
+                else:
+                    self.send_next_sample(self.pretrain_size)
+                    self.pretrain_done = True
 
-        #log
-        self.log_info(data)
-        return {'x':data[0], 'y':data[1]}
-        #return data
+    def send_next_sample(self,num_samples=1):
+        data = self.stream.next_sample(num_samples)
+        self.send_output(data)
 
-class ML_Model(AgentMET4FOF):
-    def init_parameters(self, mode="prequential", ml_model= HoeffdingTree(), split_type=None):
-        self.mode = mode
-        self.ml_model = ml_model
-        self.results = []
-        if split_type is not None:
-            self.split_type = split_type
-        else:
-            self.split_type = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-
-    def on_received_message(self, message):
-        if len(message) >1:
-            x = message['data']['x']
-            y = message['data']['y']
-        else:
-            return -1
-
-        # prequential: test & train
-        if self.mode == "prequential":
-            y_pred = self.ml_model.predict(x)
-            self.ml_model.partial_fit(x, y)
-            res = self.compute_accuracy(y_pred=y_pred, y_true=y)
-            self.results.append(res)
-
-        # holdout: test & train
-        elif self.mode == "holdout":
-            res_temp = []
-            # begin kfold
-            for train_index, test_index in self.split_type.split(x, y):
-                x_train, x_test = x[train_index], x[test_index]
-                y_train, y_test = y[train_index], y[test_index]
-                self.ml_model.partial_fit(x_train, y_train)
-                y_pred = self.ml_model.predict(x_test)
-                res = self.compute_accuracy(y_pred=y_pred, y_true=y_test)
-                res_temp.append(res)
-            self.results.append(np.mean(res_temp))
-
-        self.send_output(self.results[-1])
-
-    # classifier accuracy - user defined
-    def compute_accuracy(self, y_pred, y_true):
-        res = y_pred == y_true
-        num_accurate = [1 if y == True else 0 for y in res]
-        accuracy = np.sum(num_accurate) / len(num_accurate) * 100
-        return accuracy
+    def send_all_sample(self):
+        self.send_next_sample(-1)
 
 class MonitorAgent(AgentMET4FOF):
     """
@@ -742,7 +682,7 @@ class MonitorAgent(AgentMET4FOF):
                     # if the value is not list types, turn it into a list
                     if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray":
                         message['data'][key] = [message['data'][key]]
-                    self.memory.update({message['from']:message['data']})
+                    self.memory.update({message['from']: message['data']})
 
             else:
                 self.memory.update({message['from']:[message['data']]})
@@ -767,8 +707,14 @@ class MonitorAgent(AgentMET4FOF):
         # handle dict
         elif type(message['data']).__name__ == "dict":
             for key in message['data'].keys():
+                # handle : check if key is in dictionary, otherwise add new key in dictionary
+                if key not in self.memory[message['from']].keys():
+                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray":
+                        message['data'][key] = [message['data'][key]]
+                    self.memory[message['from']].update(message['data'])
+
                 # handle : dict value is list
-                if type(message['data'][key]).__name__ == "list":
+                elif type(message['data'][key]).__name__ == "list":
                     self.memory[message['from']][key] += message['data'][key]
 
                 # handle : dict value is numpy array
@@ -780,7 +726,7 @@ class MonitorAgent(AgentMET4FOF):
                     self.memory[message['from']][key] += [message['data'][key]]
         else:
             self.memory[message['from']].append(message['data'])
-        self.log_info("Memory: "+ str(self.memory))
+        self.log_info("Memory: " + str(self.memory))
 
     def update_plot_memory(self, message):
         """

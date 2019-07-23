@@ -10,21 +10,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
-class ZEMA_DataStreamAgent(AgentMET4FOF):
-    def init_parameters(self, stream=DataStreamMET4FOF()):
-        self.stream = stream
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            self.send_next_sample()
-
-    def send_next_sample(self,num_samples=1):
-        data = self.stream.next_sample(num_samples) #tuple
-        self.send_output(data)
-
-    def send_all_sample(self):
-        self.send_next_sample(-1)
-
 class FFTAgent(AgentMET4FOF):
     def init_parameters(self, sampling_period=1):
         self.sampling_period = sampling_period                                                                   # sampling period 1 s                                      # sampling points
@@ -57,8 +42,8 @@ class TrainTestSplitAgent(AgentMET4FOF):
     def on_received_message(self, message):
         x_data = message['data']['x']
         y_data = message['data']['y']
-        x_train, x_test =train_test_split(x_data, train_size=self.train_ratio,random_state=10)
-        y_train, y_test =train_test_split(y_data, train_size=self.train_ratio,random_state=10)
+        x_train, x_test =train_test_split(x_data, train_size=self.train_ratio,random_state=15)
+        y_train, y_test =train_test_split(y_data, train_size=self.train_ratio,random_state=15)
 
         #so that train and test will be handled sequentially
         self.send_output({'x': x_train,'y': y_train},channel='train')
@@ -107,7 +92,7 @@ class LDA_Agent(AgentMET4FOF):
             y_pred = self.ml_model.predict(message['data']['x'])
             self.send_output({'y_pred':y_pred, 'y_true': y_true})
             self.log_info("Overall Test Score: " + str(self.ml_model.score(message['data']['x'], y_true)))
-
+            self.lda_test_score = self.ml_model.score(message['data']['x'], y_true)
 class EvaluatorAgent(AgentMET4FOF):
      def on_received_message(self, message):
         y_pred = message['data']['y_pred']

@@ -31,7 +31,7 @@ class ZEMA_DataStream(DataStreamMET4FOF):
 
         target_matrix = pd.DataFrame(target)        # Transforming list "target" into data frame "target matrix"
         data_inputs_np = self.convert_SI(data_inputs_np)
-        super().__init__(x=data_inputs_np, y = target_matrix)
+        self.set_data_source(x=data_inputs_np, y=target_matrix)
 
     def convert_SI(self, sensor_ADC):
         sensor_SI = sensor_ADC

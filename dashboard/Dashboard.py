@@ -13,8 +13,8 @@ import networkx as nx
 
 from AgentMET4FOF import AgentMET4FOF, AgentNetwork
 import AgentMET4FOF as agentmet4fof_module
-import main_agents
-import LayoutHelper
+import dashboard.LayoutHelper as LayoutHelper
+from dashboard.LayoutHelper import get_nodes, get_edges, create_nodes, create_edges, create_monitor_graph
 
 
 #external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css']
@@ -27,7 +27,6 @@ app = dash.Dash(__name__,
                 external_scripts=external_scripts
                 )
 update_interval_seconds = 3
-
 
 app.layout = html.Div(children=[
 
@@ -173,36 +172,9 @@ app.layout = html.Div(children=[
     ])
 ])
 
-def get_nodes(agent_network):
-    agent_names = agent_network.agents()
-    return agent_names
-
-def get_edges(agent_network):
-    edges = []
-    agent_names = agent_network.agents()
-
-    for agent_name in agent_names:
-        temp_agent = agent_network.get_agent(agent_name)
-        temp_output_connections = list(temp_agent.get_attr('Outputs').keys())
-        for output_connection in temp_output_connections:
-            edges += [(temp_agent.get_attr('name'), output_connection)]
-    return edges
-
-def create_nodes(agent_graph):
-    pos = nx.fruchterman_reingold_layout(agent_graph)
-    new_elements = [{'data': {'id': k, 'label': k}, 'position': {'x': pos[k][0], 'y': pos[k][1]}} for k in agent_graph.nodes()]
-
-    return new_elements
-
-def create_edges(edges):
-    new_elements =[]
-    for edge in edges:
-        new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
-    return new_elements
-
 #global variables access via 'dashboard_var'
 class Dashboard_Control():
-    def __init__(self, ip_addr="127.0.0.1", port=3333, modules = [main_agents]):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, modules = []):
         super(Dashboard_Control, self).__init__()
         self.network_layout = {'name': 'grid'}
         self.current_selected_agent = " "
@@ -230,30 +202,30 @@ class Dashboard_Control():
 def update_network_graph(n_intervals,graph_elements):
 
     #get nameserver
-    agentNetwork = dashboard_ctrl.agentNetwork
+    agentNetwork = app.dashboard_ctrl.agentNetwork
 
     #update node graph
     nodes=get_nodes(agentNetwork)
     edges=get_edges(agentNetwork)
 
     print(nodes)
-    print(dashboard_ctrl.agent_graph.nodes())
+    print(app.dashboard_ctrl.agent_graph.nodes())
     #if current number more than before, then update graph
-    if(len(dashboard_ctrl.current_nodes) != len(nodes)) or (len(dashboard_ctrl.current_edges) != len(edges)) or n_intervals == 0:
+    if(len(app.dashboard_ctrl.current_nodes) != len(nodes)) or (len(app.dashboard_ctrl.current_edges) != len(edges)) or n_intervals == 0:
     #if (dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes)) or (
     #    dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
 
-        dashboard_ctrl.agent_graph.add_nodes_from(nodes)
-        dashboard_ctrl.agent_graph.add_edges_from(edges)
+        app.dashboard_ctrl.agent_graph.add_nodes_from(nodes)
+        app.dashboard_ctrl.agent_graph.add_edges_from(edges)
 
-        nodes_elements = create_nodes(dashboard_ctrl.agent_graph)
+        nodes_elements = create_nodes(app.dashboard_ctrl.agent_graph)
         edges_elements = create_edges(edges)
 
         # update agents connect options
         node_connect_options = [{'label': agentName, 'value': agentName} for agentName in nodes]
 
-        dashboard_ctrl.current_nodes = nodes
-        dashboard_ctrl.current_edges = edges
+        app.dashboard_ctrl.current_nodes = nodes
+        app.dashboard_ctrl.current_edges = edges
 
 
 
@@ -273,7 +245,7 @@ def update_add_module_list(n_interval):
 
     #agentTypes = dashboard_ctrl.get_agentTypes()
     #module_add_options = [ {'label': agentType, 'value': agentType} for agentType in list(agentTypes.keys())]
-    agentTypes = dashboard_ctrl.get_agentTypes()
+    agentTypes = app.dashboard_ctrl.get_agentTypes()
     module_add_options = [{'label': agentType, 'value': agentType} for agentType in list(agentTypes.keys())]
 
     return module_add_options
@@ -284,7 +256,7 @@ def update_add_module_list(n_interval):
                ])
 def start_button_click(n_clicks):
     if n_clicks is not None:
-        dashboard_ctrl.agentNetwork.set_running_state()
+        app.dashboard_ctrl.agentNetwork.set_running_state()
     return LayoutHelper.html_icon("play_circle_filled","Start")
 
 #Stop button click
@@ -293,7 +265,7 @@ def start_button_click(n_clicks):
                ])
 def stop_button_click(n_clicks):
     if n_clicks is not None:
-        dashboard_ctrl.agentNetwork.set_stop_state()
+        app.dashboard_ctrl.agentNetwork.set_stop_state()
     return LayoutHelper.html_icon("stop","Stop")
 
 #Add agent button click
@@ -304,8 +276,8 @@ def stop_button_click(n_clicks):
 def add_module_button_click(n_clicks,add_dropdown_val):
     #for add agent button click
     if n_clicks is not None:
-        agentTypes = dashboard_ctrl.get_agentTypes()
-        new_agent = dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val])
+        agentTypes = app.dashboard_ctrl.get_agentTypes()
+        new_agent = app.dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val])
 
     return LayoutHelper.html_icon("add_to_queue","Add Agent")
 
@@ -316,7 +288,7 @@ def add_module_button_click(n_clicks,add_dropdown_val):
 def bind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
     if(n_clicks_connect is not None):
         #get nameserver
-        agentNetwork = dashboard_ctrl.agentNetwork
+        agentNetwork = app.dashboard_ctrl.agentNetwork
 
         print(agentNetwork.get_agent(current_agent_id))
         print(agentNetwork.get_agent(dropdown_value))
@@ -331,7 +303,7 @@ def bind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
 def unbind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
     if(n_clicks_connect is not None):
         #get nameserver
-        agentNetwork = dashboard_ctrl.agentNetwork
+        agentNetwork = app.dashboard_ctrl.agentNetwork
 
         print(agentNetwork.get_agent(current_agent_id))
         print(agentNetwork.get_agent(dropdown_value))
@@ -351,11 +323,11 @@ def displayTapNodeData(data):
     if data is not None:
         current_agent_id = data['id']
         #get nameserver
-        agentNetwork = dashboard_ctrl.agentNetwork
+        agentNetwork = app.dashboard_ctrl.agentNetwork
 
-        dashboard_ctrl.current_selected_agent = agentNetwork.get_agent(current_agent_id)
-        input_names=list(dashboard_ctrl.current_selected_agent.get_attr('Inputs').keys())
-        output_names=list(dashboard_ctrl.current_selected_agent.get_attr('Outputs').keys())
+        app.dashboard_ctrl.current_selected_agent = agentNetwork.get_agent(current_agent_id)
+        input_names=list(app.dashboard_ctrl.current_selected_agent.get_attr('Inputs').keys())
+        output_names=list(app.dashboard_ctrl.current_selected_agent.get_attr('Outputs').keys())
 
         #formatting
         input_names =["Inputs: "]+[input_name+", "for input_name in input_names]
@@ -371,7 +343,7 @@ def displayTapNodeData(data):
                [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
 def plot_monitor_memory(n_interval):
     # get nameserver
-    agentNetwork = dashboard_ctrl.agentNetwork
+    agentNetwork = app.dashboard_ctrl.agentNetwork
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
@@ -410,7 +382,7 @@ def plot_monitor_memory(n_interval):
 
             # create a graph from it
             # and update the graph's name according to the agent's name
-            if type(input_data).__name__ == 'list':
+            if type(input_data).__name__ == 'list' or type(input_data).__name__ == 'ndarray':
                 monitor_graph = create_monitor_graph(input_data)
                 monitor_graph.update(name=from_agent_name)
                 # lastly- append this graph into the master graphs list which is monitor_graphs
@@ -438,7 +410,7 @@ def plot_monitor_memory(n_interval):
               [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
 def plot_monitor_graphs(n_interval):
     # get nameserver
-    agentNetwork = dashboard_ctrl.agentNetwork
+    agentNetwork = app.dashboard_ctrl.agentNetwork
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
@@ -483,19 +455,13 @@ def plot_monitor_graphs(n_interval):
             # html_div_monitor.append(html.Div(children=[new_graph,from_agent_title]))
             # html_div_monitor.append(from_agent_title)
             html_div_monitor.append(new_graph)
-        all_graphs.append(html.Div(className="card",children=html_div_monitor))
+
+        #only add the graph if there is some plots in the Monitor Agent
+        if len(html_div_monitor) > 1:
+            all_graphs.append(html.Div(className="card",children=html_div_monitor))
 
     # set dimensions of each monitor agent's graph
     print(all_graphs)
     return [all_graphs]
 
-def create_monitor_graph(data):
-    y = data
-    x = np.arange(len(y))
-    trace = go.Scatter(x=x, y=y,mode="lines", name='Monitor Agent')
-    return trace
 
-if __name__ == '__main__':
-    # get nameserver
-    dashboard_ctrl = Dashboard_Control()
-    app.run_server(debug=False)

@@ -2,8 +2,18 @@ from skmultiflow.data.base_stream import Stream
 import numpy as np
 
 class DataStreamMET4FOF(Stream):
-    def __init__(self, x=None, y=None):
+    """
+    Class for creating finite datastream for ML with `x` as inputs and `y` as target
+    Data can be fetched sequentially using `next_sample()` or all at once `all_samples()`
+
+    For sensors data:
+    The format shape for 2D data stream (num_samples, n_sensors)
+    The format shape for 3D data stream (num_samples, sample_length , n_sensors)
+    """
+    def __init__(self):
         super().__init__()
+
+    def set_data_source(self, x,y):
         self.sample_idx = 0
         self.current_sample_x = None
         self.current_sample_y = None
@@ -28,9 +38,30 @@ class DataStreamMET4FOF(Stream):
         self.reset()
 
     def all_samples(self):
+        """
+        Returns all the samples in the data stream
+
+        Returns
+        -------
+        samples : dict of the form `{'x': current_sample_x, 'y': current_sample_y}`
+
+        """
         return self.next_sample(-1)
 
     def next_sample(self, batch_size=1):
+        """
+        Fetches the samples from the data stream and advances the internal pointer `current_idx`
+
+        Parameters
+        ----------
+        batch_size : int
+            number of batches to get from data stream
+
+        Returns
+        -------
+        samples : dict of the form `{'x': current_sample_x, 'y': current_sample_y}`
+
+        """
         if batch_size < 0:
             batch_size = self.x.shape[0]
 
@@ -54,3 +85,34 @@ class DataStreamMET4FOF(Stream):
 
     def has_more_samples(self):
         return self.sample_idx < self.n_samples
+
+#Built-in classes with DataStreamMET4FOF
+class SineGenerator(DataStreamMET4FOF):
+    def __init__(self,num_cycles = 1000):
+        x = np.sin(np.arange(0,3.142*num_cycles,0.5))
+        y = [1 if point > 0.5 else 0 for point in x]
+        self.set_data_source(x,y)
+
+class CosineGenerator(DataStreamMET4FOF):
+    def __init__(self,num_cycles = 1000):
+        x = np.cos(np.arange(0,3.142*num_cycles,0.5))
+        y = [1 if point > 0.5 else 0 for point in x]
+        self.set_data_source(x,y)
+
+def extract_x_y(message):
+    """
+    Extracts features & target from `message['data']` with expected structure such as :
+        1. tuple - (x,y)
+        2. dict - {'x':x_data,'y':y_data}
+
+    Handle data structures of dictionary to extract features & target
+    """
+    if type(message['data']) == tuple:
+        x = message['data'][0]
+        y = message['data'][1]
+    elif type(message['data']) == dict:
+        x = message['data']['x']
+        y = message['data']['y']
+    else:
+        return -1
+    return x, y
