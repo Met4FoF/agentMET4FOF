@@ -15,7 +15,7 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      # Checkout code
+      # Checkout code.
       - checkout
 
       # Create folder for test results.
@@ -24,7 +24,7 @@ jobs:
           command: |
             mkdir test-reports
 
-      # Download and cache dependencies
+      # Download and cache dependencies.
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
@@ -32,14 +32,14 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v1-dependencies-
 
-      # Install dependencies and Codecov reporter if necessary.
+      # Install dependencies if necessary.
       - run:
          name: Install dependencies
          command: |
            python3 -m venv venv
            . venv/bin/activate
            pip install -r requirements.txt
-           pip install coverage pytest-cov codecov
+           pip install coverage pytest-cov
 
       - save_cache:
           paths:
@@ -61,10 +61,11 @@ jobs:
             . venv/bin/activate
             bash <(curl -s https://codecov.io/bash)
 
-      # Store test results.
+      # Store test results as artifacts.
       - store_artifacts:
          path: test-reports
          destination: test-reports
 
+      # Show test results as summary on job page.
       - store_test_results:
          path: test-reports
