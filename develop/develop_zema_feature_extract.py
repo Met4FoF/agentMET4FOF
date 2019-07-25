@@ -34,11 +34,11 @@ class FFT_BFC():
         self.freq_of_sorted_values= [0]*n_sensors
 
         for i in range(n_sensors):
-            print("Sensor number %s" % i)
-            print("---------------------------------------------------------------------------------")
+            # print("Sensor number %s" % i)
+            # print("---------------------------------------------------------------------------------")
             #frequency and amplitudes
             self.freq_of_sorted_values[i],__ =self.extractBFC_train(sensor = x_data[:,:,i], n_of_samples = n_of_samples, N = self.perc_feat)
-        return 0     
+        return self
         
     def fit_transform(self,x_data, perc_feat = None):
         """
@@ -73,8 +73,8 @@ class FFT_BFC():
         sorted_values_from_all_sensors= [0 for i in range(n_sensors)]
 
         for i in range(n_sensors):
-            print("Sensor number %s" % i)
-            print("---------------------------------------------------------------------------------")
+            # print("Sensor number %s" % i)
+            # print("---------------------------------------------------------------------------------")
             #frequency and amplitudes
             self.freq_of_sorted_values[i],sorted_values_from_all_sensors[i]=self.extractBFC_train(sensor = x_data[:,:,i], n_of_samples = n_of_samples, N = self.perc_feat)
         return sorted_values_from_all_sensors
@@ -105,8 +105,8 @@ class FFT_BFC():
         sorted_values_test=[0]*n_sensors
         
         for i in range(n_sensors):         
-            print("Sensor number %s" % i)
-            print("---------------------------------------------------------------------------------")
+            # print("Sensor number %s" % i)
+            # print("---------------------------------------------------------------------------------")
             sorted_values_test[i]=self.extractBFC_test(sensor_test =x_data[:,:,i], n_of_samples = n_of_samples, N = self.perc_feat, frequencies=self.get_best_frequencies()[i])
         return sorted_values_test
       

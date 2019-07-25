@@ -274,7 +274,7 @@ class AgentMET4FOF(Agent):
         out_img = BytesIO()
         matplotlib_fig.savefig(out_img, format='png')
         matplotlib_fig.clf()
-        #plt.close('all')
+        plt.close(matplotlib_fig)
         out_img.seek(0)  # rewind file
         encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
         return "data:image/png;base64,{}".format(encoded)
@@ -299,7 +299,10 @@ class AgentMET4FOF(Agent):
         if isinstance(fig, matplotlib.figure.Figure):
             #graph = self._convert_to_plotly(fig)
             graph = self._fig_to_uri(fig)
-
+        elif isinstance(fig, dict): #nested
+            for key in fig.keys():
+                fig[key] = self._fig_to_uri(fig[key])
+            graph = fig
         else:
             graph = fig
         self.send_output(graph, channel="plot")
@@ -752,5 +755,10 @@ class MonitorAgent(AgentMET4FOF):
         message : dict
             Standard message format specified by AgentMET4FOF class
         """
-        plot_fig = message['data']
-        self.plots.update({message['from']:message['data']})
+
+        if type(message['data']).__name__ != "dict" or message['from'] not in self.plots.keys():
+            self.plots[message['from']] = message['data']
+        elif type(message['data']).__name__ == "dict":
+            for key in message['data'].keys():
+                self.plots[message['from']][key] = message['data'][key]
+        self.log_info("PLOTS: " + str(self.plots))

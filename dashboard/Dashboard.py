@@ -445,14 +445,15 @@ def plot_monitor_graphs(n_interval):
             # get the 'data' relevant to 'monitor_agent_input'
             input_data = plot_data[from_agent_name]
             print(input_data)
-
             #new_graph = dcc.Graph(figure=input_data)
-            from_agent_title = html.Figcaption(from_agent_name)
-            new_graph = html.Img(src=input_data, title=from_agent_name)
+            if type(input_data).__name__ == 'dict':
+                for key in input_data.keys():
+                    new_graph = html.Img(src=input_data[key], title=from_agent_name)
+                    html_div_monitor.append(new_graph)
+            else:
+                new_graph = html.Img(src=input_data, title=from_agent_name)
+                html_div_monitor.append(new_graph)
 
-            # html_div_monitor.append(html.Div(children=[new_graph,from_agent_title]))
-            # html_div_monitor.append(from_agent_title)
-            html_div_monitor.append(new_graph)
 
         #only add the graph if there is some plots in the Monitor Agent
         if len(html_div_monitor) > 1:

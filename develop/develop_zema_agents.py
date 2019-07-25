@@ -7,6 +7,8 @@ import time
 
 from matplotlib import pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import linear_model
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
@@ -96,25 +98,53 @@ class LDA_Agent(AgentMET4FOF):
             self.lda_test_score = self.ml_model.score(message['data']['x'], y_true)
 
 
+class Regression_Agent(AgentMET4FOF):
+    def init_parameters(self, regression_model = "BayesianRidge"):
+        if regression_model=="BayesianRidge":
+            self.lin_model = linear_model.BayesianRidge()
+        elif regression_model=="RandomForest":
+            self.lin_model = RandomForestRegressor(n_estimators=40)
+        else:
+            raise Exception("Wrongly defined regression model. Available models are: 'RandomForest' and 'BayesianRidge'")
+
+    def on_received_message(self, message):
+        if message['channel'] == 'train':
+            y_true = message['data']['y'][0]
+            self.lin_model = self.lin_model.fit(message['data']['x'], y_true)
+            self.log_info("Overall Train Score: " + str(self.lin_model.score(message['data']['x'], y_true)))
+        elif message['channel'] == 'test':
+            y_true = message['data']['y'][0]
+            y_pred = self.lin_model.predict(message['data']['x'])
+            self.send_output({'y_pred': y_pred, 'y_true': y_true})
+            self.log_info("Overall Test Score: " + str(self.lin_model.score(message['data']['x'], y_true)))
+            self.reg_test_score = self.lin_model.score(message['data']['x'], y_true)
+
+
 class EvaluatorAgent(AgentMET4FOF):
      def on_received_message(self, message):
         y_pred = message['data']['y_pred']
         y_true = message['data']['y_true']
-        error_LDA1=np.abs(y_pred- y_true)
-        rmse_lda= np.sqrt(mean_squared_error(y_pred, y_true))
+        error = np.abs(y_pred- y_true)
+        rmse = np.sqrt(mean_squared_error(y_pred, y_true))
 
-        self.log_info("Root mean squared error of classification is:" + str(rmse_lda))
-        self.log_info("Error_LDA1: "+str(error_LDA1))
-        self.send_output(error_LDA1)
+        self.log_info(message['from']+": Root mean squared error of classification is:" + str(rmse))
+        self.send_output({message['from']: error})
 
         #send plot
-        graph_comparison = self.plot_comparison(y_true,y_pred)
-        self.send_plot(graph_comparison)
+        graph_comparison = self.plot_comparison(y_true, y_pred,
+                                                from_agent=message['from'],
+                                                sum_performance="RMSE: " + str(rmse))
+        self.send_plot({message['from']:graph_comparison})
 
-     def plot_comparison(self, y_true, y_pred):
+     def plot_comparison(self, y_true, y_pred, from_agent = None, sum_performance= ""):
+         if from_agent is not None: #optional
+            agent_name = from_agent
+         else:
+            agent_name = ""
          fig, ax = plt.subplots()
          ax.scatter(y_true,y_pred)
-         ax.set_title("Prediction vs True Label")
+         fig.suptitle("Prediction vs True Label: " + agent_name)
+         ax.set_title(sum_performance)
          ax.set_xlabel("Y True")
          ax.set_ylabel("Y Pred")
          return fig
