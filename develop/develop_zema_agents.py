@@ -83,6 +83,7 @@ class LDA_Agent(AgentMET4FOF):
         return np.array(class_target_vector)
 
     def on_received_message(self, message):
+        self.log_info("MODE : "+ message['channel'])
         if message['channel'] == 'train':
             y_true = self.reformat_target(message['data']['y'])
             self.ml_model = self.ml_model.fit(message['data']['x'], y_true)
@@ -93,6 +94,8 @@ class LDA_Agent(AgentMET4FOF):
             self.send_output({'y_pred':y_pred, 'y_true': y_true})
             self.log_info("Overall Test Score: " + str(self.ml_model.score(message['data']['x'], y_true)))
             self.lda_test_score = self.ml_model.score(message['data']['x'], y_true)
+
+
 class EvaluatorAgent(AgentMET4FOF):
      def on_received_message(self, message):
         y_pred = message['data']['y_pred']

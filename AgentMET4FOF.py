@@ -51,6 +51,10 @@ class AgentMET4FOF(Agent):
             Current state of agent. Can be used to define different states of operation such as "Running", "Idle, "Stop", etc..
             Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
 
+        loop_wait : int
+            The interval to wait between loop.
+            Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
+
         """
         self.Inputs = {}
         self.Outputs = {}
@@ -60,7 +64,7 @@ class AgentMET4FOF(Agent):
         self.log_info("INITIALIZED")
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = self.states[0]
-        self.loop_wait = 1.0
+        self.loop_wait = None
         self.init_parameters()
 
     def init_parameters(self):
@@ -73,7 +77,10 @@ class AgentMET4FOF(Agent):
         """
         This action is executed before initiating the loop
         """
-        self.init_agent_loop(1.0)
+        if self.loop_wait is None:
+            self.init_agent_loop()
+        else:
+            self.init_agent_loop(self.loop_wait)
 
     def init_agent_loop(self, loop_wait=1.0):
         """
@@ -585,7 +592,7 @@ class DataStreamAgent(AgentMET4FOF):
     Can be used in incremental training or batch training mode.
     See `DataStreamMET4FOF` on loading your own data set as a data stream.
     """
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100):
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100, loop_wait=10):
         self.stream = stream
         self.stream.prepare_for_use()
         self.batch_size = batch_size
@@ -594,7 +601,7 @@ class DataStreamAgent(AgentMET4FOF):
         else:
             self.pretrain_size = pretrain_size
         self.pretrain_done = False
-
+        self.loop_wait = loop_wait
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pretrain_size is None:
@@ -608,8 +615,10 @@ class DataStreamAgent(AgentMET4FOF):
                     self.pretrain_done = True
 
     def send_next_sample(self,num_samples=1):
-        data = self.stream.next_sample(num_samples)
-        self.send_output(data)
+        if self.stream.has_more_samples():
+            data = self.stream.next_sample(num_samples)
+            self.log_info("IDX "+ str(self.stream.sample_idx))
+            self.send_output(data)
 
     def send_all_sample(self):
         self.send_next_sample(-1)

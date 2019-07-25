@@ -212,9 +212,6 @@ def update_network_graph(n_intervals,graph_elements):
     print(app.dashboard_ctrl.agent_graph.nodes())
     #if current number more than before, then update graph
     if(len(app.dashboard_ctrl.current_nodes) != len(nodes)) or (len(app.dashboard_ctrl.current_edges) != len(edges)) or n_intervals == 0:
-    #if (dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes)) or (
-    #    dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
-
         app.dashboard_ctrl.agent_graph.add_nodes_from(nodes)
         app.dashboard_ctrl.agent_graph.add_edges_from(edges)
 
@@ -234,6 +231,7 @@ def update_network_graph(n_intervals,graph_elements):
 
     else:
         raise PreventUpdate
+
 
 
 @app.callback( dash.dependencies.Output('add-modules-dropdown', 'options'),

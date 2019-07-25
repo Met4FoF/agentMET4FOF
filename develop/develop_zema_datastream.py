@@ -14,7 +14,7 @@ class ZEMA_DataStream(DataStreamMET4FOF):
         self.b=[1, 1, 1, 1, 1, 1, 1, 1, 5.299641744, 5.299641744, 5.299641744]
         self.k=[250, 1, 10, 10, 1.25, 1, 30, 0.5, 2, 2, 2]
         self.units=['[Pa]', '[g]', '[g]', '[g]', '[kN]', '[bar]', '[mm/s]', '[A]', '[A]', '[A]', '[A]']
-
+        self.labels = ['Microphone', 'Vibration plain bearing','Vibration piston rod','Vibration ball bearing', 'Axial force','Pressure','Velocity','Active current','Motor current phase 1', 'Motor current phase 2','Motor current phase 3']
         #prepare sensor data
         list(f.keys())
         data= f['Sensor_Data']

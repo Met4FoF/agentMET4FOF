@@ -35,7 +35,7 @@ class MultiOutputMathAgent(AgentMET4FOF):
 class MultiGeneratorAgent(AgentMET4FOF):
     def init_parameters(self):
         self.sine_stream = SineGenerator()
-        self.cos_stream = SineGenerator()
+        self.cos_stream = CosineGenerator()
 
     def agent_loop(self):
         if self.current_state == "Running":

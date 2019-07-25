@@ -67,9 +67,6 @@ class DataStreamMET4FOF(Stream):
 
         self.sample_idx += batch_size
 
-        if self.sample_idx > self.x.shape[0]:
-            self.sample_idx = self.x.shape[0]
-
         try:
             self.current_sample_x = self.x[self.sample_idx - batch_size:self.sample_idx]
             self.current_sample_y = self.y[self.sample_idx - batch_size:self.sample_idx]
