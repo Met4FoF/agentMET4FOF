@@ -7,6 +7,8 @@ import time
 
 from matplotlib import pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn import linear_model
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
@@ -93,15 +95,47 @@ class LDA_Agent(AgentMET4FOF):
             self.send_output({'y_pred':y_pred, 'y_true': y_true})
             self.log_info("Overall Test Score: " + str(self.ml_model.score(message['data']['x'], y_true)))
             self.lda_test_score = self.ml_model.score(message['data']['x'], y_true)
+            
+class Regression_Agent(AgentMET4FOF):
+    def init_parameters(self, regression_model):      # Maybe use'BayesianRidge' as a default !! 
+        if regression_model=="BayesianRidge":
+            self.lin_model = linear_model.BayesianRidge()
+        elif regression_model=="RandomForest":
+            self.lin_model = RandomForestRegressor(n_estimators=40)
+        else:
+            raise Exception("Wronly defined regression model. Available models are: 'RandomForest' and 'BayesianRidge'")
+
+#    No need to reformat the target.
+#            
+#    def reformat_target(self, target_vector):
+#        class_target_vector=np.ceil(target_vector[0])
+#        for i in class_target_vector.index:
+#            if class_target_vector[i]==0:
+#                class_target_vector[i]=1                   #Fixing the zero element.
+#        return np.array(class_target_vector)
+
+    def on_received_message(self, message):
+        if message['channel'] == 'train':
+            y_true = message['data']['y'][0]
+            self.lin_model = self.lin_model.fit(message['data']['x'], y_true)
+            self.log_info("Overall Train Score: " + str(self.lin_model.score(message['data']['x'], y_true)))
+        elif message['channel'] == 'test':
+            y_true = message['data']['y'][0]
+            y_pred = self.lin_model.predict(message['data']['x'])
+            self.send_output({'y_pred': y_pred, 'y_true': y_true})
+            self.log_info("Overall Test Score: " + str(self.lin_model.score(message['data']['x'], y_true)))
+            self.reg_test_score = self.lin_model.score(message['data']['x'], y_true) 
+
+
 class EvaluatorAgent(AgentMET4FOF):
      def on_received_message(self, message):
         y_pred = message['data']['y_pred']
         y_true = message['data']['y_true']
-        error_LDA1=np.abs(y_pred- y_true)
-        rmse_lda= np.sqrt(mean_squared_error(y_pred, y_true))
+        error_LDA1=np.abs(y_pred- y_true)                         # Change to just error
+        rmse_lda= np.sqrt(mean_squared_error(y_pred, y_true))     # Also just rmse
 
-        self.log_info("Root mean squared error of classification is:" + str(rmse_lda))
-        self.log_info("Error_LDA1: "+str(error_LDA1))
+        self.log_info("Root mean squared error of classification is:" + str(rmse_lda))  # prediction instead of classification
+        self.log_info("Error_LDA1: "+str(error_LDA1))                   # Error
         self.send_output(error_LDA1)
 
         #send plot
