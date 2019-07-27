@@ -1,6 +1,8 @@
 import pytest
 
-from AgentMET4FOF import AgentNetwork, MonitorAgent, DataStreamAgent
+from AgentMET4FOF import AgentNetwork, MonitorAgent
+from DataStreamMET4FOF import DataStreamAgent
+
 from develop.develop_zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, EvaluatorAgent
 from develop.develop_zema_feature_extract import Pearson_FeatureSelection, FFT_BFC
 from develop.develop_zema_datastream import ZEMA_DataStream

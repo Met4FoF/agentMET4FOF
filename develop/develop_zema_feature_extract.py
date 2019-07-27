@@ -151,7 +151,7 @@ class FFT_BFC():
         fft_matrix=fft_matrix.transpose()                     # Transposing to matrix where rows are cycles.
         n_rows, n_columns = np.shape(fft_matrix)
 
-        print("\nNumber of cycles is: %s, and number of features is: %s" % (n_rows, n_columns))
+        # print("\nNumber of cycles is: %s, and number of features is: %s" % (n_rows, n_columns))
         fft_matrix.columns = freq                    # Column labels are frequencies.
 
         # Calculating the average of absolute vales for each frequency (column).
@@ -164,15 +164,15 @@ class FFT_BFC():
         sorted_values_matrix=fft_matrix.iloc[:,:round((N/100.0)*len(freq))]
 
         n_rows, n_columns = np.shape(sorted_values_matrix)
-        print("\nNumber of cycles is: %s, and number of selected features is: %s" % (n_rows, n_columns))
-        print(np.shape(sorted_values_matrix))
+        # print("\nNumber of cycles is: %s, and number of selected features is: %s" % (n_rows, n_columns))
+        # print(np.shape(sorted_values_matrix))
 
         # Informations about the selected frequencies are columns in sorted data frame.
         freq_of_sorted_values=(pd.DataFrame(sorted_values_matrix.columns)).transpose()
-        print("\nFirst 10 selected frequencies are:\n\n %s" % freq_of_sorted_values.values[:,:10])
+        # print("\nFirst 10 selected frequencies are:\n\n %s" % freq_of_sorted_values.values[:,:10])
 
         sorted_values_matrix.columns=range(round((N/100.0)*len(freq))) # Resetting the column labels.
-        print("---------------------------------------------------------------------------------\n")
+        # print("---------------------------------------------------------------------------------\n")
         # Output "sorted_values_matrix" is data frame whose rows-
         # -are cycles and columns are selected frequencies. For example,-
         # -value at position (i,j) is amplitude for frequency j in cycle i.
@@ -192,15 +192,15 @@ class FFT_BFC():
 
         n_rows, n_columns = np.shape(fft_matrix)
 
-        print("\nNumber of cycles is: %s, and number of features is: %s \n" % (n_rows, n_columns))
+        # print("\nNumber of cycles is: %s, and number of features is: %s \n" % (n_rows, n_columns))
         fft_matrix.columns = freq                    # Column labels are frequencies.
 
-        print("Frequencies are the same as in the traning data, of course. \nFirst 10 of them:\n\n %s" % frequencies.values[:,:10])
+        # print("Frequencies are the same as in the traning data, of course. \nFirst 10 of them:\n\n %s" % frequencies.values[:,:10])
 
         sorted_values_matrix_test=fft_matrix.loc[:, frequencies.loc[0,:]]
 
         n_rows, n_columns = np.shape(sorted_values_matrix_test)
-        print("\nNumber of cycles is: %s, and number of selected features is: %s \n\n" % (n_rows, n_columns))
+        # print("\nNumber of cycles is: %s, and number of selected features is: %s \n\n" % (n_rows, n_columns))
 
         sorted_values_matrix_test.columns=range(len(sorted_values_matrix_test.columns))
 
@@ -265,10 +265,10 @@ class Pearson_FeatureSelection():
 
         target_matrix = y_data
 
-        print("\nDimension of target matrix is:")
-        print("                                                 ", target_matrix.shape)
-        print("Dimension of amplitude matrix for one sensor is:")
-        print("                                                 ", sorted_values_from_all_sensors[0].iloc[:][:].shape)
+        # print("\nDimension of target matrix is:")
+        # print("                                                 ", target_matrix.shape)
+        # print("Dimension of amplitude matrix for one sensor is:")
+        # print("                                                 ", sorted_values_from_all_sensors[0].iloc[:][:].shape)
 
         corr=list(range(n_sensors))                      # Making list for correlation coefficients.
         p_value=list(range(n_sensors))
@@ -284,8 +284,8 @@ class Pearson_FeatureSelection():
         #matrix_corr_coeff = np.transpose(pd.DataFrame(corr))# Transforming list of correlation coefficients to data frame.
         corr_array=np.array(corr)                                   # Transforming list of correlation coefficients to nparray
 
-        print("Array of correlation coefficients has size:")
-        print("                                                 ",corr_array.shape)
+        # print("Array of correlation coefficients has size:")
+        # print("                                                 ",corr_array.shape)
 
         def largest_indices(array, n):                               # Function that find indices for 500 biggest Pearson-
             """Returns the n largest indices from a numpy array."""  # -correlation coefficients.
@@ -298,10 +298,10 @@ class Pearson_FeatureSelection():
         # feature_indices is the index of the feature number for each sensor number.
         sensor_indices, feature_indices = largest_indices(corr_array, self.n_of_features)
 
-        print("Sensor indices of location of features in >sorted_values_from_all_sensors< matrix: \n")
-        print(sensor_indices)
-        print("\nColumn indices of location of features in >sorted_values_from_all_sensors< matrix: \n")
-        print(feature_indices)
+        # print("Sensor indices of location of features in >sorted_values_from_all_sensors< matrix: \n")
+        # print(sensor_indices)
+        # print("\nColumn indices of location of features in >sorted_values_from_all_sensors< matrix: \n")
+        # print(feature_indices)
         self.sensor_indices = sensor_indices
         self.feature_indices = feature_indices
         return self
@@ -332,7 +332,7 @@ class Pearson_FeatureSelection():
         top_n_together=[j for i in top_n_features for j in i]  
 
         top_n_together_matrix=np.transpose(pd.DataFrame(top_n_together))
-        print(type(top_n_together_matrix), "\n")
+        # print(type(top_n_together_matrix), "\n")
 
         # Continue working with abosulte values.
         abs_top_n_together_matrix=np.abs(top_n_together_matrix)
@@ -341,11 +341,11 @@ class Pearson_FeatureSelection():
         k=0
         for i in range(n_sensors):
             #print(top_n_features_matrix.shape)
-            print("Number of features from sensor %2.0f is: %3.0f or  %4.2f %%" % (i, len(top_n_features[i]), len(top_n_features[i])/len(sensor_n)*100))
+            # print("Number of features from sensor %2.0f is: %3.0f or  %4.2f %%" % (i, len(top_n_features[i]), len(top_n_features[i])/len(sensor_n)*100))
             percentage[i]=len(top_n_features[i])
             k=k+len(top_n_features[i])/len(self.sensor_indices)*100
-        print("----------------------------------------------------")
-        print("                                             %4.2f" % (k))
+        # print("----------------------------------------------------")
+        # print("                                             %4.2f" % (k))
         
         return abs_top_n_together_matrix, percentage
     
