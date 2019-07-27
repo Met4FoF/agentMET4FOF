@@ -1,27 +1,29 @@
-import numpy as np
-
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork ,DataStream, MonitorAgent
+#AGENTMET4FOF modules
+from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent, DataStreamAgent
+from DataStreamMET4FOF import extract_x_y
 
 #ML dependencies
 import numpy as np
-from skmultiflow.data import WaveformGenerator
+from skmultiflow.data import SineGenerator
 from skmultiflow.trees import HoeffdingTree
-from sklearn.model_selection import StratifiedKFold
+
 
 #Here we demonstrate a slightly more complicated scenario :
 #We separate the ML into different agents: Predictor, Trainer and Evaluator
 #This has the advantage in actual hardware deployment where Predictor Agent is most likely
 #to be deployed on limited computing resource compared to Trainer Agent which may be more resourceful
-
+#However, it is important to note that - the predictor and trainer has not been synchronized
+#upon receiving the data from the generator!
 class Predictor(AgentMET4FOF):
-    def init_parameters(self, ml_model= HoeffdingTree()):
+    def init_parameters(self, ml_model= None):
         self.ml_model =ml_model
 
     def on_received_message(self, message):
-        data = message['data']
+
         #handle Trainer Agent
         if message['senderType'] == "Trainer":
             try:
+                data = message['data']
                 if 'ml_model' in data.keys():
                     self.ml_model = data['ml_model']
                     return 0
@@ -30,19 +32,17 @@ class Predictor(AgentMET4FOF):
 
         #handle x & y data
         else:
-            x = data['x']
-            y_true = data['y']
-            y_pred = self.ml_model.predict(x)
-            self.send_output({'y_pred':y_pred, 'y_true':y_true})
+            if self.ml_model is not None:
+                x , y_true = extract_x_y(message)
+                y_pred = self.ml_model.predict(x)
+                self.send_output({'y_pred':y_pred, 'y_true':y_true})
 
 class Trainer(AgentMET4FOF):
     def init_parameters(self, ml_model= HoeffdingTree()):
-        self.ml_model =ml_model
+        self.ml_model = ml_model
 
     def on_received_message(self, message):
-        data = message['data']
-        x = data['x']
-        y = data['y']
+        x,y = extract_x_y(message)
         self.ml_model.partial_fit(x, y)
         self.send_output({'ml_model':self.ml_model})
 
@@ -67,13 +67,15 @@ if __name__ == '__main__':
     agentNetwork = AgentNetwork()
 
     # init agents
-    gen_agent = agentNetwork.add_agent(agentType=DataStream)
+    gen_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
     trainer_agent = agentNetwork.add_agent(agentType=Trainer)
     predictor_agent = agentNetwork.add_agent(agentType=Predictor)
     evaluator_agent = agentNetwork.add_agent(agentType=Evaluator)
     monitor_agent_1 = agentNetwork.add_agent(agentType=MonitorAgent)
     monitor_agent_2 = agentNetwork.add_agent(agentType=MonitorAgent)
 
+    gen_agent.init_parameters(stream=SineGenerator(), pretrain_size = 1000, batch_size= 1)
+    trainer_agent.init_parameters(ml_model=HoeffdingTree())
     # connect agents : We can connect multiple agents to any particular agent
     # However the agent needs to implement handling multiple input types
     agentNetwork.bind_agents(gen_agent, trainer_agent)
