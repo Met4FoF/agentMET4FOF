@@ -7,6 +7,10 @@ import dashboard.Dashboard as Dashboard
 import dashboard.Dashboard_Control as Dashboard_Control
 from DataStreamMET4FOF import DataStreamMET4FOF
 from multiprocess.context import Process
+import pandas as pd
+import re
+import csv
+import sys
 
 #ML dependencies
 import numpy as np
@@ -443,6 +447,7 @@ class _AgentController(AgentMET4FOF):
         self.current_state = "Idle"
         self.ns = ns
         self.G = nx.DiGraph()
+        self._logger = None
 
     def get_agentType_count(self, agentType):
         num_count = 1
@@ -477,11 +482,14 @@ class _AgentController(AgentMET4FOF):
             new_name= self.generate_module_name_byType(agentType)
         else:
             new_name= self.generate_module_name_byUnique(name)
+        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
 
-        return run_agent(new_name, base=agentType, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        if log_mode:
+            new_agent.set_logger(self._get_logger())
+        return new_agent
 
     def agents(self):
-        exclude_names = ["AgentController"]
+        exclude_names = ["AgentController","Logger"]
         agent_names = [name for name in self.ns.agents() if name not in exclude_names]
         return agent_names
 
@@ -507,8 +515,16 @@ class _AgentController(AgentMET4FOF):
                 edges += [(agent_name, output_connection)]
         return edges
 
-def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
+    def _get_logger(self):
+        """
+        Internal method to access the Logger relative to the nameserver
+        """
+        if self._logger is None:
+            self._logger = self.ns.proxy('Logger')
+        return self._logger
 
+def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
+    """"""
     def is_port_in_use(_port):
         import socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -532,7 +548,7 @@ class AgentNetwork:
     Interfaces with an internal _AgentController which is hidden from user
 
     """
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, dashboard_modules=True, dashboard_update_interval=3):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, dashboard_modules=True, dashboard_update_interval=3, log_filename="log_file.csv"):
         """
         Parameters
         ----------
@@ -548,11 +564,19 @@ class AgentNetwork:
             If set to True, will initiate the dashboard with default agents in AgentMET4FOF
         dashboard_update_interval : int
             Regular interval (seconds) to update the dashboard graphs
+        logfile: str
+            Name of log file, acceptable csv format. If set to None or False, then will not save file
         """
 
         self.ip_addr= ip_addr
         self.port = port
         self._controller = None
+        self.log_filename= log_filename
+
+        if type(self.log_filename) == str and '.csv' in self.log_filename:
+            self.save_logfile = True
+        else:
+            self.save_logfile = False
 
         if connect:
             self.connect(ip_addr,port)
@@ -602,7 +626,10 @@ class AgentNetwork:
             self.ns.shutdown()
             self.ns = run_nameserver(addr=ip_addr+':' + str(port))
         controller = run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
+
         controller.init_parameters(self.ns)
+        logger.init_parameters(log_filename=self.log_filename,save_logfile=self.save_logfile)
 
     def _set_mode(self, state):
         """
@@ -801,7 +828,7 @@ class AgentNetwork:
             Agent class to be instantiated in the network.
 
         log_mode : bool
-            Default is True. Determines if messages will be logged.
+            Default is True. Determines if messages will be logged to background Logger Agent.
 
         Returns
         -------
@@ -810,6 +837,7 @@ class AgentNetwork:
         """
 
         agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode)
+
         return agent
 
     def shutdown(self):
@@ -933,4 +961,57 @@ class MonitorAgent(AgentMET4FOF):
     def reset(self):
         super(MonitorAgent, self).reset()
         self.plots = {}
+
+class _Logger(AgentMET4FOF):
+
+    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True):
+        self.bind('SUB', 'sub', self.log_handler)
+        self.log_filename = log_filename
+        self.save_logfile = save_logfile
+        if self.save_logfile:
+            try:
+                #writes a new file
+                self.writeFile = open(self.log_filename, 'w',newline='')
+                writer = csv.writer(self.writeFile)
+                writer.writerow(['Time','Name','Topic','Data'])
+                #set to append mode
+                self.writeFile = open(self.log_filename,'a',newline='')
+            except:
+                raise Exception
+        self.save_cycles= 0
+
+    def log_handler(self, message, topic):
+        sys.stdout.write(message+'\n')
+        sys.stdout.flush()
+        self.save_log_info(str(message))
+
+    def save_log_info(self, log_msg):
+        re_sq = '\[(.*?)\]'
+        re_rd = '\((.*?)\)'
+
+        date = re.findall(re_sq,log_msg)[0]
+        date = "[" + date + "]"
+
+        agent_name = re.findall(re_rd,log_msg)[0]
+
+        contents = log_msg.split(':')
+        if len(contents) > 4:
+            topic = contents[3]
+            data = str(contents[4:])
+        else:
+            topic = contents[3]
+            data = " "
+
+        if self.save_logfile:
+            try:
+                #append new row
+                writer = csv.writer(self.writeFile)
+                writer.writerow([str(date),agent_name,topic,data])
+
+                if self.save_cycles % 15 == 0:
+                    self.writeFile.close()
+                    self.writeFile = open(self.log_filename,'a',newline='')
+                self.save_cycles+=1
+            except:
+                raise Exception
 

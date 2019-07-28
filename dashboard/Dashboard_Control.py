@@ -27,6 +27,7 @@ class Dashboard_Control():
             agentTypes.update(dict([(name, cls) for name, cls in module_.__dict__.items() if
                                isinstance(cls, type) and cls.__bases__[-1] == agentmet4fof_module.AgentMET4FOF]))
         agentTypes.pop("_AgentController",None)
+        agentTypes.pop("_Logger",None)
         agentTypes.pop("DataStreamAgent",None)
         return agentTypes
 
