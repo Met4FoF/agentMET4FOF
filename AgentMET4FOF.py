@@ -6,6 +6,8 @@ from osbrain import NSProxy
 import dashboard.Dashboard as Dashboard
 import dashboard.Dashboard_Control as Dashboard_Control
 from DataStreamMET4FOF import DataStreamMET4FOF
+#from multiprocessing import Process
+from multiprocess.context import Process
 
 #ML dependencies
 import numpy as np
@@ -497,6 +499,22 @@ class _AgentController(AgentMET4FOF):
                 edges += [(agent_name, output_connection)]
         return edges
 
+def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
+
+    def is_port_in_use(_port):
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex((ip_addr, _port)) == 0
+
+    if is_port_in_use(port) is False:
+        if dashboard_modules is not None and dashboard_modules is not False:
+
+            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules)
+            Dashboard.app.dashboard_ctrl = dashboard_ctrl
+            Dashboard.app.update_interval = dashboard_update_interval
+            Dashboard.app.run_server(debug=False)
+    else:
+        print("Dashboard is running on: " + ip_addr+":"+str(port))
 
 class AgentNetwork:
     """
@@ -535,13 +553,12 @@ class AgentNetwork:
             if self.ns == 0:
                 self.start_server(ip_addr,port)
 
-        if dashboard_modules is not None and dashboard_modules is not False:
-            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules)
-            Dashboard.app.dashboard_ctrl = dashboard_ctrl
-            Dashboard.app.update_interval = dashboard_update_interval
-            Dashboard.app.run_server(debug=False)
-        # from run_dashboard import run_dashboard
-        # run_dashboard()
+        if dashboard_modules is not False:
+            self.dashboard_proc = Process(target=run_dashboard, args=(dashboard_modules,dashboard_update_interval))
+            self.dashboard_proc.start()
+        else:
+            self.dashboard_proc = None
+
 
     def connect(self,ip_addr="127.0.0.1", port = 3333,verbose=True):
         """
@@ -793,6 +810,9 @@ class AgentNetwork:
         """
 
         self._get_controller().get_attr('ns').shutdown()
+
+        if self.dashboard_proc is not None:
+            self.dashboard_proc.terminate()
         return 0
 
 class DataStreamAgent(AgentMET4FOF):
