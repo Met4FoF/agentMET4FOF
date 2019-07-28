@@ -36,7 +36,7 @@ class GeneratorAgent(AgentMET4FOF):
 
 def test_send_plot():
     # start agent network server
-    agentNetwork = AgentNetwork()
+    agentNetwork = AgentNetwork(dashboard_modules=False)
 
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=GeneratorAgent)

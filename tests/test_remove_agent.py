@@ -3,7 +3,7 @@ import time
 
 def test_remove_agent():
     #start agent network server
-    agentNetwork = AgentNetwork()
+    agentNetwork = AgentNetwork(dashboard_modules=False)
 
     #init agents by adding into the agent network
     dummy_agent1 = agentNetwork.add_agent(agentType= AgentMET4FOF)
@@ -27,5 +27,3 @@ def test_remove_agent():
     assert len(agentNetwork.agents()) == 0
     agentNetwork.shutdown()
 
-if __name__ == "__main__":
-    test_remove_agent()

@@ -118,7 +118,7 @@ params = [(SingleValueAgent, {'SingleValueAgent_1': [0, 1, 2, 3, 4, 5, 6, 7, 8, 
 @pytest.mark.parametrize("agentType,expected_monitor_results", params)
 def test_simpleAgent(agentType, expected_monitor_results):
     #start agent network server
-    agentNetwork = AgentNetwork()
+    agentNetwork = AgentNetwork(dashboard_modules=False)
 
     #init agents by adding into the agent network
     simple_agent = agentNetwork.add_agent(agentType=agentType)

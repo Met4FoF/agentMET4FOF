@@ -1,7 +1,7 @@
 import pytest
 
-from AgentMET4FOF import AgentNetwork, MonitorAgent
-from DataStreamMET4FOF import DataStreamAgent
+from AgentMET4FOF import AgentNetwork, MonitorAgent, DataStreamAgent
+
 
 from develop.develop_zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, EvaluatorAgent
 from develop.develop_zema_feature_extract import Pearson_FeatureSelection, FFT_BFC
@@ -62,7 +62,7 @@ def test_zema_emc_lda():
 def test_zema_emc_lda_agents():
     np.random.seed(100)
     #start agent network server
-    agentNetwork = AgentNetwork()
+    agentNetwork = AgentNetwork(dashboard_modules=False)
 
     #init agents by adding into the agent network
     datastream_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
