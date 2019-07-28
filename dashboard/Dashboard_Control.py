@@ -2,12 +2,6 @@ import AgentMET4FOF as agentmet4fof_module
 import DataStreamMET4FOF as datastreammet4fof_module
 import networkx as nx
 
-#Agent modules
-# import develop.develop_zema_agents as zema_agents
-# import develop.develop_zema_datastream as zema_datastream
-#
-# _additional_dashboard_modules = [zema_agents, zema_datastream]
-
 #global variables access via 'dashboard_ctrl'
 class Dashboard_Control():
     def __init__(self, ip_addr="127.0.0.1", port=3333, modules= []):

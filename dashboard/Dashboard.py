@@ -131,6 +131,7 @@ app.layout = html.Div(children=[
 
 
                     ]),
+                    html.H6(id='agent-parameters', children="Not selected", className="flow-text"),
 
                     html.P(id="connect_placeholder", className="black-text", children=" "),
                     html.P(id="disconnect_placeholder", className="black-text", children=" "),
@@ -176,12 +177,6 @@ def update_network_graph(n_intervals,graph_elements):
     #update node graph
     agentNetwork.update_networkx()
     nodes, edges = agentNetwork.get_nodes_edges()
-
-    print(nodes)
-    print(edges)
-    print(app.dashboard_ctrl.agent_graph.edges)
-    print(app.dashboard_ctrl.agent_graph.nodes)
-    print(graph_elements)
 
     #if current graph number is different more than before, then update graph
     if len(graph_elements) != (len(nodes) + len(edges)):
@@ -299,9 +294,7 @@ def bind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
         #get nameserver
         agentNetwork = app.dashboard_ctrl.agentNetwork
 
-        print("current_agent_id: "+current_agent_id, " dropdown_selected: "+dropdown_value)
         #for connect module button click
-
         if current_agent_id != dropdown_value:
             agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id), agentNetwork.get_agent(dropdown_value))
     raise PreventUpdate
@@ -315,20 +308,20 @@ def unbind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
         #get nameserver
         agentNetwork = app.dashboard_ctrl.agentNetwork
 
-        print(agentNetwork.get_agent(current_agent_id))
-        print(agentNetwork.get_agent(dropdown_value))
         #for connect module button click
         agentNetwork.unbind_agents(agentNetwork.get_agent(current_agent_id), agentNetwork.get_agent(dropdown_value))
     raise PreventUpdate
 
 @app.callback([dash.dependencies.Output('selected-node', 'children'),
                dash.dependencies.Output('input-names', 'children'),
-               dash.dependencies.Output('output-names', 'children')
+               dash.dependencies.Output('output-names', 'children'),
+               dash.dependencies.Output('agent-parameters', 'children'),
                ],
               [dash.dependencies.Input('agents-network', 'tapNodeData')])
 def displayTapNodeData(data):
     input_names =[]
     output_names=[]
+    agent_parameters_div = []
 
     if data is not None:
         current_agent_id = data['id']
@@ -338,14 +331,18 @@ def displayTapNodeData(data):
         app.dashboard_ctrl.current_selected_agent = agentNetwork.get_agent(current_agent_id)
         input_names=list(app.dashboard_ctrl.current_selected_agent.get_attr('Inputs').keys())
         output_names=list(app.dashboard_ctrl.current_selected_agent.get_attr('Outputs').keys())
+        agent_parameters = app.dashboard_ctrl.current_selected_agent.get_all_attr()
 
         #formatting
         input_names =["Inputs: "]+[input_name+", "for input_name in input_names]
         output_names = ["Outputs: "] + [output_name + ", " for output_name in output_names]
+        agent_parameters_texts=[html.H6(k +": "+str(v)) for k,v in agent_parameters.items()]
+        agent_parameters_div=[html.H6("Parameters: ")] + agent_parameters_texts
 
-        return [current_agent_id, input_names, output_names]
+        return [current_agent_id, input_names, output_names,agent_parameters_div]
     else:
-        return ["Not selected", input_names, output_names]
+        return ["Not selected", input_names, output_names, agent_parameters_div]
+
 
 #load Monitors data and draw - all at once
 @app.callback( [dash.dependencies.Output('monitors-graph', 'figure')],
@@ -357,9 +354,7 @@ def plot_monitor_memory(n_interval):
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
-    print("n_interval-monitor-graph",n_interval)
     if agentNetwork._get_mode() != "Running" and agentNetwork._get_mode() != "Reset" and n_interval > 0:
-        print(agentNetwork._get_mode())
         raise PreventUpdate
 
     agent_names = agentNetwork.agents() # get all agent names
@@ -399,8 +394,6 @@ def plot_monitor_memory(n_interval):
                     # lastly- append this graph into the master graphs list which is monitor_graphs
                     monitor_graphs.append_trace(monitor_graph, count+1, 1)
                 elif type(input_data).__name__ == 'dict':
-                    print("LIST: ",from_agent_name,list(input_data.keys()))
-                    print(input_data)
                     for channel in input_data.keys():
                         monitor_graph = create_monitor_graph(input_data[channel])
                         monitor_graph.update(name=from_agent_name+" : "+channel)
@@ -427,9 +420,7 @@ def plot_monitor_graphs(n_interval):
 
     # check if agent network is running and first_time running
     # if it isn't, abort updating graphs
-    print("n_interval-monitor-graph",n_interval)
     if agentNetwork._get_mode() != "Running" and n_interval > 0:
-        print(agentNetwork._get_mode())
         raise PreventUpdate
 
     agent_names = agentNetwork.agents() # get all agent names
@@ -473,7 +464,6 @@ def plot_monitor_graphs(n_interval):
             all_graphs.append(html.Div(className="card",children=html_div_monitor))
 
     # set dimensions of each monitor agent's graph
-    print(all_graphs)
     return [all_graphs]
 
 

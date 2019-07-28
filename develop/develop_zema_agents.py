@@ -24,7 +24,8 @@ class FFTAgent(AgentMET4FOF):
 
 class FFT_BFCAgent(AgentMET4FOF):
     def init_parameters(self, perc_feat=10):
-        self.fft_bfc = FFT_BFC(perc_feat=perc_feat)
+        self.percentage_features = perc_feat
+        self.fft_bfc = FFT_BFC(perc_feat=self.percentage_features)
 
     def on_received_message(self, message):
         if message['channel'] == 'train':
@@ -140,6 +141,8 @@ class LDA_Agent(AgentMET4FOF):
 class Regression_Agent(AgentMET4FOF):
     def init_parameters(self, regression_model="BayesianRidge", incremental=True):
         self.incremental = incremental
+        self.regression_model = regression_model
+
         if regression_model=="BayesianRidge":
             self.lin_model = linear_model.BayesianRidge()
         elif regression_model=="RandomForest":

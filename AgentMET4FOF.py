@@ -6,7 +6,6 @@ from osbrain import NSProxy
 import dashboard.Dashboard as Dashboard
 import dashboard.Dashboard_Control as Dashboard_Control
 from DataStreamMET4FOF import DataStreamMET4FOF
-#from multiprocessing import Process
 from multiprocess.context import Process
 
 #ML dependencies
@@ -422,6 +421,15 @@ class AgentMET4FOF(Agent):
             self.memory[message['from']].append(message['data'])
         self.log_info("Memory: " + str(self.memory))
 
+    def get_all_attr(self):
+        _all_attr = self.__dict__
+        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias","PubAddr","states","log_mode","get_all_attr","plots","name","agent_loop"]
+        filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
+        filtered_attr = {key: val for key, val in filtered_attr.items() if key not in excludes and type(val).__name__ != 'function'}
+        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(val) == str) else str(val) for key, val in filtered_attr.items()}
+        filtered_attr = {key: val for key, val in filtered_attr.items() if "object" not in str(val)}
+
+        return filtered_attr
 
 class _AgentController(AgentMET4FOF):
     """
