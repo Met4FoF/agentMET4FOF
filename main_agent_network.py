@@ -1,16 +1,12 @@
 from AgentMET4FOF import AgentNetwork
-from dashboard.Dashboard import Dashboard_Control, app
 
 #Agent modules
 import develop.develop_zema_agents as zema_agents
+import develop.develop_zema_datastream as zema_datastream
 
-modules = [zema_agents]
+dashboard_modules = [zema_agents, zema_datastream]
 
 if __name__ == '__main__':
 
     #start agent network server
-    #agentNetwork = AgentNetwork(visualize = [modules])
-    agentNetwork = AgentNetwork()
-    # dashboard_ctrl = Dashboard_Control(modules)
-    # app.dashboard_ctrl = dashboard_ctrl
-    # app.run_server(debug=False)
+    agentNetwork = AgentNetwork(dashboard_modules=dashboard_modules)

@@ -3,6 +3,9 @@ from osbrain import run_nameserver
 from osbrain import run_agent
 from osbrain import Agent
 from osbrain import NSProxy
+import dashboard.Dashboard as Dashboard
+import dashboard.Dashboard_Control as Dashboard_Control
+from DataStreamMET4FOF import DataStreamMET4FOF
 
 #ML dependencies
 import numpy as np
@@ -494,13 +497,16 @@ class _AgentController(AgentMET4FOF):
                 edges += [(agent_name, output_connection)]
         return edges
 
+
 class AgentNetwork:
     """
     Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
 
     Provides function to add agents, (un)bind agents, query agent network state, set global agent states
+    Interfaces with an internal _AgentController which is hidden from user
+
     """
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, dashboard_modules=True, dashboard_update_interval=3):
         """
         Parameters
         ----------
@@ -508,9 +514,14 @@ class AgentNetwork:
             Ip address of server to connect/start
         port: int
             Port of server to connect/start
-        connect: boolean
+        connect: bool
             False sets Agent network to connect mode and will connect to specified address
-            True sets Agent network to start server mode. It will initially try to connect  and will start a new server at specified address
+            True (Default) sets Agent network to initially try to connect and if it cant find one, it will start a new server at specified address
+        dashboard_modules : list of modules , modules or bool
+            Accepts list of modules which contains the AgentMET4FOF and DataStreamMET4FOF derived classes
+            If set to True, will initiate the dashboard with default agents in AgentMET4FOF
+        dashboard_update_interval : int
+            Regular interval (seconds) to update the dashboard graphs
         """
 
         self.ip_addr= ip_addr
@@ -523,6 +534,14 @@ class AgentNetwork:
             self.connect(ip_addr,port, verbose=False)
             if self.ns == 0:
                 self.start_server(ip_addr,port)
+
+        if dashboard_modules is not None and dashboard_modules is not False:
+            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules)
+            Dashboard.app.dashboard_ctrl = dashboard_ctrl
+            Dashboard.app.update_interval = dashboard_update_interval
+            Dashboard.app.run_server(debug=False)
+        # from run_dashboard import run_dashboard
+        # run_dashboard()
 
     def connect(self,ip_addr="127.0.0.1", port = 3333,verbose=True):
         """
@@ -775,6 +794,54 @@ class AgentNetwork:
 
         self._get_controller().get_attr('ns').shutdown()
         return 0
+
+class DataStreamAgent(AgentMET4FOF):
+    """
+    Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
+
+    Can be used in incremental training or batch training mode.
+    See `DataStreamMET4FOF` on loading your own data set as a data stream.
+    """
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100, loop_wait=10, randomize = False):
+        self.stream = stream
+        self.stream.prepare_for_use()
+        if randomize:
+            self.stream.randomize_data()
+        self.batch_size = batch_size
+        if pretrain_size is None:
+            self.pretrain_size = batch_size
+        else:
+            self.pretrain_size = pretrain_size
+        self.pretrain_done = False
+        self.loop_wait = loop_wait
+
+    def agent_loop(self):
+        if self.current_state == "Running":
+            if self.pretrain_size is None:
+                self.send_next_sample(self.batch_size)
+            elif self.pretrain_size == -1:
+                self.send_all_sample()
+                self.pretrain_done = True
+            else:
+                #handle pre-training mode
+                if self.pretrain_done:
+                    self.send_next_sample(self.batch_size)
+                else:
+                    self.send_next_sample(self.pretrain_size)
+                    self.pretrain_done = True
+
+    def send_next_sample(self,num_samples=1):
+        if self.stream.has_more_samples():
+            data = self.stream.next_sample(num_samples)
+            self.log_info("IDX "+ str(self.stream.sample_idx))
+            self.send_output(data)
+
+    def reset(self):
+        super(DataStreamAgent, self).reset()
+        self.stream.reset()
+
+    def send_all_sample(self):
+        self.send_next_sample(-1)
 
 class MonitorAgent(AgentMET4FOF):
     """

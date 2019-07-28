@@ -8,28 +8,20 @@ from dash.exceptions import PreventUpdate
 import plotly.graph_objs as go
 from plotly import tools
 
-import numpy as np
 import networkx as nx
-
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork
-from DataStreamMET4FOF import DataStreamMET4FOF
-import DataStreamMET4FOF as datastreammet4fof_module
 import AgentMET4FOF as agentmet4fof_module
+
 import dashboard.LayoutHelper as LayoutHelper
 from dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
 
-
-
-#external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css']
-#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', 'https://fonts.googleapis.com/icon?family=Material+Icons']
 external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
+
 app = dash.Dash(__name__,
                 external_stylesheets=external_stylesheets,
                 external_scripts=external_scripts
                 )
-update_interval_seconds = 3
+app.update_interval_seconds = 3
 
 app.layout = html.Div(children=[
 
@@ -70,9 +62,7 @@ app.layout = html.Div(children=[
                            id='agents-network',
                            layout={'name': 'breadthfirst'},
                            style={'width': '100%', 'height': '600px'},
-                           elements=[{'data': {'id': 'add1', 'label': 'add1'}, 'position': {'x': 75, 'y': 75}},
-                                     {'data': {'id': 'subt1', 'label': 'subt1'}, 'position': {'x': 75, 'y': 90}},
-                                     {'data': {'id': 'subt2', 'label': 'subt2'}, 'position': {'x': 75, 'y': 105}}],
+                           elements=[],
                            stylesheet=[
                                         { 'selector': 'node', 'style':
                                             { 'label': 'data(id)' ,
@@ -156,7 +146,7 @@ app.layout = html.Div(children=[
         ]),
         dcc.Interval(
             id='interval-component-network-graph',
-            interval=update_interval_seconds * 1000,  # in milliseconds
+            interval=app.update_interval_seconds * 1000,  # in milliseconds
             n_intervals=0
         ),
         dcc.Interval(
@@ -166,43 +156,15 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-update-monitor-graph',
-            interval=update_interval_seconds * 1000,  # in milliseconds
+            interval=app.update_interval_seconds * 1000,  # in milliseconds
             n_intervals=0
         )
     ])
 ])
 
-#global variables access via 'dashboard_var'
-class Dashboard_Control():
-    def __init__(self, ip_addr="127.0.0.1", port=3333, modules=[]):
-        super(Dashboard_Control, self).__init__()
-        self.network_layout = {'name': 'grid'}
-        self.current_selected_agent = " "
-        self.current_nodes = []
-        self.current_edges = []
-        # get nameserver
-        self.agent_graph = nx.DiGraph()
-        self.agentNetwork = AgentNetwork(ip_addr=ip_addr,port=port, connect=True)
-        self.modules = [agentmet4fof_module, datastreammet4fof_module] + modules
-
-    def get_agentTypes(self):
-        agentTypes ={}
-        for module_ in self.modules:
-            agentTypes.update(dict([(name, cls) for name, cls in module_.__dict__.items() if
-                               isinstance(cls, type) and cls.__bases__[-1] == AgentMET4FOF]))
-        return agentTypes
-
-    def get_datasets(self):
-        datasets ={}
-        for module_ in self.modules:
-            datasets.update(dict([(name, cls) for name, cls in module_.__dict__.items() if
-                               isinstance(cls, type) and cls.__bases__[-1] == DataStreamMET4FOF]))
-        return datasets
-
 #Update network graph per interval
 @app.callback([dash.dependencies.Output('agents-network', 'elements'),
-       #        dash.dependencies.Output('agents-network', 'layout'),
-               dash.dependencies.Output('connect-modules-dropdown', 'options') ],
+               dash.dependencies.Output('connect-modules-dropdown', 'options')],
               [dash.dependencies.Input('interval-component-network-graph', 'n_intervals')],
               [dash.dependencies.State('agents-network', 'elements')]
                )
@@ -219,21 +181,20 @@ def update_network_graph(n_intervals,graph_elements):
     print(edges)
     print(app.dashboard_ctrl.agent_graph.edges)
     print(app.dashboard_ctrl.agent_graph.nodes)
+    print(graph_elements)
 
-    #if current number more than before, then update graph
-    if(app.dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes) or app.dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
-        print("GGxx")
+    #if current graph number is different more than before, then update graph
+    if len(graph_elements) != (len(nodes) + len(edges)):
+    #if(app.dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes) or app.dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
         new_G = nx.DiGraph()
         new_G.add_nodes_from(nodes)
         new_G.add_edges_from(edges)
 
         nodes_elements = create_nodes_cytoscape(new_G)
         edges_elements = create_edges_cytoscape(edges)
-        print("GGxx22")
-        print(nodes_elements)
-        print(edges_elements)
 
         app.dashboard_ctrl.agent_graph = new_G
+
         # update agents connect options
         node_connect_options = [{'label': agentName, 'value': agentName} for agentName in nodes]
 
@@ -324,8 +285,7 @@ def add_dataset_button_click(n_clicks,add_dropdown_val):
         agentTypes = app.dashboard_ctrl.get_agentTypes()
         datasets = app.dashboard_ctrl.get_datasets()
         chosen_dataset = datasets[add_dropdown_val]()
-        print(datasets[add_dropdown_val])
-        new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=type(chosen_dataset).__name__,agentType=datastreammet4fof_module.DataStreamAgent)
+        new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=type(chosen_dataset).__name__,agentType=agentmet4fof_module.DataStreamAgent)
 
         new_agent.init_parameters(stream=chosen_dataset)
     raise PreventUpdate
@@ -339,10 +299,11 @@ def bind_module_click(n_clicks_connect,dropdown_value, current_agent_id):
         #get nameserver
         agentNetwork = app.dashboard_ctrl.agentNetwork
 
-        print(agentNetwork.get_agent(current_agent_id))
-        print(agentNetwork.get_agent(dropdown_value))
+        print("current_agent_id: "+current_agent_id, " dropdown_selected: "+dropdown_value)
         #for connect module button click
-        agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id), agentNetwork.get_agent(dropdown_value))
+
+        if current_agent_id != dropdown_value:
+            agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id), agentNetwork.get_agent(dropdown_value))
     raise PreventUpdate
 
 @app.callback(dash.dependencies.Output('disconnect_placeholder', 'children') ,
@@ -453,10 +414,8 @@ def plot_monitor_memory(n_interval):
         constant_height_px= 400
         height_px = num_graphs*constant_height_px
         style = {'height': height_px}
-        #return [monitor_graphs,style]
         return [monitor_graphs]
     else:
-        #return [[],{}]
         return [[]]
 
 #load Monitors data and draw - all at once

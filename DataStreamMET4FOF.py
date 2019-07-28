@@ -1,4 +1,3 @@
-from AgentMET4FOF import AgentMET4FOF
 from skmultiflow.data.base_stream import Stream
 import numpy as np
 
@@ -94,55 +93,6 @@ class DataStreamMET4FOF(Stream):
 
     def has_more_samples(self):
         return self.sample_idx < self.n_samples
-
-class DataStreamAgent(AgentMET4FOF):
-    """
-    Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
-
-    Can be used in incremental training or batch training mode.
-    See `DataStreamMET4FOF` on loading your own data set as a data stream.
-    """
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100, loop_wait=10, randomize = False):
-        self.stream = stream
-        self.stream.prepare_for_use()
-        if randomize:
-            self.stream.randomize_data()
-        self.batch_size = batch_size
-        if pretrain_size is None:
-            self.pretrain_size = batch_size
-        else:
-            self.pretrain_size = pretrain_size
-        self.pretrain_done = False
-        self.loop_wait = loop_wait
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            if self.pretrain_size is None:
-                self.send_next_sample(self.batch_size)
-            elif self.pretrain_size == -1:
-                self.send_all_sample()
-                self.pretrain_done = True
-            else:
-                #handle pre-training mode
-                if self.pretrain_done:
-                    self.send_next_sample(self.batch_size)
-                else:
-                    self.send_next_sample(self.pretrain_size)
-                    self.pretrain_done = True
-
-    def send_next_sample(self,num_samples=1):
-        if self.stream.has_more_samples():
-            data = self.stream.next_sample(num_samples)
-            self.log_info("IDX "+ str(self.stream.sample_idx))
-            self.send_output(data)
-
-    def reset(self):
-        super(DataStreamAgent, self).reset()
-        self.stream.reset()
-
-    def send_all_sample(self):
-        self.send_next_sample(-1)
-
 
 #Built-in classes with DataStreamMET4FOF
 class SineGenerator(DataStreamMET4FOF):
