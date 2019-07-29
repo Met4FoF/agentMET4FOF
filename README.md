@@ -30,8 +30,6 @@ First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py)
 or start hacking the [main_agents.py](main_agents.py) if you already are
 familiar with agentMet4FoF and want to customize your agents' network.
 
-=======
-
 Updates
 ---
  - Implemented Sensor Agent, Aggregator Agent, Predictor Agent, DecisionMaker Agent, Sensor Network Agent
