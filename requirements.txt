@@ -7,3 +7,4 @@ matplotlib
 pandas
 seaborn
 osbrain
+dash
