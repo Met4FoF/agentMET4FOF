@@ -1,21 +1,73 @@
-from DataStreamMET4FOF import DataStreamMET4FOF
+import sys
+
+import h5py
 import numpy as np
 import pandas as pd
-import h5py
+import requests
+
+from DataStreamMET4FOF import DataStreamMET4FOF
+import os
 
 
 class ZEMA_DataStream(DataStreamMET4FOF):
-    def __init__(self):
-        f = h5py.File("F:/PhD Research/Github/agentMet4FoF/dataset/Sensor_data_2kHz.h5", 'r')
+    url = ""
 
-        # Order of sensors in the picture is different from the order in imported data, which will be followed.
-        self.offset=[0, 0, 0, 0, 0.00488591, 0.00488591, 0.00488591,  0.00488591, 1.36e-2, 1.5e-2, 1.09e-2]
-        self.gain=[5.36e-9, 5.36e-9, 5.36e-9, 5.36e-9, 3.29e-4, 3.29e-4, 3.29e-4, 3.29e-4, 8.76e-5, 8.68e-5, 8.65e-5]
-        self.b=[1, 1, 1, 1, 1, 1, 1, 1, 5.299641744, 5.299641744, 5.299641744]
-        self.k=[250, 1, 10, 10, 1.25, 1, 30, 0.5, 2, 2, 2]
-        self.units=['[Pa]', '[g]', '[g]', '[g]', '[kN]', '[bar]', '[mm/s]', '[A]', '[A]', '[A]', '[A]']
-        self.labels = ['Microphone', 'Vibration plain bearing','Vibration piston rod','Vibration ball bearing', 'Axial force','Pressure','Velocity','Active current','Motor current phase 1', 'Motor current phase 2','Motor current phase 3']
-        #prepare sensor data
+    def get_filename(self):
+        return os.path.join("..", "develop", "dataset", self.url.split('/')[-1])
+
+    def do_download(self):
+        with open(self.get_filename(), "wb") as f:
+            print
+            "Downloading %s" % self.get_filename()
+            response = requests.get(self.url, stream=True)
+            total_length = response.headers.get('content-length')
+
+            if total_length is None:  # no content length header
+                f.write(response.content)
+            else:
+                dl = 0
+                total_length = int(total_length)
+                for data in response.iter_content(chunk_size=4096):
+                    dl += len(data)
+                    f.write(data)
+                    done = int(50 * dl / total_length)
+                    sys.stdout.write(
+                        "\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
+                    sys.stdout.flush()
+
+    def __init__(self):
+
+        self.url = "https://zenodo.org/record/1326278/files/Sensor_data_2kHz.h5"
+
+        # Check if the file is existing already, if not download the file.
+
+        if os.path.isfile(self.get_filename()):
+            print("Data already exist.\n")
+        else:
+            print("Download data...")
+            self.do_download
+            print("Download finished.\n")
+        print(os.system("dir"))
+
+        f = h5py.File(self.get_filename(), 'r')
+
+        # Order of sensors in the picture is different from the order in
+        # imported data, which will be followed.
+        self.offset = [0, 0, 0, 0, 0.00488591, 0.00488591, 0.00488591,
+                       0.00488591, 1.36e-2, 1.5e-2, 1.09e-2]
+        self.gain = [5.36e-9, 5.36e-9, 5.36e-9, 5.36e-9, 3.29e-4, 3.29e-4,
+                     3.29e-4, 3.29e-4, 8.76e-5, 8.68e-5, 8.65e-5]
+        self.b = [1, 1, 1, 1, 1, 1, 1, 1, 5.299641744, 5.299641744, 5.299641744]
+        self.k = [250, 1, 10, 10, 1.25, 1, 30, 0.5, 2, 2, 2]
+        self.units = ['[Pa]', '[g]', '[g]', '[g]', '[kN]', '[bar]', '[mm/s]',
+                      '[A]', '[A]', '[A]', '[A]']
+        self.labels = ['Microphone', 'Vibration plain bearing',
+                       'Vibration piston rod', 'Vibration ball bearing',
+                       'Axial force', 'Pressure', 'Velocity', 'Active current',
+                       'Motor current phase 1', 'Motor current phase 2',
+                       'Motor current phase 3']
+
+        # prepare sensor data
         list(f.keys())
         data= f['Sensor_Data']
         data= data[:,:,:data.shape[2]-1] #drop last cycle
