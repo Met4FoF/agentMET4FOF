@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/bangxiangyong/agentMet4FoF.svg?style=svg)](https://circleci.com/gh/bangxiangyong/agentMet4FoF)
+
 # Multi-Agent System for Metrology for Factory of the Future (Met4FoF) Code
 This is supported by European Metrology Programme for Innovation and Research (EMPIR) under the project Metrology for the Factory of the Future (Met4FoF), project number 17IND12. (https://www.ptb.de/empir2018/met4fof/home/)
 
