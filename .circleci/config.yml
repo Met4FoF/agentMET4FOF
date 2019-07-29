@@ -51,8 +51,8 @@ jobs:
           name: Run agentMet4FoF tests
           command: |
             . venv/bin/activate
-            pytest -v --junitxml=test-reports/pytest.xml --cov=/ . > \
-            test-reports/agentMet4FoF.log
+            pytest -v --junitxml=test-reports/pytest.xml \
+            --cov=agentMet4FoF . > test-reports/agentMet4FoF.log
 
       # Upload coverage report.
       - run:
