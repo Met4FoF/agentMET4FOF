@@ -1,9 +1,10 @@
 .idea
 .ipynb_checkpoints
+dataset
 archived
-Dataset
 pickles
 venv
 __pycache__
 depracated
+develop/ZeMA-machine-learning-tutorials-master
 *.csv
