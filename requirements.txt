@@ -9,3 +9,4 @@ seaborn
 osbrain
 dash
 dash-cytoscape
+networkx
