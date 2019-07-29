@@ -11,11 +11,14 @@ import os
 
 class ZEMA_DataStream(DataStreamMET4FOF):
     url = ""
+    path = ""
 
     def get_filename(self):
-        return os.path.join("develop", "dataset", self.url.split('/')[-1])
+        return os.path.join(self.path, self.url.split('/')[-1])
 
     def do_download(self):
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         with open(self.get_filename(), "wb") as f:
             response = requests.get(self.url, stream=True)
             total_length = response.headers.get('content-length')
@@ -36,6 +39,7 @@ class ZEMA_DataStream(DataStreamMET4FOF):
     def __init__(self):
 
         self.url = "https://zenodo.org/record/1326278/files/Sensor_data_2kHz.h5"
+        self.path = os.path.join("develop", "dataset")
 
         # Check if the file is existing already, if not download the file.
 
