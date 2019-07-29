@@ -167,12 +167,7 @@ class Regression_Agent(AgentMET4FOF):
             self.log_info("Overall Train Score: " + str(self.lin_model.score(x, y_true)))
         elif message['channel'] == 'test':
             y_true = message['data']['y'][0]
-            y_pred = self.lin_model.predict(message['data']['x'])
-            for idx, value in enumerate(y_pred):
-                if y_pred[idx]>100:
-                    y_pred[idx]=100
-                elif y_pred[idx]<0:
-                    y_pred[idx]=0
+            y_pred = self.lin_model.predict(message['data']['x']).clip(0, 100)
             self.send_output({'y_pred': y_pred, 'y_true': np.array(y_true)})
             self.log_info("Overall Test Score: " + str(self.lin_model.score(message['data']['x'], y_true)))
             self.reg_test_score = self.lin_model.score(message['data']['x'], y_true)
