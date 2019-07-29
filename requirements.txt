@@ -11,3 +11,4 @@ dash
 dash-cytoscape
 networkx
 multiprocess
+h5py
