@@ -52,7 +52,7 @@ jobs:
           command: |
             . venv/bin/activate
             pytest -v --junitxml=test-reports/pytest.xml \
-            --cov=agentMet4FoF --ignore=tests/test_zema_emc_ml.py . > \
+            --cov=. --ignore=tests/test_zema_emc_ml.py . > \
             test-reports/agentMet4FoF.log
 
       # Upload coverage report.
