@@ -3,3 +3,13 @@
 archived
 Dataset
 pickles
+venv
+__pycache__
+depracated
+dataset
+develop/.ipynb_checkpoints
+develop/ZeMA-machine-learning-tutorials-master
+tutorials/log_file.csv
+develop/log_file.csv
+tests/log_file.csv
+examples/log_file.csv
