@@ -10,3 +10,4 @@ osbrain
 dash
 dash-cytoscape
 networkx
+multiprocess
