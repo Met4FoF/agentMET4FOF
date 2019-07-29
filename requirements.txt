@@ -12,3 +12,4 @@ dash-cytoscape
 networkx
 multiprocess
 h5py
+requests
