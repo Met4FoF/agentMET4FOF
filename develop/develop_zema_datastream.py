@@ -13,12 +13,10 @@ class ZEMA_DataStream(DataStreamMET4FOF):
     url = ""
 
     def get_filename(self):
-        return os.path.join("..", "develop", "dataset", self.url.split('/')[-1])
+        return os.path.join("develop", "dataset", self.url.split('/')[-1])
 
     def do_download(self):
         with open(self.get_filename(), "wb") as f:
-            print
-            "Downloading %s" % self.get_filename()
             response = requests.get(self.url, stream=True)
             total_length = response.headers.get('content-length')
 
@@ -45,9 +43,8 @@ class ZEMA_DataStream(DataStreamMET4FOF):
             print("Data already exist.\n")
         else:
             print("Download data...")
-            self.do_download
+            self.do_download()
             print("Download finished.\n")
-        print(os.system("dir"))
 
         f = h5py.File(self.get_filename(), 'r')
 
