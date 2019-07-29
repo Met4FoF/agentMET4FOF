@@ -6,3 +6,4 @@ pickles
 venv
 __pycache__
 depracated
+*.csv
