@@ -9,6 +9,7 @@ About
 ---
  - How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
  - Includes agent-based simulation and implementation
+ - Readthedocs documentation is available at (https://agentmet4fof.readthedocs.io)
 
 Get started
 ---
