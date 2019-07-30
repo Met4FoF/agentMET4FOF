@@ -28,21 +28,15 @@ satisfied. If you don't have *Anaconda* installed already follow [this guide
 ](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/download.html)
 first, then create the virtual environment as stated above and then proceed.
 
-First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py)
-or start hacking the [main_agents.py](main_agents.py) if you already are
+First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py) and [examples](./examples/zema_emc/)
+or start hacking the [main_agent_network.py](main_agent_network.py) if you already are
 familiar with agentMet4FoF and want to customize your agents' network.
 
 Updates
 ---
- - Implemented Sensor Agent, Aggregator Agent, Predictor Agent, DecisionMaker Agent, Sensor Network Agent
- - Able to handle multiple Sensor Agents & Predictor Agents (each equipped with a different model)
- - Implemented with ZEMA condition monitoring of hydraulic system data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1323611.svg)](https://doi.org/10.5281/zenodo.1323611)
- - Implemented web visualization with user interface
-
-
-To run
----
- - Run Code 01-03 to prepare the ML models, and run Code 04 to start and run the agents. While Code 04 is running, run Code 05 in separate terminal to visualize them.
+ - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent 
+ - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
+ - Implemented interactive web application with user interface
 
 
 ## Screenshot of web visualization
