@@ -7,7 +7,7 @@ Manufacturing of the University of Cambridge <https://www.ifm.eng.cam.ac.uk>`_
 <https://met4fof.eu>`_.
 
 For the *agentMet4FoF* homepage go to
-`GitHub <https://github.com/bangxiangyong/agentMet4FoF/tree/develop>`_.
+`GitHub <https://github.com/bangxiangyong/agentMet4FoF/tree/master>`_.
 
 *agentMet4FoF* is written in Python 3.
 
@@ -16,6 +16,8 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
+   index.rst
+   Getting started.rst
    AgentMET4FOF.rst
 
 
@@ -29,7 +31,7 @@ Indices and tables
 References
 ==========
 
-.. [Bang2016]   Bang X. Yong, A. Brintrup
+.. [Bang2019]   Bang X. Yong, A. Brintrup
                 Multi Agent System for Machine Learning Under Uncertainty in
                 Cyber Physical Manufacturing System,
                 9th Workshop on Service Oriented, Holonic and Multi-agent

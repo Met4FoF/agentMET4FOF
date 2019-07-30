@@ -7,3 +7,9 @@ matplotlib
 pandas
 seaborn
 osbrain
+dash
+dash-cytoscape
+networkx
+multiprocess
+h5py
+requests
