@@ -34,7 +34,8 @@ familiar with agentMet4FoF and want to customize your agents' network.
 
 Updates
 ---
- - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent 
+ - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
+ - Implemented class AgentNetwork to start or connect to a agent server
  - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
  - Implemented interactive web application with user interface
 
