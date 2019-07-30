@@ -17,7 +17,6 @@ Contents:
    :maxdepth: 1
 
    index.rst
-   Getting started.rst
    AgentMET4FOF.rst
 
 
