@@ -860,7 +860,7 @@ class DataStreamAgent(AgentMET4FOF):
     See `DataStreamMET4FOF` on loading your own data set as a data stream.
     """
 
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size=None, batch_size=100, loop_wait=10, randomize = False):
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size=None, batch_size=1, loop_wait=1, randomize = False):
         """
         Parameters
         ----------
@@ -912,7 +912,7 @@ class DataStreamAgent(AgentMET4FOF):
     def send_next_sample(self,num_samples=1):
         if self.stream.has_more_samples():
             data = self.stream.next_sample(num_samples)
-            self.log_info("IDX "+ str(self.stream.sample_idx))
+            self.log_info("DATA SAMPLE ID: "+ str(self.stream.sample_idx))
             self.send_output(data)
 
     def reset(self):
