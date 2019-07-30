@@ -10,6 +10,7 @@ class DataStreamMET4FOF(Stream):
     The format shape for 2D data stream (num_samples, n_sensors)
     The format shape for 3D data stream (num_samples, sample_length , n_sensors)
     """
+
     def __init__(self):
         super().__init__()
 
@@ -22,7 +23,6 @@ class DataStreamMET4FOF(Stream):
             self.y = self.y[random_index]
         elif type(self.y).__name__ == "DataFrame":
             self.y = self.y.iloc[random_index]
-
 
     def set_data_source(self, x,y):
         self.sample_idx = 0

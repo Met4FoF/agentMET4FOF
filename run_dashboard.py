@@ -1,8 +1,8 @@
 from AgentMET4FOF import run_dashboard
 
 #Agent modules
-import develop.develop_zema_agents as zema_agents
-import develop.develop_zema_datastream as zema_datastream
+import examples.ZEMA_EMC.zema_agents as zema_agents
+import examples.ZEMA_EMC.zema_datastream as zema_datastream
 
 modules = [zema_agents, zema_datastream]
 

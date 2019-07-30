@@ -1,5 +1,5 @@
 from AgentMET4FOF import AgentMET4FOF
-from develop.develop_zema_feature_extract import FFT_BFC, Pearson_FeatureSelection
+from examples.ZEMA_EMC.zema_feature_extract import FFT_BFC, Pearson_FeatureSelection
 
 import numpy as np
 import time
@@ -130,6 +130,7 @@ class LDA_Agent(AgentMET4FOF):
                 x = message['data']['x']
             self.ml_model = self.ml_model.fit(x, y_true)
             self.log_info("Overall Train Score: " + str(self.ml_model.score(x, y_true)))
+
         elif message['channel'] == 'test':
             y_true = self.reformat_target(message['data']['y'])
             y_pred = self.ml_model.predict(message['data']['x'])
@@ -151,11 +152,9 @@ class Regression_Agent(AgentMET4FOF):
             raise Exception("Wrongly defined regression model. Available models are: 'RandomForest' and 'BayesianRidge'")
 
     def on_received_message(self, message):
-        #self.log_info("Y MESSAGE "+ type(message['y']).__name__)
 
         if message['channel'] == 'train':
             if self.incremental:
-                #message['data']['y'] = message['data']['y'][0]
                 message['data']['y'] = message['data']['y'].values.ravel()
                 self.update_data_memory(message)
                 y_true = self.memory[list(self.memory.keys())[0]]['y']

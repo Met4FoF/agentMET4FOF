@@ -1,7 +1,9 @@
 from AgentMET4FOF import AgentNetwork, MonitorAgent, DataStreamAgent
 
-from develop.develop_zema_datastream import ZEMA_DataStream
-from develop.develop_zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, Regression_Agent ,EvaluatorAgent
+from examples.ZEMA_EMC.zema_datastream import ZEMA_DataStream
+from examples.ZEMA_EMC.zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, Regression_Agent ,EvaluatorAgent
+import examples.ZEMA_EMC.zema_agents
+
 import numpy as np
 np.random.seed(100)
 
@@ -9,7 +11,8 @@ np.random.seed(100)
 if __name__ == '__main__':
 
     #start agent network server
-    agentNetwork = AgentNetwork()
+    agentNetwork = AgentNetwork(dashboard_modules=[examples.ZEMA_EMC.zema_datastream,
+                                                   examples.ZEMA_EMC.zema_agents], log_filename=False)
 
     #init agents by adding into the agent network
     datastream_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
@@ -25,10 +28,11 @@ if __name__ == '__main__':
 
     #init parameters
     #incremental training
-    datastream_agent.init_parameters(stream=ZEMA_DataStream(), pretrain_size=1000, batch_size = 250, loop_wait=10, randomize=True)
+    datastream_agent.init_parameters(stream=ZEMA_DataStream(), pretrain_size=1000, batch_size=250, loop_wait=10, randomize=True)
 
     #batch training
-    #datastream_agent.init_parameters(ZEMA_DataStream())
+    #datastream_agent.init_parameters(stream=ZEMA_DataStream(), pretrain_size=-1, randomize=True)
+
 
     #hold-out or prequential mode
     #train_test_split_agent.init_parameters(train_ratio=0.8) #hold-out

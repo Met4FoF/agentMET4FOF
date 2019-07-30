@@ -856,11 +856,34 @@ class DataStreamAgent(AgentMET4FOF):
     Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
 
     Can be used in incremental training or batch training mode.
+    To simulate batch training mode, set `pretrain_size=-1` , otherwise, set pretrain_size and batch_size for the respective
     See `DataStreamMET4FOF` on loading your own data set as a data stream.
     """
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100, loop_wait=10, randomize = False):
+
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size=None, batch_size=100, loop_wait=10, randomize = False):
+        """
+        Parameters
+        ----------
+
+        stream : DataStreamMET4FOF
+            A DataStreamMET4FOF object which provides the sample data
+
+        pretrain_size : int
+            The number of sample data to send through in the first loop cycle, and subsequently, the batch_size will be used
+
+        batch_size : int
+            The number of sample data to send in every loop cycle
+
+        loop_wait : int
+            The duration to wait (seconds) at the end of each loop cycle before going into the next cycle
+
+        randomize : bool
+            Determines if the dataset should be shuffled before streaming
+        """
+
         self.stream = stream
         self.stream.prepare_for_use()
+
         if randomize:
             self.stream.randomize_data()
         self.batch_size = batch_size
@@ -875,7 +898,7 @@ class DataStreamAgent(AgentMET4FOF):
         if self.current_state == "Running":
             if self.pretrain_size is None:
                 self.send_next_sample(self.batch_size)
-            elif self.pretrain_size == -1:
+            elif self.pretrain_size == -1 or self.batch_size == -1:
                 self.send_all_sample()
                 self.pretrain_done = True
             else:

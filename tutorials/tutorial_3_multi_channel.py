@@ -12,8 +12,21 @@ from DataStreamMET4FOF import SineGenerator, CosineGenerator
 
 def minus(data, minus_val):
     return data-minus_val
+
 def plus(data,plus_val):
     return data+plus_val
+
+class MultiGeneratorAgent(AgentMET4FOF):
+    def init_parameters(self):
+        self.sine_stream = SineGenerator()
+        self.cos_stream = CosineGenerator()
+
+    def agent_loop(self):
+        if self.current_state == "Running":
+            sine_data = self.sine_stream.next_sample() #dictionary
+            cosine_data = self.sine_stream.next_sample() #dictionary
+            self.send_output(sine_data['x'], channel="sine")
+            self.send_output(cosine_data['x'], channel="cosine")
 
 class MultiOutputMathAgent(AgentMET4FOF):
     def init_parameters(self,minus_param=0.5,plus_param=0.5):
@@ -31,18 +44,6 @@ class MultiOutputMathAgent(AgentMET4FOF):
         elif message['channel'] == 'sine':
             plus_data = plus(message['data'], self.plus_param)
             self.send_output({'sine_plus':plus_data})
-
-class MultiGeneratorAgent(AgentMET4FOF):
-    def init_parameters(self):
-        self.sine_stream = SineGenerator()
-        self.cos_stream = CosineGenerator()
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            sine_data = self.sine_stream.next_sample() #dictionary
-            cosine_data = self.sine_stream.next_sample() #dictionary
-            self.send_output(sine_data['x'], channel="sine")
-            self.send_output(cosine_data['x'], channel="cosine")
 
 if __name__ == '__main__':
     # start agent network server

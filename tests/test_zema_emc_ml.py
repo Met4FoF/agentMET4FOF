@@ -1,11 +1,9 @@
-import pytest
-
 from AgentMET4FOF import AgentNetwork, MonitorAgent, DataStreamAgent
 
 
-from develop.develop_zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, EvaluatorAgent
-from develop.develop_zema_feature_extract import Pearson_FeatureSelection, FFT_BFC
-from develop.develop_zema_datastream import ZEMA_DataStream
+from examples.ZEMA_EMC.zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, EvaluatorAgent
+from examples.ZEMA_EMC.zema_feature_extract import Pearson_FeatureSelection, FFT_BFC
+from examples.ZEMA_EMC.zema_datastream import ZEMA_DataStream
 from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 

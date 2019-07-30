@@ -13,3 +13,4 @@ tutorials/log_file.csv
 develop/log_file.csv
 tests/log_file.csv
 examples/log_file.csv
+*log_file*
