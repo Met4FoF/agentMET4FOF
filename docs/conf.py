@@ -55,8 +55,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'agentMet4FoF'
-copyright = '2019, Bang Xiang Yong (UCAM), Björn Ludwig (PTB)'
-author = 'Bang Xiang Yong, Björn Ludwig'
+copyright = '2019, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Haris Lulic (' \
+            'PTB)'
+author = 'Bang Xiang Yong, Björn Ludwig, Haris Lulic'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
