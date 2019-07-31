@@ -62,10 +62,10 @@ class Evaluator(AgentMET4FOF):
             res = self.compute_accuracy(y_pred=y_pred, y_true=y_true)
             self.send_output(res)
 
-if __name__ == '__main__':
+
+def main():
     # start agent network server
     agentNetwork = AgentNetwork()
-
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
     trainer_agent = agentNetwork.add_agent(agentType=Trainer)
@@ -73,8 +73,8 @@ if __name__ == '__main__':
     evaluator_agent = agentNetwork.add_agent(agentType=Evaluator)
     monitor_agent_1 = agentNetwork.add_agent(agentType=MonitorAgent)
     monitor_agent_2 = agentNetwork.add_agent(agentType=MonitorAgent)
-
-    gen_agent.init_parameters(stream=SineGenerator(), pretrain_size = 1000, batch_size= 1)
+    gen_agent.init_parameters(stream=SineGenerator(), pretrain_size=1000,
+                              batch_size=1)
     trainer_agent.init_parameters(ml_model=HoeffdingTree())
     # connect agents : We can connect multiple agents to any particular agent
     # However the agent needs to implement handling multiple input types
@@ -82,9 +82,14 @@ if __name__ == '__main__':
     agentNetwork.bind_agents(gen_agent, predictor_agent)
     agentNetwork.bind_agents(trainer_agent, predictor_agent)
     agentNetwork.bind_agents(predictor_agent, evaluator_agent)
-
     agentNetwork.bind_agents(evaluator_agent, monitor_agent_1)
     agentNetwork.bind_agents(predictor_agent, monitor_agent_2)
-
     # set all agents states to "Running"
     agentNetwork.set_running_state()
+
+    # allow for shutting down the network after execution
+    return agentNetwork
+
+
+if __name__ == '__main__':
+    main()

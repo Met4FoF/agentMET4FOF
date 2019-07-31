@@ -58,29 +58,35 @@ class ML_Model(AgentMET4FOF):
         accuracy = np.sum(num_accurate) / len(num_accurate) * 100
         return accuracy
 
-if __name__ == '__main__':
 
-    #start agent network
+def main():
+    global agentNetwork
+    # start agent network
     agentNetwork = AgentNetwork()
-
-    #add agents
+    # add agents
     data_stream_agent_1 = agentNetwork.add_agent(agentType=DataStreamAgent)
     ml_agent_hoeffdingTree = agentNetwork.add_agent(agentType=ML_Model)
     ml_agent_neuralNets = agentNetwork.add_agent(agentType=ML_Model)
     monitor_agent_1 = agentNetwork.add_agent(agentType=MonitorAgent)
-
-    #init parameters
-    data_stream_agent_1.init_parameters(stream=WaveformGenerator(), pretrain_size = 1000, batch_size= 100)
+    # init parameters
+    data_stream_agent_1.init_parameters(stream=WaveformGenerator(),
+                                        pretrain_size=1000, batch_size=100)
     ml_agent_hoeffdingTree.init_parameters(ml_model=HoeffdingTree())
     ml_agent_neuralNets.init_parameters(ml_model=NaiveBayes())
-
-    #connect agents
+    # connect agents
     agentNetwork.bind_agents(data_stream_agent_1, ml_agent_hoeffdingTree)
     agentNetwork.bind_agents(data_stream_agent_1, ml_agent_neuralNets)
     agentNetwork.bind_agents(ml_agent_hoeffdingTree, monitor_agent_1)
     agentNetwork.bind_agents(ml_agent_neuralNets, monitor_agent_1)
-
     agentNetwork.set_running_state()
+
+    # allow for shutting down the network after execution
+    return agentNetwork
+
+
+if __name__ == '__main__':
+    main()
+
 
 
 

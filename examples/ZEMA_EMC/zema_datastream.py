@@ -39,7 +39,7 @@ class ZEMA_DataStream(DataStreamMET4FOF):
     def __init__(self):
 
         self.url = "https://zenodo.org/record/1326278/files/Sensor_data_2kHz.h5"
-        self.path = os.path.join("develop", "dataset")
+        self.path = os.path.join(os.path.dirname(__file__), "dataset")
 
         # Check if the file is existing already, if not download the file.
 

@@ -23,3 +23,24 @@ class AdditionAgent(AgentMET4FOF):
         plus_data = plus(message['data']['x'], self.plus_param)
 
         self.send_output(plus_data)
+
+
+def main():
+    # start agent network server
+    agentNetwork = AgentNetwork()
+    # init agents
+    sub_agent = agentNetwork.add_agent(agentType=SubtractAgent)
+    add_agent = agentNetwork.add_agent(agentType=AdditionAgent)
+    monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
+    # connect
+    agentNetwork.bind_agents(sub_agent, monitor_agent)
+    agentNetwork.bind_agents(add_agent, monitor_agent)
+    # set all agents states to "Running"
+    agentNetwork.set_running_state()
+
+    # allow for shutting down the network after execution
+    return agentNetwork
+
+
+if __name__ == '__main__':
+    main()

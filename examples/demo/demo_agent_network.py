@@ -8,7 +8,10 @@ import examples.demo.demo_agents as demo_agents
 dashboard_modules = [zema_agents, zema_datastream, demo_agents]
 
 
-if __name__ == '__main__':
+def main():
+    # start agent network server and return it to allow for shutdown
+    return AgentNetwork(dashboard_modules=dashboard_modules)
 
-    #start agent network server
-    agentNetwork = AgentNetwork(dashboard_modules=dashboard_modules)
+
+if __name__ == '__main__':
+    main()
