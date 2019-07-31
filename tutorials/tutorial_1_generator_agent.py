@@ -16,7 +16,8 @@ class SineGeneratorAgent(AgentMET4FOF):
             sine_data = self.stream.next_sample() #dictionary
             self.send_output(sine_data['x'])
 
-if __name__ == '__main__':
+
+def main():
     #start agent network server
     agentNetwork = AgentNetwork()
 
@@ -34,5 +35,10 @@ if __name__ == '__main__':
     # set all agents states to "Running"
     agentNetwork.set_running_state()
 
+    # allow for shutting down the network after execution
+    return agentNetwork
 
+
+if __name__ == '__main__':
+    main()
 

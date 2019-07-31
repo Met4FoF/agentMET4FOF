@@ -41,27 +41,30 @@ class SineGeneratorAgent(AgentMET4FOF):
             sine_data = self.stream.next_sample() #dictionary
             self.send_output(sine_data['x'])
 
-if __name__ == '__main__':
+
+def main():
     # start agent network server
     agentNetwork = AgentNetwork()
-
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=SineGeneratorAgent)
     math_agent = agentNetwork.add_agent(agentType=MathAgent)
     multi_math_agent = agentNetwork.add_agent(agentType=MultiMathAgent)
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
-
     # connect agents : We can connect multiple agents to any particular agent
     agentNetwork.bind_agents(gen_agent, math_agent)
     agentNetwork.bind_agents(gen_agent, multi_math_agent)
-
     # connect
     agentNetwork.bind_agents(gen_agent, monitor_agent)
     agentNetwork.bind_agents(math_agent, monitor_agent)
     agentNetwork.bind_agents(multi_math_agent, monitor_agent)
-
     # set all agents states to "Running"
     agentNetwork.set_running_state()
 
+    # allow for shutting down the network after execution
+    return agentNetwork
+
+
+if __name__ == '__main__':
+    main()
 
 
