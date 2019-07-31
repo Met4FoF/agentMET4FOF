@@ -13,3 +13,4 @@ networkx
 multiprocess
 h5py
 requests
+plotly
