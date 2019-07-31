@@ -42,7 +42,7 @@ Updates
 
 
 ## Screenshot of web visualization
-![Web Screenshot](https://github.com/bangxiangyong/agentMet4FoF/blob/master/screenshot_met4fof.png)
+![Web Screenshot](docs/screenshot_met4fof.png)
 
 Note
 ---
