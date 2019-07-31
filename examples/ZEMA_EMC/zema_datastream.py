@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-from DataStreamMET4FOF import DataStreamMET4FOF
+from agentMet4FoF.streams import DataStreamMET4FOF
 import os
 
 

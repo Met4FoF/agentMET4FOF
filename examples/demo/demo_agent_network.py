@@ -1,4 +1,4 @@
-from AgentMET4FOF import AgentNetwork
+from agentMet4FoF.agents import AgentNetwork
 
 #Agent modules
 import examples.ZEMA_EMC.zema_agents as zema_agents

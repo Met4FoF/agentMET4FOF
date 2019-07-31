@@ -1,5 +1,5 @@
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent
-from DataStreamMET4FOF import SineGenerator
+from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMet4FoF.streams import SineGenerator
 
 #Now we demonstrate how to build a MathAgent as an intermediate to process the SineGeneratorAgent's output
 #Subsequently, a MultiMathAgent is built to show the ability to send a dictionary of multiple fields to the recipient
