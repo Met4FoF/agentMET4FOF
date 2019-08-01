@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import dash
 import dash_cytoscape as cyto
 import dash_html_components as html
@@ -16,8 +17,10 @@ from dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscap
 
 external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', 'https://fonts.googleapis.com/icon?family=Material+Icons']
 external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
+assets_url_path = os.path.join(os.path.dirname(__file__), 'assets')
 
 app = dash.Dash(__name__,
+                assets_url_path=assets_url_path,
                 external_stylesheets=external_stylesheets,
                 external_scripts=external_scripts
                 )
