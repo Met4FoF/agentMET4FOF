@@ -22,7 +22,7 @@ cd /your/local/folder/agentMet4FoF
 ```
 and execute
 ```
-conda env create --name agentMet4FoF --file environment.yml 
+conda env create --file environment.yml 
 ```
 This will create an *Anaconda* virtual environment with all dependencies
 satisfied. If you don't have *Anaconda* installed already follow [this guide
