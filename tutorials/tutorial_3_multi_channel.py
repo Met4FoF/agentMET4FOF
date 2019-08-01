@@ -1,5 +1,5 @@
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMet4FoF.streams import SineGenerator, CosineGenerator
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.streams import SineGenerator, CosineGenerator
 
 #We can use different channels for the receiver  to handle specifically each channel name
 #This can be useful for example in splitting train and test channels in machine learning

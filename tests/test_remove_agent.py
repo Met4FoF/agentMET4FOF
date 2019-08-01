@@ -1,4 +1,4 @@
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork
 import time
 
 def test_remove_agent():

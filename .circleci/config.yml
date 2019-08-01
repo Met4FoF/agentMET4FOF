@@ -48,7 +48,7 @@ jobs:
 
       # Run tests with coverage report! We use pytest's test-runner.
       - run:
-          name: Run agentMet4FoF tests
+          name: Run agentMET4FOF tests
           command: |
             . venv/bin/activate
             pytest -v --junitxml=test-reports/pytest.xml --cov=. \

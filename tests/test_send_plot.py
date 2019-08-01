@@ -1,4 +1,4 @@
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 import matplotlib.pyplot as plt
 import numpy as np
 import time

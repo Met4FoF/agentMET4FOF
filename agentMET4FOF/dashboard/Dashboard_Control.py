@@ -1,7 +1,7 @@
 import networkx as nx
 
-import agentMet4FoF.agents as agentmet4fof_module
-import agentMet4FoF.streams as datastreammet4fof_module
+import agentMET4FOF.agents as agentmet4fof_module
+import agentMET4FOF.streams as datastreammet4fof_module
 
 
 #global variables access via 'dashboard_ctrl'

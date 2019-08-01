@@ -1,6 +1,6 @@
 from osbrain.logging import Logger
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMet4FoF.streams import SineGenerator
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.streams import SineGenerator
 import re
 import pandas as pd
 import sys

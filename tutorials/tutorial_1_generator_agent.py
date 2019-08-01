@@ -1,5 +1,5 @@
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMet4FoF.streams import SineGenerator
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.streams import SineGenerator
 
 #Here we define a new agent SineGeneratorAgent, and override the functions : init_parameters & agent_loop
 #init_parameters() is used to setup the data stream and necessary parameters

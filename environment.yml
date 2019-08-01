@@ -1,4 +1,4 @@
-name: agentMet4FoF
+name: agentMET4FOF
 channels:
     - conda-forge
 dependencies:

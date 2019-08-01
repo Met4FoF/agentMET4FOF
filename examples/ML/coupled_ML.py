@@ -1,7 +1,7 @@
 #AGENTMET4FOF modules
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, \
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, \
     DataStreamAgent
-from agentMet4FoF.streams import extract_x_y
+from agentMET4FOF.streams import extract_x_y
 
 #ML Dependencies
 from skmultiflow.data import WaveformGenerator

@@ -1,4 +1,4 @@
-from agentMet4FoF.agents import AgentNetwork, MonitorAgent, DataStreamAgent
+from agentMET4FOF.agents import AgentNetwork, MonitorAgent, DataStreamAgent
 
 from examples.ZEMA_EMC.zema_datastream import ZEMA_DataStream
 from examples.ZEMA_EMC.zema_agents import TrainTestSplitAgent, FFT_BFCAgent, Pearson_FeatureSelectionAgent, LDA_Agent, Regression_Agent ,EvaluatorAgent

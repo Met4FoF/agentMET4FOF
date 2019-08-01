@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# agentMet4FoF documentation build configuration file, created from PyDynamic
+# agentMET4FOF documentation build configuration file, created from PyDynamic
 # draft on Fri Jul 12 10:31:35 2019.
 #
 # This file is execfile()d with the current directory set to its
@@ -54,7 +54,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'agentMet4FoF'
+project = 'agentMET4FOF'
 copyright = '2019, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Haris Lulic (' \
             'PTB)'
 author = 'Bang Xiang Yong, Björn Ludwig, Haris Lulic'
@@ -231,7 +231,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'agentMet4FoF.tex', 'agentMet4FoF Documentation',
+    (master_doc, 'agentMET4FOF.tex', 'agentMET4FOF Documentation',
      'Bang Xiang Yong', 'manual'),
 ]
 
@@ -261,7 +261,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'agentMet4FoF', 'agentMet4FoF Documentation',
+    (master_doc, 'agentMET4FOF', 'agentMET4FOF Documentation',
      [author], 1)
 ]
 
@@ -275,8 +275,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'agentMet4FoF', 'agentMet4FoF Documentation',
-     author, 'agentMet4FoF', 'One line description of project.',
+    (master_doc, 'agentMET4FOF', 'agentMET4FOF Documentation',
+     author, 'agentMET4FOF', 'One line description of project.',
      'Miscellaneous'),
 ]
 

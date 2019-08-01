@@ -1,4 +1,4 @@
-from agentMet4FoF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 
 def minus(data, minus_val):
     return data-minus_val

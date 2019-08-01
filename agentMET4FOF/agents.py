@@ -17,9 +17,9 @@ from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
 
-import agentMet4FoF.dashboard.Dashboard as Dashboard
-import agentMet4FoF.dashboard.Dashboard_Control as Dashboard_Control
-from agentMet4FoF.streams import DataStreamMET4FOF
+import agentMET4FOF.dashboard.Dashboard as Dashboard
+import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
+from agentMET4FOF.streams import DataStreamMET4FOF
 
 
 class AgentMET4FOF(Agent):
