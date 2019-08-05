@@ -1,4 +1,4 @@
-from AgentMET4FOF import run_dashboard
+from agentMET4FOF.agents import run_dashboard
 
 #Agent modules
 import examples.ZEMA_EMC.zema_agents as zema_agents
