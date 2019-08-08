@@ -1,25 +1,26 @@
 #Agent dependencies
-from osbrain import run_nameserver
-from osbrain import run_agent
+import base64
+import csv
+import re
+import sys
+from io import BytesIO
+
+import matplotlib.figure
+import matplotlib.pyplot as plt
+import networkx as nx
+# ML dependencies
+import numpy as np
+from multiprocess.context import Process
 from osbrain import Agent
 from osbrain import NSProxy
-import dashboard.Dashboard as Dashboard
-import dashboard.Dashboard_Control as Dashboard_Control
-from DataStreamMET4FOF import DataStreamMET4FOF
-from multiprocess.context import Process
-import pandas as pd
-import re
-import csv
-import sys
-
-#ML dependencies
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.figure
+from osbrain import run_agent
+from osbrain import run_nameserver
 from plotly import tools as tls
-from io import BytesIO
-import base64
-import networkx as nx
+
+import agentMET4FOF.dashboard.Dashboard as Dashboard
+import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
+from agentMET4FOF.streams import DataStreamMET4FOF
+
 
 class AgentMET4FOF(Agent):
     """
@@ -435,6 +436,7 @@ class AgentMET4FOF(Agent):
 
         return filtered_attr
 
+
 class _AgentController(AgentMET4FOF):
     """
     Unique internal agent to provide control to other agents. Automatically instantiated when starting server.
@@ -523,6 +525,7 @@ class _AgentController(AgentMET4FOF):
             self._logger = self.ns.proxy('Logger')
         return self._logger
 
+
 def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
     """"""
     def is_port_in_use(_port):
@@ -539,6 +542,7 @@ def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="
             Dashboard.app.run_server(debug=False)
     else:
         print("Dashboard is running on: " + ip_addr+":"+str(port))
+
 
 class AgentNetwork:
     """
@@ -851,6 +855,7 @@ class AgentNetwork:
             self.dashboard_proc.terminate()
         return 0
 
+
 class DataStreamAgent(AgentMET4FOF):
     """
     Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
@@ -922,6 +927,7 @@ class DataStreamAgent(AgentMET4FOF):
     def send_all_sample(self):
         self.send_next_sample(-1)
 
+
 class MonitorAgent(AgentMET4FOF):
     """
     Unique Agent for storing plots and data from messages received from input agents.
@@ -984,6 +990,7 @@ class MonitorAgent(AgentMET4FOF):
     def reset(self):
         super(MonitorAgent, self).reset()
         self.plots = {}
+
 
 class _Logger(AgentMET4FOF):
 

@@ -1,4 +1,4 @@
-name: agentMet4FoF
+name: agentMET4FOF
 channels:
     - conda-forge
 dependencies:
@@ -20,3 +20,4 @@ dependencies:
     - pip:
         - osbrain
         - dash-cytoscape
+        - plotly
