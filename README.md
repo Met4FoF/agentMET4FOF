@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/bangxiangyong/agentMet4FoF.svg?style=shield)](https://circleci.com/gh/bangxiangyong/agentMet4FoF)
+[![CircleCI](https://circleci.com/gh/bangxiangyong/agentMET4FOF.svg?style=shield)](https://circleci.com/gh/bangxiangyong/agentMET4FOF)
 [![Documentation Status](https://readthedocs.org/projects/agentmet4fof/badge/?version=latest)](https://agentmet4fof.readthedocs.io/en/latest/?badge=latest)
 [![Codecov Badge](https://codecov.io/gh/bangxiangyong/agentMet4FoF/branch/master/graph/badge.svg)](https://codecov.io/gh/bangxiangyong/agentMet4FoF)
 
