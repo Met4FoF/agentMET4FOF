@@ -1,6 +1,8 @@
-import AgentMET4FOF as agentmet4fof_module
-import DataStreamMET4FOF as datastreammet4fof_module
 import networkx as nx
+
+import agentMET4FOF.agents as agentmet4fof_module
+import agentMET4FOF.streams as datastreammet4fof_module
+
 
 #global variables access via 'dashboard_ctrl'
 class Dashboard_Control():

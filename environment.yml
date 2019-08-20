@@ -1,4 +1,4 @@
-name: agentMet4FoF
+name: agentMET4FOF
 channels:
     - conda-forge
 dependencies:
@@ -11,6 +11,13 @@ dependencies:
     - matplotlib
     - pandas
     - seaborn
+    - dash
+    - networkx
+    - multiprocess
+    - h5py
+    - requests
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
         - osbrain
+        - dash-cytoscape
+        - plotly

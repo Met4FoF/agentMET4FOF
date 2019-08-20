@@ -1,8 +1,8 @@
-from AgentMET4FOF import AgentNetwork
+from agentMET4FOF.agents import AgentNetwork
 
 #Agent modules
-import develop.develop_zema_agents as zema_agents
-import develop.develop_zema_datastream as zema_datastream
+import examples.ZEMA_EMC.zema_agents as zema_agents
+import examples.ZEMA_EMC.zema_datastream as zema_datastream
 
 dashboard_modules = [zema_agents, zema_datastream]
 

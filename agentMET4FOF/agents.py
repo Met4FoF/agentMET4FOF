@@ -1,25 +1,26 @@
 #Agent dependencies
-from osbrain import run_nameserver
-from osbrain import run_agent
+import base64
+import csv
+import re
+import sys
+from io import BytesIO
+
+import matplotlib.figure
+import matplotlib.pyplot as plt
+import networkx as nx
+# ML dependencies
+import numpy as np
+from multiprocess.context import Process
 from osbrain import Agent
 from osbrain import NSProxy
-import dashboard.Dashboard as Dashboard
-import dashboard.Dashboard_Control as Dashboard_Control
-from DataStreamMET4FOF import DataStreamMET4FOF
-from multiprocess.context import Process
-import pandas as pd
-import re
-import csv
-import sys
-
-#ML dependencies
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.figure
+from osbrain import run_agent
+from osbrain import run_nameserver
 from plotly import tools as tls
-from io import BytesIO
-import base64
-import networkx as nx
+
+import agentMET4FOF.dashboard.Dashboard as Dashboard
+import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
+from agentMET4FOF.streams import DataStreamMET4FOF
+
 
 class AgentMET4FOF(Agent):
     """
@@ -435,6 +436,7 @@ class AgentMET4FOF(Agent):
 
         return filtered_attr
 
+
 class _AgentController(AgentMET4FOF):
     """
     Unique internal agent to provide control to other agents. Automatically instantiated when starting server.
@@ -523,6 +525,7 @@ class _AgentController(AgentMET4FOF):
             self._logger = self.ns.proxy('Logger')
         return self._logger
 
+
 def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
     """"""
     def is_port_in_use(_port):
@@ -539,6 +542,7 @@ def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="
             Dashboard.app.run_server(debug=False)
     else:
         print("Dashboard is running on: " + ip_addr+":"+str(port))
+
 
 class AgentNetwork:
     """
@@ -851,16 +855,40 @@ class AgentNetwork:
             self.dashboard_proc.terminate()
         return 0
 
+
 class DataStreamAgent(AgentMET4FOF):
     """
     Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
 
     Can be used in incremental training or batch training mode.
+    To simulate batch training mode, set `pretrain_size=-1` , otherwise, set pretrain_size and batch_size for the respective
     See `DataStreamMET4FOF` on loading your own data set as a data stream.
     """
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size = None, batch_size=100, loop_wait=10, randomize = False):
+
+    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size=None, batch_size=1, loop_wait=1, randomize = False):
+        """
+        Parameters
+        ----------
+
+        stream : DataStreamMET4FOF
+            A DataStreamMET4FOF object which provides the sample data
+
+        pretrain_size : int
+            The number of sample data to send through in the first loop cycle, and subsequently, the batch_size will be used
+
+        batch_size : int
+            The number of sample data to send in every loop cycle
+
+        loop_wait : int
+            The duration to wait (seconds) at the end of each loop cycle before going into the next cycle
+
+        randomize : bool
+            Determines if the dataset should be shuffled before streaming
+        """
+
         self.stream = stream
         self.stream.prepare_for_use()
+
         if randomize:
             self.stream.randomize_data()
         self.batch_size = batch_size
@@ -875,7 +903,7 @@ class DataStreamAgent(AgentMET4FOF):
         if self.current_state == "Running":
             if self.pretrain_size is None:
                 self.send_next_sample(self.batch_size)
-            elif self.pretrain_size == -1:
+            elif self.pretrain_size == -1 or self.batch_size == -1:
                 self.send_all_sample()
                 self.pretrain_done = True
             else:
@@ -889,7 +917,7 @@ class DataStreamAgent(AgentMET4FOF):
     def send_next_sample(self,num_samples=1):
         if self.stream.has_more_samples():
             data = self.stream.next_sample(num_samples)
-            self.log_info("IDX "+ str(self.stream.sample_idx))
+            self.log_info("DATA SAMPLE ID: "+ str(self.stream.sample_idx))
             self.send_output(data)
 
     def reset(self):
@@ -898,6 +926,7 @@ class DataStreamAgent(AgentMET4FOF):
 
     def send_all_sample(self):
         self.send_next_sample(-1)
+
 
 class MonitorAgent(AgentMET4FOF):
     """
@@ -961,6 +990,7 @@ class MonitorAgent(AgentMET4FOF):
     def reset(self):
         super(MonitorAgent, self).reset()
         self.plots = {}
+
 
 class _Logger(AgentMET4FOF):
 

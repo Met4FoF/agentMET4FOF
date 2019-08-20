@@ -10,6 +10,7 @@ class DataStreamMET4FOF(Stream):
     The format shape for 2D data stream (num_samples, n_sensors)
     The format shape for 3D data stream (num_samples, sample_length , n_sensors)
     """
+
     def __init__(self):
         super().__init__()
 
@@ -22,7 +23,6 @@ class DataStreamMET4FOF(Stream):
             self.y = self.y[random_index]
         elif type(self.y).__name__ == "DataFrame":
             self.y = self.y.iloc[random_index]
-
 
     def set_data_source(self, x,y):
         self.sample_idx = 0
@@ -80,7 +80,11 @@ class DataStreamMET4FOF(Stream):
 
         try:
             self.current_sample_x = self.x[self.sample_idx - batch_size:self.sample_idx]
-            self.current_sample_y = self.y[self.sample_idx - batch_size:self.sample_idx]
+
+            if self.y is not None:
+                self.current_sample_y = self.y[self.sample_idx - batch_size:self.sample_idx]
+            else:
+                self.current_sample_y = None
 
         except IndexError:
             self.current_sample_x = None
@@ -98,14 +102,12 @@ class DataStreamMET4FOF(Stream):
 class SineGenerator(DataStreamMET4FOF):
     def __init__(self,num_cycles = 1000):
         x = np.sin(np.arange(0,3.142*num_cycles,0.5))
-        y = [1 if point > 0.5 else 0 for point in x]
-        self.set_data_source(x,y)
+        self.set_data_source(x,y=None)
 
 class CosineGenerator(DataStreamMET4FOF):
     def __init__(self,num_cycles = 1000):
         x = np.cos(np.arange(0,3.142*num_cycles,0.5))
-        y = [1 if point > 0.5 else 0 for point in x]
-        self.set_data_source(x,y)
+        self.set_data_source(x,y=None)
 
 def extract_x_y(message):
     """

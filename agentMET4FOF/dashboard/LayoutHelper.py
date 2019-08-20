@@ -1,10 +1,8 @@
-import dash
-import dash_cytoscape as cyto
 import dash_html_components as html
-import dash_core_components as dcc
-import plotly.graph_objs as go
 import networkx as nx
 import numpy as np
+import plotly.graph_objs as go
+
 
 #return icon and text for button
 def html_icon(icon="play_circle_filled" ,text="Start", alignment="left"):

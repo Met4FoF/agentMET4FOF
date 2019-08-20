@@ -1,6 +1,6 @@
 import pytest
 
-from AgentMET4FOF import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 import numpy as np
 import pandas as pd
 import time
