@@ -46,4 +46,4 @@ Updates
 
 Note
 ---
- - In the event of agents not terminating cleanly, run ```taskkill /f /im python.exe /t``` in Windows Command Prompt to terminate all background python processes.
+ - In the event of agents not terminating cleanly, run ```taskkill /f /im python.exe /t``` or ```sudo pkill python``` in Windows Command Prompt or Linux Terminal to terminate all background python processes.
