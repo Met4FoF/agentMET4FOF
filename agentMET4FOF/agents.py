@@ -75,8 +75,12 @@ class AgentMET4FOF(Agent):
         self.current_state = self.states[0]
         self.loop_wait = None
         self.memory = {}
+        self.log_mode = True
 
-        self.init_parameters()
+        try:
+            self.init_parameters()
+        except:
+            print("Error in calling init_parameters()...")
 
     def reset(self):
         """
@@ -102,6 +106,22 @@ class AgentMET4FOF(Agent):
             self.init_agent_loop()
         else:
             self.init_agent_loop(self.loop_wait)
+
+    def log_info(self, message):
+        """
+        Prints logs to be saved into logfile with Logger Agent
+
+        Parameters
+        ----------
+        message : str
+            Message to be logged to the internal Logger Agent
+
+        """
+        try:
+            if self.log_mode:
+                super(AgentMET4FOF, self).log_info(message)
+        except:
+            print("Error in logging...")
 
     def init_agent_loop(self, loop_wait=1.0):
         """
@@ -152,9 +172,13 @@ class AgentMET4FOF(Agent):
         """
         return message
 
-    def pack_data(self,data, channel='data'):
+
+    def pack_data(self,data, channel='default'):
         """
         Internal method to pack the data content into a dictionary before sending out.
+
+        Special case : if the `data` is already a `message`, then the `from` and `senderType` will be altered to this agent,
+        without altering the `data` and `channel` within the message this is used for more succinct data processing and passing.
 
         Parameters
         ----------
@@ -168,6 +192,15 @@ class AgentMET4FOF(Agent):
         -------
         Packed message data : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
         """
+
+        if type(data) == dict:
+            dict_keys = data.keys()
+            if 'from' in dict_keys and 'data' in dict_keys and 'senderType' in dict_keys:
+                new_data = data
+                new_data['from'] = self.name
+                new_data['senderType'] = type(self).__name__
+                return new_data
+
         return {'from': self.name, 'data': data, 'senderType': type(self).__name__, 'channel': channel}
 
     def send_output(self, data, channel='default'):
@@ -176,7 +209,7 @@ class AgentMET4FOF(Agent):
 
         Output connection can first be formed by calling bind_output.
         By default calls pack_data(data) before sending out.
-        Can specify specific channel as opposed to default 'data' channel.
+        Can specify specific channel as opposed to 'default' channel.
 
         Parameters
         ----------
@@ -195,8 +228,7 @@ class AgentMET4FOF(Agent):
         self.send(self.PubAddr, packed_data, topic='data')
 
         # LOGGING
-        if self.log_mode:
-            self.log_info("Sending: "+str(data))
+        self.log_info("Sending: "+str(data))
 
         return packed_data
 
@@ -211,8 +243,8 @@ class AgentMET4FOF(Agent):
         if self.current_state == "Stop" or self.current_state == "Reset":
             return 0
 
-        if self.log_mode:
-            self.log_info("Received: "+str(message))
+        self.log_info("Received: "+str(message))
+
         # process the received data here
         proc_msg = self.on_received_message(message)
 
@@ -966,11 +998,9 @@ class MonitorAgent(AgentMET4FOF):
             self.update_plot_memory(message)
         return 0
 
-
     def update_plot_memory(self, message):
         """
         Updates plot figures stored in `self.plots` with the received message
-
 
         Parameters
         ----------
