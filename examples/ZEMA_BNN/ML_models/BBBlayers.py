@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from .BBBdistributions import Normal, Normalout, distribution_selector
 from torch.nn.modules.utils import _pair
 
-cuda = torch.cuda.is_available()
-
+USE_CUDA = False
+cuda = USE_CUDA
 
 class FlattenLayer(nn.Module):
 
@@ -271,22 +271,29 @@ class BBBLinearFactorial(nn.Module):
         :param input: data tensor
         :return: output, kl-divergence
         """
+        if cuda:
+            input = input.cuda()
+            qw_mean = self.qw_mean.cuda()
+            log_alpha = self.log_alpha.cuda()
+        else:
+            input = input
+            qw_mean = self.qw_mean
+            log_alpha = self.log_alpha
 
-        fc_qw_mean = F.linear(input=input, weight=self.qw_mean)
-        fc_qw_si = torch.sqrt(1e-8 + F.linear(input=input.pow(2), weight=torch.exp(self.log_alpha)*self.qw_mean.pow(2)))
+        fc_qw_mean = F.linear(input=input, weight=qw_mean)
+        fc_qw_si = torch.sqrt(1e-8 + F.linear(input=input.pow(2), weight=torch.exp(log_alpha)*qw_mean.pow(2)))
 
         if cuda:
-            fc_qw_mean.cuda()
-            fc_qw_si.cuda()
+            fc_qw_mean = fc_qw_mean.cuda()
+            fc_qw_si = fc_qw_si.cuda()
 
         # sample from output
         if cuda:
-            output = fc_qw_mean + fc_qw_si * (torch.randn(fc_qw_mean.size())).cuda()
+            output = fc_qw_mean + fc_qw_si * torch.randn(fc_qw_mean.size()).cuda()
         else:
             output = fc_qw_mean + fc_qw_si * (torch.randn(fc_qw_mean.size()))
 
-        if cuda:
-            output.cuda()
+
 
         w_sample = self.fc_qw.sample()
 
@@ -294,6 +301,10 @@ class BBBLinearFactorial(nn.Module):
         qw_logpdf = self.fc_qw.logpdf(w_sample)
 
         kl = torch.sum(qw_logpdf - self.pw.logpdf(w_sample))
+
+        if cuda:
+            output = output.cuda()
+            kl = kl.cuda()
 
         return output, kl
 
@@ -309,6 +320,10 @@ class GaussianVariationalInference(nn.Module):
         self.loss = loss
 
     def forward(self, logits, y, kl, beta):
+        if cuda:
+            y = y.cuda()
+            logits = logits.cuda()
+
         logpy = -self.loss(logits, y)
 
         ll = logpy - beta * kl  # ELBO

@@ -123,11 +123,13 @@ class BNN_Wrapper(ML_Wrapper):
     def fit_normalizer(self,x_train_not_normalized_yet):
         self.fitted_scalers = [RobustScaler().fit(x_train_not_normalized_yet[:,i].reshape(-1, 1)) for i in range(x_train_not_normalized_yet.shape[-1]) ]
         return self.fitted_scalers
+
     def run_normalizer(self,x_train_normalized):
         for i in range(len(self.fitted_scalers)):
             x_train_normalized[:,i] = self.fitted_scalers[i].transform(x_train_normalized[:,i].reshape(-1, 1)).reshape(-1)
         return x_train_normalized
-    def train_model(self,x_train,y_train,learning_rate= 0.005,num_epochs = 100,plot_losses=True):
+
+    def train_model(self,x_train,y_train,learning_rate=0.005, num_epochs=100, plot_losses=True):
         #fit the normalizer
         self.fit_normalizer(x_train)
         
@@ -162,6 +164,7 @@ class BNN_Wrapper(ML_Wrapper):
         plt.show()
         plt.clf()
         return self.trained_model
+
     def predict_model_wUnc(self,x_test, num_samples=15):
         #run normalizer
         x_test_normalized = self.run_normalizer(x_test)
