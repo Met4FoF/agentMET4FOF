@@ -3,7 +3,7 @@ numpy
 scikit-learn
 scikit-multiflow
 scipy
-matplotlib
+matplotlib == 3.1.0
 pandas
 seaborn
 osbrain

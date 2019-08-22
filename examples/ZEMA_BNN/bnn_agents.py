@@ -73,16 +73,34 @@ class StatsFeaturesAgent(AgentMET4FOF):
         return df_feats
 
 class BNN_Model(torch.nn.Module):
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, output_size, architecture=["d2","d4","d8"]):
         super(BNN_Model, self).__init__()
-        self.linear = BBBLinearFactorial(input_size, (int)(input_size / 2))
-        self.linear_2 = BBBLinearFactorial((int)(input_size / 2), (int)(input_size / 4))
-        self.linear_3 = BBBLinearFactorial((int)(input_size / 4), (int)(input_size / 8))
-        self.linear_4 = BBBLinearFactorial((int)(input_size / 8), output_size)
-
-        layers = [self.linear, self.linear_2, self.linear_3, self.linear_4]
+        self.architecture = architecture
+        layers = []
+        for layer_index,layer_string in enumerate(architecture):
+            if layer_index ==0:
+                first_layer = BBBLinearFactorial(input_size, self.calc_layer_size(input_size, layer_string))
+                layers.append(first_layer)
+            elif layer_index == (len(architecture)-1):
+                new_layer = BBBLinearFactorial(self.calc_layer_size(input_size, architecture[layer_index-1]),
+                                                self.calc_layer_size(input_size, layer_string))
+                last_layer = BBBLinearFactorial(self.calc_layer_size(input_size, layer_string), output_size)
+                layers.append(new_layer)
+                layers.append(last_layer)
+            else:
+                new_layer = BBBLinearFactorial(self.calc_layer_size(input_size, architecture[layer_index-1]),
+                                                self.calc_layer_size(input_size, layer_string))
+                layers.append(new_layer)
 
         self.layers = torch.nn.ModuleList(layers)
+    def calc_layer_size(self,input_size,layer_string):
+        operator = layer_string[0]
+        magnitude = float(layer_string[1:])
+        if operator.lower() == "d":
+            output_size = (int)(input_size/magnitude)
+        elif operator.lower() == "x":
+            output_size = (int)(input_size*magnitude)
+        return output_size
 
     def probforward(self, x):
         # 'Forward pass with Bayesian weights'
@@ -102,13 +120,13 @@ class BNN_Model(torch.nn.Module):
 
 
 class BNN_Agent(AgentMET4FOF):
-    def init_parameters(self, model,input_size=10,output_size=10,learning_rate=0.005, num_epochs=300, selectY_col=-1):
+    def init_parameters(self, model,input_size=10,output_size=10,learning_rate=0.005, num_epochs=300, selectY_col=-1, architecture=["d2","d4","d8"]):
         self.set_modelType(model,input_size,output_size)
         self.fitted_scalers = []
         self.learning_rate= learning_rate
         self.num_epochs = num_epochs
         self.selectY_col = selectY_col
-
+        self.architecture = architecture
     def on_received_message(self, message):
         if message['channel'] == 'train':
             y_train = self.filter_multiY(message['data']['y'])
@@ -130,7 +148,7 @@ class BNN_Agent(AgentMET4FOF):
             input_size= self.input_size
         if output_size==-1:
             output_size= self.output_size
-        return self.modelType(input_size,output_size)
+        return self.modelType(input_size,output_size,self.architecture)
 
     def fit_normalizer(self,x_train_not_normalized_yet):
         self.fitted_scalers = [RobustScaler().fit(x_train_not_normalized_yet[:,i].reshape(-1, 1)) for i in range(x_train_not_normalized_yet.shape[-1]) ]
@@ -192,6 +210,7 @@ class BNN_Agent(AgentMET4FOF):
         return self.trained_model, self.losses
 
     def predict_model_wUnc(self,x_test, num_samples=15):
+        self.log_info("Predicting...")
         #run normalizer
         if type(x_test) == pd.DataFrame:
             x_test = x_test.values

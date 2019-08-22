@@ -10,6 +10,7 @@ from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 
 class FFTAgent(AgentMET4FOF):
     def init_parameters(self, sampling_period=1):
@@ -45,16 +46,18 @@ class TrainTestSplitAgent(AgentMET4FOF):
     In prequential mode, every batch of data is first fully tested and then trained.
 
     """
-    def init_parameters(self, train_ratio=0.8):
+    def init_parameters(self, train_ratio=0.8,kfold=-1):
         """
         train_ratio : float
             The ratio of training data in splitting the batch of data. The test_ratio then, is 1 - train_ratio.
             When train_ratio is -1, the mode is set to prequential, that is the whole batch of data is sent for testing and then training.
         """
-
+        self.kfold = kfold
         self.train_ratio = train_ratio
 
-        if train_ratio > 0:
+        #adjust status of pretrain_done
+        #if train_ratio >0 or kfold>0, then we're not doing any pretraining
+        if train_ratio > 0 or kfold > 0:
             self.pretrain_done = True
         else:
             self.pretrain_done = False
@@ -63,8 +66,20 @@ class TrainTestSplitAgent(AgentMET4FOF):
         x_data = message['data']['x']
         y_data = message['data']['y']
 
+        #kfold gets precedence
+        if self.kfold > 0:
+            kf = KFold(n_splits=self.kfold)
+            for train_index, test_index in kf.split(x_data):
+                x_train, x_test = x_data[train_index], x_data[test_index]
+                y_train, y_test = y_data[train_index], y_data[test_index]
+
+                #so that train and test will be handled sequentially
+                self.send_output({'x': x_train, 'y': y_train}, channel='train')
+                time.sleep(2)
+                self.send_output({'x': x_test, 'y': y_test}, channel='test')
+                time.sleep(2)
         #leave one out
-        if self.train_ratio > 0:
+        elif self.train_ratio > 0:
             x_train, x_test =train_test_split(x_data, train_size=self.train_ratio,random_state=15)
             y_train, y_test =train_test_split(y_data, train_size=self.train_ratio,random_state=15)
 
