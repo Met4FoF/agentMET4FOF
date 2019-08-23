@@ -76,7 +76,7 @@ class AgentMET4FOF(Agent):
         self.loop_wait = None
         self.memory = {}
         self.log_mode = True
-
+        self.output_channels_info = {}
         try:
             self.init_parameters()
         except:
@@ -193,9 +193,8 @@ class AgentMET4FOF(Agent):
         Packed message data : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
         """
 
-        if type(data) == dict:
-            dict_keys = data.keys()
-            if 'from' in dict_keys and 'data' in dict_keys and 'senderType' in dict_keys:
+        #if is a message type, override the `from` and `senderType` fields only
+        if self._is_type_message(data):
                 new_data = data
                 new_data['from'] = self.name
                 new_data['senderType'] = type(self).__name__
@@ -203,6 +202,24 @@ class AgentMET4FOF(Agent):
 
         return {'from': self.name, 'data': data, 'senderType': type(self).__name__, 'channel': channel}
 
+    def _is_type_message(self, data):
+        """
+        Internal method to check if the data carries signature of an agent message type
+
+        Parameters
+        ----------
+        data
+            Data to be checked for type
+
+        Returns
+        -------
+        result : boolean
+        """
+        if type(data) == dict:
+            dict_keys = data.keys()
+            if 'from' in dict_keys and 'data' in dict_keys and 'senderType' in dict_keys:
+                return True
+        return False
     def send_output(self, data, channel='default'):
         """
         Sends message data to all connected agents in self.Outputs.
@@ -230,7 +247,47 @@ class AgentMET4FOF(Agent):
         # LOGGING
         self.log_info("Sending: "+str(data))
 
+        # Add info of channel
+        self._update_output_channels_info(packed_data['data'],packed_data['channel'])
+
         return packed_data
+
+    def _update_output_channels_info(self, data,channel):
+        """
+        Internal method to update the dict of output_channels_info. This is used in conjunction with send_output().
+
+
+        Checks and records data type & dimension and channel name
+        If the data is nested within dict, then it will search deeper and subsequently record the info of each
+        inner hierarchy
+
+
+        Parameters
+        ----------
+        data
+            data to be checked for type & dimension
+
+        channel : str
+            name of channel to be recorded
+        """
+        if channel not in self.output_channels_info.keys():
+            if type(data) == dict:
+                nested_metadata = {key: self._get_metadata(data[key]) for key in data.keys()}
+                self.output_channels_info.update({channel:nested_metadata})
+            else:
+                self.output_channels_info.update({channel:self._get_metadata(data)})
+
+    def _get_metadata(self, data):
+        """
+        Internal helper function for getting the data type & dimensions of data.
+        This is for update_output_channels_info()
+        """
+        data_info = {}
+        if type(data) == np.ndarray or type(data).__name__ == "DataFrame":
+            data_info.update({'type':type(data).__name__,'shape':data.shape})
+        else:
+            data_info.update({'type':type(data).__name__})
+        return data_info
 
     def handle_process_data(self, message):
         """
@@ -463,7 +520,7 @@ class AgentMET4FOF(Agent):
         excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias","PubAddr","states","log_mode","get_all_attr","plots","name","agent_loop"]
         filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
         filtered_attr = {key: val for key, val in filtered_attr.items() if key not in excludes and type(val).__name__ != 'function'}
-        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(val) == str) else str(val) for key, val in filtered_attr.items()}
+        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(val) == str or key == 'output_channels_info') else str(val) for key, val in filtered_attr.items()}
         filtered_attr = {key: val for key, val in filtered_attr.items() if "object" not in str(val)}
 
         return filtered_attr
