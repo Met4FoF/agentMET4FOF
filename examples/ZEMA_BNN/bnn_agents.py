@@ -81,6 +81,10 @@ class BNN_Model(torch.nn.Module):
             if layer_index ==0:
                 first_layer = BBBLinearFactorial(input_size, self.calc_layer_size(input_size, layer_string))
                 layers.append(first_layer)
+                #special case if there's only a single hidden layer
+                if len(architecture) == 1:
+                    last_layer = BBBLinearFactorial(self.calc_layer_size(input_size, layer_string), output_size)
+                    layers.append(last_layer)
             elif layer_index == (len(architecture)-1):
                 new_layer = BBBLinearFactorial(self.calc_layer_size(input_size, architecture[layer_index-1]),
                                                 self.calc_layer_size(input_size, layer_string))

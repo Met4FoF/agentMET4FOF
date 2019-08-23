@@ -8,3 +8,4 @@ __pycache__
 ZeMA-machine-learning-tutorials-master
 *.csv
 depracated
+results/

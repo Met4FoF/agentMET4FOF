@@ -10,10 +10,19 @@ np.random.seed(100)
 
 USE_CUDA = False
 
-output_sizes = [3,4,3,4,2]
-# architecture = ["d2","d4","d8"]
-architecture = ["d2","d4"]
-architecture = ["d2"]
+# output_sizes = [3,4,3,4,2]
+output_sizes = [3]
+
+# architecture = ["d1","d2","d4","d8"]
+# architecture = ["d2","d4"]
+# architecture = ["d2"]
+
+#varying deepness with equal wideness
+# architecture = ["d1","d1","d1","d1"]
+# architecture = ["d1","d1","d1"]
+# architecture = ["d1","d1"]
+architecture = ["d1"]
+
 
 def main():
     #if use cuda
