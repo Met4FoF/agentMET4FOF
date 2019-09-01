@@ -33,12 +33,15 @@ First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py) 
 or start hacking the [main_agent_network.py](./agentMET4FOF/main_agent_network.py) if you already are
 familiar with agentMet4FoF and want to customize your agents' network.
 
+Alternatively, watch the tutorial webinar [here](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
+
 Updates
 ---
  - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
  - Implemented class AgentNetwork to start or connect to a agent server
  - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
  - Implemented interactive web application with user interface
+
 
 
 ## Screenshot of web visualization
