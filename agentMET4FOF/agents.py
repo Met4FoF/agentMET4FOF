@@ -4,6 +4,7 @@ import csv
 import re
 import sys
 from io import BytesIO
+import time
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -64,6 +65,9 @@ class AgentMET4FOF(Agent):
             The interval to wait between loop.
             Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
 
+        memory_buffer_size : int
+            The total number of elements to be stored in the agent `memory`
+            When total elements exceeds this number, the latest elements will be replaced with the incoming data elements
         """
         self.Inputs = {}
         self.Outputs = {}
@@ -76,6 +80,7 @@ class AgentMET4FOF(Agent):
         self.loop_wait = None
         self.memory = {}
         self.log_mode = True
+
         self.output_channels_info = {}
         try:
             self.init_parameters()
@@ -119,7 +124,7 @@ class AgentMET4FOF(Agent):
         """
         try:
             if self.log_mode:
-                super(AgentMET4FOF, self).log_info(message)
+                super().log_info(message)
         except:
             print("Error in logging...")
 
@@ -220,6 +225,7 @@ class AgentMET4FOF(Agent):
             if 'from' in dict_keys and 'data' in dict_keys and 'senderType' in dict_keys:
                 return True
         return False
+
     def send_output(self, data, channel='default'):
         """
         Sends message data to all connected agents in self.Outputs.
@@ -241,11 +247,17 @@ class AgentMET4FOF(Agent):
         message : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
 
         """
+        start_time_pack = time.time()
         packed_data = self.pack_data(data, channel=channel)
         self.send(self.PubAddr, packed_data, topic='data')
+        duration_time_pack = round(time.time() - start_time_pack, 6)
 
         # LOGGING
-        self.log_info("Sending: "+str(data))
+        try:
+            self.log_info("Pack time: " + str(duration_time_pack))
+            self.log_info("Sending: "+str(data))
+        except Exception as e:
+            print(e)
 
         # Add info of channel
         self._update_output_channels_info(packed_data['data'],packed_data['channel'])
@@ -255,7 +267,6 @@ class AgentMET4FOF(Agent):
     def _update_output_channels_info(self, data,channel):
         """
         Internal method to update the dict of output_channels_info. This is used in conjunction with send_output().
-
 
         Checks and records data type & dimension and channel name
         If the data is nested within dict, then it will search deeper and subsequently record the info of each
@@ -285,6 +296,8 @@ class AgentMET4FOF(Agent):
         data_info = {}
         if type(data) == np.ndarray or type(data).__name__ == "DataFrame":
             data_info.update({'type':type(data).__name__,'shape':data.shape})
+        elif type(data) == list:
+            data_info.update({'type':type(data).__name__,'len':len(data)})
         else:
             data_info.update({'type':type(data).__name__})
         return data_info
@@ -296,15 +309,20 @@ class AgentMET4FOF(Agent):
         If current_state is either Stop or Reset, it will terminate early before entering on_received_message
         """
 
-        # LOGGING
         if self.current_state == "Stop" or self.current_state == "Reset":
             return 0
 
-        self.log_info("Received: "+str(message))
+        #LOGGING
+        try:
+            self.log_info("Received: "+str(message))
+        except Exception as e:
+            print(e)
 
         # process the received data here
+        start_time_pack = time.time()
         proc_msg = self.on_received_message(message)
-
+        end_time_pack = time.time()
+        self.log_info("Tproc: "+str(round(end_time_pack-start_time_pack,6)))
 
     def bind_output(self, output_agent):
         """
@@ -470,7 +488,7 @@ class AgentMET4FOF(Agent):
 
             else:
                 self.memory.update({message['from']:[message['data']]})
-            self.log_info("Memory: "+ str(self.memory))
+            # self.log_info("Memory: "+ str(self.memory))
             return 0
 
         # otherwise 'sender' exists in memory, handle appending
@@ -479,14 +497,23 @@ class AgentMET4FOF(Agent):
         # handle list
         if type(message['data']).__name__ == "list":
             self.memory[message['from']] += message['data']
-
+            #check if exceed memory buffer size, remove the first n elements which exceeded the size
+            if len(self.memory[message['from']]) > self.memory_buffer_size:
+                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
+                self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
         # handle if data type is np.ndarray
         elif type(message['data']).__name__ == "ndarray":
             self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']))
+            if len(self.memory[message['from']]) > self.memory_buffer_size:
+                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
+                self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
 
         # handle if data type is pd.DataFrame
         elif type(message['data']).__name__ == "DataFrame":
             self.memory[message['from']] = self.memory[message['from']].append(message['data']).reset_index(drop=True)
+            if len(self.memory[message['from']]) > self.memory_buffer_size:
+                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
+                self.memory[message['from']]= self.memory[message['from']].truncate(before=truncated_element_index)
 
         # handle dict
         elif type(message['data']).__name__ == "dict":
@@ -500,19 +527,34 @@ class AgentMET4FOF(Agent):
                 # handle : dict value is list
                 elif type(message['data'][key]).__name__ == "list":
                     self.memory[message['from']][key] += message['data'][key]
-
+                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
+                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
+                        self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
                 # handle : dict value is numpy array
                 elif type(message['data'][key]).__name__== "ndarray":
                     self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]))
+                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
+                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
+                        self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
 
                 elif type(message['data'][key]).__name__== "DataFrame":
                     self.memory[message['from']][key] = self.memory[message['from']][key].append(message['data'][key])
                     self.memory[message['from']][key].reset_index(drop=True, inplace=True)
+                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
+                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
+                        self.memory[message['from']][key]= self.memory[message['from']][key].truncate(before=truncated_element_index)
+
                 # handle: dict value is int/float/single value to be converted into list
                 else:
                     self.memory[message['from']][key] += [message['data'][key]]
+                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
+                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
+                        self.memory[message['from']][key] = self.memory[message['from']][key][truncated_element_index:]
         else:
             self.memory[message['from']].append(message['data'])
+            if len(self.memory[message['from']]) > self.memory_buffer_size:
+                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
+                self.memory[message['from']] = self.memory[message['from']][truncated_element_index:]
         self.log_info("Memory: " + str(self.memory))
 
     def get_all_attr(self):
@@ -568,12 +610,12 @@ class _AgentController(AgentMET4FOF):
         name += "_"+str(self.get_agent_name_count(agent_name))
         return name
 
-    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True):
+    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000):
         if name == " ":
             new_name= self.generate_module_name_byType(agentType)
         else:
             new_name= self.generate_module_name_byUnique(name)
-        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr())
 
         if log_mode:
             new_agent.set_logger(self._get_logger())
@@ -628,6 +670,7 @@ def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="
             dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules)
             Dashboard.app.dashboard_ctrl = dashboard_ctrl
             Dashboard.app.update_interval = dashboard_update_interval
+            Dashboard.app = Dashboard.init_app_layout(Dashboard.app, dashboard_update_interval)
             Dashboard.app.run_server(debug=False)
     else:
         print("Dashboard is running on: " + ip_addr+":"+str(port))
@@ -895,7 +938,7 @@ class AgentNetwork:
 
         return self._get_controller().get_attr('ns').proxy(agent_name)
 
-    def agents(self):
+    def agents(self, filter_agent=None):
         """
         Returns all agent names connected to Agent Network.
 
@@ -905,9 +948,11 @@ class AgentNetwork:
 
         """
         agent_names = self._get_controller().agents()
+        if filter_agent is not None:
+            agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000):
         """
         Instantiates a new agent in the network.
 
@@ -929,7 +974,7 @@ class AgentNetwork:
 
         """
 
-        agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode)
+        agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, memory_buffer_size=memory_buffer_size)
 
         return agent
 
