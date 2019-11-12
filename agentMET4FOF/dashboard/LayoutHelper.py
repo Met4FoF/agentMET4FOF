@@ -28,10 +28,10 @@ def create_edges_cytoscape(edges):
         new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
     return new_elements
 
-def create_monitor_graph(data):
+def create_monitor_graph(data,label = 'Monitor Agent'):
     y = data
     x = np.arange(len(y))
-    trace = go.Scatter(x=x, y=y,mode="lines", name='Monitor Agent')
+    trace = go.Scatter(x=x, y=y,mode="lines", name=label)
     return trace
 
 def visualise_agent_parameters(k,v):

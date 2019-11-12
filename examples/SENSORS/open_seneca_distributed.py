@@ -2,8 +2,19 @@ from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
 
 import serial
-#run this on terminal to gain permission to the port
+#run this on terminal to gain permission to the serial port for reading from sensor
 #sudo chmod 666 /dev/ttyS0
+
+#This example setups two computers for receiving and sending data from OpenSeneca sensor board
+#1) Record the IP addresses of the first and second PC and saved as `host_ip` and `local_ip` variables below
+#2) Setup a PC with an AgentNetwork server, such as running `main_agent_network.py` or any of the other tutorials
+#by passing the argument `ip_addr=host_ip` when starting the AgentNetwork
+#3) Connect the sensor board to the second PC (such as Raspberry Pi) and execute this code to start an agent
+#on the second PC and subsequently connect to the first PC (host)
+#Note: Firewall permission will need to be allowed on several ports : 3333 (agent server) and 8050 (web app)
+
+host_ip='192.168.43.95'
+local_ip='192.168.43.102'
 
 class OpenSenecaAgent(AgentMET4FOF):
     def init_parameters(self, port_name='/dev/ttyUSB0', sensor_buffer_size=5):
@@ -40,27 +51,20 @@ class OpenSenecaAgent(AgentMET4FOF):
         return {}
 
 def main():
-    #start agent network server
+    #connect to agent network server
     log_file = False
-    agentNetwork = AgentNetwork(log_filename=log_file, dashboard_update_interval=1)
+    agentNetwork = AgentNetwork(dashboard_modules=False,log_filename=log_file, ip_addr=host_ip)
 
     #init agents by adding into the agent network
-    sensor_agent = agentNetwork.add_agent(agentType = OpenSenecaAgent)
-    monitor_agent = agentNetwork.add_agent(agentType = MonitorAgent, memory_buffer_size=100)
-
-    sensor_agent.init_parameters(port_name='/dev/ttyUSB0',sensor_buffer_size=1)
-    sensor_agent.init_agent_loop(loop_wait=1)
-
-    #connect the sensor agent to the monitor agent
-    agentNetwork.bind_agents(sensor_agent, monitor_agent)
+    gen_agent = agentNetwork.add_agent(agentType = OpenSenecaAgent,ip_addr=local_ip)
+    gen_agent.init_parameters(port_name='/dev/ttyUSB0',sensor_buffer_size=1)
+    gen_agent.init_agent_loop(loop_wait=1)
 
     # set all agents states to "Running"
     agentNetwork.set_running_state()
 
     # allow for shutting down the network after execution
     return agentNetwork
-
-
 
 if __name__ == '__main__':
     main()

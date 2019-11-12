@@ -9,6 +9,7 @@ from dash.exceptions import PreventUpdate
 
 import plotly.graph_objs as go
 from plotly import tools
+from plotly.subplots import make_subplots
 
 import networkx as nx
 import agentMET4FOF.agents as agentmet4fof_module
@@ -25,9 +26,13 @@ app = dash.Dash(__name__,
                 external_stylesheets=external_stylesheets,
                 external_scripts=external_scripts
                 )
-app.update_interval_seconds = 3
 
-def init_app_layout(app,update_interval_seconds):
+def get_multiple_graphs(num_monitors):
+    return [dcc.Graph(id='monitors-graph-'+str(i), figure={})for i in range(num_monitors)]
+
+def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
+    app.update_interval_seconds = update_interval_seconds
+    app.num_monitors = num_monitors
     app.layout = html.Div(children=[
         #header
         html.Nav([
@@ -83,13 +88,16 @@ def init_app_layout(app,update_interval_seconds):
                     ]),
                     html.H5(className="card", id="matplotlib-division", children=" "),
 
-                    html.Div(className="card", id="monitors-temp-division", children=[
-                        dcc.Graph(id='monitors-graph',
-                            figure=go.Figure(),
-                            #style={'height': 800},
-                        ),
-                    ])
-
+                    # html.Div(className="card", id="monitors-temp-division", children=[
+                    #     dcc.Graph(id='monitors-graph',
+                    #         figure={},
+                    #         #style={'height': 800},
+                    #     ),
+                    #     dcc.Graph(id='monitors-graph-2',
+                    #         figure={},
+                    #     )
+                    # ])
+                    html.Div(className="card", id="monitors-temp-division", children=get_multiple_graphs(num_monitors))
 
             ]),
 
@@ -152,7 +160,7 @@ def init_app_layout(app,update_interval_seconds):
             dcc.Interval(
                 id='interval-component-network-graph',
                 interval=update_interval_seconds * 1000,  # in milliseconds
-                n_intervals=0
+                n_intervals=5
             ),
             dcc.Interval(
                 id='interval-add-module-list',
@@ -162,7 +170,7 @@ def init_app_layout(app,update_interval_seconds):
             dcc.Interval(
                 id='interval-update-monitor-graph',
                 interval=update_interval_seconds * 1000,  # in milliseconds
-                n_intervals=0
+                n_intervals=5
             )
         ])
     ])
@@ -348,10 +356,12 @@ def init_app_layout(app,update_interval_seconds):
             return ["Not selected", input_names, output_names, agent_parameters_div]
 
 
-    #load Monitors data and draw - all at once
-    @app.callback( [dash.dependencies.Output('monitors-graph', 'figure')],
-                 #   dash.dependencies.Output('monitors-graph', 'style')],
-                   [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
+    #define maximum number of monitors graph
+    output_figures = [dash.dependencies.Output('monitors-graph-'+str(i), 'figure') for i in range(app.num_monitors)]
+    output_styles = [dash.dependencies.Output('monitors-graph-'+str(i), 'style') for i in range(app.num_monitors)]
+    outputs = output_figures+output_styles
+    @app.callback(outputs,
+                  [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
     def plot_monitor_memory(n_interval):
         # get nameserver
         agentNetwork = app.dashboard_ctrl.agentNetwork
@@ -361,63 +371,34 @@ def init_app_layout(app,update_interval_seconds):
         if agentNetwork._get_mode() != "Running" and agentNetwork._get_mode() != "Reset" and n_interval > 0:
             raise PreventUpdate
 
-        agent_names = agentNetwork.agents() # get all agent names
+        agent_names = agentNetwork.agents('MonitorAgent') # get all agent names
+        app.num_monitor = len(agent_names)
         agent_type ="Monitor" #all agents with Monitor in its name will be selected
-        monitors_data = {} #storage for all monitor agent's memory
+        # monitor_graphs = []
+        # monitor_graphs = [{'data': [] , 'layout':{'height':10,'width':10}, 'xaxis':{'visible':False}, 'yaxis':{'visible':False}} for i in range(app.num_monitors)]
+        monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
+        style_graphs = [{'opacity':0, 'width':10,'height':10} for i in range(app.num_monitors)]
 
-        # load data from all Monitor agent's memory
-        for agent_name in agent_names:
-            if agent_type in agent_name:
-                monitor_agent = agentNetwork.get_agent(agent_name)
-                memory = monitor_agent.get_attr('memory')
-                monitors_data.update({agent_name:memory})
-
-        # now monitors_data = {'monitor_agent1_name':agent1_memory, 'monitor_agent2_name':agent2_memory }
-        # now create a plot for each monitor agent
-        # initialize necessary variables for plotting multi-graphs
-        subplot_titles = tuple(list(monitors_data.keys()))
-        num_graphs = len(list(monitors_data.keys()))
-        if num_graphs > 0:
-            monitor_graphs = tools.make_subplots(rows=num_graphs, cols=1, subplot_titles=subplot_titles)
-
-            # now loop through monitors_data's every monitor agent's memory
-            # build a graph from every agent's memory via create_monitor_graph()
-            for count, agent_name in enumerate(monitors_data.keys()):
-                monitor_data = monitors_data[agent_name]
-
-                # create a new graph for every 'Input agent' connected to Monitor Agent
-                for from_agent_name in monitor_data:
-                    # get the 'data' relevant to 'monitor_agent_input'
-                    input_data = monitor_data[from_agent_name]
-
-                    # create a graph from it
-                    # and update the graph's name according to the agent's name
-                    if type(input_data).__name__ == 'list' or type(input_data).__name__ == 'ndarray':
-                        monitor_graph = create_monitor_graph(input_data)
-                        monitor_graph.update(name=from_agent_name)
-                        # lastly- append this graph into the master graphs list which is monitor_graphs
-                        monitor_graphs.append_trace(monitor_graph, count+1, 1)
-                    elif type(input_data).__name__ == 'dict':
-                        for channel in input_data.keys():
-                            monitor_graph = create_monitor_graph(input_data[channel])
-                            monitor_graph.update(name=from_agent_name+" : "+channel)
-                            # lastly- append this graph into the master graphs list which is monitor_graphs
-                            monitor_graphs.append_trace(monitor_graph, count+1, 1)
-
-            # set to show legend
-            monitor_graphs['layout'].update(showlegend = True)
-
-            # set dimensions of each monitor agent's graph
-            constant_height_px= 400
-            height_px = num_graphs*constant_height_px
-            style = {'height': height_px}
-            return [monitor_graphs]
-        else:
-            return [[]]
+        for monitor_id, monitor_agent in enumerate(agent_names):
+            memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+            monitor_graph={
+                'data': [create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute)
+                         for sender_agent in memory_data.keys()
+                         for attribute in memory_data[sender_agent].keys()],
+                'layout': {
+                    'title': monitor_agent,
+                    'uirevision': app.num_monitor,
+                    'showlegend': True
+                },
+            }
+            monitor_graphs[monitor_id]= monitor_graph
+            style_graphs[monitor_id]= {'opacity':1.0, 'width':'100%','height':'100%'}
+        # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
+        return monitor_graphs+ style_graphs
 
     #load Monitors data and draw - all at once
     @app.callback([dash.dependencies.Output('matplotlib-division', 'children')],
-                  [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
+                 [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
     def plot_monitor_graphs(n_interval):
         # get nameserver
         agentNetwork = app.dashboard_ctrl.agentNetwork

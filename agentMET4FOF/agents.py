@@ -72,7 +72,7 @@ class AgentMET4FOF(Agent):
         self.Inputs = {}
         self.Outputs = {}
         self.PubAddr_alias = self.name + "_PUB"
-        self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias)
+        self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias,transport='tcp')
         self.AgentType = type(self).__name__
         self.log_info("INITIALIZED")
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
@@ -610,12 +610,15 @@ class _AgentController(AgentMET4FOF):
         name += "_"+str(self.get_agent_name_count(agent_name))
         return name
 
-    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000):
+    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000,ip_addr=None):
+        if ip_addr is None:
+            ip_addr = 'localhost'
+            
         if name == " ":
             new_name= self.generate_module_name_byType(agentType)
         else:
             new_name= self.generate_module_name_byUnique(name)
-        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr())
+        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
 
         if log_mode:
             new_agent.set_logger(self._get_logger())
@@ -667,11 +670,11 @@ def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="
     if is_port_in_use(port) is False:
         if dashboard_modules is not None and dashboard_modules is not False:
 
-            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules)
+            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules,ip_addr=ip_addr)
             Dashboard.app.dashboard_ctrl = dashboard_ctrl
             Dashboard.app.update_interval = dashboard_update_interval
             Dashboard.app = Dashboard.init_app_layout(Dashboard.app, dashboard_update_interval)
-            Dashboard.app.run_server(debug=False)
+            Dashboard.app.run_server(debug=False,host=ip_addr)
     else:
         print("Dashboard is running on: " + ip_addr+":"+str(port))
 
@@ -722,7 +725,7 @@ class AgentNetwork:
                 self.start_server(ip_addr,port)
 
         if dashboard_modules is not False:
-            self.dashboard_proc = Process(target=run_dashboard, args=(dashboard_modules,dashboard_update_interval))
+            self.dashboard_proc = Process(target=run_dashboard, args=(dashboard_modules,dashboard_update_interval,ip_addr))
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -761,7 +764,7 @@ class AgentNetwork:
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
             self.ns = run_nameserver(addr=ip_addr+':' + str(port))
-        controller = run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr())
+        controller = run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True), nsaddr=self.ns.addr(), addr=ip_addr)
         logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
 
         controller.init_parameters(self.ns)
@@ -952,7 +955,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000, ip_addr=None):
         """
         Instantiates a new agent in the network.
 
@@ -973,9 +976,15 @@ class AgentNetwork:
         AgentMET4FOF : Newly instantiated agent
 
         """
-
-        agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, memory_buffer_size=memory_buffer_size)
-
+        if ip_addr is None:
+            ip_addr = self.ip_addr
+            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, memory_buffer_size=memory_buffer_size,ip_addr=ip_addr)
+        else:
+            if name == " ":
+                new_name= self._get_controller().generate_module_name_byType(agentType)
+            else:
+                new_name= self._get_controller().generate_module_name_byUnique(name)
+            agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
         return agent
 
     def shutdown(self):
@@ -1077,11 +1086,15 @@ class MonitorAgent(AgentMET4FOF):
     plots : dict
         Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
 
+    plot_filter : list of str
+        List of keys to filter the 'data' upon receiving message to be saved into memory
+        Used to specifically select only a few keys to be plotted
     """
 
-    def init_parameters(self):
+    def init_parameters(self,plot_filter=[]):
         self.memory = {}
         self.plots = {}
+        self.plot_filter=plot_filter
 
     def on_received_message(self, message):
         """
@@ -1095,9 +1108,12 @@ class MonitorAgent(AgentMET4FOF):
             Acceptable channel values are 'default' or 'plot'
         """
         if message['channel'] == 'default':
+            if self.plot_filter != []:
+                message['data'] = {key: message['data'][key] for key in self.plot_filter}
             self.update_data_memory(message)
         elif message['channel'] == 'plot':
             self.update_plot_memory(message)
+
         return 0
 
     def update_plot_memory(self, message):
