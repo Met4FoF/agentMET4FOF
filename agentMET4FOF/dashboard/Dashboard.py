@@ -381,16 +381,26 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
 
         for monitor_id, monitor_agent in enumerate(agent_names):
             memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+            data =[]
+            for sender_agent in memory_data.keys():
+                if type(memory_data[sender_agent]) == dict:
+                    for attribute in memory_data[sender_agent].keys():
+                        data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
+                else:
+                    data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
+
             monitor_graph={
-                'data': [create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute)
-                         for sender_agent in memory_data.keys()
-                         for attribute in memory_data[sender_agent].keys()],
+                'data': data,
                 'layout': {
                     'title': monitor_agent,
                     'uirevision': app.num_monitor,
-                    'showlegend': True
+                    'showlegend': True,
+                    # 'legend':dict(x=-.1, y=1.2),
+                    # 'margin':dict(t=150)
                 },
+
             }
+
             monitor_graphs[monitor_id]= monitor_graph
             style_graphs[monitor_id]= {'opacity':1.0, 'width':'100%','height':'100%'}
         # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
