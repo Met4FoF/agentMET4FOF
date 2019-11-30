@@ -332,9 +332,22 @@ class AgentMET4FOF(Agent):
 
         Parameters
         ----------
-        output_agent : AgentMET4FOF
-            Agent to be binded to this agent's output channel
+        output_agent : AgentMET4FOF or list
+            Agent(s) to be binded to this agent's output channel
 
+        """
+        if "AgentPipeline" in str(type(output_agent).__name__):
+            for agent in output_agent.pipeline[0]:
+                self._bind_output(agent)
+        elif type(output_agent) == list:
+            for agent in output_agent:
+                self._bind_output(agent)
+        else:
+            self._bind_output(output_agent)
+
+    def _bind_output(self, output_agent):
+        """
+        Internal method which implements the logic for connecting this agent, to the `output_agent`.
         """
         if type(output_agent) == str:
             output_module_id = output_agent
@@ -997,6 +1010,103 @@ class AgentNetwork:
         if self.dashboard_proc is not None:
             self.dashboard_proc.terminate()
         return 0
+
+class TransformerAgent(AgentMET4FOF):
+    def init_parameters(self,method=None):
+        self.method = method
+
+    def on_received_message(self,message):
+        #if data is dict, with 'x' in keys
+        if type(message['data']) == dict and 'x' in message['data'].keys():
+            X= message['data']['x']
+            Y= message['data']['y']
+        else:
+            X=message['data']
+            Y=None
+
+        #if it is train, and has fit function, then fit it first.
+        if message['channel'] == 'train':
+            if hasattr(self.method, 'fit'):
+                self.method = self.method.fit(X,Y)
+
+        #proceed in transforming or predicting
+        if hasattr(self.method, 'transform'):
+            results = self.method.transform(X)
+        elif hasattr(self.method, 'predict'):
+            results = self.method.predict(X)
+        else:
+            results = self.method(X)
+
+        #send out
+        if hasattr(self.method, 'predict'):
+            self.send_output({'x':X, 'y_true':Y, 'y_pred':results},channel=message['channel'])
+        else:
+            self.send_output({'x':results, 'y':Y},channel=message['channel'])
+
+
+class AgentPipeline:
+    def __init__(self, agentNetwork=None,*argv):
+        agentNetwork = agentNetwork
+        self.pipeline = self.make_agent_pipelines(agentNetwork, argv)
+
+    def make_transform_agent(self,agentNetwork, pipeline_component=None):
+        if ("function" in type(pipeline_component).__name__) or ("method" in type(pipeline_component).__name__):
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent.init_parameters(pipeline_component)
+        elif "AgentMET4FOF" in type(pipeline_component).__name__:
+            transform_agent = pipeline_component
+        else: #class objects with fit and transform
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent.init_parameters(pipeline_component())
+        return transform_agent
+
+    def make_agent_pipelines(self,agentNetwork=None, argv=[]):
+        if agentNetwork is None:
+            print("You need to pass an agent network as parameter to add agents")
+            return -1
+        agent_pipeline = []
+        for pipeline_level, pipeline_component in enumerate(argv):
+        #create the pipeline level, and the agents
+            #handle list type
+            agent_pipeline.append([])
+            if type(pipeline_component) == list:
+                for pipeline_function in pipeline_component:
+                    #fill up the new empty list with a new agent for every pipeline function
+                    transform_agent = self.make_transform_agent(agentNetwork,pipeline_function)
+                    agent_pipeline[-1].append(transform_agent)
+            #non list, single function, class, or agent
+            else:
+                #fill up the new empty list with a new agent for every pipeline function
+                transform_agent = self.make_transform_agent(agentNetwork,pipeline_component)
+                agent_pipeline[-1].append(transform_agent)
+
+        #now connect the agents on one level to the next levels, for every pipeline level
+        for pipeline_level, _ in enumerate(agent_pipeline):
+            if pipeline_level != (len(agent_pipeline)-1):
+                for agent in agent_pipeline[pipeline_level]:
+                    for agent_next in agent_pipeline[pipeline_level+1]:
+                        agent.bind_output(agent_next)
+        return agent_pipeline
+
+    def bind_output(self, output_agent):
+        pipeline_last_level = self.pipeline[-1]
+        if "AgentPipeline" in str(type(output_agent).__name__):
+            for agent in pipeline_last_level:
+                for next_agent in output_agent.pipeline[0]:
+                    agent.bind_output(next_agent)
+        else:
+            for agent in pipeline_last_level:
+                agent.bind_output(output_agent)
+
+    def unbind_output(self, output_agent):
+        pipeline_last_level = self.pipeline[-1]
+        if "AgentPipeline" in str(type(output_agent).__name__):
+            for agent in pipeline_last_level:
+                for next_agent in output_agent.pipeline[0]:
+                    agent.unbind_output(next_agent)
+        else:
+            for agent in pipeline_last_level:
+                agent.unbind_output(output_agent)
 
 
 class DataStreamAgent(AgentMET4FOF):
