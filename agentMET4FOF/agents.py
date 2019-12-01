@@ -17,6 +17,8 @@ from osbrain import NSProxy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
+from sklearn.model_selection import ParameterGrid
+import copy
 
 import agentMET4FOF.dashboard.Dashboard as Dashboard
 import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
@@ -1084,7 +1086,7 @@ class AgentPipeline:
         # each hyperparam in the dict will be spawned as an agent
         agentNetwork = agentNetwork
         self.hyperparameters = hyperparameters
-        self.pipeline = self.make_agent_pipelines(agentNetwork, argv,hyperparameters)
+        self.pipeline = self.make_agent_pipelines(agentNetwork, argv, hyperparameters)
 
     def make_transform_agent(self,agentNetwork, pipeline_component=None, hyperparameters={}):
         if ("function" in type(pipeline_component).__name__) or ("method" in type(pipeline_component).__name__):
@@ -1205,6 +1207,7 @@ class AgentPipeline:
             for agent in level:
                 agent_names[-1].append(agent.get_attr('name'))
         return agent_names
+    
 class DataStreamAgent(AgentMET4FOF):
     """
     Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
