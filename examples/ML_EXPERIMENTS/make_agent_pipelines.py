@@ -55,10 +55,7 @@ method_ann = ANN()
 print(str(type(method_pca.fit)))
 print(str(type(method_ann.transform)))
 
-
 # In[5]:
-
-
 class TransformerAgent(AgentMET4FOF):
     def init_parameters(self,method=None):
         self.method = method
@@ -114,6 +111,7 @@ class EvaluationAgent(AgentMET4FOF):
     def init_parameters(self,method=None, **kwargs):
         self.method = method
         self.eval_params = kwargs
+
     def on_received_message(self,message):
         #only evaluate if it is not train channel
         if message['channel'] != 'train':
@@ -275,23 +273,6 @@ if __name__ == '__main__':
 
     datastream_agent.bind_output(ML_Agent_pipelines_A)
     datastream_agent.bind_output(ML_Agent_pipelines_A.pipeline[1])
-
-    # In[14]:
-
-
-    def joe(**kwargs):
-        print(kwargs)
-
-    joe(poi=123,eqwe=123)
-
-
-    # In[15]:
-
-
-    joe.__name__
-
-
-    # In[ ]:
 
 
 
