@@ -28,7 +28,8 @@ app = dash.Dash(__name__,
                 )
 
 def get_multiple_graphs(num_monitors):
-    return [dcc.Graph(id='monitors-graph-'+str(i), figure={})for i in range(num_monitors)]
+    return [dcc.Graph(id='monitors-graph-'+str(i), figure={},style={'height':'90vh'}) for i in range(num_monitors)]
+    # return [dcc.Graph(id='monitors-graph-'+str(i), figure={}) for i in range(num_monitors)]
 
 def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
     app.update_interval_seconds = update_interval_seconds
@@ -395,14 +396,15 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
                     'title': monitor_agent,
                     'uirevision': app.num_monitor,
                     'showlegend': True,
-                    # 'legend':dict(x=-.1, y=1.2),
+                    'legend':dict(xanchor='auto',yanchor='bottom', x=1, y=1,orientation= "h"),
                     # 'margin':dict(t=150)
                 },
 
             }
 
             monitor_graphs[monitor_id]= monitor_graph
-            style_graphs[monitor_id]= {'opacity':1.0, 'width':'100%','height':'100%'}
+            # style_graphs[monitor_id]= {'opacity':1.0, 'width':'100%','height':'100%'}
+            style_graphs[monitor_id]= {'opacity':1.0, 'height':'auto'}
         # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
         return monitor_graphs+ style_graphs
 
