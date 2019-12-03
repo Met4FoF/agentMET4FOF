@@ -34,26 +34,34 @@ def create_monitor_graph(data,label = 'Monitor Agent'):
     trace = go.Scatter(x=x, y=y,mode="lines", name=label)
     return trace
 
+def create_params_table(table_name="",data={}, **kwargs):
+    if type(data) == dict:
+        data_pd = pd.DataFrame.from_dict(data)
+        data_pd = data_pd.reset_index().astype(str)
+    else:
+        data_pd = data
+
+    output_info_table = dash_table.DataTable(
+        id=table_name,
+        columns=[{"name": i, "id": i} for i in data_pd.columns],
+        data=data_pd.to_dict('records'),
+        style_table={'overflowX': 'scroll'},
+        style_cell={
+            'minWidth': '0px', 'maxWidth': '180px',
+            'whiteSpace': 'normal',
+            'font_size': '14px',
+        },
+        css=[{
+            'selector': '.dash-cell div.dash-cell-value',
+            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+        }],
+        **kwargs
+    )
+    return output_info_table
+
 def visualise_agent_parameters(k,v):
     if k == "output_channels_info":
-        data_pd = pd.DataFrame.from_dict(v)
-        data_pd = data_pd.reset_index().astype(str)
-
-        output_info_table = dash_table.DataTable(
-            id='agent-parameters-table',
-            columns=[{"name": i, "id": i} for i in data_pd.columns],
-            data=data_pd.to_dict('records'),
-            style_table={'overflowX': 'scroll'},
-            style_cell={
-                'minWidth': '0px', 'maxWidth': '180px',
-                'whiteSpace': 'normal',
-                'font_size': '14px',
-            },
-            css=[{
-                'selector': '.dash-cell div.dash-cell-value',
-                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-            }],
-        )
+        output_info_table = create_params_table('agent-parameters-table',v)
         return html.Div([html.H6(k),output_info_table])
     else:
         return html.H6(k +": "+str(v))
