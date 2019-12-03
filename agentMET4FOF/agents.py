@@ -1207,7 +1207,7 @@ class AgentPipeline:
             for agent in level:
                 agent_names[-1].append(agent.get_attr('name'))
         return agent_names
-    
+
 class DataStreamAgent(AgentMET4FOF):
     """
     Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
@@ -1351,7 +1351,7 @@ class MonitorAgent(AgentMET4FOF):
 
 class _Logger(AgentMET4FOF):
 
-    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True):
+    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True, ML_experiment=False):
         self.bind('SUB', 'sub', self.log_handler)
         self.log_filename = log_filename
         self.save_logfile = save_logfile
