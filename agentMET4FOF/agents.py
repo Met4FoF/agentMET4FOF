@@ -5,6 +5,7 @@ import re
 import sys
 from io import BytesIO
 import time
+import os
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -84,10 +85,11 @@ class AgentMET4FOF(Agent):
         self.log_mode = True
 
         self.output_channels_info = {}
+
         try:
             self.init_parameters()
-        except:
-            print("Error in calling init_parameters()...")
+        except Exception as e:
+            return 0
 
     def reset(self):
         """
@@ -114,6 +116,9 @@ class AgentMET4FOF(Agent):
         else:
             self.init_agent_loop(self.loop_wait)
 
+    def log_ML(self, message):
+        self.send("_logger", message, topic="ML_EXP")
+
     def log_info(self, message):
         """
         Prints logs to be saved into logfile with Logger Agent
@@ -127,8 +132,9 @@ class AgentMET4FOF(Agent):
         try:
             if self.log_mode:
                 super().log_info(message)
-        except:
-            print("Error in logging...")
+
+        except Exception as e:
+                return -1
 
     def init_agent_loop(self, loop_wait=1.0):
         """
@@ -640,7 +646,7 @@ class _AgentController(AgentMET4FOF):
                 new_agent.set_logger(self._get_logger())
             return new_agent
         except Exception as e:
-            self.log_info("ERROR:" + e)
+            self.log_info("ERROR:" + str(e))
 
 
     def agents(self):
@@ -1023,9 +1029,12 @@ class AgentNetwork:
 
 class TransformerAgent(AgentMET4FOF):
     def init_parameters(self,method=None, **kwargs):
-        self.method = method
+        if ("function" in type(method).__name__) or ("method" in type(method).__name__):
+            self.method = method
+        else:
+            self.method = method(**kwargs)
         self.models = {}
-
+        self.hyperparams = kwargs
         #for single functions passed to the method
         for key in kwargs.keys():
             self.set_attr(key,kwargs[key])
@@ -1061,7 +1070,7 @@ class TransformerAgent(AgentMET4FOF):
             else:
                 results = self.method.predict(X)
         else: #it is a plain function
-            results = self.method(X)
+            results = self.method(X, **self.hyperparams)
 
         #send out
         #if it is a base model, don't send out the predicted train results
@@ -1097,7 +1106,7 @@ class AgentPipeline:
             transform_agent.init_parameters(**hyperparameters)
         else: #class objects with fit and transform
             transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
-            transform_agent.init_parameters(pipeline_component(**hyperparameters))
+            transform_agent.init_parameters(pipeline_component,**hyperparameters)
         return transform_agent
 
     def make_agent_pipelines(self,agentNetwork=None, argv=[], hyperparameters=None):
@@ -1200,13 +1209,26 @@ class AgentPipeline:
             for agent in pipeline_last_level:
                 agent.unbind_output(output_agent)
 
-    def agents(self):
+    def agents(self,ret_hyperparams=False):
         agent_names = []
+        hyperparams = []
         for level in self.pipeline:
             agent_names.append([])
+            hyperparams.append([])
             for agent in level:
                 agent_names[-1].append(agent.get_attr('name'))
-        return agent_names
+                if ret_hyperparams:
+                    hyperparams[-1].append(agent.get_attr('hyperparams'))
+
+        # if ret_hyperparams:
+        #     return [agent_names,hyperparams]
+        # else:
+        #     return agent_names
+
+        if ret_hyperparams:
+            return {"agents":agent_names,"hyperparams":hyperparams}
+        else:
+            return agent_names
 
 class DataStreamAgent(AgentMET4FOF):
     """
@@ -1351,8 +1373,9 @@ class MonitorAgent(AgentMET4FOF):
 
 class _Logger(AgentMET4FOF):
 
-    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True, ML_experiment=False):
-        self.bind('SUB', 'sub', self.log_handler)
+    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True, ml_experiment=False):
+        self.ml_experiment = ml_experiment
+        self.bind('SUB', 'sub', {"INFO":self.log_handler, "ML_EXP":self.log_handler_ML})
         self.log_filename = log_filename
         self.save_logfile = save_logfile
         if self.save_logfile:
@@ -1366,6 +1389,13 @@ class _Logger(AgentMET4FOF):
             except:
                 raise Exception
         self.save_cycles= 0
+
+    def log_handler_ML(self, message, topic):
+        if self.ml_experiment:
+            self.ml_experiment.update_chain_results(message)
+
+    def set_ml_experiment(self, ml_experiment=False):
+        self.ml_experiment = ml_experiment
 
     def log_handler(self, message, topic):
         sys.stdout.write(message+'\n')
@@ -1401,4 +1431,3 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles+=1
             except:
                 raise Exception
-
