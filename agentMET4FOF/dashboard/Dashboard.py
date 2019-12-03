@@ -16,7 +16,7 @@ import agentMET4FOF.agents as agentmet4fof_module
 
 import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
 from agentMET4FOF.dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
-
+from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout
 external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', 'https://fonts.googleapis.com/icon?family=Material+Icons']
 external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
 assets_url_path = os.path.join(os.path.dirname(__file__), 'assets')
@@ -35,144 +35,171 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
     app.update_interval_seconds = update_interval_seconds
     app.num_monitors = num_monitors
     app.layout = html.Div(children=[
-        #header
-        html.Nav([
-            html.Div([
-                html.A("Met4FoF Agent Testbed", className="brand-logo"),
-                html.Ul([
-                ], className="right hide-on-med-and-down")
-            ], className="nav-wrapper container")
-        ], className="light-blue lighten-1"),
 
-        #body
-        html.Div(className="row",children=[
+                #header
+                html.Nav([
+                    html.Div([
+                        html.A("Met4FoF Agent Testbed", className="brand-logo center"),
+                        html.Ul([
+                        ], className="right hide-on-med-and-down")
+                    ], className="nav-wrapper container")
+                ], className="light-blue lighten-1"),
+                dcc.Tabs([
+                    dcc.Tab(label='Agent Network', children=[
+                #body
+                html.Div(className="row",children=[
 
-            #main panel
-            html.Div(className="col s9", children=[
-                    html.Div(className="card", children=[
-                       html.Div(className="card-content", children=[
-                               html.Span(className="card-title", children=["Agent Network"]),
-                               html.P(children=["Active agents running in local host"]),
-                               html.Div(className="row", children = [
-                                            html.Div(className="col", children=[
-                                                LayoutHelper.html_button(icon="play_circle_filled",text="Start", id="start-button")
-                                            ]),
-                                            html.Div(className="col", children=[
-                                                LayoutHelper.html_button(icon="stop",text="Stop", id="stop-button")
-                                            ]),
+                    #main panel
+                    html.Div(className="col s9", children=[
+                            html.Div(className="card", children=[
+                               html.Div(className="card-content", children=[
+                                       # html.Span(className="card-title", children=["Agent Network"]),
+                                       # html.P(children=["Active agents running in agent network"]),
+                                       html.Div(className="row", children = [
+                                                    html.Div(className="col", children=[
+                                                        LayoutHelper.html_button(icon="play_circle_filled",text="Start", id="start-button")
+                                                    ]),
+                                                    html.Div(className="col", children=[
+                                                        LayoutHelper.html_button(icon="stop",text="Stop", id="stop-button")
+                                                    ]),
 
-                                            html.Div(className="col", children=[
-                                                LayoutHelper.html_button(icon="restore",text="Reset", id="reset-button")
-                                            ])
-                                        ])
+                                                    html.Div(className="col", children=[
+                                                        LayoutHelper.html_button(icon="restore",text="Reset", id="reset-button")
+                                                    ]),
+                                                ])
 
-                        ]),
-                       html.Div(className="card-action", children=[
-                           cyto.Cytoscape(
-                               id='agents-network',
-                               layout={'name': 'breadthfirst'},
-                               style={'width': '100%', 'height': '600px'},
-                               elements=[],
-                               stylesheet=[
-                                            { 'selector': 'node', 'style':
-                                                { 'label': 'data(id)' ,
-                                                  'shape': 'rectangle' }
-                                                 },
-                                            { 'selector': 'edge',
-                                              'style': { 'mid-target-arrow-shape': 'triangle','arrow-scale': 3},
-                                            }
-                                          ]
-                           )
+                                ]),
+                               html.Div(className="card-action", children=[
+                                   cyto.Cytoscape(
+                                       id='agents-network',
+                                       layout={'name': 'breadthfirst'},
+                                       style={'width': '100%', 'height': '600px'},
+                                       elements=[],
+                                       stylesheet=[
+                                                    { 'selector': 'node', 'style':
+                                                        { 'label': 'data(id)' ,
+                                                          'shape': 'rectangle' }
+                                                         },
+                                                    { 'selector': 'edge',
+                                                      'style': { 'mid-target-arrow-shape': 'triangle','arrow-scale': 3},
+                                                    }
+                                                  ]
+                                   )
 
-                        ])
+                                ])
+
+                            ]),
+                            html.H5(className="card", id="matplotlib-division", children=" "),
+
+                            # html.Div(className="card", id="monitors-temp-division", children=[
+                            #     dcc.Graph(id='monitors-graph',
+                            #         figure={},
+                            #         #style={'height': 800},
+                            #     ),
+                            #     dcc.Graph(id='monitors-graph-2',
+                            #         figure={},
+                            #     )
+                            # ])
+                            html.Div(className="card", id="monitors-temp-division", children=get_multiple_graphs(num_monitors))
 
                     ]),
-                    html.H5(className="card", id="matplotlib-division", children=" "),
 
-                    # html.Div(className="card", id="monitors-temp-division", children=[
-                    #     dcc.Graph(id='monitors-graph',
-                    #         figure={},
-                    #         #style={'height': 800},
-                    #     ),
-                    #     dcc.Graph(id='monitors-graph-2',
-                    #         figure={},
-                    #     )
-                    # ])
-                    html.Div(className="card", id="monitors-temp-division", children=get_multiple_graphs(num_monitors))
+                    #side panel
+                    html.Div(className="col s3 ", children=[
+                        html.Div(className="card blue lighten-4", children= [
+                            html.Div(className="card-content", children=[
 
-            ]),
+                                html.Div(style={'margin-top': '20px'}, children=[
+                                    html.H6(className="black-text", children="Add Agent"),
+                                    dcc.Dropdown(id="add-modules-dropdown"),
+                                    LayoutHelper.html_button(icon="person_add",text="Add Agent", id="add-module-button"),
+                                    LayoutHelper.html_button(icon="delete_forever",text="Remove Agent", id="remove-module-button", style={"margin-left":'4px'})
 
-            #side panel
-            html.Div(className="col s3 ", children=[
-                html.Div(className="card blue lighten-4", children= [
-                    html.Div(className="card-content", children=[
+                                ]),
 
-                        html.Div(style={'margin-top': '20px'}, children=[
-                            html.H6(className="black-text", children="Add Agent"),
-                            dcc.Dropdown(id="add-modules-dropdown"),
-                            LayoutHelper.html_button(icon="person_add",text="Add Agent", id="add-module-button"),
-                            LayoutHelper.html_button(icon="delete_forever",text="Remove Agent", id="remove-module-button", style={"margin-left":'4px'})
-
+                                html.Div(style={'margin-top': '20px'}, children=[
+                                    html.H6(className="black-text", children="Dataset"),
+                                    dcc.Dropdown(id="add-dataset-dropdown"),
+                                    LayoutHelper.html_button(icon="add_to_queue",text="Add Datastream Agent", id="add-dataset-button")
+                                ])
+                            ])
                         ]),
 
-                        html.Div(style={'margin-top': '20px'}, children=[
-                            html.H6(className="black-text", children="Dataset"),
-                            dcc.Dropdown(id="add-dataset-dropdown"),
-                            LayoutHelper.html_button(icon="add_to_queue",text="Add Datastream Agent", id="add-dataset-button")
+                        html.Div(className="card green lighten-4", children=[
+
+                            html.Div(className="card-content", children=[
+                                # side panel contents here
+                                html.H5("Agent Configuration"),
+                                html.H5(id='selected-node', children="Not selected", className="flow-text", style={"font-weight": "bold"}),
+
+                                html.H6(id='input-names', children="Not selected", className="flow-text"),
+                                html.H6(id='output-names', children="Not selected", className="flow-text"),
+
+                                html.Div(style={'margin-top': '20px'}, children=[
+                                    html.H6(className="black-text", children="Select Output Module"),
+                                    dcc.Dropdown(id="connect-modules-dropdown"),
+
+                                    LayoutHelper.html_button(icon="link",text="Connect Agent", id="connect-module-button"),
+                                    LayoutHelper.html_button(icon="highlight_off",text="Disconnect Agent", id="disconnect-module-button", style={"margin-left":'4px'})
+
+
+                                ]),
+                                html.H6(id='agent-parameters', children="Not selected", className="flow-text"),
+
+                                html.P(id="connect_placeholder", className="black-text", children=" "),
+                                html.P(id="disconnect_placeholder", className="black-text", children=" "),
+                                html.P(id="monitor_placeholder", className="black-text", children=" "),
+
+
+
+                            ])
+
                         ])
 
-                    ])
+
+                    ]),
+                    dcc.Interval(
+                        id='interval-component-network-graph',
+                        interval=update_interval_seconds * 1000,  # in milliseconds
+                        n_intervals=5
+                    ),
+                    dcc.Interval(
+                        id='interval-add-module-list',
+                        interval=1000 * 1000,  # in milliseconds
+                        n_intervals=0
+                    ),
+                    dcc.Interval(
+                        id='interval-update-monitor-graph',
+                        interval=update_interval_seconds * 1000,  # in milliseconds
+                        n_intervals=5
+                    )
+                ])
+            ]),
+
+            dcc.Tab(label='Experiments', children=[
+                get_ml_exp_layout()
+                # html.Details([
+                #     html.Summary('Label of the item', style={"font-size":"20"}),
+                #     html.Div('Contents')
+                # ]),
+                # html.Ul([
+                #     html.Li([
+                #         html.Div(["FIRST"], className="collapsible-header"),
+                #         html.Div([html.Span(["akjshdkajshdqwudihqwiudhqiwuehqwikjdhaksjdhakj"])], className="collapsible-body"),
+                # ], className="collapsible")
+                # ]),
+                # dcc.Graph(
+                #     figure={
+                #         'data': [
+                #             {'x': [1, 2, 3], 'y': [1, 4, 1],
+                #                 'type': 'bar', 'name': 'SF'},
+                #             {'x': [1, 2, 3], 'y': [1, 2, 3],
+                #              'type': 'bar', 'name': u'Montréal'},
+                #         ]
+                #     }
+                # )
 
                 ]),
-
-                html.Div(className="card green lighten-4", children=[
-
-                    html.Div(className="card-content", children=[
-                        # side panel contents here
-                        html.H5("Agent Configuration"),
-                        html.H5(id='selected-node', children="Not selected", className="flow-text", style={"font-weight": "bold"}),
-
-                        html.H6(id='input-names', children="Not selected", className="flow-text"),
-                        html.H6(id='output-names', children="Not selected", className="flow-text"),
-
-                        html.Div(style={'margin-top': '20px'}, children=[
-                            html.H6(className="black-text", children="Select Output Module"),
-                            dcc.Dropdown(id="connect-modules-dropdown"),
-
-                            LayoutHelper.html_button(icon="link",text="Connect Agent", id="connect-module-button"),
-                            LayoutHelper.html_button(icon="highlight_off",text="Disconnect Agent", id="disconnect-module-button", style={"margin-left":'4px'})
-
-
-                        ]),
-                        html.H6(id='agent-parameters', children="Not selected", className="flow-text"),
-
-                        html.P(id="connect_placeholder", className="black-text", children=" "),
-                        html.P(id="disconnect_placeholder", className="black-text", children=" "),
-                        html.P(id="monitor_placeholder", className="black-text", children=" "),
-
-
-
-                    ])
-
-                ])
-
-
-            ]),
-            dcc.Interval(
-                id='interval-component-network-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
-                n_intervals=5
-            ),
-            dcc.Interval(
-                id='interval-add-module-list',
-                interval=1000 * 1000,  # in milliseconds
-                n_intervals=0
-            ),
-            dcc.Interval(
-                id='interval-update-monitor-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
-                n_intervals=5
-            )
         ])
     ])
 
