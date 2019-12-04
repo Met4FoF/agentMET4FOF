@@ -25,6 +25,7 @@ import agentMET4FOF.dashboard.Dashboard as Dashboard
 import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
 from agentMET4FOF.streams import DataStreamMET4FOF
 
+from agentMET4FOF.develop.ML_Experiment import save_experiment
 
 class AgentMET4FOF(Agent):
     """
@@ -1391,8 +1392,15 @@ class _Logger(AgentMET4FOF):
         self.save_cycles= 0
 
     def log_handler_ML(self, message, topic):
+        """
+        Handles the results coming from Evaluation agent to be saved into the provided ML experiment file.
+        This updates the results of individual "chains" to be aggregated later for comparisons of chains/pipelines
+        The mechanism relies on regularly saving the ml_experiment object into the pickled file in default ML_EXP folder.
+
+        """
         if self.ml_experiment:
             self.ml_experiment.update_chain_results(message)
+            save_experiment(self.ml_experiment)
 
     def set_ml_experiment(self, ml_experiment=False):
         self.ml_experiment = ml_experiment
