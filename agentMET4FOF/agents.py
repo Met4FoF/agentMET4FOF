@@ -1077,7 +1077,13 @@ class TransformerAgent(AgentMET4FOF):
         #if it is a base model, don't send out the predicted train results
         chain= chain+"->"+self.name
         if hasattr(self.method, 'predict'):
-            self.send_output({'x':X, 'y_true':Y, 'y_pred':results,'chain':chain},channel=message['channel'])
+            #check if uncertainty is included
+            if type(results) == tuple and len(results) == 2:
+                y_pred = results[0]
+                y_unc = results[1]
+                self.send_output({'x':X, 'y_true':Y, 'y_pred':y_pred,'y_unc':y_unc,'chain':chain},channel=message['channel'])
+            else:
+                self.send_output({'x':X, 'y_true':Y, 'y_pred':results,'chain':chain},channel=message['channel'])
         else:
             self.send_output({'x':results, 'y':Y,'chain':chain},channel=message['channel'])
 

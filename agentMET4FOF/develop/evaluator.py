@@ -14,13 +14,27 @@ class EvaluationAgent(AgentMET4FOF):
         #only evaluate if it is not train channel
         if message['channel'] != 'train':
             results = {}
+            check_y_unc = False
+            if "y_unc" in message['data'].keys():
+                check_y_unc = True
+
             for method_id, method in enumerate(self.methods):
                 if len(self.eval_params) !=0:
-                    results.update({str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.eval_params[method_id])})
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], message['data']['y_unc'], **self.eval_params[method_id])}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.eval_params[method_id])}
                 elif len(self.methods) == 1 and len(self.eval_params) == 0:
-                    results.update({str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.kwargs)})
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], message['data']['y_unc'], **self.kwargs)}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.kwargs)}
                 else:
-                    results.update({str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'])})
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'],message['data']['y_unc'])}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'])}
+                results.update(new_res)
             if type(message['data']) == dict and 'chain' in message['data'].keys():
                 agent_chain = message['data']['chain']
                 for key in results.keys():
@@ -30,7 +44,10 @@ class EvaluationAgent(AgentMET4FOF):
                 self.send_output(results)
 
             if self.ML_exp:
-                log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})}
+                if check_y_unc:
+                    log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred'],'y_unc':message['data']['y_unc']})}
+                else:
+                    log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})}
                 log_results.update(results)
                 self.log_ML(log_results)
 
