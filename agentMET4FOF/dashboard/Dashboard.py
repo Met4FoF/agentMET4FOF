@@ -188,6 +188,8 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
         if tab == 'ml-exp':
             experiments_df = get_experiments_list()
             return get_ml_exp_layout(experiments_df)
+        else:
+            return ""
 
     #Update network graph per interval
     @app.callback([dash.dependencies.Output('agents-network', 'elements'),

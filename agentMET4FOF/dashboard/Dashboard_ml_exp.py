@@ -1,7 +1,6 @@
 """
 Provides functions to obtain data from experiments folder (default is MLEXP)
 To be rendered on the tab of the dashboard for visualizing and comparing ML experiments
-
 """
 
 
@@ -40,10 +39,6 @@ def get_experiments_list():
         experiment_list = {}
     return experiment_list
 
-# try
-# ml_exp = load_experiment(ml_experiment_name="run_1")
-# pipeline_data = pd.DataFrame.from_dict(ml_exp.pipeline_details)
-
 def get_ml_exp_layout(experiments_df={}):
     #body
     return html.Div(className="row",children=[
@@ -56,7 +51,7 @@ def get_ml_exp_layout(experiments_df={}):
                     ]),
                    html.Div(className="card-action", id="chains-div", children=[
                     LayoutHelper.create_params_table(table_name="chains-table",
-                                                     data=experiments_df,
+                                                     data={},
                                                         editable=True,
                                                         filter_action="native",
                                                         sort_action="native",
@@ -102,7 +97,7 @@ def get_ml_exp_layout(experiments_df={}):
                     ]),
                     html.Div(id="pipeline-div",children=
                     LayoutHelper.create_params_table(table_name="pipeline-table",
-                                                    data=experiments_df,
+                                                    data={},
                                                     editable=True,
                                                     filter_action="native",
                                                     sort_action="native",
