@@ -16,13 +16,12 @@ import agentMET4FOF.agents as agentmet4fof_module
 
 import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
 from agentMET4FOF.dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
-from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout
-external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', 'https://fonts.googleapis.com/icon?family=Material+Icons']
+# from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout
+
+external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons']
 external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
-assets_url_path = os.path.join(os.path.dirname(__file__), 'assets')
 
 app = dash.Dash(__name__,
-                assets_url_path=assets_url_path,
                 external_stylesheets=external_stylesheets,
                 external_scripts=external_scripts
                 )
@@ -177,7 +176,7 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
             ]),
 
             dcc.Tab(label='Experiments', children=[
-                get_ml_exp_layout()
+                # get_ml_exp_layout()
                 # html.Details([
                 #     html.Summary('Label of the item', style={"font-size":"20"}),
                 #     html.Div('Contents')

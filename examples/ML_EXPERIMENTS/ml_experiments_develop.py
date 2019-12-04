@@ -22,16 +22,17 @@ import copy
 
 if __name__ == "__main__":
     agentNetwork = AgentNetwork()
-    # hyperparameters = [[],
-    #                   [{"n_components":[1,2,3]}],
-    #                   ]
-    #
-    #
+    hyperparameters = [[],
+                      [{"n_components":[1,2,3]}],
+                      ]
+
+
     # ML_Agent_pipelines_B = AgentPipeline(agentNetwork,
     #                                      [StandardScaler,RobustScaler],
     #                                      [PCA],
     #                                      [LogisticRegression,SVC],
     #                                      hyperparameters=hyperparameters)
+
     ML_Agent_pipelines_B = AgentPipeline(agentNetwork,
                                              [StandardScaler],
                                              [LogisticRegression])
@@ -54,5 +55,6 @@ if __name__ == "__main__":
     print(ml_experiment.chain_results)
     agentNetwork.set_running_state()
 
+    #save and load file
     save_experiment(agentNetwork.get_agent("Logger").get_attr("ml_experiment"))
-    qwe= load_experiment("run_20")
+    ml_exp_load = load_experiment("run_2")

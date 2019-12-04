@@ -15,15 +15,13 @@ class EvaluationAgent(AgentMET4FOF):
                 agent_chain = message['data']['chain']
                 self.send_output({agent_chain:results})
 
-
             else:
                 agent_chain = self.method.__name__
                 self.send_output({self.method.__name__:results})
 
-
             if self.ML_exp:
-                self.log_ML({agent_chain: {"evaluation":results,
-                                           "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})
-                                           }
+                self.log_ML({"chain":agent_chain,
+                             "evaluation":results,
+                             "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})
                              })
 

@@ -1037,7 +1037,7 @@ class TransformerAgent(AgentMET4FOF):
         self.hyperparams = kwargs
         #for single functions passed to the method
         for key in kwargs.keys():
-            self.set_attr(key,kwargs[key])
+            self.set_attr(key=kwargs[key])
 
     def on_received_message(self,message):
         #update chain
