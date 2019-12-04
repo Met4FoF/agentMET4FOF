@@ -90,15 +90,6 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
                             ]),
                             html.H5(className="card", id="matplotlib-division", children=" "),
 
-                            # html.Div(className="card", id="monitors-temp-division", children=[
-                            #     dcc.Graph(id='monitors-graph',
-                            #         figure={},
-                            #         #style={'height': 800},
-                            #     ),
-                            #     dcc.Graph(id='monitors-graph-2',
-                            #         figure={},
-                            #     )
-                            # ])
                             html.Div(className="card", id="monitors-temp-division", children=get_multiple_graphs(num_monitors))
 
                     ]),
@@ -389,7 +380,6 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
 
         agent_names = agentNetwork.agents('MonitorAgent') # get all agent names
         app.num_monitor = len(agent_names)
-        agent_type ="Monitor" #all agents with Monitor in its name will be selected
         # monitor_graphs = []
         # monitor_graphs = [{'data': [] , 'layout':{'height':10,'width':10}, 'xaxis':{'visible':False}, 'yaxis':{'visible':False}} for i in range(app.num_monitors)]
         monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
@@ -404,17 +394,25 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
                         data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
                 else:
                     data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
-
+            if len(data) > 5:
+                y_title_offset = 0.1
+            else:
+                y_title_offset = -0.1
             monitor_graph={
                 'data': data,
                 'layout': {
-                    'title': monitor_agent,
+                    'title': {
+                        'text': monitor_agent,
+                        'y':y_title_offset,
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'bottom'
+                    },
                     'uirevision': app.num_monitor,
                     'showlegend': True,
                     'legend':dict(xanchor='auto',yanchor='bottom', x=1, y=1,orientation= "h"),
                     # 'margin':dict(t=150)
                 },
-
             }
 
             monitor_graphs[monitor_id]= monitor_graph
