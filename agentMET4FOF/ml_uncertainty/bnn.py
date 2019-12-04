@@ -31,7 +31,7 @@ from datetime import datetime
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 
-from agentMET4FOF.ml_uncertainty.utils import *
+from agentMET4FOF.ml_uncertainty.bnn_utils import *
 from agentMET4FOF.ml_uncertainty.bnn import *
 
 from sklearn.naive_bayes import GaussianNB
