@@ -150,16 +150,18 @@ def prepare_ml_exp_callbacks(app):
 
             #compute aggregated results
             chain_results = pd.DataFrame.from_dict(chain_results)
-            aggregated_chain_results = chain_results[["chain","evaluation"]]
+            aggregated_chain_results = chain_results.drop(columns=['raw'])
 
-            mean_chain = aggregated_chain_results.groupby('chain').mean()["evaluation"]
-            std_chain = aggregated_chain_results.groupby('chain').std()["evaluation"]
 
+            mean_chain = aggregated_chain_results.groupby('chain').mean()
+            std_chain = aggregated_chain_results.groupby('chain').std()
+
+            mean_chain.columns = [column+"_mean" for column in mean_chain.columns]
+            std_chain.columns = [column+"_std" for column in std_chain.columns]
 
             aggregated_chain_results = pd.concat([mean_chain, std_chain], axis=1).applymap(round_sig)
 
             aggregated_chain_results= aggregated_chain_results.reset_index()
-            aggregated_chain_results.columns = ["chain","Mean","Std"]
 
             #auto select all
             selected_rows_chains = np.arange(0,aggregated_chain_results.shape[0])
@@ -190,19 +192,6 @@ def prepare_ml_exp_callbacks(app):
 
 
         #create chains table
-        # chains_table= LayoutHelper.create_params_table(table_name="chains-table",
-        #                                                 data=aggregated_chain_results,
-        #                                                 editable=True,
-        #                                                 filter_action="native",
-        #                                                 sort_action="native",
-        #                                                 sort_mode="multi",
-        #                                                 row_selectable="multi",
-        #                                                 selected_rows=selected_rows_chains,
-        #                                                 style_data={
-        #                                                     'whiteSpace': 'normal',
-        #                                                     'height': 'auto'
-        #                                                     },
-        #                                                  )
         try:
             chains_table = dash_table.DataTable(data=aggregated_chain_results.to_dict('records'),
                                                  columns=[{'id': c, 'name': c} for c in aggregated_chain_results.columns],
@@ -242,7 +231,8 @@ def prepare_ml_exp_callbacks(app):
         if len(aggregated_chain_results) == 0:
             return [""]
 
-        aggregated_chain_results = aggregated_chain_results.sort_values(by=['Mean'],ascending=False)
+        sort_col = list(aggregated_chain_results.columns[1:3])
+        aggregated_chain_results = aggregated_chain_results.sort_values(by=sort_col,ascending=False)
         filter_chain = [derived_virtual_data[selected_chain]['chain'] for selected_chain in derived_virtual_selected_rows]
         aggregated_chain_results = aggregated_chain_results[aggregated_chain_results['chain'].isin(filter_chain)]
 
@@ -269,10 +259,8 @@ def prepare_ml_exp_callbacks(app):
                     },
                 },
             )
-            # check if column exists - user may have deleted it
-            # If `column.deletable=False`, then you don't
-            # need to do this check.
-            for column in ['Mean', 'Std'] if column in aggregated_chain_results
+
+            for column in list(aggregated_chain_results.columns[1:])
         ]
 
         return [final_graphs]
