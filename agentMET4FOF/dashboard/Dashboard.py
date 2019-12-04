@@ -16,7 +16,7 @@ import agentMET4FOF.agents as agentmet4fof_module
 
 import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
 from agentMET4FOF.dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
-# from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout
+from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout, prepare_ml_exp_callbacks, get_experiments_list
 
 external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons']
 external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
@@ -43,7 +43,7 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
                         ], className="right hide-on-med-and-down")
                     ], className="nav-wrapper container")
                 ], className="light-blue lighten-1"),
-                dcc.Tabs([
+                dcc.Tabs(id="main-tabs", children=[
                     dcc.Tab(label='Agent Network', children=[
                 #body
                 html.Div(className="row",children=[
@@ -174,33 +174,20 @@ def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
                     )
                 ])
             ]),
-
-            dcc.Tab(label='Experiments', children=[
-                # get_ml_exp_layout()
-                # html.Details([
-                #     html.Summary('Label of the item', style={"font-size":"20"}),
-                #     html.Div('Contents')
-                # ]),
-                # html.Ul([
-                #     html.Li([
-                #         html.Div(["FIRST"], className="collapsible-header"),
-                #         html.Div([html.Span(["akjshdkajshdqwudihqwiudhqiwuehqwikjdhaksjdhakj"])], className="collapsible-body"),
-                # ], className="collapsible")
-                # ]),
-                # dcc.Graph(
-                #     figure={
-                #         'data': [
-                #             {'x': [1, 2, 3], 'y': [1, 4, 1],
-                #                 'type': 'bar', 'name': 'SF'},
-                #             {'x': [1, 2, 3], 'y': [1, 2, 3],
-                #              'type': 'bar', 'name': u'Montréal'},
-                #         ]
-                #     }
-                # )
-
+            dcc.Tab(id="ml-exp-tab",label='ML Experiments', value="ml-exp", children=[
+                get_ml_exp_layout()
                 ]),
         ])
     ])
+
+    app = prepare_ml_exp_callbacks(app)
+
+    @app.callback(dash.dependencies.Output('ml-exp-tab', 'children'),
+                  [dash.dependencies.Input('main-tabs', 'value')])
+    def render_content(tab):
+        if tab == 'ml-exp':
+            experiments_df = get_experiments_list()
+            return get_ml_exp_layout(experiments_df)
 
     #Update network graph per interval
     @app.callback([dash.dependencies.Output('agents-network', 'elements'),
