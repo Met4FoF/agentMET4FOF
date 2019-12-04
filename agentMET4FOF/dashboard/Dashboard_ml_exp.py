@@ -14,11 +14,11 @@ import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
 from datetime import datetime
 import pandas as pd
 from agentMET4FOF.develop.ML_Experiment import load_experiment
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import numpy as np
 from math import log10, floor
-
+import copy
 
 def get_experiments_list():
     try:
@@ -48,6 +48,14 @@ def get_ml_exp_layout(experiments_df={}):
                 html.Div(className="card", children=[
                    html.Div(className="card-content", children=[
                            html.Span(className="card-title", children=["Results"]),
+                                       html.Div(className="row", children = [
+                                                    html.Div(className="col", children=[
+                                                        LayoutHelper.html_button(icon="select_all",text="Select All", id="select-all-button")
+                                                    ]),
+                                                    html.Div(className="col", children=[
+                                                        LayoutHelper.html_button(icon="tab_unselected",text="Unselect All", id="unselect-all-button")
+                                                    ]),
+                                                ])
                     ]),
                    html.Div(className="card-action", id="chains-div", children=[
                     LayoutHelper.create_params_table(table_name="chains-table",
@@ -62,8 +70,9 @@ def get_ml_exp_layout(experiments_df={}):
                     ])
 
                 ]),
-                html.Div(className="card", id="compare-graph-div", children=[])
-
+                html.Div(className="card", id="compare-graph-div", children=[]),
+                html.Div(id="placeholder-select",style={"opacity":0}),
+                # html.Div(id="placeholder-unselect",style={"opacity":0}),
         ]),
 
         #side panel
@@ -98,12 +107,12 @@ def get_ml_exp_layout(experiments_df={}):
                     html.Div(id="pipeline-div",children=
                     LayoutHelper.create_params_table(table_name="pipeline-table",
                                                     data={},
-                                                    editable=True,
+                                                    # editable=True,
                                                     filter_action="native",
                                                     sort_action="native",
                                                     sort_mode="multi",
-                                                    row_selectable="multi",
-                                                    selected_rows=[],
+                                                    # row_selectable="multi",
+                                                    # selected_rows=[],
                                                      )
                     )
 
@@ -119,9 +128,33 @@ def prepare_ml_exp_callbacks(app):
     app.aggregated_chain_results ={}
 
     @app.callback(
-        [Output('experiment-placeholder-selected-rows', "children"),
-         # Output('pipeline-table', "columns"),
-        Output('pipeline-div', "children"),
+        [Output('chains-table', "selected_rows"),],
+        [Input('select-all-button', 'n_clicks_timestamp'),
+         Input('unselect-all-button', 'n_clicks_timestamp')],
+        [State('chains-table', "derived_virtual_data"),
+         ]
+    )
+    def unselect_all(select_timestamp,unselect_timestamp, rows):
+        if select_timestamp is None and unselect_timestamp is None:
+            raise PreventUpdate
+        res = "SELECT"
+        if unselect_timestamp is None:
+            res = "SELECT"
+        elif select_timestamp is None:
+            res = "UNSELECT"
+        elif select_timestamp > unselect_timestamp:
+            res = "SELECT"
+        else:
+            res = "UNSELECT"
+
+        if res == "SELECT":
+            return [[i for i in range(len(rows))]]
+        elif res == "UNSELECT":
+            return [[]]
+
+    @app.callback(
+        [
+         Output('pipeline-div', "children"),
          Output('chains-div', "children"),
          ],
         [Input('experiment-table', "derived_virtual_data"),
@@ -150,18 +183,34 @@ def prepare_ml_exp_callbacks(app):
 
             #compute aggregated results
             chain_results = pd.DataFrame.from_dict(chain_results)
-            aggregated_chain_results = chain_results.drop(columns=['raw'])
-
-
+            if "raw" in chain_results.columns:
+                aggregated_chain_results = chain_results.drop(columns=['raw'])
+            else:
+                aggregated_chain_results = copy.copy(chain_results)
+            #aggregate the evaluations by mean and std
             mean_chain = aggregated_chain_results.groupby('chain').mean()
             std_chain = aggregated_chain_results.groupby('chain').std()
 
+            #rename columns
             mean_chain.columns = [column+"_mean" for column in mean_chain.columns]
             std_chain.columns = [column+"_std" for column in std_chain.columns]
 
             aggregated_chain_results = pd.concat([mean_chain, std_chain], axis=1).applymap(round_sig)
 
             aggregated_chain_results= aggregated_chain_results.reset_index()
+
+            #remove datastream agent from the chain names
+            def filter_name_agent(chain):
+                if '->' in chain:
+                    agents = chain.split('->')[1:]
+                    chain = ""
+                    for id_, agent in enumerate(agents):
+                        if id_ >0:
+                            chain = chain +"->"+ str(agent)
+                        else:
+                            chain = str(agent)
+                return chain
+            aggregated_chain_results['chain'] = aggregated_chain_results['chain'].apply(filter_name_agent)
 
             #auto select all
             selected_rows_chains = np.arange(0,aggregated_chain_results.shape[0])
@@ -203,13 +252,13 @@ def prepare_ml_exp_callbacks(app):
                                                  row_selectable="multi",
                                                  selected_rows=selected_rows_chains,
                                                  filter_action="native",
+                                                 sort_action="native",
                                                  sort_mode="multi",
                                                  id="chains-table"
                                                  )
         except:
             chains_table = " "
-        return [str(rows), pipeline_table, chains_table]
-
+        return [pipeline_table, chains_table]
 
     def round_sig(x, sig=2):
         try:
