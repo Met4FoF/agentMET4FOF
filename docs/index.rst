@@ -26,7 +26,13 @@ For the *agentMET4FOF* homepage go to
 
 .. toctree::
    :maxdepth: 1
-   :caption: Code Reference
+   :caption: In depth examples:
+
+   examples/01-Download-Data.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Code Reference:
 
    agentMET4FOF_agents
    agentMET4FOF_streams
