@@ -42,7 +42,6 @@ def get_experiments_list():
 def get_ml_exp_layout(experiments_df={}):
     #body
     return html.Div(className="row",children=[
-
         #main panel
         html.Div(className="col s8", children=[
                 html.Div(className="card", children=[
@@ -72,7 +71,6 @@ def get_ml_exp_layout(experiments_df={}):
                 ]),
                 html.Div(className="card", id="compare-graph-div", children=[]),
                 html.Div(id="placeholder-select",style={"opacity":0}),
-                # html.Div(id="placeholder-unselect",style={"opacity":0}),
         ]),
 
         #side panel
@@ -81,10 +79,8 @@ def get_ml_exp_layout(experiments_df={}):
                 html.Div(className="card-content", children=[
 
                     html.Span(className="card-title",style={'margin-top': '20px'}, children=[
-                        # html.H6(className="black-text", children="ML Experiments"),
                          "ML Experiments"
                     ]),
-
                     LayoutHelper.create_params_table(table_name="experiment-table",
                                                      data=experiments_df,
                                                         editable=True,
@@ -115,7 +111,6 @@ def get_ml_exp_layout(experiments_df={}):
                                                     # selected_rows=[],
                                                      )
                     )
-
                 ])
             ]),
 
@@ -136,7 +131,7 @@ def prepare_ml_exp_callbacks(app):
     )
     def unselect_all(select_timestamp,unselect_timestamp, rows):
         if select_timestamp is None and unselect_timestamp is None:
-            raise PreventUpdate
+            return [[]]
         res = "SELECT"
         if unselect_timestamp is None:
             res = "SELECT"

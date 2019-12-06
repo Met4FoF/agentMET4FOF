@@ -2,3 +2,8 @@
   display: none;
 }
 
+.dash-table-container [type="checkbox"]:not(:checked), .dash-table-container [type="checkbox"]:checked {
+    position: inherit;
+    opacity: inherit;
+    pointer-events: inherit;
+}
