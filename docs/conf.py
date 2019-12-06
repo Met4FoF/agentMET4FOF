@@ -15,6 +15,7 @@
 
 import os
 import sys
+import shutil
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -39,6 +40,36 @@ extensions = [
 	'sphinx.ext.todo',
     'nbsphinx'
 ]
+
+################################################################################
+# This part is taken from
+# https://github.com/cornellius-gp/gpytorch/issues/new/choose?permalink=https%3A%2F%2Fgithub.com%2Fcornellius-gp%2Fgpytorch%2Fblob%2F0b28dd0b8430a0df9838593e7e632dc01d20bcf4%2Fdocs%2Fsource%2Fconf.py%23L107
+#
+# - Copy over examples folder to docs/source
+# This makes it so that nbsphinx properly loads the notebook images
+
+examples_source = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "examples")
+)
+examples_dest = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "examples")
+)
+
+if os.path.exists(examples_dest):
+    shutil.rmtree(examples_dest)
+os.mkdir(examples_dest)
+
+for root, dirs, files in os.walk(examples_source):
+    for dr in dirs:
+        os.mkdir(os.path.join(root.replace(examples_source, examples_dest), dr))
+    for fil in files:
+        if os.path.splitext(fil)[1] in [".ipynb", ".md", ".rst"]:
+            source_filename = os.path.join(root, fil)
+            dest_filename = source_filename.replace(
+                examples_source, examples_dest
+            )
+            shutil.copyfile(source_filename, dest_filename)
+################################################################################
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
