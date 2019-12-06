@@ -41,6 +41,8 @@ extensions = [
     'nbsphinx'
 ]
 
+nbsphinx_allow_errors = True
+
 ################################################################################
 # This part is taken from
 # https://github.com/cornellius-gp/gpytorch/issues/new/choose?permalink=https%3A%2F%2Fgithub.com%2Fcornellius-gp%2Fgpytorch%2Fblob%2F0b28dd0b8430a0df9838593e7e632dc01d20bcf4%2Fdocs%2Fsource%2Fconf.py%23L107
