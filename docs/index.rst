@@ -14,11 +14,11 @@ For the *agentMET4FOF* homepage go to
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
 
-   index.rst
-   agentMET4FOF agents.rst
-   agentMET4FOF streams.rst
+    index.rst
+    agentMET4FOF_agents.rst
+    agentMET4FOF_streams.rst
 
 
 Indices and tables

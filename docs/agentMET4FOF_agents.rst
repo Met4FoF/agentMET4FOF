@@ -1,5 +1,5 @@
 agentMET4FOF agents
 ===================
 
-.. automodule:: agents
+.. automodule:: agentMET4FOF.agents
     :members:
