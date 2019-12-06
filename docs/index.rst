@@ -30,6 +30,10 @@ For the *agentMET4FOF* homepage go to
 
    examples/ZEMA_BNN/README.md
    examples/ZEMA_BNN/01-Download-Data.ipynb
+   examples/ZEMA_BNN/02-Data-Preprocessing.ipynb
+   examples/ZEMA_BNN/03-BNN-Training.ipynb
+   examples/ZEMA_BNN/04-Run-Multi-Agents-System.ipynb
+   examples/ZEMA_BNN/05-Agent-Dashboard-User-Interface.ipynb
 
 .. toctree::
    :maxdepth: 1
