@@ -20,12 +20,6 @@ For the *agentMET4FOF* homepage go to
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
-
-   index.rst
-
-.. toctree::
-   :maxdepth: 1
    :caption: In depth examples:
 
    examples/ZEMA_BNN/README.md
