@@ -19,10 +19,17 @@ For the *agentMET4FOF* homepage go to
 *agentMET4FOF* is written in Python 3.
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+   :maxdepth: 2
+   :caption: Contents:
 
-    index.rst
+   index.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Code Reference
+
+   agentMET4FOF_agents
+   agentMET4FOF_streams
 
 
 Indices and tables
