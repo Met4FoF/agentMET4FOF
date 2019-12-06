@@ -1,5 +1,5 @@
 agentMET4FOF streams
 ====================
 
-.. automodule:: streams
+.. automodule:: agentMET4FOF.streams
     :members:

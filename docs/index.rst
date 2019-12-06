@@ -1,7 +1,14 @@
+.. agentMET4FOF's documentation master file, which we copied heavily from the
+   docs of https://github.com/cornellius-gp/gpytorch, because we liked so
+   much the way they presented their tutorials, examples and actual
+   documentation of the code side by side.
+
+:github_url: https://github.com/bangxiangyong/agentMET4FOF
+
 agentMET4FOF - Metrological Agent-based system
 ==============================================
 
-*agentMET4FOF* is a Python software package developed at the `Institute for
+*agentMET4FOF* is a Python library developed at the `Institute for
 Manufacturing of the University of Cambridge <https://www.ifm.eng.cam.ac.uk>`_
 (UK) as part of the European joint Research Project `EMPIR 17IND12 Met4FoF
 <https://met4fof.eu>`_.
@@ -11,14 +18,29 @@ For the *agentMET4FOF* homepage go to
 
 *agentMET4FOF* is written in Python 3.
 
-Contents:
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting started:
+
+   Getting started
 
 .. toctree::
    :maxdepth: 1
+   :caption: In depth examples:
 
-   index.rst
-   agentMET4FOF agents.rst
-   agentMET4FOF streams.rst
+   examples/ZEMA_BNN/README.md
+   examples/ZEMA_BNN/01-Download-Data.ipynb
+   examples/ZEMA_BNN/02-Data-Preprocessing.ipynb
+   examples/ZEMA_BNN/03-BNN-Training.ipynb
+   examples/ZEMA_BNN/04-Run-Multi-Agents-System.ipynb
+   examples/ZEMA_BNN/05-Agent-Dashboard-User-Interface.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Code Reference:
+
+   agentMET4FOF_agents
+   agentMET4FOF_streams
 
 
 Indices and tables

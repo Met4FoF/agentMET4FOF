@@ -23,7 +23,8 @@ import numpy as np
 import random
 from copy import copy
 
-from Agent_models.agents import Sensor, Aggregator, Predictor, DecisionMaker, SensorNetwork
+from .Agent_models.agents import Sensor, Aggregator, Predictor, \
+	DecisionMaker, SensorNetwork
 
 # TYPES OF AGENT
 # 0 - SENSOR NETWORK
