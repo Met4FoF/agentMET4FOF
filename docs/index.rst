@@ -28,7 +28,7 @@ For the *agentMET4FOF* homepage go to
    :maxdepth: 1
    :caption: In depth examples:
 
-   examples/01-Download-Data.ipynb
+   examples/ZEMA_BNN/01-Download-Data.ipynb
 
 .. toctree::
    :maxdepth: 1
