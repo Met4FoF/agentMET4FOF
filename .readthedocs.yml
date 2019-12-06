@@ -15,7 +15,7 @@ build:
 python:
     version: 3.7
     install:
-        - requirements: requirements/requirements.txt
+        - requirements: requirements.txt
 
 # Sphinx configuration
 sphinx:
