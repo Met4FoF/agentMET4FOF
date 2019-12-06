@@ -49,7 +49,7 @@ extensions = [
 # This makes it so that nbsphinx properly loads the notebook images
 
 examples_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "examples")
+    os.path.join(os.path.dirname(__file__), "..", "examples")
 )
 examples_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "examples")
