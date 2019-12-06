@@ -9,14 +9,16 @@ formats: all
 
 # Docker image to use for build process
 build:
-  image: latest
+    image: latest
 
 # Python environment to build the docs for installing the package
 python:
-  version: 3.7
+    version: 3.7
+    install:
+        - requirements: requirements/requirements.txt
 
 # Sphinx configuration
 sphinx:
-  builder: html
-  configuration: docs/conf.py
-  fail_on_warning: false
+    builder: html
+    configuration: docs/conf.py
+    fail_on_warning: false
