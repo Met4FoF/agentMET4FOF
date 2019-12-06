@@ -1,3 +1,8 @@
+.. agentMET4FOF's documentation master file, which we copied heavily from the
+   docs of https://github.com/cornellius-gp/gpytorch, because we liked so
+   much the way they presented their tutorials, examples and actual
+   documentation of the code side by side.
+
 agentMET4FOF - Metrological Agent-based system
 ==============================================
 
