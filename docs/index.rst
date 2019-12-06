@@ -17,8 +17,6 @@ Contents:
     :maxdepth: 1
 
     index.rst
-    agentMET4FOF_agents.rst
-    agentMET4FOF_streams.rst
 
 
 Indices and tables
