@@ -19,9 +19,8 @@ For the *agentMET4FOF* homepage go to
 *agentMET4FOF* is written in Python 3.
 
 .. toctree::
-    :glob:
-    :maxdepth: 1
-    :caption: Content:
+    :maxdepth: 2
+    :caption: Contents:
 
     index.rst
 
