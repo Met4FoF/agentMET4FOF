@@ -20,21 +20,24 @@ import numpy as np
 from math import log10, floor
 import copy
 
+
 def get_experiments_list():
     try:
         #get experiments list
         experiment_list = []
-        experiment_base_path=""
+        experiment_base_path = ""
         experiment_folder = "ML_EXP"
         experiment_path = experiment_base_path+experiment_folder
         for dir_ in os.listdir(experiment_base_path+experiment_folder):
             if "." not in dir_:
-                date_mod = datetime.strptime(time.ctime(os.path.getmtime(experiment_base_path+experiment_folder+"/"+dir_)), "%a %b %d %H:%M:%S %Y")
-                date_mod_string = date_mod.strftime("%d-%m-%Y, %H:%M")
-                experiment_list.append({"Name":dir_,"__date_time":date_mod, "Date": date_mod_string})
+                temp_exp = load_experiment(ml_experiment_name=dir_)
 
+                experiment_meta_data = {"Name":temp_exp.name,"Date":temp_exp.run_date_string,
+                                        "Datasets":str(temp_exp.datasets), "Mode":temp_exp.train_mode,"__date_time":temp_exp.run_date}
+
+                experiment_list.append(experiment_meta_data)
         experiment_list = pd.DataFrame(experiment_list).sort_values(by=["__date_time","Name"], ascending=False)
-        experiment_list = experiment_list[["Name","Date"]]
+        experiment_list = experiment_list.drop(columns=["__date_time"])
     except Exception as e:
         experiment_list = {}
     return experiment_list

@@ -2,6 +2,7 @@ import os
 import datetime
 import pickle
 
+
 def get_pipeline_details(pipelines):
     pipeline_details = [pipeline.agents(ret_hyperparams=True) for pipeline in pipelines]
     return pipeline_details
@@ -25,10 +26,15 @@ def load_experiment(ml_experiment_name="run_1",base_directory=""):
         print("Error in loading experiment: "+ str(e))
 
 class ML_Experiment:
-    def __init__(self, pipelines=[], name="run"):
+    def __init__(self, datasets=[], pipelines=[], evaluation=[], name="run", train_mode={"Prequential","Kfold5","Kfold10"}):
+
         experiment_folder = "ML_EXP"
         if type(pipelines) is not list:
             pipelines = [pipelines]
+        if type(datasets) is not list:
+            datasets = [datasets]
+        if type(evaluation) is not list:
+            evaluation = [evaluation]
 
         #create new directory
         if not os.path.exists(experiment_folder):
@@ -48,14 +54,29 @@ class ML_Experiment:
             name = name+"_" +str(next_count)
             os.makedirs(experiment_folder+"/"+name)
 
-        #record all the details
+        #record all the meta data
         self.name = name
         self.path = experiment_folder+"/"+self.name
         self.run_date = datetime.datetime.today()
-        self.run_date_string = self.run_date.strftime("%d-%m-%y %H-%M-%S")
+        self.run_date_string = self.run_date.strftime("%d-%m-%y %H:%M:%S")
         self.pipeline_details = get_pipeline_details(pipelines)
         self.chain_results = []
+        self.datasets = []
 
+        #handle collecting dataset names
+        #handle binding of agents and pipelines
+        for datastream_agent in datasets:
+            self.datasets.append(datastream_agent.get_attr('data_name'))
+            for pipeline in pipelines:
+                for evaluation_agent in evaluation:
+                    pipeline.bind_output(evaluation_agent)
+                    datastream_agent.bind_output(pipeline)
+
+        #handle training mode
+        if type(train_mode) == set:
+            self.train_mode = "Kfold5"
+        else:
+            self.train_mode = train_mode
 
     def update_chain_results(self,res):
         self.chain_results.append(res)
