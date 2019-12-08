@@ -43,7 +43,6 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from sklearn.metrics import f1_score, mean_squared_error
 from sklearn.decomposition import PCA
-from pprint import pprint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
@@ -98,8 +97,6 @@ class BNN_Model():
         if type(task) == set:
             task = "classification"
         self.task = task
-        print("TASK: ")
-        print(task)
         if task == "classification":
             criterion = torch.nn.CrossEntropyLoss()
         elif task == "regression":
