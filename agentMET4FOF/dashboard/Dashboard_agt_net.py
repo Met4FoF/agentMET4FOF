@@ -330,20 +330,25 @@ def prepare_agt_net_callbacks(app):
 
         agent_names = agentNetwork.agents('MonitorAgent') # get all agent names
         app.num_monitor = len(agent_names)
-        # monitor_graphs = []
-        # monitor_graphs = [{'data': [] , 'layout':{'height':10,'width':10}, 'xaxis':{'visible':False}, 'yaxis':{'visible':False}} for i in range(app.num_monitors)]
         monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
         style_graphs = [{'opacity':0, 'width':10,'height':10} for i in range(app.num_monitors)]
 
         for monitor_id, monitor_agent in enumerate(agent_names):
             memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+            custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
             data =[]
             for sender_agent in memory_data.keys():
-                if type(memory_data[sender_agent]) == dict:
-                    for attribute in memory_data[sender_agent].keys():
-                        data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
+                #if custom plot function is not provided, resolve to default plotting
+                if type(custom_plot_function).__name__ == "int":
+                    if type(memory_data[sender_agent]) == dict:
+                        for attribute in memory_data[sender_agent].keys():
+                            data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
+                    else:
+                        data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
+                #otherwise call custom plot function and load up custom plot parameters
                 else:
-                    data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
+                    custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_parameters')
+                    data.append(custom_plot_function(memory_data[sender_agent],sender_agent,**custom_plot_parameters))
             if len(data) > 5:
                 y_title_offset = 0.1
             else:

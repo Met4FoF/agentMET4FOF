@@ -1313,10 +1313,12 @@ class MonitorAgent(AgentMET4FOF):
         Used to specifically select only a few keys to be plotted
     """
 
-    def init_parameters(self,plot_filter=[]):
+    def init_parameters(self,plot_filter=[], custom_plot_function=-1, **kwargs):
         self.memory = {}
         self.plots = {}
         self.plot_filter=plot_filter
+        self.custom_plot_function = custom_plot_function
+        self.custom_plot_parameters = kwargs
 
     def on_received_message(self, message):
         """
