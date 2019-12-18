@@ -21,8 +21,7 @@ from plotly import tools as tls
 from sklearn.model_selection import ParameterGrid
 import copy
 
-import agentMET4FOF.dashboard.Dashboard as Dashboard
-import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
+from agentMET4FOF.dashboard.Dashboard import AgentDashboard
 from agentMET4FOF.streams import DataStreamMET4FOF
 
 from agentMET4FOF.develop.ML_Experiment import save_experiment
@@ -685,26 +684,6 @@ class _AgentController(AgentMET4FOF):
             self._logger = self.ns.proxy('Logger')
         return self._logger
 
-
-def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
-    """"""
-    def is_port_in_use(_port):
-        import socket
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex((ip_addr, _port)) == 0
-
-    if is_port_in_use(port) is False:
-        if dashboard_modules is not None and dashboard_modules is not False:
-
-            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules,ip_addr=ip_addr)
-            Dashboard.app.dashboard_ctrl = dashboard_ctrl
-            Dashboard.app.update_interval = dashboard_update_interval
-            Dashboard.app = Dashboard.init_app_layout(Dashboard.app, dashboard_update_interval)
-            Dashboard.app.run_server(debug=False,host=ip_addr)
-    else:
-        print("Dashboard is running on: " + ip_addr+":"+str(port))
-
-
 class AgentNetwork:
     """
     Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
@@ -713,7 +692,7 @@ class AgentNetwork:
     Interfaces with an internal _AgentController which is hidden from user
 
     """
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, dashboard_modules=True, dashboard_update_interval=3, log_filename="log_file.csv"):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv", dashboard_modules=True, dashboard_update_interval=3, dashboard_max_monitors=10,  dashboard_port=8050):
         """
         Parameters
         ----------
@@ -724,13 +703,18 @@ class AgentNetwork:
         connect: bool
             False sets Agent network to connect mode and will connect to specified address
             True (Default) sets Agent network to initially try to connect and if it cant find one, it will start a new server at specified address
+        log_filename: str
+            Name of log file, acceptable csv format. It will be saved locally, in the same folder as the python script in which this AgentNetwork is instantiated on.
+            If set to None or False, then will not save in a file. Note that the overhead of updating the log file can be huge, especially for high number of agents and large data transmission.
         dashboard_modules : list of modules , modules or bool
             Accepts list of modules which contains the AgentMET4FOF and DataStreamMET4FOF derived classes
             If set to True, will initiate the dashboard with default agents in AgentMET4FOF
         dashboard_update_interval : int
             Regular interval (seconds) to update the dashboard graphs
-        logfile: str
-            Name of log file, acceptable csv format. If set to None or False, then will not save file
+        dashboard_max_monitors : int
+            Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the each Monitor Agent will occupy one of these figures.
+        dashboard_port: int
+            Port of the dashboard to be hosted on. By default is port 8050.
         """
 
         self.ip_addr= ip_addr
@@ -744,14 +728,14 @@ class AgentNetwork:
             self.save_logfile = False
 
         if connect:
-            self.connect(ip_addr,port)
+            self.connect(ip_addr,port, verbose=False)
         else:
             self.connect(ip_addr,port, verbose=False)
             if self.ns == 0:
                 self.start_server(ip_addr,port)
 
         if dashboard_modules is not False:
-            self.dashboard_proc = Process(target=run_dashboard, args=(dashboard_modules,dashboard_update_interval,ip_addr))
+            self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None

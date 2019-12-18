@@ -3,7 +3,6 @@ Provides functions to obtain data from experiments folder (default is MLEXP)
 To be rendered on the tab of the dashboard for visualizing and comparing ML experiments
 """
 
-
 import dash_html_components as html
 import dash_core_components as dcc
 import os
@@ -19,7 +18,6 @@ import plotly.graph_objects as go
 import numpy as np
 from math import log10, floor
 import copy
-
 
 def get_experiments_list():
     try:

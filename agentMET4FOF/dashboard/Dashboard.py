@@ -5,48 +5,124 @@ import dash_core_components as dcc
 
 from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout, prepare_ml_exp_callbacks, get_experiments_list
 from agentMET4FOF.dashboard.Dashboard_agt_net import get_agt_net_layout, prepare_agt_net_callbacks
+from agentMET4FOF.dashboard.Dashboard_Control import _Dashboard_Control
 
-external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
-external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
 
-app = dash.Dash(__name__,
-                external_stylesheets=external_stylesheets,
-                external_scripts=external_scripts
-                )
+class AgentDashboard:
+    """
+    Class for the web dashboard which runs with the AgentNetwork object, which by default are on the same IP.
+    Optional to run the dashboard on a separate IP by providing the right parameters.
+    An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
+    """
+    def __init__(self, dashboard_modules=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork=None, agent_ip_addr=None,agent_port=None):
+        """
+        Parameters
+        ----------
 
-def init_app_layout(app,update_interval_seconds=3,num_monitors=10):
-    app.update_interval_seconds = update_interval_seconds
-    app.num_monitors = num_monitors
-    app.layout = html.Div(children=[
-            #header
-            html.Nav([
-                html.Div([
-                    html.A("Met4FoF Agent Testbed", className="brand-logo center"),
-                    html.Ul([
-                    ], className="right hide-on-med-and-down")
-                ], className="nav-wrapper container")
-            ], className="light-blue lighten-1"),
-            dcc.Tabs(id="main-tabs", value="agt-net", children=[
-                dcc.Tab(id="agt-net-tab", value="agt-net",label='Agent Network', children=[
-                ]),
-                dcc.Tab(id="ml-exp-tab",value="ml-exp", label='ML Experiments',  children=[
-                ]),
-            ]),
-            html.Div(id="page-div",children=[
-            get_agt_net_layout(update_interval_seconds,app.num_monitors),
-            get_ml_exp_layout(),
-            ]),
-    ])
-    prepare_agt_net_callbacks(app)
-    prepare_ml_exp_callbacks(app)
+        dashboard_modules : modules
+            Modules which are separate files, and contain classes of agents to be imported into the dashboard's interactive "Add Agent" function
 
-    @app.callback([dash.dependencies.Output('page-div', 'children')],
-                  [dash.dependencies.Input('main-tabs', 'value')])
-    def render_content(tab):
-        if tab == 'ml-exp':
-            experiments_df = get_experiments_list()
-            return [get_ml_exp_layout(experiments_df)]
+        dashboard_update_interval : int
+            Auto refresh rate which the dashboard queries the states of Agent Network to update the graphs and display
+
+        max_monitors : int
+            Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the
+            each Monitor Agent will occupy one of these figures. It is not ideal, but will undergo changes for the better.
+
+        ip_addr : str
+            IP Address of the dashboard to be instantiated on.
+
+        port : int
+            Port number of the dashboard to be instantianted on.
+
+        agentNetwork: AgentNetwork
+            AgentNetwork object. If `agent_ip_addr` or `agent_port` is provided, this argument will be ignored and try to connect to a new AgentNetwork specified by those arguments.
+
+        agent_ip_addr : str
+            IP Address of the Agent Network address to connect to. By default, it will match that of the ip_addr, assuming the Dashboard and Agent Network are run on the same machine with same IP address.
+            If they are meant to be separated, then this argument will point to the IP address of where the Agent Network is running.
+
+        agent_port : int
+            Port of the Agent Network port. The rationale is similar to that of the argument `agent_ip_addr`.
+
+        """
+        if self.is_port_in_use(ip_addr,port) is False:
+            if dashboard_modules is not None and dashboard_modules is not False:
+                if agent_ip_addr is None:
+                    agent_ip_addr = ip_addr
+                if agent_port is None:
+                    agent_port = port
+
+                #initialise the dashboard layout and its control here
+                self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
+                self.external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
+                self.app = self.init_app_layout(update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors)
+                self.app.dashboard_ctrl = _Dashboard_Control(modules=dashboard_modules,agent_ip_addr=agent_ip_addr,agent_port=agent_port,agentNetwork=agentNetwork)
+                self.app.run_server(debug=False,host=ip_addr, port=8050)
+
         else:
-            return [get_agt_net_layout(app.update_interval_seconds,app.num_monitors)]
+            print("Dashboard is running on: " + ip_addr+":"+str(port))
 
-    return app
+
+
+    def init_app_layout(self,update_interval_seconds=3, max_monitors=10):
+        """
+        Initialises the overall dash app "layout" which has two sub-pages (Agent network and ML experiment)
+
+        Parameters
+        ----------
+        update_interval_seconds : float or int
+            Auto refresh rate which the app queries the states of Agent Network to update the graphs and display
+
+        max_monitors : int
+            Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the
+            each Monitor Agent will occupy one of these figures. It is not ideal, but will undergo changes for the better.
+
+        Returns
+        -------
+        app : Dash app object
+        """
+        app = dash.Dash(__name__,
+                        external_stylesheets=self.external_stylesheets,
+                        external_scripts=self.external_scripts
+                        )
+        app.update_interval_seconds = update_interval_seconds
+        app.num_monitors = max_monitors
+        app.layout = html.Div(children=[
+                #header
+                html.Nav([
+                    html.Div([
+                        html.A("Met4FoF Agent Testbed", className="brand-logo center"),
+                        html.Ul([
+                        ], className="right hide-on-med-and-down")
+                    ], className="nav-wrapper container")
+                ], className="light-blue lighten-1"),
+                dcc.Tabs(id="main-tabs", value="agt-net", children=[
+                    dcc.Tab(id="agt-net-tab", value="agt-net",label='Agent Network', children=[
+                    ]),
+                    dcc.Tab(id="ml-exp-tab",value="ml-exp", label='ML Experiments',  children=[
+                    ]),
+                ]),
+                html.Div(id="page-div",children=[
+                get_agt_net_layout(update_interval_seconds,app.num_monitors),
+                get_ml_exp_layout(),
+                ]),
+        ])
+        prepare_agt_net_callbacks(app)
+        prepare_ml_exp_callbacks(app)
+
+        @app.callback([dash.dependencies.Output('page-div', 'children')],
+                      [dash.dependencies.Input('main-tabs', 'value')])
+        def render_content(tab):
+            if tab == 'ml-exp':
+                experiments_df = get_experiments_list()
+                return [get_ml_exp_layout(experiments_df)]
+            else:
+                return [get_agt_net_layout(app.update_interval_seconds,app.num_monitors)]
+
+        return app
+
+    def is_port_in_use(self,ip_addr,_port):
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex((ip_addr, _port)) == 0
