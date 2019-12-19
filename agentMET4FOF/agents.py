@@ -21,7 +21,7 @@ from plotly import tools as tls
 from sklearn.model_selection import ParameterGrid
 import copy
 
-from agentMET4FOF.dashboard.Dashboard import AgentDashboard
+from agentMET4FOF.dashboard.Dashboard import AgentDashboard as AgentDashboard
 from agentMET4FOF.streams import DataStreamMET4FOF
 
 from agentMET4FOF.develop.ML_Experiment import save_experiment

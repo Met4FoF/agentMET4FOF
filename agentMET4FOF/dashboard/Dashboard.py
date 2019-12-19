@@ -11,10 +11,10 @@ from agentMET4FOF.dashboard.Dashboard_Control import _Dashboard_Control
 class AgentDashboard:
     """
     Class for the web dashboard which runs with the AgentNetwork object, which by default are on the same IP.
-    Optional to run the dashboard on a separate IP by providing the right parameters.
+    Optional to run the dashboard on a separate IP by providing the right parameters. See example for an implementation of a separate run of dashboard to connect to an existing agent network. If there is no existing agent network, error will show up.
     An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
     """
-    def __init__(self, dashboard_modules=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork=None, agent_ip_addr=None,agent_port=None):
+    def __init__(self, dashboard_modules=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,agent_port=None):
         """
         Parameters
         ----------
@@ -48,10 +48,6 @@ class AgentDashboard:
         """
         if self.is_port_in_use(ip_addr,port) is False:
             if dashboard_modules is not None and dashboard_modules is not False:
-                if agent_ip_addr is None:
-                    agent_ip_addr = ip_addr
-                if agent_port is None:
-                    agent_port = port
 
                 #initialise the dashboard layout and its control here
                 self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
