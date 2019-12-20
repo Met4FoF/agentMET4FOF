@@ -30,6 +30,7 @@ For the *agentMET4FOF* homepage go to
 
    tutorials/tutorial_1_generator_agent.ipynb
    tutorials/tutorial_2_math_agent.ipynb
+   tutorials/tutorial_3_multi_channel.ipynb
 
 .. toctree::
    :maxdepth: 1
