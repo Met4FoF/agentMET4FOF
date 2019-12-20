@@ -1,12 +1,6 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
 
-#Now we demonstrate how to build a MathAgent as an intermediate to process the SineGeneratorAgent's output
-#Subsequently, a MultiMathAgent is built to show the ability to send a dictionary of multiple fields to the recipient
-#We overload the on_received_message() function, which is called every time a message is received from the input agents
-#The received message is a dictionary with the format: {'from':agent_name, 'data': data, 'senderType': agent_class_name, 'channel':'channel_name' }
-#By default, channel is set to "default", however specific channel can be set when needed and is demonstrated in the next tutorial
-
 
 #simple math functions
 def divide_by_two(data):
