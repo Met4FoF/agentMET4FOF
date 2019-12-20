@@ -9,3 +9,4 @@ ZeMA-machine-learning-tutorials-master
 *.csv
 depracated
 results/
+*.pkl

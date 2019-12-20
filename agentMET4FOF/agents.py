@@ -344,10 +344,10 @@ class AgentMET4FOF(Agent):
             Agent(s) to be binded to this agent's output channel
 
         """
-        if "AgentPipeline" in str(type(output_agent).__name__):
+        if isinstance(output_agent, AgentPipeline):
             for agent in output_agent.pipeline[0]:
                 self._bind_output(agent)
-        elif type(output_agent) == list:
+        elif isinstance(output_agent, list):
             for agent in output_agent:
                 self._bind_output(agent)
         else:
@@ -1078,6 +1078,7 @@ class TransformerAgent(AgentMET4FOF):
         else:
             chain = message['from']
         return chain
+
 
 class AgentPipeline:
     def __init__(self, agentNetwork=None,*argv, hyperparameters=None):
