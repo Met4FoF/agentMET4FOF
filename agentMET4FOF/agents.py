@@ -26,6 +26,7 @@ from agentMET4FOF.streams import DataStreamMET4FOF
 
 from agentMET4FOF.develop.ML_Experiment import save_experiment
 
+
 class AgentMET4FOF(Agent):
     """
     Base class for all agents with specific functions to be overridden/supplied by user.
@@ -78,6 +79,8 @@ class AgentMET4FOF(Agent):
         self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias,transport='tcp')
         self.AgentType = type(self).__name__
         self.log_info("INITIALIZED")
+        # These are the available states to change the agents' behaviour in
+        # agent_loop.
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
@@ -975,15 +978,12 @@ class AgentNetwork:
 
         Parameters
         ----------
-        name : str
-            Unique name of agent. If left empty, the name will be automatically set to its class name.
-            There cannot be more than one agent with the same name.
-
-        agentType : AgentMET4FOF
-            Agent class to be instantiated in the network.
-
-        log_mode : bool
-            Default is True. Determines if messages will be logged to background Logger Agent.
+        name str : (Optional) Unique name of agent. here cannot be more than one agent
+            with the same name. Defaults to the agent's class name.
+        agentType AgentMET4FOF : (Optional) Agent class to be instantiated in the
+            network. Defaults to :py:class:`AgentMET4FOF`
+        log_mode bool : (Optional) Determines if messages will be logged to background
+            Logger Agent. Defaults to `True`.
 
         Returns
         -------
