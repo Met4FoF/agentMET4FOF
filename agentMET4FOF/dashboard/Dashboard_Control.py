@@ -14,13 +14,13 @@ class _Dashboard_Control():
         self.current_edges = []
         # get nameserver
         self.agent_graph = nx.DiGraph()
-        if agentNetwork is None:
-            self.agentNetwork = agentmet4fof_module.AgentNetwork(ip_addr=agent_ip_addr,port=agent_port, connect=True, dashboard_modules=False) #dashboard_modules has to be false, to prevent infinite loop
-        else:
+        if agentNetwork:
             self.agentNetwork = agentNetwork
-        if type(modules) == bool and modules is True:
+        else:
+            self.agentNetwork = agentmet4fof_module.AgentNetwork(ip_addr=agent_ip_addr,port=agent_port, connect=True, dashboard_modules=False) #dashboard_modules has to be false, to prevent infinite loop
+        if isinstance(modules, bool) and modules:
             modules = []
-        elif type(modules) == list:
+        elif isinstance(modules, list):
             modules = modules
         elif type(modules).__name__ == "module":
             modules = [modules]
