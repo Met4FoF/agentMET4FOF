@@ -4,27 +4,21 @@
 
 version: 2
 
-# Build PDF & ePub
-formats:
-  - htmlzip
-  - pdf
-
-conda:
-  environment: environment.yml
+# Build HTML, PDF & ePub
+formats: all
 
 # Docker image to use for build process
 build:
-  image: latest
+    image: latest
 
 # Python environment to build the docs for installing the package
 python:
-  version: 3
-  install:
-    - method: setuptools
-      path: .
+    version: 3.7
+    install:
+        - requirements: docs/sphinx-requirements.txt
 
 # Sphinx configuration
 sphinx:
-  builder: html
-  configuration: docs/conf.py
-  fail_on_warning: false
+    builder: html
+    configuration: docs/conf.py
+    fail_on_warning: false
