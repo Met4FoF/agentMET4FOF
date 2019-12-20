@@ -2,13 +2,18 @@ from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
 
 
-#simple math functions
-def divide_by_two(data):
-    return data / 2
-def minus(data, minus_val):
-    return data-minus_val
-def plus(data,plus_val):
-    return data+plus_val
+# Define simple math functions.
+def divide_by_two(numerator: float) -> float:
+    return numerator / 2
+
+
+def minus(minuend: float, subtrahend: float) -> float:
+    return minuend - subtrahend
+
+
+def plus(summand_1: float, summand_2: float) -> float:
+    return summand_1+summand_2
+
 
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
