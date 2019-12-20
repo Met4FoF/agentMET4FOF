@@ -76,7 +76,7 @@ path_dicts = [make_path_dict(examples_source, examples_dest), make_path_dict(
 
 for path_dict in path_dicts:
     source_folder = path_dict['source']
-    dest_folder = path_dict['example']
+    dest_folder = path_dict['destination']
     if os.path.exists(dest_folder):
         shutil.rmtree(dest_folder)
     os.mkdir(dest_folder)
