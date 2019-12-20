@@ -53,7 +53,7 @@ nbsphinx_allow_errors = True
 
 def make_path_dict(source: str, destination: str) -> dict:
     # Function to construct the desired dict structure for the folders to copy.
-    return {source: source, destination: destination}
+    return {'source': source, 'destination': destination}
 
 
 # Set up all paths for source and destination folders.
