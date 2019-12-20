@@ -28,7 +28,7 @@ import copy
 from agentMET4FOF.ml_uncertainty.bnn import BNN_Model
 from agentMET4FOF.ml_uncertainty.evaluate_pred_unc import *
 
-if __name__ == "__main__":
+def main():
     agentNetwork = AgentNetwork()
 
     ml_exp_name = "multiple"
@@ -61,3 +61,10 @@ if __name__ == "__main__":
 
     #set to active running
     agentNetwork.set_running_state()
+
+    # allow for shutting down the network after execution
+    return agentNetwork
+
+
+if __name__ == "__main__":
+    main()
