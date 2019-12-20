@@ -26,6 +26,12 @@ For the *agentMET4FOF* homepage go to
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorials:
+
+   tutorials/tutorial_2_math_agent.ipynb
+
+.. toctree::
+   :maxdepth: 1
    :caption: In depth examples:
 
    examples/ZEMA_BNN/README.md
