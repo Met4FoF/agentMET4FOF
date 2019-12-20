@@ -44,33 +44,53 @@ extensions = [
 nbsphinx_allow_errors = True
 
 ################################################################################
-# This part is taken from
+# This part is originally taken from
 # https://github.com/cornellius-gp/gpytorch/issues/new/choose?permalink=https%3A%2F%2Fgithub.com%2Fcornellius-gp%2Fgpytorch%2Fblob%2F0b28dd0b8430a0df9838593e7e632dc01d20bcf4%2Fdocs%2Fsource%2Fconf.py%23L107
 #
-# - Copy over examples folder to docs/source
-# This makes it so that nbsphinx properly loads the notebook images
+# Copy over examples and tutorials and all other folders to docs' source
+# This makes it so that nbsphinx can properly load the notebook images
 
+
+def make_path_dict(source: str, destination: str) -> dict:
+    # Function to construct the desired dict structure for the folders to copy.
+    return {source: source, destination: destination}
+
+
+# Set up all paths for source and destination folders.
 examples_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "examples")
+)
+tutorials_source = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "tutorials")
 )
 examples_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "examples")
 )
+tutorials_dest = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "tutorials")
+)
 
-if os.path.exists(examples_dest):
-    shutil.rmtree(examples_dest)
-os.mkdir(examples_dest)
+# Assemble the list of dicts of all source and destination folders to copy.
+path_dicts = [make_path_dict(examples_source, examples_dest), make_path_dict(
+    tutorials_source, tutorials_dest)]
 
-for root, dirs, files in os.walk(examples_source):
-    for dr in dirs:
-        os.mkdir(os.path.join(root.replace(examples_source, examples_dest), dr))
-    for fil in files:
-        if os.path.splitext(fil)[1] in [".ipynb", ".md", ".rst"]:
-            source_filename = os.path.join(root, fil)
-            dest_filename = source_filename.replace(
-                examples_source, examples_dest
-            )
-            shutil.copyfile(source_filename, dest_filename)
+for path_dict in path_dicts:
+    source_folder = path_dict['source']
+    dest_folder = path_dict['example']
+    if os.path.exists(dest_folder):
+        shutil.rmtree(dest_folder)
+    os.mkdir(dest_folder)
+
+    for root, dirs, files in os.walk(source_folder):
+        for dr in dirs:
+            os.mkdir(os.path.join(root.replace(source_folder, dest_folder), dr))
+        for fil in files:
+            if os.path.splitext(fil)[1] in [".ipynb", ".md", ".rst"]:
+                source_filename = os.path.join(root, fil)
+                dest_filename = source_filename.replace(
+                    source_folder, dest_folder
+                )
+                shutil.copyfile(source_filename, dest_filename)
 ################################################################################
 
 # Add any paths that contain templates here, relative to this directory.
