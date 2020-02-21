@@ -143,18 +143,22 @@ jobs:
             source agent_venv/bin/activate
             python3 setup.py sdist bdist_wheel
 
-      # We create a .pypirc to provide the username, password and correct URL.
+      # Store test results as artifacts.
+      - store_artifacts:
+         path: dist
+         destination: dist
+
+      # We create a .pypirc to provide the username and password.
       - run:
           name: Create .pypirc
           command: |
             echo -e "[pypi]" >> ~/.pypirc
-            echo -e "repository: https://test.pypi.org/legacy/" >> ~/.pypirc
             echo -e "username: __token__" >> ~/.pypirc
             echo -e "password: $PYPI_PASSWORD" >> ~/.pypirc
 
       # Upload the created packages to test.pypi.org.
       - run:
-          name: Upload to Test.PyPI
+          name: Upload to PyPI.org
           command: |
             source agent_venv/bin/activate
             twine upload dist/*
