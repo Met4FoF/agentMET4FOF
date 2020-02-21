@@ -5,6 +5,7 @@ import re
 import sys
 from io import BytesIO
 import time
+import os
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -17,11 +18,13 @@ from osbrain import NSProxy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
+from sklearn.model_selection import ParameterGrid
+import copy
 
-import agentMET4FOF.dashboard.Dashboard as Dashboard
-import agentMET4FOF.dashboard.Dashboard_Control as Dashboard_Control
+from agentMET4FOF.dashboard.Dashboard import AgentDashboard as AgentDashboard
 from agentMET4FOF.streams import DataStreamMET4FOF
 
+from agentMET4FOF.develop.ML_Experiment import save_experiment
 
 class AgentMET4FOF(Agent):
     """
@@ -82,10 +85,11 @@ class AgentMET4FOF(Agent):
         self.log_mode = True
 
         self.output_channels_info = {}
+
         try:
             self.init_parameters()
-        except:
-            print("Error in calling init_parameters()...")
+        except Exception as e:
+            return 0
 
     def reset(self):
         """
@@ -112,6 +116,9 @@ class AgentMET4FOF(Agent):
         else:
             self.init_agent_loop(self.loop_wait)
 
+    def log_ML(self, message):
+        self.send("_logger", message, topic="ML_EXP")
+
     def log_info(self, message):
         """
         Prints logs to be saved into logfile with Logger Agent
@@ -125,8 +132,9 @@ class AgentMET4FOF(Agent):
         try:
             if self.log_mode:
                 super().log_info(message)
-        except:
-            print("Error in logging...")
+
+        except Exception as e:
+                return -1
 
     def init_agent_loop(self, loop_wait=1.0):
         """
@@ -332,9 +340,22 @@ class AgentMET4FOF(Agent):
 
         Parameters
         ----------
-        output_agent : AgentMET4FOF
-            Agent to be binded to this agent's output channel
+        output_agent : AgentMET4FOF or list
+            Agent(s) to be binded to this agent's output channel
 
+        """
+        if isinstance(output_agent, AgentPipeline):
+            for agent in output_agent.pipeline[0]:
+                self._bind_output(agent)
+        elif isinstance(output_agent, list):
+            for agent in output_agent:
+                self._bind_output(agent)
+        else:
+            self._bind_output(output_agent)
+
+    def _bind_output(self, output_agent):
+        """
+        Internal method which implements the logic for connecting this agent, to the `output_agent`.
         """
         if type(output_agent) == str:
             output_module_id = output_agent
@@ -611,18 +632,22 @@ class _AgentController(AgentMET4FOF):
         return name
 
     def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000,ip_addr=None):
-        if ip_addr is None:
-            ip_addr = 'localhost'
-            
-        if name == " ":
-            new_name= self.generate_module_name_byType(agentType)
-        else:
-            new_name= self.generate_module_name_byUnique(name)
-        new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+        try:
+            if ip_addr is None:
+                ip_addr = 'localhost'
 
-        if log_mode:
-            new_agent.set_logger(self._get_logger())
-        return new_agent
+            if name == " ":
+                new_name= self.generate_module_name_byType(agentType)
+            else:
+                new_name= self.generate_module_name_byUnique(name)
+            new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+
+            if log_mode:
+                new_agent.set_logger(self._get_logger())
+            return new_agent
+        except Exception as e:
+            self.log_info("ERROR:" + str(e))
+
 
     def agents(self):
         exclude_names = ["AgentController","Logger"]
@@ -659,26 +684,6 @@ class _AgentController(AgentMET4FOF):
             self._logger = self.ns.proxy('Logger')
         return self._logger
 
-
-def run_dashboard(dashboard_modules=[], dashboard_update_interval = 3, ip_addr="127.0.0.1",port=8050):
-    """"""
-    def is_port_in_use(_port):
-        import socket
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex((ip_addr, _port)) == 0
-
-    if is_port_in_use(port) is False:
-        if dashboard_modules is not None and dashboard_modules is not False:
-
-            dashboard_ctrl = Dashboard_Control.Dashboard_Control(modules=dashboard_modules,ip_addr=ip_addr)
-            Dashboard.app.dashboard_ctrl = dashboard_ctrl
-            Dashboard.app.update_interval = dashboard_update_interval
-            Dashboard.app = Dashboard.init_app_layout(Dashboard.app, dashboard_update_interval)
-            Dashboard.app.run_server(debug=False,host=ip_addr)
-    else:
-        print("Dashboard is running on: " + ip_addr+":"+str(port))
-
-
 class AgentNetwork:
     """
     Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
@@ -687,7 +692,7 @@ class AgentNetwork:
     Interfaces with an internal _AgentController which is hidden from user
 
     """
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, dashboard_modules=True, dashboard_update_interval=3, log_filename="log_file.csv"):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv", dashboard_modules=True, dashboard_update_interval=3, dashboard_max_monitors=10,  dashboard_port=8050):
         """
         Parameters
         ----------
@@ -698,13 +703,18 @@ class AgentNetwork:
         connect: bool
             False sets Agent network to connect mode and will connect to specified address
             True (Default) sets Agent network to initially try to connect and if it cant find one, it will start a new server at specified address
+        log_filename: str
+            Name of log file, acceptable csv format. It will be saved locally, in the same folder as the python script in which this AgentNetwork is instantiated on.
+            If set to None or False, then will not save in a file. Note that the overhead of updating the log file can be huge, especially for high number of agents and large data transmission.
         dashboard_modules : list of modules , modules or bool
             Accepts list of modules which contains the AgentMET4FOF and DataStreamMET4FOF derived classes
             If set to True, will initiate the dashboard with default agents in AgentMET4FOF
         dashboard_update_interval : int
             Regular interval (seconds) to update the dashboard graphs
-        logfile: str
-            Name of log file, acceptable csv format. If set to None or False, then will not save file
+        dashboard_max_monitors : int
+            Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the each Monitor Agent will occupy one of these figures.
+        dashboard_port: int
+            Port of the dashboard to be hosted on. By default is port 8050.
         """
 
         self.ip_addr= ip_addr
@@ -718,14 +728,14 @@ class AgentNetwork:
             self.save_logfile = False
 
         if connect:
-            self.connect(ip_addr,port)
+            self.connect(ip_addr,port, verbose=False)
         else:
             self.connect(ip_addr,port, verbose=False)
             if self.ns == 0:
                 self.start_server(ip_addr,port)
 
         if dashboard_modules is not False:
-            self.dashboard_proc = Process(target=run_dashboard, args=(dashboard_modules,dashboard_update_interval,ip_addr))
+            self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -860,7 +870,11 @@ class AgentNetwork:
         for agent_name in self.agents():
             if (filter_agent is not None and filter_agent in agent_name) or (filter_agent is None):
                 agent = self.get_agent(agent_name)
-                agent.set_attr(current_state=state)
+                try:
+                    agent.set_attr(current_state=state)
+                except Exception as e:
+                    print(e)
+
         print("SET STATE:  ", state)
         return 0
 
@@ -998,6 +1012,215 @@ class AgentNetwork:
             self.dashboard_proc.terminate()
         return 0
 
+class TransformerAgent(AgentMET4FOF):
+    def init_parameters(self,method=None, **kwargs):
+        if ("function" in type(method).__name__) or ("method" in type(method).__name__):
+            self.method = method
+        else:
+            self.method = method(**kwargs)
+        self.models = {}
+        self.hyperparams = kwargs
+        #for single functions passed to the method
+        for key in kwargs.keys():
+            self.set_attr(key=kwargs[key])
+
+    def on_received_message(self,message):
+        #update chain
+        chain = self.get_chain(message)
+
+        #if data is dict, with 'x' in keys
+        if type(message['data']) == dict and 'x' in message['data'].keys():
+            X= message['data']['x']
+            Y= message['data']['y']
+        else:
+            X=message['data']
+            Y=None
+
+        #if it is train, and has fit function, then fit it first.
+        if message['channel'] == 'train':
+            if hasattr(self.method, 'fit'):
+                self.models.update({chain:copy.deepcopy(self.method).fit(X,Y)})
+                if hasattr(self.method,'predict'):
+                    return 0
+
+        #proceed in transforming or predicting
+        if hasattr(self.method, 'transform'):
+            if chain in self.models.keys():
+                results = self.models[chain].transform(X)
+            else:
+                results = self.method.transform(X)
+        elif hasattr(self.method, 'predict'):
+            if chain in self.models.keys():
+                results = self.models[chain].predict(X)
+            else:
+                results = self.method.predict(X)
+        else: #it is a plain function
+            results = self.method(X, **self.hyperparams)
+
+        #send out
+        #if it is a base model, don't send out the predicted train results
+        chain= chain+"->"+self.name
+        if hasattr(self.method, 'predict'):
+            #check if uncertainty is included
+            if type(results) == tuple and len(results) == 2:
+                y_pred = results[0]
+                y_unc = results[1]
+                self.send_output({'x':X, 'y_true':Y, 'y_pred':y_pred,'y_unc':y_unc,'chain':chain},channel=message['channel'])
+            else:
+                self.send_output({'x':X, 'y_true':Y, 'y_pred':results,'chain':chain},channel=message['channel'])
+        else:
+            self.send_output({'x':results, 'y':Y,'chain':chain},channel=message['channel'])
+
+    def get_chain(self,message):
+        chain =""
+        if type(message['data']) == dict and 'chain' in message['data'].keys():
+            chain = message['data']['chain']
+        else:
+            chain = message['from']
+        return chain
+
+
+class AgentPipeline:
+    def __init__(self, agentNetwork=None,*argv, hyperparameters=None):
+
+        # list of dicts where each dict is of (key:list of hyperparams)
+        # each hyperparam in the dict will be spawned as an agent
+        agentNetwork = agentNetwork
+        self.hyperparameters = hyperparameters
+        self.pipeline = self.make_agent_pipelines(agentNetwork, argv, hyperparameters)
+
+    def make_transform_agent(self,agentNetwork, pipeline_component=None, hyperparameters={}):
+        if ("function" in type(pipeline_component).__name__) or ("method" in type(pipeline_component).__name__):
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent.init_parameters(pipeline_component,**hyperparameters)
+        elif issubclass(type(pipeline_component), AgentMET4FOF):
+            transform_agent = pipeline_component
+            transform_agent.init_parameters(**hyperparameters)
+        else: #class objects with fit and transform
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent.init_parameters(pipeline_component,**hyperparameters)
+        return transform_agent
+
+    def make_agent_pipelines(self,agentNetwork=None, argv=[], hyperparameters=None):
+        if agentNetwork is None:
+            print("You need to pass an agent network as parameter to add agents")
+            return -1
+        agent_pipeline = []
+
+        if hyperparameters is not None and len(hyperparameters) == 1:
+            if type(hyperparameters[0]) != list:
+                hyperparameters = [hyperparameters]
+
+        for pipeline_level, pipeline_component in enumerate(argv):
+            agent_pipeline.append([])
+            #create an agent for every unique hyperparameter combination
+            if hyperparameters is not None:
+                try:
+                    if pipeline_level < len(hyperparameters):
+                        hyper_param_level = hyperparameters[pipeline_level]
+                    else:
+                        hyper_param_level = {}
+                except:
+                    print("Error getting hyperparameters mapping")
+                    return -1
+
+                #now, hyper_param_level is a list of dictionaries of hyperparams for agents at pipeline_level
+                if type(pipeline_component) == list:
+                    for function_id ,pipeline_function in enumerate(pipeline_component):
+                        print(hyper_param_level)
+                        if (type(hyper_param_level) == dict) or ((len(hyper_param_level)>0) and (len(hyper_param_level[function_id]) > 0)):
+                            if type(hyper_param_level) == dict:
+                                param_grid = list(ParameterGrid(hyper_param_level))
+                            else:
+                                param_grid = list(ParameterGrid(hyper_param_level[function_id]))
+                            print("MAKING {} AGENTS WITH HYPERPARAMS: {}".format(pipeline_function.__name__, param_grid))
+                            for param in param_grid:
+                                transform_agent = self.make_transform_agent(agentNetwork,pipeline_function,param)
+                                agent_pipeline[-1].append(transform_agent)
+
+                        else:
+                            print("MAKING {} AGENT WITH DEFAULT HYPERPARAMS".format(pipeline_function.__name__))
+                            #fill up the new empty list with a new agent for every pipeline function
+                            transform_agent = self.make_transform_agent(agentNetwork,pipeline_function)
+                            agent_pipeline[-1].append(transform_agent)
+
+                #non list, single function, class, or agent
+                else:
+                    #fill up the new empty list with a new agent for every pipeline function
+                    transform_agent = self.make_transform_agent(agentNetwork,pipeline_component)
+                    agent_pipeline[-1].append(transform_agent)
+
+
+            #otherwise there's no hyperparameters usage, proceed with defaults for all agents
+            #the logic similar to before but without hyperparams loop
+            else:
+                if type(pipeline_component) == list:
+                    for pipeline_function in pipeline_component:
+                        #fill up the new empty list with a new agent for every pipeline function
+                        transform_agent = self.make_transform_agent(agentNetwork,pipeline_function)
+                        agent_pipeline[-1].append(transform_agent)
+                #non list, single function, class, or agent
+                else:
+                    #fill up the new empty list with a new agent for every pipeline function
+                    transform_agent = self.make_transform_agent(agentNetwork,pipeline_component)
+                    agent_pipeline[-1].append(transform_agent)
+
+        #now bind the agents on one level to the next levels, for every pipeline level
+        for pipeline_level, _ in enumerate(agent_pipeline):
+            if pipeline_level != (len(agent_pipeline)-1):
+                for agent in agent_pipeline[pipeline_level]:
+                    for agent_next in agent_pipeline[pipeline_level+1]:
+                        agent.bind_output(agent_next)
+        return agent_pipeline
+
+    def bind_output(self, output_agent):
+        pipeline_last_level = self.pipeline[-1]
+        if "AgentPipeline" in str(type(output_agent).__name__):
+            for agent in pipeline_last_level:
+                for next_agent in output_agent.pipeline[0]:
+                    agent.bind_output(next_agent)
+        elif type(output_agent) == list:
+            for agent in pipeline_last_level:
+                for next_agent in output_agent:
+                    agent.bind_output(next_agent)
+        else:
+            for agent in pipeline_last_level:
+                agent.bind_output(output_agent)
+
+    def unbind_output(self, output_agent):
+        pipeline_last_level = self.pipeline[-1]
+        if "AgentPipeline" in str(type(output_agent).__name__):
+            for agent in pipeline_last_level:
+                for next_agent in output_agent.pipeline[0]:
+                    agent.unbind_output(next_agent)
+        elif type(output_agent) == list:
+            for agent in pipeline_last_level:
+                for next_agent in output_agent:
+                    agent.unbind_output(next_agent)
+        else:
+            for agent in pipeline_last_level:
+                agent.unbind_output(output_agent)
+
+    def agents(self,ret_hyperparams=False):
+        agent_names = []
+        hyperparams = []
+        for level in self.pipeline:
+            agent_names.append([])
+            hyperparams.append([])
+            for agent in level:
+                agent_names[-1].append(agent.get_attr('name'))
+                if ret_hyperparams:
+                    hyperparams[-1].append(agent.get_attr('hyperparams'))
+
+        # if ret_hyperparams:
+        #     return [agent_names,hyperparams]
+        # else:
+        #     return agent_names
+
+        if ret_hyperparams:
+            return {"agents":agent_names,"hyperparams":hyperparams}
+        else:
+            return agent_names
 
 class DataStreamAgent(AgentMET4FOF):
     """
@@ -1091,10 +1314,12 @@ class MonitorAgent(AgentMET4FOF):
         Used to specifically select only a few keys to be plotted
     """
 
-    def init_parameters(self,plot_filter=[]):
+    def init_parameters(self,plot_filter=[], custom_plot_function=-1, **kwargs):
         self.memory = {}
         self.plots = {}
         self.plot_filter=plot_filter
+        self.custom_plot_function = custom_plot_function
+        self.custom_plot_parameters = kwargs
 
     def on_received_message(self, message):
         """
@@ -1142,8 +1367,9 @@ class MonitorAgent(AgentMET4FOF):
 
 class _Logger(AgentMET4FOF):
 
-    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True):
-        self.bind('SUB', 'sub', self.log_handler)
+    def init_parameters(self,log_filename= "log_file.csv", save_logfile=True, ml_experiment=False):
+        self.ml_experiment = ml_experiment
+        self.bind('SUB', 'sub', {"INFO":self.log_handler, "ML_EXP":self.log_handler_ML})
         self.log_filename = log_filename
         self.save_logfile = save_logfile
         if self.save_logfile:
@@ -1157,6 +1383,20 @@ class _Logger(AgentMET4FOF):
             except:
                 raise Exception
         self.save_cycles= 0
+
+    def log_handler_ML(self, message, topic):
+        """
+        Handles the results coming from Evaluation agent to be saved into the provided ML experiment file.
+        This updates the results of individual "chains" to be aggregated later for comparisons of chains/pipelines
+        The mechanism relies on regularly saving the ml_experiment object into the pickled file in default ML_EXP folder.
+
+        """
+        if self.ml_experiment:
+            self.ml_experiment.update_chain_results(message)
+            save_experiment(self.ml_experiment)
+
+    def set_ml_experiment(self, ml_experiment=False):
+        self.ml_experiment = ml_experiment
 
     def log_handler(self, message, topic):
         sys.stdout.write(message+'\n')
@@ -1192,4 +1432,3 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles+=1
             except:
                 raise Exception
-

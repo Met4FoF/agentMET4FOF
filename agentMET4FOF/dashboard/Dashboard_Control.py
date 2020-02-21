@@ -5,19 +5,22 @@ import agentMET4FOF.streams as datastreammet4fof_module
 
 
 #global variables access via 'dashboard_ctrl'
-class Dashboard_Control():
-    def __init__(self, ip_addr="127.0.0.1", port=3333, modules= []):
-        super(Dashboard_Control, self).__init__()
+class _Dashboard_Control():
+    def __init__(self, agent_ip_addr="127.0.0.1", agent_port=3333, modules= [], agentNetwork=None):
+        super(_Dashboard_Control, self).__init__()
         self.network_layout = {'name': 'grid'}
         self.current_selected_agent = " "
         self.current_nodes = []
         self.current_edges = []
         # get nameserver
         self.agent_graph = nx.DiGraph()
-        self.agentNetwork = agentmet4fof_module.AgentNetwork(ip_addr=ip_addr,port=port, connect=True, dashboard_modules=False) #dashboard_modules has to be false, to prevent infinite loop
-        if type(modules) == bool and modules is True:
+        if agentNetwork:
+            self.agentNetwork = agentNetwork
+        else:
+            self.agentNetwork = agentmet4fof_module.AgentNetwork(ip_addr=agent_ip_addr,port=agent_port, connect=True, dashboard_modules=False) #dashboard_modules has to be false, to prevent infinite loop
+        if isinstance(modules, bool) and modules:
             modules = []
-        elif type(modules) == list:
+        elif isinstance(modules, list):
             modules = modules
         elif type(modules).__name__ == "module":
             modules = [modules]
