@@ -121,7 +121,7 @@ jobs:
            python3 -m venv agent_venv
            source agent_venv/bin/activate
            pip install -r requirements.txt
-           pip install --upgrade twine
+           pip install --upgrade setuptools wheel twine
 
       - save_cache:
           paths:
