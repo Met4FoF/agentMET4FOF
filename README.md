@@ -11,7 +11,55 @@ About
  - Includes agent-based simulation and implementation
  - Readthedocs documentation is available at (https://agentmet4fof.readthedocs.io)
 
-Get started
+Use agentMET4FOF
+---
+
+The easiest way to get started with *agentMET4FOF* is navigating to the folder
+in which you want to create a virtual Python environment (*venv*), create one,
+activate it, first install numpy, then install *agentMET4FOF* from PyPI.org and then
+work through the [tutorials](agentMET4FOF_tutorials) or [examples](examples). To do this, issue the
+following commands on your Shell:
+
+```shell
+$ cd /LOCAL/PATH/TO/ENVS
+$ python3 -m venv agentMET4FOF_venv
+$ source agentMET4FOF_venv/bin/activate
+(agentMET4FOF_venv) $ pip install numpy
+Collecting numpy
+...
+Successfully installed numpy-...
+(agentMET4FOF_venv) $ pip install agentMET4FOF
+Collecting agentMET4FOF
+...
+Successfully installed agentMET4FOF-... ...
+(agentMET4FOF_venv) $ python
+Python ... (default, ..., ...) 
+[GCC ...] on ...
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
+>>> tutorial_1_generator_agent.main()
+Starting NameServer...
+Broadcast server running on 0.0.0.0:9091
+NS running on 127.0.0.1:3333 (127.0.0.1)
+URI = PYRO:Pyro.NameServer@127.0.0.1:3333
+INFO [2020-02-21 19:04:26.961014] (AgentController): INITIALIZED
+INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
+ * Serving Flask app "agentMET4FOF.dashboard.Dashboard" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+...
+```
+
+Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
+ SineGenerator agent you just spawned.
+ 
+To get some insights and really get going please visit [agentMET4FOF.readthedocs.io
+](https://agentmet4fof.readthedocs.io/).
+
+Get started developing
 ---
 First clone the repository to your local machine as described
 [here](https://help.github.com/en/articles/cloning-a-repository). To get started
@@ -19,7 +67,7 @@ with your present *Anaconda* installation just go to *Anaconda
 prompt*, navigate to your local clone
 
 ```shell
-cd /your/local/folder/agentMet4FoF
+cd /LOCAL/PATH/TO/agentMET4FOF
 ```
 
 and execute
@@ -38,7 +86,7 @@ Alternatively, for non-conda environments, you can install the dependencies usin
 pip install -r requirements.txt
 ```
 
-First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py) and
+First take a look at the [tutorials](agentMET4FOF_tutorials/tutorial_1_generator_agent.py) and
 [examples](./examples) or start hacking if you already are familiar with agentMET4FOF
 and want to customize your agents' network.
 
