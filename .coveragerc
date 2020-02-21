@@ -11,3 +11,4 @@ omit =
     venv/*
     tests/*
     docs/*
+    setup.py
