@@ -17,13 +17,17 @@ First clone the repository to your local machine as described
 [here](https://help.github.com/en/articles/cloning-a-repository). To get started
 with your present *Anaconda* installation just go to *Anaconda
 prompt*, navigate to your local clone
-```
+
+```shell
 cd /your/local/folder/agentMet4FoF
 ```
+
 and execute
-```
+
+```shell
 conda env create --file environment.yml 
 ```
+
 This will create an *Anaconda* virtual environment with all dependencies
 satisfied. If you don't have *Anaconda* installed already follow [this guide
 ](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/download.html)
@@ -34,9 +38,9 @@ Alternatively, for non-conda environments, you can install the dependencies usin
 pip install -r requirements.txt
 ```
 
-First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py) and [examples](./examples)
-or start hacking the [main_agent_network.py](./agentMET4FOF/main_agent_network.py) if you already are
-familiar with agentMet4FoF and want to customize your agents' network.
+First take a look at the [tutorials](./tutorials/tutorial_1_generator_agent.py) and
+[examples](./examples) or start hacking if you already are familiar with agentMET4FOF
+and want to customize your agents' network.
 
 Alternatively, watch the tutorial webinar [here](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
 
@@ -44,14 +48,19 @@ Updates
 ---
  - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
  - Implemented class AgentNetwork to start or connect to a agent server
- - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
+ - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case 
+   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
  - Implemented interactive web application with user interface
-
-
 
 ## Screenshot of web visualization
 ![Web Screenshot](docs/screenshot_met4fof.png)
 
 Note
 ---
- - In the event of agents not terminating cleanly, run ```taskkill /f /im python.exe /t``` or ```sudo pkill python``` in Windows Command Prompt or Linux Terminal to terminate all background python processes.
+- In the event of agents not terminating cleanly, run
+ 
+  ```python
+  taskkill /f /im python.exe /t
+  ```
+
+  in Windows Command Prompt to terminate all background python processes.
