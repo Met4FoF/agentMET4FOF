@@ -51,9 +51,6 @@ setup(
     author_email="bxy20@cam.ac.uk",
     keywords="uncertainty metrology MAS agent-based agents",
     packages=find_packages(exclude=["test"]),
-    setup_requires=[
-        "numpy",
-    ],
     install_requires=[
         "ipykernel",
         "numpy",
