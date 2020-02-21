@@ -16,22 +16,22 @@ workflows:
     jobs:
       # Create 'test' job to test agentMET4FOF for every commit.
       - test:
-         # Include tag filter to trigger as well on tag pushes.
-         filters:
-           tags:
-             only: /.*/
-     - deploy:
-         # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
-         # pushes, which successfully run 'test' job and are tagged with version.
-         requires:
-           - test
-         filters:
-           tags:
-             # Specify the tags which trigger the job as regular expression.
-             only: /[0-9]+(\.[0-9]+)*/
-           branches:
-             # This assures the job only being triggered by tag pushes.
-             ignore: /.*/
+          filters:
+              tags:
+                # Include tag filter to trigger as well on tag pushes.
+                only: /.*/
+      - deploy:
+          # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
+          # pushes, which successfully run 'test' job and are tagged with version.
+          requires:
+              - test
+          filters:
+              tags:
+                # Specify the tags which trigger the job as regular expression.
+                only: /[0-9]+(\.[0-9]+)*/
+              branches:
+                # This assures the job only being triggered by tag pushes.
+                ignore: /.*/
 
 jobs:
   test:
@@ -152,9 +152,9 @@ jobs:
             echo -e "username: __token__" >> ~/.pypirc
             echo -e "password: $PYPI_PASSWORD" >> ~/.pypirc
 
-       # Upload the created packages to test.pypi.org.
-       - run:
-           name: Upload to Test.PyPI
-           command: |
-             source agent_venv/bin/activate
-             twine upload dist/*
+      # Upload the created packages to test.pypi.org.
+      - run:
+          name: Upload to Test.PyPI
+          command: |
+            source agent_venv/bin/activate
+            twine upload dist/*
