@@ -1,6 +1,8 @@
-from tutorials.tutorial_1_generator_agent import demonstrate_generator_agent_use as tut1
-from tutorials.tutorial_2_math_agent import main as tutorial_2_main
-from tutorials.tutorial_3_multi_channel import main as tutorial_3_main
+from agentMET4FOF_tutorials.tutorial_1_generator_agent import (
+    demonstrate_generator_agent_use as tut1,
+)
+from agentMET4FOF_tutorials.tutorial_2_math_agent import main as tut2
+from agentMET4FOF_tutorials.tutorial_3_multi_channel import main as tut3
 
 
 def test_tutorial_1():
@@ -9,8 +11,10 @@ def test_tutorial_1():
 
 
 def test_tutorial_2():
-    tutorial_2_main().shutdown()
+    # Test executability of tutorial_2_math_agent.
+    tut2().shutdown()
 
 
 def test_tutorial_3():
-    tutorial_3_main().shutdown()
+    # Test executability of tutorial_3_multi_channel.
+    tut3().shutdown()
