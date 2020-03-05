@@ -101,7 +101,7 @@ Updates
  - Implemented interactive web application with user interface
 
 ## Screenshot of web visualization
-![Web Screenshot](docs/screenshot_met4fof.png)
+![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
 Note
 ---
