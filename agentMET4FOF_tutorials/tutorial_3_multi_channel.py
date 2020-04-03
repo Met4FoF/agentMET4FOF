@@ -1,20 +1,14 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator, CosineGenerator
 
-#We can use different channels for the receiver  to handle specifically each channel name
-#This can be useful for example in splitting train and test channels in machine learning
-#Then, the user will need to implement specific handling of each channel in the receiving agent
-#In this example, the MultiGeneratorAgent is used to send two different types of data - Sine and Cosine generator
-#This is done via specifiying send_output(channel="sine") and send_output(channel="cosine")
-#Then on the receiving end, the on_received_message() function checks for message['channel'] to handle it separately
-#Note that by default, Monitor Agent is only subscribed to the "default" channel
-#Hence it will not respond to the "cosine" and "sine" channel
 
 def minus(data, minus_val):
     return data-minus_val
 
+
 def plus(data,plus_val):
     return data+plus_val
+
 
 class MultiGeneratorAgent(AgentMET4FOF):
     def init_parameters(self):
@@ -27,6 +21,7 @@ class MultiGeneratorAgent(AgentMET4FOF):
             cosine_data = self.sine_stream.next_sample() #dictionary
             self.send_output(sine_data['x'], channel="sine")
             self.send_output(cosine_data['x'], channel="cosine")
+
 
 class MultiOutputMathAgent(AgentMET4FOF):
     def init_parameters(self,minus_param=0.5,plus_param=0.5):
@@ -60,7 +55,6 @@ def main():
     agentNetwork.bind_agents(multi_math_agent, monitor_agent)
     # set all agents states to "Running"
     agentNetwork.set_running_state()
-
 
     # allow for shutting down the network after execution
     return agentNetwork
