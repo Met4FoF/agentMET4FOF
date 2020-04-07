@@ -16,3 +16,4 @@ requests
 plotly
 torch
 torchvision
+dash-dangerously-set-inner-html
