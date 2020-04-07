@@ -5,7 +5,10 @@ import dash_core_components as dcc
 import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
 from agentMET4FOF.dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
 from dash.exceptions import PreventUpdate
+import dash_dangerously_set_inner_html
 import networkx as nx
+from bs4 import BeautifulSoup
+import visdcc
 
 def get_multiple_graphs(num_monitors=10):
     return [dcc.Graph(id='monitors-graph-'+str(i), figure={},style={'height':'90vh'}) for i in range(num_monitors)]
@@ -418,10 +421,16 @@ def prepare_agt_net_callbacks(app):
 
                 if type(input_data).__name__ == 'dict':
                     for key in input_data.keys():
-                        new_graph = html.Img(src=input_data[key], title=from_agent_name)
+                        # new_graph = html.Img(src=input_data[key], title=from_agent_name)
+                        # new_graph=dash_dangerously_set_inner_html.DangerouslySetInnerHTML(input_data[key])
+                        # new_graph=dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''<h1>WOW<h1><script>console.log('WTFMAN')<script>''')
+                        new_graph = dcc.Graph(figure=input_data[key])
                         html_div_monitor.append(new_graph)
                 else:
-                    new_graph = html.Img(src=input_data, title=from_agent_name)
+                    # new_graph = html.Img(src=input_data, title=from_agent_name)
+                    # new_graph=dash_dangerously_set_inner_html.DangerouslySetInnerHTML(input_data)
+                    # new_graph=dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''<h1>WOW<h1><script>console.log('WTFMAN')<script>''')
+                    new_graph = dcc.Graph(figure=input_data)
                     html_div_monitor.append(new_graph)
 
             #only add the graph if there is some plots in the Monitor Agent
@@ -431,3 +440,4 @@ def prepare_agt_net_callbacks(app):
         # set dimensions of each monitor agent's graph
         return [all_graphs]
     return app
+

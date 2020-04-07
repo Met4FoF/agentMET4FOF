@@ -408,7 +408,7 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
 
-    def convert_to_plotly(self, matplotlib_fig):
+    def _convert_to_plotly(self, matplotlib_fig):
         """
         Internal method to convert matplotlib figure to plotly figure
 
@@ -419,9 +419,9 @@ class AgentMET4FOF(Agent):
 
         """
         # convert to plotly format
-        matplotlib_fig.tight_layout()
+        # matplotlib_fig.tight_layout()
         plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
-        plotly_fig['layout']['showlegend'] = True
+        # plotly_fig['layout']['showlegend'] = True
         return plotly_fig
 
 
@@ -460,16 +460,32 @@ class AgentMET4FOF(Agent):
         -------
         The message format is {'from':agent_name, 'plot': data, 'senderType': agent_class}.
         """
+        # if isinstance(fig, matplotlib.figure.Figure):
+        #     #graph = self._convert_to_plotly(fig) #unreliable
+        #     graph = self._fig_to_uri(fig)
+        # elif isinstance(fig, dict): #nested
+        #     for key in fig.keys():
+        #         fig[key] = self._fig_to_uri(fig[key])
+        #     graph = fig
+        # else:
+        #     graph = fig
+        # self.send_output(graph, channel="plot")
+
         if isinstance(fig, matplotlib.figure.Figure):
-            #graph = self._convert_to_plotly(fig) #unreliable
-            graph = self._fig_to_uri(fig)
+            graph = self._convert_to_plotly(fig) #unreliable
+            # graph = self._fig_to_uri(fig)
+            # graph = mpld3.fig_to_html(fig)
         elif isinstance(fig, dict): #nested
             for key in fig.keys():
-                fig[key] = self._fig_to_uri(fig[key])
+                fig[key] = self._convert_to_plotly(fig[key]) #unreliable
+                # fig[key] = self._fig_to_uri(fig[key])
+                # fig[key] = mpld3.fig_to_html(fig[key])
             graph = fig
         else:
             graph = fig
+        self.log_info(graph)
         self.send_output(graph, channel="plot")
+
         return graph
 
     def update_data_memory(self,message):
