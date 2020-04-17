@@ -6,21 +6,4 @@ dependencies:
     - python >=3.5
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
-        - scipy
-        - osbrain
-        - dash-cytoscape
-        - plotly
-        - matplotlib==3.1.0
-        - pandas
-        - seaborn
-        - dash
-        - networkx
-        - multiprocess
-        - h5py
-        - requests
-        - ipykernel
-        - numpy
-        - scikit-learn
-        - scikit-multiflow
-        - torch
-        - rchvision
+        - -r requirements.txt

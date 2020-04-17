@@ -17,3 +17,5 @@ plotly
 torch
 torchvision
 dash-dangerously-set-inner-html
+beautifulsoup4
+visdcc
