@@ -15,10 +15,10 @@ Use agentMET4FOF
 ---
 
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
-in which you want to create a virtual Python environment (*venv*), create one,
-activate it, first install numpy, then install *agentMET4FOF* from PyPI.org and then
-work through the [tutorials](agentMET4FOF_tutorials) or [examples](examples). To do this, issue the
-following commands on your Shell:
+in which you want to create a virtual Python environment (*venv*), create one based
+on Python 3.6 or later, activate it, first install numpy, then install *agentMET4FOF*
+from PyPI.org and then work through the [tutorials](agentMET4FOF_tutorials) or
+[examples](examples). To do this, issue the following commands on your Shell:
 
 ```shell
 $ cd /LOCAL/PATH/TO/ENVS
