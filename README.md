@@ -37,7 +37,7 @@ Python ... (default, ..., ...)
 [GCC ...] on ...
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
->>> tutorial_1_generator_agent.main()
+>>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
 Starting NameServer...
 Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
