@@ -9,7 +9,7 @@ class SineGeneratorAgent(AgentMET4FOF):
     to connected agents via its output channel.
     """
 
-    # Publish the privateThe datatype of the stream will be a
+    # The datatype of the stream will be SineGenerator.
     _sine_stream: SineGenerator
 
     def init_parameters(self):
