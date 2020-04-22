@@ -3,16 +3,20 @@
 [![Codecov Badge](https://codecov.io/gh/bangxiangyong/agentMet4FoF/branch/master/graph/badge.svg)](https://codecov.io/gh/bangxiangyong/agentMet4FoF)
 
 # Multi-Agent System for Metrology for Factory of the Future (Met4FoF) Code
-This is supported by European Metrology Programme for Innovation and Research (EMPIR) under the project Metrology for the Factory of the Future (Met4FoF), project number 17IND12. (https://www.ptb.de/empir2018/met4fof/home/)
 
-About
----
- - How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
+This is supported by European Metrology Programme for Innovation and Research (EMPIR)
+under the project Metrology for the Factory of the Future (Met4FoF), project number
+17IND12. (https://www.ptb.de/empir2018/met4fof/home/)
+
+## About
+
+ - How can metrological input be incorporated into an agent-based system for
+   addressing uncertainty of machine learning in future manufacturing?
  - Includes agent-based simulation and implementation
  - Readthedocs documentation is available at (https://agentmet4fof.readthedocs.io)
 
-Use agentMET4FOF
----
+## Use agentMET4FOF
+
 
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
@@ -59,8 +63,8 @@ Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
 To get some insights and really get going please visit [agentMET4FOF.readthedocs.io
 ](https://agentmet4fof.readthedocs.io/).
 
-Get started developing
----
+## Get started developing
+
 First clone the repository to your local machine as described
 [here](https://help.github.com/en/articles/cloning-a-repository). To get started
 with your present *Anaconda* installation just go to *Anaconda
@@ -92,8 +96,8 @@ and want to customize your agents' network.
 
 Alternatively, watch the tutorial webinar [here](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
 
-Updates
----
+## Updates
+
  - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
  - Implemented class AgentNetwork to start or connect to a agent server
  - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case 
@@ -103,8 +107,8 @@ Updates
 ## Screenshot of web visualization
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
-Note
----
+## Note
+
 - In the event of agents not terminating cleanly, run
  
   ```python
