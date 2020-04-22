@@ -51,6 +51,11 @@ setup(
     author_email="bxy20@cam.ac.uk",
     keywords="uncertainty metrology MAS agent-based agents",
     packages=find_packages(exclude=["tests"]),
+    project_urls={
+        "Documentation": "https://agentmet4fof.readthedocs.io/",
+        "Source": "https://github.com/bangxiangyong/agentMET4FOF",
+        "Tracker": "https://github.com/bangxiangyong/agentMET4FOF/issues",
+    },
     install_requires=[
         "ipykernel",
         "numpy",
@@ -69,12 +74,19 @@ setup(
         "requests",
         "plotly",
     ],
-    python_requires=">=3",
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     cmdclass={"verify": VerifyVersionCommand,},
 )
