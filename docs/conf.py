@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.viewcode',
 	'sphinx.ext.napoleon',
 	'sphinx.ext.todo',
-    'nbsphinx'
+    'nbsphinx',
+    'recommonmark'
 ]
 
 nbsphinx_allow_errors = True
