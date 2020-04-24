@@ -58,26 +58,11 @@ def make_path_dict(source: str, destination: str) -> dict:
 
 
 # Set up all paths for source and destination folders.
-examples_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "examples")
-)
-tutorials_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "agentMET4FOF_tutorials")
-)
-root_source = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                           "..", "README.md"))
-examples_dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "examples"))
-tutorials_dest = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
-)
-root_dest = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "README.md")
-)
+root_source = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+root_dest = os.path.abspath(os.path.dirname(__file__))
 
 # Assemble the list of dicts of all source and destination folders to copy.
 path_dicts = [
-    make_path_dict(examples_source, examples_dest),
-    make_path_dict(tutorials_source, tutorials_dest),
     make_path_dict(root_source, root_dest),
 ]
 
@@ -90,7 +75,8 @@ for path_dict in path_dicts:
 
     for root, dirs, files in os.walk(source_folder):
         for dr in dirs:
-            os.mkdir(os.path.join(root.replace(source_folder, dest_folder), dr))
+            if dr != "docs":
+                os.mkdir(os.path.join(root.replace(source_folder, dest_folder), dr))
         for fil in files:
             if os.path.splitext(fil)[1] in [".ipynb", ".md", ".rst"]:
                 source_filename = os.path.join(root, fil)
