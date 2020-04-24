@@ -22,26 +22,15 @@ For the *agentMET4FOF* homepage go to
    :maxdepth: 1
    :caption: Getting started:
 
-   Getting started
+   README.md
 
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials:
 
-   tutorials/tutorial_1_generator_agent.ipynb
-   tutorials/tutorial_2_math_agent.ipynb
-   tutorials/tutorial_3_multi_channel.ipynb
-
-.. toctree::
-   :maxdepth: 1
-   :caption: In depth examples:
-
-   examples/ZEMA_BNN/README.md
-   examples/ZEMA_BNN/01-Download-Data.ipynb
-   examples/ZEMA_BNN/02-Data-Preprocessing.ipynb
-   examples/ZEMA_BNN/03-BNN-Training.ipynb
-   examples/ZEMA_BNN/04-Run-Multi-Agents-System.ipynb
-   examples/ZEMA_BNN/05-Agent-Dashboard-User-Interface.ipynb
+   agentMET4FOF_tutorials/tutorial_1_generator_agent.ipynb
+   agentMET4FOF_tutorials/tutorial_2_math_agent.ipynb
+   agentMET4FOF_tutorials/tutorial_3_multi_channel.ipynb
 
 .. toctree::
    :maxdepth: 1
