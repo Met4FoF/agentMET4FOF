@@ -62,7 +62,7 @@ examples_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "examples")
 )
 tutorials_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "tutorials")
+    os.path.join(os.path.dirname(__file__), "..", "agentMET4FOF_tutorials")
 )
 root_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..")
@@ -71,7 +71,7 @@ examples_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "examples")
 )
 tutorials_dest = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "tutorials")
+    os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
 )
 root_dest = os.path.abspath(os.path.dirname(__file__)
 )
