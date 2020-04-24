@@ -51,6 +51,14 @@ nbsphinx_allow_errors = True
 # Copy over examples and tutorials and all other folders to docs' source
 # This makes it so that nbsphinx can properly load the notebook images
 
+# Copy over README.md from root folder.
+shutil.copyfile(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "README.md")),
+    os.path.join(os.path.dirname(__file__), "README.md"),
+)
+
+# Copy over all other specified folders from repository tree.
+
 
 def make_path_dict(source: str, destination: str) -> dict:
     # Function to construct the desired dict structure for the folders to copy.
@@ -64,23 +72,18 @@ examples_source = os.path.abspath(
 tutorials_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "agentMET4FOF_tutorials")
 )
-root_source = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                           "..", "README.md"))
 examples_dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "examples"))
 tutorials_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
-)
-root_dest = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "README.md")
 )
 
 # Assemble the list of dicts of all source and destination folders to copy.
 path_dicts = [
     make_path_dict(examples_source, examples_dest),
     make_path_dict(tutorials_source, tutorials_dest),
-    make_path_dict(root_source, root_dest),
 ]
 
+# Do the actual copying.
 for path_dict in path_dicts:
     source_folder = path_dict["source"]
     dest_folder = path_dict["destination"]
