@@ -1,54 +1,10 @@
-from agentMET4FOF.agents import AgentMET4FOF
-from examples.ZEMA_EMC.zema_feature_extract import FFT_BFC, Pearson_FeatureSelection
-
-import numpy as np
-import time
-
-from matplotlib import pyplot as plt
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn import linear_model
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
-
-from sklearn.metrics import f1_score
-from sklearn.metrics import confusion_matrix
-
-from scipy.stats import skew
-from scipy.stats import kurtosis
-from scipy.fftpack import fft
-
-import pandas as pd
-
-import torch
-from torch.autograd import Variable
-from sklearn.preprocessing import StandardScaler, MinMaxScaler,RobustScaler
-
-from examples.ZEMA_BNN.ML_models.BBBlayers import BBBLinearFactorial
-from examples.ZEMA_BNN.ML_models.BBBlayers import GaussianVariationalInference
-from datetime import datetime
-
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-
-from agentMET4FOF.ml_uncertainty.bnn_utils import *
 from agentMET4FOF.ml_uncertainty.bnn import *
 
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn import svm, datasets
-from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LogisticRegression, LinearRegression
-
-from sklearn.metrics import f1_score, mean_squared_error
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import pandas as pd
-from sklearn.svm import SVC
-import copy
 from scipy import stats
+from scipy import stats
+
+from agentMET4FOF.ml_uncertainty.bnn import *
+
 
 class BNN_Dropout(torch.nn.Module):
     def __init__(self, input_size, output_size, architecture=["d1","d1"], dropout_p=0.2,use_cuda=False):
