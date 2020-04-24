@@ -22,7 +22,7 @@ For the *agentMET4FOF* homepage go to
    :maxdepth: 1
    :caption: Getting started:
 
-   README.md
+   README
 
 .. toctree::
    :maxdepth: 1
