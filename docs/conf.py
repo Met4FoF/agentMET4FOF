@@ -69,7 +69,9 @@ examples_dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "example
 tutorials_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
 )
-root_dest = os.path.abspath(os.path.dirname(__file__))
+root_dest = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "root")
+)
 
 # Assemble the list of dicts of all source and destination folders to copy.
 path_dicts = [
