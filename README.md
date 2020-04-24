@@ -21,8 +21,10 @@ under the project Metrology for the Factory of the Future (Met4FoF), project num
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
 on Python 3.6 or later, activate it, first install numpy, then install *agentMET4FOF*
-from PyPI.org and then work through the [tutorials](agentMET4FOF_tutorials) or
-[examples](examples). To do this, issue the following commands on your Shell:
+from PyPI.org and then work through the [tutorials
+](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
+or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
+To do this, issue the following commands on your Shell:
 
 ```shell
 $ cd /LOCAL/PATH/TO/ENVS
@@ -90,11 +92,14 @@ Alternatively, for non-conda environments, you can install the dependencies usin
 pip install -r requirements.txt
 ```
 
-First take a look at the [tutorials](agentMET4FOF_tutorials/tutorial_1_generator_agent.py) and
-[examples](./examples) or start hacking if you already are familiar with agentMET4FOF
-and want to customize your agents' network.
+First take a look at the [tutorials
+](https://github.com/bangxiangyong/agentMET4FOF/blob/develop/agentMET4FOF_tutorials/tutorial_1_generator_agent.py)
+and [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples)
+or start hacking if you already are familiar with agentMET4FOF and want to customize
+your agents' network.
 
-Alternatively, watch the tutorial webinar [here](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
+Alternatively, watch the tutorial webinar [here
+](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
 
 ## Updates
 
