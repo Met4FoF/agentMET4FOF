@@ -78,8 +78,6 @@ jobs:
           command: |
             source agent_venv/bin/activate
             pytest -v --junitxml=test-reports/pytest.xml --cov=. \
-            --deselect tests/test_examples.py::TestZEMA_EMC \
-            --ignore=tests/test_zema_emc_ml.py . > \
             test-reports/agentMET4FOF.log
 
       # Upload coverage report.
