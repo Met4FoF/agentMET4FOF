@@ -2,7 +2,6 @@ from agentMET4FOF.ml_uncertainty.bnn import *
 
 from scipy import stats
 from scipy import stats
-import torch
 
 from agentMET4FOF.ml_uncertainty.bnn import *
 
