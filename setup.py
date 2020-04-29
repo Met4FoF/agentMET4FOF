@@ -63,7 +63,6 @@ setup(
         "pandas",
         "osbrain",
         "dash",
-        "dash-cytoscape",
         "networkx",
         "multiprocess",
         "plotly",

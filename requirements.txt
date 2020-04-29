@@ -5,14 +5,10 @@ scikit-multiflow
 scipy
 matplotlib == 3.1.0
 pandas
-seaborn
 osbrain
 dash
-dash-cytoscape
 networkx
 multiprocess
-h5py
-requests
 plotly
 torch
 torchvision
