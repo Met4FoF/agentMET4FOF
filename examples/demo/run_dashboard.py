@@ -1,13 +1,13 @@
 # Agent modules
-import examples.ZEMA_EMC.zema_agents as zema_agents
-import examples.ZEMA_EMC.zema_datastream as zema_datastream
 from agentMET4FOF.agents import AgentDashboard
+from agentMET4FOF import agents
+from agentMET4FOF import streams
 
 # This example shows how we can run the dashboard separately on a different IP
 # The dashboard will need to connect to an existing up and running AgentNetwork,
 # which is running on another process or script. Otherwise there will be error messages.
 
-modules = [zema_agents, zema_datastream]
+modules = [agents, streams]
 
 
 def run_dashboard():

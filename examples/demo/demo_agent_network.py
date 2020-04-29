@@ -1,11 +1,9 @@
 from agentMET4FOF.agents import AgentNetwork
 
 #Agent modules
-import examples.ZEMA_EMC.zema_agents as zema_agents
-import examples.ZEMA_EMC.zema_datastream as zema_datastream
 import examples.demo.demo_agents as demo_agents
 
-dashboard_modules = [zema_agents, zema_datastream, demo_agents]
+dashboard_modules = [demo_agents]
 
 
 def main():
