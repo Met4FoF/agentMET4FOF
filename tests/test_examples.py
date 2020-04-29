@@ -4,16 +4,12 @@ import pytest
 from requests import head
 from requests.exceptions import ConnectionError
 
+from examples.demo.run_dashboard import run_dashboard as demo_dashboard_main
 from examples.ML.coupled_ML import main as coupled_ml_main
 from examples.ML.decoupled_ML import main as decoupled_ml_main
-from examples.demo.demo_agents import main as demo_agents_main
-from examples.demo.run_dashboard import run_dashboard as demo_dashboard_main
 
 
 class TestDemo:
-    def test_demo_agents(self):
-        demo_agents_main().shutdown()
-
     @pytest.mark.timeout(1)
     def test_demo_dashboard(self):
         # This test runs the run() method of demo_dashboard_main and waits for the
