@@ -6,15 +6,11 @@ from requests.exceptions import ConnectionError
 
 from examples.ML.coupled_ML import main as coupled_ml_main
 from examples.ML.decoupled_ML import main as decoupled_ml_main
-from examples.demo.demo_agent_network import main as demo_agent_network_main
 from examples.demo.demo_agents import main as demo_agents_main
 from examples.demo.run_dashboard import run_dashboard as demo_dashboard_main
 
 
 class TestDemo:
-    def test_demo_agent_network(self):
-        demo_agent_network_main().shutdown()
-
     def test_demo_agents(self):
         demo_agents_main().shutdown()
 
@@ -41,4 +37,3 @@ class TestML:
 
     def test_decoupled_ML(self):
         decoupled_ml_main().shutdown()
-
