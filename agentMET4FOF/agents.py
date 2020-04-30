@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 # ML dependencies
 import numpy as np
-from multiprocess.context import Process
+from multiprocessing.context import Process
 from osbrain import Agent
 from osbrain import NSProxy
 from osbrain import run_agent
