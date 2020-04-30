@@ -10,26 +10,17 @@ consisting of pipelines and subsets called chains, can be viewed and compared.
 """
 
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, AgentPipeline
+from agentMET4FOF.agents import AgentNetwork, MonitorAgent, AgentPipeline
 from agentMET4FOF.develop.datastream import *
 from agentMET4FOF.develop.evaluator import *
 from agentMET4FOF.develop.ML_Experiment import *
 
-from sklearn.model_selection import KFold
 from sklearn import datasets
-from sklearn.metrics import f1_score
 
-from sklearn.neighbors import KNeighborsClassifier as KNN
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler,PowerTransformer
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import ParameterGrid
-from pprint import pprint
-import copy
+from sklearn.preprocessing import StandardScaler
 
-from agentMET4FOF.ml_uncertainty.bnn import BNN_Model
-from agentMET4FOF.ml_uncertainty.evaluate_pred_unc import *
+from examples.ML_EXPERIMENTS.bnn import BNN_Model
+from examples.ML_EXPERIMENTS.evaluate_pred_unc import *
 
 def main():
     agentNetwork = AgentNetwork()
