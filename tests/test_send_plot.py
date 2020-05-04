@@ -1,4 +1,6 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -28,11 +30,11 @@ class GeneratorAgent(AgentMET4FOF):
 
         cxy, f = axs[1].cohere(s1, s2, 256, 1. / dt)
         axs[1].set_ylabel('coherence')
-        #fig.suptitle('Monitor Agent 1', fontsize=16)
+
         return fig
 
-    def dummy_send_graph(self):
-        self.send_plot(self.create_graph())
+    def dummy_send_graph(self, mode="image"):
+        self.send_plot(self.create_graph(), mode=mode)
 
 def test_send_plot():
     # start agent network server
@@ -44,7 +46,9 @@ def test_send_plot():
 
     agentNetwork.bind_agents(gen_agent, monitor_agent)
 
-    gen_agent.dummy_send_graph()
+    gen_agent.dummy_send_graph(mode="image")
+    time.sleep(3)
+    gen_agent.dummy_send_graph(mode="plotly")
     time.sleep(3)
 
     assert monitor_agent.get_attr('plots')['GeneratorAgent_1']

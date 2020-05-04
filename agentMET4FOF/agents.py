@@ -408,7 +408,7 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
 
-    def convert_to_plotly(self, matplotlib_fig):
+    def _convert_to_plotly(self, matplotlib_fig):
         """
         Internal method to convert matplotlib figure to plotly figure
 
@@ -443,7 +443,7 @@ class AgentMET4FOF(Agent):
         encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
         return "data:image/png;base64,{}".format(encoded)
 
-    def send_plot(self, fig=plt.Figure()):
+    def send_plot(self, fig: matplotlib.figure.Figure, mode="image"):
         """
         Sends plot to agents connected to this agent's Output channel.
 
@@ -456,18 +456,30 @@ class AgentMET4FOF(Agent):
         fig : Figure
             Can be either matplotlib figure or plotly figure
 
+        mode : str
+            "image" - converts into image via encoding at base64 string.
+            "plotly" - converts into plotly figure using `mpl_to_plotly`
+            Default: "image"
+
         Returns
         -------
         The message format is {'from':agent_name, 'plot': data, 'senderType': agent_class}.
         """
+
         if isinstance(fig, matplotlib.figure.Figure):
-            #graph = self._convert_to_plotly(fig) #unreliable
-            graph = self._fig_to_uri(fig)
+            if mode == "plotly":
+                graph = self._convert_to_plotly(fig)
+            elif mode == "image":
+                graph = self._fig_to_uri(fig)
         elif isinstance(fig, dict): #nested
-            for key in fig.keys():
-                fig[key] = self._fig_to_uri(fig[key])
+            if mode == "plotly":
+                for key in fig.keys():
+                    fig[key] = self._convert_to_plotly(fig[key])
+            if mode == "image":
+                for key in fig.keys():
+                    fig[key] = self._fig_to_uri(fig[key])
             graph = fig
-        else:
+        else: #a plotly figure
             graph = fig
         self.send_output(graph, channel="plot")
         return graph

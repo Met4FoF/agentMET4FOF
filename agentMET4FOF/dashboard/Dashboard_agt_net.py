@@ -418,10 +418,16 @@ def prepare_agt_net_callbacks(app):
 
                 if type(input_data).__name__ == 'dict':
                     for key in input_data.keys():
-                        new_graph = html.Img(src=input_data[key], title=from_agent_name)
+                        if isinstance(input_data[key], str):
+                            new_graph = html.Img(src=input_data[key], title=from_agent_name)
+                        else:
+                            new_graph = dcc.Graph(figure=input_data[key])
                         html_div_monitor.append(new_graph)
                 else:
-                    new_graph = html.Img(src=input_data, title=from_agent_name)
+                    if isinstance(input_data, str):
+                        new_graph = html.Img(src=input_data, title=from_agent_name)
+                    else:
+                        new_graph = dcc.Graph(figure=input_data)
                     html_div_monitor.append(new_graph)
 
             #only add the graph if there is some plots in the Monitor Agent
