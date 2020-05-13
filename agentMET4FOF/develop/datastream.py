@@ -1,4 +1,4 @@
-from agentMET4FOF.agents import AgentMET4FOF
+from ..agents import AgentMET4FOF
 from sklearn.model_selection import KFold
 
 

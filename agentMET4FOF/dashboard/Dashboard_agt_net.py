@@ -2,8 +2,9 @@ import dash
 import dash_cytoscape as cyto
 import dash_html_components as html
 import dash_core_components as dcc
-import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
-from agentMET4FOF.dashboard.LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, create_monitor_graph
+from . import LayoutHelper
+from .LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, \
+    create_monitor_graph
 from dash.exceptions import PreventUpdate
 import networkx as nx
 

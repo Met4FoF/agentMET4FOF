@@ -9,10 +9,10 @@ import os
 import time
 import dash_table
 from dash.exceptions import PreventUpdate
-import agentMET4FOF.dashboard.LayoutHelper as LayoutHelper
+from . import LayoutHelper
 from datetime import datetime
 import pandas as pd
-from agentMET4FOF.develop.ML_Experiment import load_experiment
+from ..develop.ML_Experiment import load_experiment
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import numpy as np

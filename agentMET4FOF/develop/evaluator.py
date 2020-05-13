@@ -1,4 +1,4 @@
-from agentMET4FOF.agents import AgentMET4FOF
+from ..agents import AgentMET4FOF
 import pandas as pd
 
 class EvaluationAgent(AgentMET4FOF):
