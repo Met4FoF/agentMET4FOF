@@ -188,6 +188,12 @@ class AgentMET4FOF(Agent):
         """
         return message
 
+    @property
+    def buffer_filled(self):
+        if len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size:
+            return True
+        else:
+            return False
 
     def pack_data(self,data, channel='default'):
         """
@@ -472,7 +478,7 @@ class AgentMET4FOF(Agent):
         self.send_output(graph, channel="plot")
         return graph
 
-    def update_data_memory(self,message):
+    def update_data_memory(self,agent_from,data=None):
         """
         Updates data stored in `self.memory` with the received message
 
@@ -481,10 +487,19 @@ class AgentMET4FOF(Agent):
 
         Parameters
         ----------
-        message : dict
-            Standard message format specified by AgentMET4FOF class
+        agent_from : dict | str
+            if type is dict, we expect it to be the agentMET4FOF dict message to be compliant with older code
+            otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
+        data
+            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffer.
 
         """
+        # if first argument is the agentMET4FOF dict message
+        if isinstance(agent_from, dict):
+            message = agent_from
+        # otherwise, we expect the name of agent_sender and the data to be passed
+        else:
+            message = {"from":agent_from, "data":data}
 
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for it
