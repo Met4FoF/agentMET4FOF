@@ -190,10 +190,7 @@ class AgentMET4FOF(Agent):
 
     @property
     def buffer_filled(self):
-        if len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size:
-            return True
-        else:
-            return False
+        return len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size
 
     def pack_data(self,data, channel='default'):
         """
