@@ -426,15 +426,15 @@ def prepare_agt_net_callbacks(app):
             html_div_monitor.append(html.H5(agent_name, style={"text-align": "center"}))
             # create a new graph for every agent
             for from_agent_name in plot_data:
-                # get the 'data' relevant to 'monitor_agent_input'
-                input_data = plot_data[from_agent_name]
+                # get the graph relevant to 'monitor_agent_input'
+                graph = plot_data[from_agent_name]
 
-                if type(input_data).__name__ == 'dict':
-                    for key in input_data.keys():
-                        new_graph = _handle_matplotlib_figure(input_data[key], from_agent_name)
+                if isinstance(graph, dict):
+                    for graph_ in graph.values():
+                        new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
                         html_div_monitor.append(new_graph)
                 else:
-                    new_graph = _handle_matplotlib_figure(input_data, from_agent_name)
+                    new_graph = _handle_matplotlib_figure(graph, from_agent_name)
                     html_div_monitor.append(new_graph)
 
             #only add the graph if there is some plots in the Monitor Agent
