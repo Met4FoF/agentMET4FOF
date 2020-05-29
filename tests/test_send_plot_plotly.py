@@ -46,8 +46,6 @@ def test_send_plot():
 
     agentNetwork.bind_agents(gen_agent, monitor_agent)
 
-    gen_agent.dummy_send_graph(mode="image")
-    time.sleep(3)
     gen_agent.dummy_send_graph(mode="plotly")
     time.sleep(3)
 
