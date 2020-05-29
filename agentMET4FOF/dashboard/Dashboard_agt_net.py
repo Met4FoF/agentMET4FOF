@@ -376,6 +376,19 @@ def prepare_agt_net_callbacks(app):
         # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
         return monitor_graphs+ style_graphs
 
+    def _handle_matplotlib_figure(input_data, from_agent_name: str):
+        """
+        Internal function. Checks the mode of matplotlib.figure.Fig to be plotted
+        Either it is a base64 str image, or a plotly graph
+
+        This is used in plotting the received matplotlib figures in the MonitorAgent's plot memory.
+        """
+
+        if isinstance(input_data, str):
+            new_graph = html.Img(src=input_data, title=from_agent_name)
+        else:
+            new_graph = dcc.Graph(figure=input_data)
+        return new_graph
     #load Monitors data and draw - all at once
     @app.callback([dash.dependencies.Output('matplotlib-division', 'children')],
                  [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
@@ -418,16 +431,10 @@ def prepare_agt_net_callbacks(app):
 
                 if type(input_data).__name__ == 'dict':
                     for key in input_data.keys():
-                        if isinstance(input_data[key], str):
-                            new_graph = html.Img(src=input_data[key], title=from_agent_name)
-                        else:
-                            new_graph = dcc.Graph(figure=input_data[key])
+                        new_graph = _handle_matplotlib_figure(input_data[key], from_agent_name)
                         html_div_monitor.append(new_graph)
                 else:
-                    if isinstance(input_data, str):
-                        new_graph = html.Img(src=input_data, title=from_agent_name)
-                    else:
-                        new_graph = dcc.Graph(figure=input_data)
+                    new_graph = _handle_matplotlib_figure(input_data, from_agent_name)
                     html_div_monitor.append(new_graph)
 
             #only add the graph if there is some plots in the Monitor Agent
