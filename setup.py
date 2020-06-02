@@ -65,7 +65,6 @@ setup(
         "dash",
         "dash_cytoscape",
         "networkx",
-        "multiprocess",
         "plotly",
     ],
     python_requires=">=3.6",
