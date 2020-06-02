@@ -6,6 +6,7 @@ import sys
 from io import BytesIO
 import time
 import os
+from typing import Union, Dict, Optional
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -139,15 +140,15 @@ class AgentMET4FOF(Agent):
         except Exception as e:
                 return -1
 
-    def init_agent_loop(self, loop_wait=1.0):
+    def init_agent_loop(self, loop_wait: Optional[int] = 1.0):
         """
-        Initiates the agent loop, which iterates every`loop_wait` seconds
+        Initiates the agent loop, which iterates every `loop_wait` seconds
 
         Stops every timers and initiate a new loop.
 
         Parameters
         ----------
-        loop_wait : int
+        loop_wait : int, optional
             The wait between each iteration of the loop
         """
         self.loop_wait = loop_wait
@@ -411,7 +412,7 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 self.log_info("Disconnected output module: "+ module_id)
 
-    def convert_to_plotly(self, matplotlib_fig):
+    def _convert_to_plotly(self, matplotlib_fig: matplotlib.figure.Figure):
         """
         Internal method to convert matplotlib figure to plotly figure
 
@@ -428,7 +429,7 @@ class AgentMET4FOF(Agent):
         return plotly_fig
 
 
-    def _fig_to_uri(self, matplotlib_fig = plt.figure()):
+    def _fig_to_uri(self, matplotlib_fig : matplotlib.figure.Figure):
         """
         Internal method to convert matplotlib figure to base64 uri image for display
 
@@ -446,31 +447,54 @@ class AgentMET4FOF(Agent):
         encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
         return "data:image/png;base64,{}".format(encoded)
 
-    def send_plot(self, fig=plt.Figure()):
+    def send_plot(self, fig: Union[matplotlib.figure.Figure, Dict[str,matplotlib.figure.Figure]], mode:str ="image"):
         """
         Sends plot to agents connected to this agent's Output channel.
 
         This method is different from send_output which will be sent to through the
         'plot' channel to be handled.
 
+        Tradeoffs between "image" and "plotly" modes are that "image" are more stable and "plotly" are interactive.
+        Note not all (complicated) matplotlib figures can be converted into a plotly figure.
+
         Parameters
         ----------
 
-        fig : Figure
-            Can be either matplotlib figure or plotly figure
+        fig : matplotlib.figure.Figure or dict of matplotlib.figure.Figure
+            Alternatively, multiple figures can be nested in a dict (with any preferred keys) e.g {"Temperature":matplotlib.Figure, "Acceleration":matplotlib.Figure}
+
+        mode : str
+            "image" - converts into image via encoding at base64 string.
+            "plotly" - converts into plotly figure using `mpl_to_plotly`
+            Default: "image"
 
         Returns
         -------
-        The message format is {'from':agent_name, 'plot': data, 'senderType': agent_class}.
+
+        graph : str or plotly figure or dict of one of those converted figure(s)
+
         """
+
+        error_msg = "Conversion mode "+mode+" is not implemented."
+
         if isinstance(fig, matplotlib.figure.Figure):
-            #graph = self._convert_to_plotly(fig) #unreliable
-            graph = self._fig_to_uri(fig)
+            if mode == "plotly":
+                graph = self._convert_to_plotly(fig)
+            elif mode == "image":
+                graph = self._fig_to_uri(fig)
+            else:
+                raise NotImplementedError(error_msg)
         elif isinstance(fig, dict): #nested
-            for key in fig.keys():
-                fig[key] = self._fig_to_uri(fig[key])
+            if mode == "plotly":
+                for key in fig.keys():
+                    fig[key] = self._convert_to_plotly(fig[key])
+            elif mode == "image":
+                for key in fig.keys():
+                    fig[key] = self._fig_to_uri(fig[key])
+            else:
+                raise NotImplementedError(error_msg)
             graph = fig
-        else:
+        else: #a plotly figure
             graph = fig
         self.send_output(graph, channel="plot")
         return graph
