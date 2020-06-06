@@ -1,7 +1,7 @@
 from collections import deque
 import numpy as np
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
+from ..agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from ..streams import SineGenerator
 import matplotlib.pyplot as plt
 import numpy as np
 
