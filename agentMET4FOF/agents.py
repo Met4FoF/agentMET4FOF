@@ -32,7 +32,7 @@ class AgentMET4FOF(Agent):
     """
     Base class for all agents with specific functions to be overridden/supplied by user.
 
-    Behavioural functions for users to provide are init_parameters, agent_loop and on_received_message.
+    Behavioral functions for users to provide are init_parameters, agent_loop and on_received_message.
     Communicative functions are bind_output, unbind_output and send_output.
 
     """
@@ -80,7 +80,7 @@ class AgentMET4FOF(Agent):
         self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias,transport='tcp')
         self.AgentType = type(self).__name__
         self.log_info("INITIALIZED")
-        # These are the available states to change the agents' behaviour in
+        # These are the available states to change the agents' behavior in
         # agent_loop.
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
@@ -153,7 +153,7 @@ class AgentMET4FOF(Agent):
         """
         self.loop_wait = loop_wait
         self.stop_all_timers()
-        #check if agent_loop is overriden by user
+        # check if agent_loop is overridden by user
         if self.__class__.agent_loop == AgentMET4FOF.agent_loop:
             return 0
         else:
