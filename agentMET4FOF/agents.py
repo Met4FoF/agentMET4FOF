@@ -92,7 +92,7 @@ class AgentMET4FOF(Agent):
 
         try:
             self.init_parameters()
-        except Exception as e:
+        except Exception:
             return 0
 
     def reset(self):
@@ -137,7 +137,7 @@ class AgentMET4FOF(Agent):
             if self.log_mode:
                 super().log_info(message)
 
-        except Exception as e:
+        except Exception:
                 return -1
 
     def init_agent_loop(self, loop_wait: Optional[int] = 1.0):
@@ -335,7 +335,7 @@ class AgentMET4FOF(Agent):
 
         # process the received data here
         start_time_pack = time.time()
-        proc_msg = self.on_received_message(message)
+        self.on_received_message(message)
         end_time_pack = time.time()
         self.log_info("Tproc: "+str(round(end_time_pack-start_time_pack,6)))
 
@@ -1440,8 +1440,8 @@ class _Logger(AgentMET4FOF):
         self.save_log_info(str(message))
 
     def save_log_info(self, log_msg):
-        re_sq = '\[(.*?)\]'
-        re_rd = '\((.*?)\)'
+        re_sq = r'\[(.*?)\]'
+        re_rd = r'\((.*?)\)'
 
         date = re.findall(re_sq,log_msg)[0]
         date = "[" + date + "]"
