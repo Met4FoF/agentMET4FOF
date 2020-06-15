@@ -350,7 +350,22 @@ def prepare_agt_net_callbacks(app):
                 #otherwise call custom plot function and load up custom plot parameters
                 else:
                     custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_parameters')
-                    data.append(custom_plot_function(memory_data[sender_agent],sender_agent,**custom_plot_parameters))
+                    data.append(custom_plot_function(memory_data[sender_agent], sender_agent, **custom_plot_parameters))
+                    # Handle iterable of traces.
+                    traces = custom_plot_function(
+                        memory_data[sender_agent],
+                        sender_agent,
+                        **custom_plot_parameters
+                    )
+                    if (
+                        isinstance(traces, tuple)
+                        or isinstance(traces, list)
+                        or isinstance(traces, set)
+                    ):
+                        for trace in traces:
+                            data.append(trace)
+                    else:
+                        data.append(traces)
             if len(data) > 5:
                 y_title_offset = 0.1
             else:
