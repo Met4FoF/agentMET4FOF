@@ -65,7 +65,7 @@ jobs:
            source agent_venv/bin/activate
            pip install --upgrade pip
            pip install -r requirements.txt
-           pip install pytest pytest-cov pytest-timeout
+           pip install -r dev-requirements.txt
 
       - save_cache:
           paths:
