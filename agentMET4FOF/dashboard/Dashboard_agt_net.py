@@ -207,11 +207,12 @@ def prepare_agt_net_callbacks(app):
             app.dashboard_ctrl.agentNetwork.set_stop_state()
         raise PreventUpdate
 
-    #Stop button click
-    @app.callback( dash.dependencies.Output('reset-button', 'children'),
-                  [dash.dependencies.Input('reset-button', 'n_clicks')
-                   ])
-    def stop_button_click(n_clicks):
+    # Handle click of the reset button.
+    @app.callback(
+        dash.dependencies.Output("reset-button", "children"),
+        [dash.dependencies.Input("reset-button", "n_clicks")],
+    )
+    def reset_button_click(n_clicks):
         if n_clicks is not None:
             app.dashboard_ctrl.agentNetwork.reset_agents()
         raise PreventUpdate
