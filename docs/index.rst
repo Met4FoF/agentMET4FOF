@@ -11,7 +11,8 @@ agentMET4FOF - Metrological Agent-based system
 *agentMET4FOF* is a Python library developed at the `Institute for
 Manufacturing of the University of Cambridge <https://www.ifm.eng.cam.ac.uk>`_
 (UK) as part of the European joint Research Project `EMPIR 17IND12 Met4FoF
-<https://met4fof.eu>`_.
+<https://met4fof.eu>`_. More on the topic of multi-agent systems you can find in
+[Bang2019]_.
 
 For the *agentMET4FOF* homepage go to
 `GitHub <https://github.com/bangxiangyong/agentMet4FoF/tree/master>`_.
