@@ -14,8 +14,8 @@
 # serve to show the default.
 
 import os
-import sys
 import shutil
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -41,6 +41,13 @@ extensions = [
     "nbsphinx",
     "recommonmark",
 ]
+
+# This should make SciPy and PyDynamic documentation available inside our docs.
+intersphinx_mapping = {
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": ("https://pydynamic.readthedocs.io/en/latest/", None),
+}
+
 
 nbsphinx_allow_errors = True
 
