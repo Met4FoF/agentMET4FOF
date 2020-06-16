@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.todo",
     "nbsphinx",
     "recommonmark",
+    "sphinx.ext.intersphinx",
 ]
 
 # This should make SciPy and PyDynamic documentation available inside our docs.
