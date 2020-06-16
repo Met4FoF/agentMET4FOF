@@ -13,3 +13,4 @@ plotly
 nbsphinx
 recommonmark
 sphinx_rtd_theme
+PyDynamic

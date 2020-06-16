@@ -39,6 +39,11 @@ For the *agentMET4FOF* homepage go to
    agentMET4FOF_agents
    agentMET4FOF_streams
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Extensions:
+
+   PyDynamic interp1d_unc.rst
 
 Indices and tables
 ==================
