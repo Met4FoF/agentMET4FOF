@@ -8,6 +8,7 @@ exclude_lines =
     if __name__ == .__main__.:
 ignore_errors = True
 omit =
-    venv/*
+    *venv/*
     tests/*
+    docs/*
     setup.py

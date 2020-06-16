@@ -1,9 +1,9 @@
 .idea
 .ipynb_checkpoints
 dataset
-archived
 pickles
 venv
 __pycache__
-ZeMA-machine-learning-tutorials-master
 *.csv
+results/
+*.pkl

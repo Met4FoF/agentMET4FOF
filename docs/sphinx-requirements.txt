@@ -10,5 +10,6 @@ dash
 dash_cytoscape
 networkx
 plotly
-torch
-torchvision
+nbsphinx
+recommonmark
+sphinx_rtd_theme

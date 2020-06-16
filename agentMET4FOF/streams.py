@@ -1,7 +1,6 @@
-from skmultiflow.data.base_stream import Stream
 import numpy as np
 
-class DataStreamMET4FOF(Stream):
+class DataStreamMET4FOF():
     """
     Class for creating finite datastream for ML with `x` as inputs and `y` as target
     Data can be fetched sequentially using `next_sample()` or all at once `all_samples()`

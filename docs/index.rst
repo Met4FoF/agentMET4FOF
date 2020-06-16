@@ -1,7 +1,14 @@
+.. agentMET4FOF's documentation master file, which we copied heavily from the
+   docs of https://github.com/cornellius-gp/gpytorch, because we liked so
+   much the way they presented their tutorials, examples and actual
+   documentation of the code side by side.
+
+:github_url: https://github.com/bangxiangyong/agentMET4FOF
+
 agentMET4FOF - Metrological Agent-based system
 ==============================================
 
-*agentMET4FOF* is a Python software package developed at the `Institute for
+*agentMET4FOF* is a Python library developed at the `Institute for
 Manufacturing of the University of Cambridge <https://www.ifm.eng.cam.ac.uk>`_
 (UK) as part of the European joint Research Project `EMPIR 17IND12 Met4FoF
 <https://met4fof.eu>`_.
@@ -11,14 +18,26 @@ For the *agentMET4FOF* homepage go to
 
 *agentMET4FOF* is written in Python 3.
 
-Contents:
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting started:
+
+   README
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorials:
 
-   index.rst
-   agentMET4FOF agents.rst
-   agentMET4FOF streams.rst
+   agentMET4FOF_tutorials/tutorial_1_generator_agent.ipynb
+   agentMET4FOF_tutorials/tutorial_2_math_agent.ipynb
+   agentMET4FOF_tutorials/tutorial_3_multi_channel.ipynb
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Code Reference:
+
+   agentMET4FOF_agents
+   agentMET4FOF_streams
 
 
 Indices and tables
