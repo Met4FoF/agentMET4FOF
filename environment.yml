@@ -1,24 +1,8 @@
 name: agentMET4FOF
 channels:
     - defaults
-    - conda-forge
 dependencies:
-    - python >= 3
-    - ipykernel
-    - numpy
-    - scikit-learn
-    - scikit-multiflow
-    - scipy
-    - matplotlib
-    - pandas
-    - seaborn
-    - dash
-    - networkx
-    - multiprocess
-    - h5py
-    - requests
+    - python=3.8
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
-        - osbrain
-        - dash-cytoscape
-        - plotly
+        - r requirements.txt
