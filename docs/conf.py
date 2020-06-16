@@ -14,13 +14,15 @@
 # serve to show the default.
 
 import os
-import sys
 import shutil
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
+from recommonmark.parser import CommonMarkParser
+
 sys.path.insert(0, os.path.abspath(".."))
 
 # -- General configuration ------------------------------------------------
@@ -39,7 +41,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "nbsphinx",
-    "recommonmark",
 ]
 
 nbsphinx_allow_errors = True
@@ -99,6 +100,21 @@ for path_dict in path_dicts:
                 source_filename = os.path.join(root, fil)
                 dest_filename = source_filename.replace(source_folder, dest_folder)
                 shutil.copyfile(source_filename, dest_filename)
+################################################################################
+# This is to avoid an error which recommonmark throws. This quick-fix was provided in
+# the according GitHub issue
+# https://github.com/readthedocs/recommonmark/issues/177#issuecomment-555553053
+
+
+class CustomCommonMarkParser(CommonMarkParser):
+    def visit_document(self, node):
+        pass
+
+
+def setup(app):
+    app.add_source_parser(CustomCommonMarkParser)
+
+
 ################################################################################
 
 # Add any paths that contain templates here, relative to this directory.
@@ -276,13 +292,13 @@ htmlhelp_basename = "agentMe4FoFdoc"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    # 'preamble': '',
     # Latex figure (float) alignment
-    #'figure_align': 'htbp',
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
