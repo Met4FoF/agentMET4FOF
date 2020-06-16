@@ -9,17 +9,17 @@ formats:
   - htmlzip
   - pdf
 
-conda:
-  environment: environment.yml
-
 # Docker image to use for build process
 build:
   image: latest
 
 # Python environment to build the docs for installing the package
 python:
-  version: 3
+  version: 3.8
   install:
+    - requirements: requirements.txt
+    - method: pip
+      path: .
     - method: setuptools
       path: .
 
