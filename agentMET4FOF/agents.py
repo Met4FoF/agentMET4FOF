@@ -22,10 +22,12 @@ from plotly import tools as tls
 from sklearn.model_selection import ParameterGrid
 import copy
 
+from .dashboard.Dashboard_agt_net import Dashboard_agt_net
+
 from .dashboard.Dashboard import AgentDashboard as AgentDashboard
 from .streams import DataStreamMET4FOF
 
-from .develop.ML_Experiment import save_experiment
+# from .develop.ML_Experiment import save_experiment
 
 
 class AgentMET4FOF(Agent):
@@ -731,7 +733,7 @@ class AgentNetwork:
     Interfaces with an internal _AgentController which is hidden from user
 
     """
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv", dashboard_modules=True, dashboard_update_interval=3, dashboard_max_monitors=10,  dashboard_port=8050):
+    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv", dashboard_modules=True, dashboard_extensions=[], dashboard_update_interval=3, dashboard_max_monitors=10,  dashboard_port=8050):
         """
         Parameters
         ----------
@@ -773,8 +775,11 @@ class AgentNetwork:
             if self.ns == 0:
                 self.start_server(ip_addr,port)
 
+        if isinstance(dashboard_extensions, list) == False:
+            dashboard_extensions = [dashboard_extensions]
+
         if dashboard_modules is not False:
-            self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
+            self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,[Dashboard_agt_net]+dashboard_extensions,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -1248,11 +1253,6 @@ class AgentPipeline:
                 if ret_hyperparams:
                     hyperparams[-1].append(agent.get_attr('hyperparams'))
 
-        # if ret_hyperparams:
-        #     return [agent_names,hyperparams]
-        # else:
-        #     return agent_names
-
         if ret_hyperparams:
             return {"agents":agent_names,"hyperparams":hyperparams}
         else:
@@ -1405,7 +1405,8 @@ class _Logger(AgentMET4FOF):
 
     def init_parameters(self,log_filename= "log_file.csv", save_logfile=True, ml_experiment=False):
         self.ml_experiment = ml_experiment
-        self.bind('SUB', 'sub', {"INFO":self.log_handler, "ML_EXP":self.log_handler_ML})
+        # self.bind('SUB', 'sub', {"INFO":self.log_handler, "ML_EXP":self.log_handler_ML})
+        self.bind('SUB', 'sub', {"INFO":self.log_handler})
         self.log_filename = log_filename
         self.save_logfile = save_logfile
         if self.save_logfile:
@@ -1420,19 +1421,19 @@ class _Logger(AgentMET4FOF):
                 raise Exception
         self.save_cycles= 0
 
-    def log_handler_ML(self, message, topic):
-        """
-        Handles the results coming from Evaluation agent to be saved into the provided ML experiment file.
-        This updates the results of individual "chains" to be aggregated later for comparisons of chains/pipelines
-        The mechanism relies on regularly saving the ml_experiment object into the pickled file in default ML_EXP folder.
-
-        """
-        if self.ml_experiment:
-            self.ml_experiment.update_chain_results(message)
-            save_experiment(self.ml_experiment)
-
-    def set_ml_experiment(self, ml_experiment=False):
-        self.ml_experiment = ml_experiment
+    # def log_handler_ML(self, message, topic):
+    #     """
+    #     Handles the results coming from Evaluation agent to be saved into the provided ML experiment file.
+    #     This updates the results of individual "chains" to be aggregated later for comparisons of chains/pipelines
+    #     The mechanism relies on regularly saving the ml_experiment object into the pickled file in default ML_EXP folder.
+    #
+    #     """
+    #     if self.ml_experiment:
+    #         self.ml_experiment.update_chain_results(message)
+    #         save_experiment(self.ml_experiment)
+    #
+    # def set_ml_experiment(self, ml_experiment=False):
+    #     self.ml_experiment = ml_experiment
 
     def log_handler(self, message, topic):
         sys.stdout.write(message+'\n')
