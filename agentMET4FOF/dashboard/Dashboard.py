@@ -3,9 +3,9 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 
-from agentMET4FOF.dashboard.Dashboard_ml_exp import get_ml_exp_layout, prepare_ml_exp_callbacks, get_experiments_list
-from agentMET4FOF.dashboard.Dashboard_agt_net import get_agt_net_layout, prepare_agt_net_callbacks
-from agentMET4FOF.dashboard.Dashboard_Control import _Dashboard_Control
+from .Dashboard_ml_exp import get_ml_exp_layout, prepare_ml_exp_callbacks, get_experiments_list
+from .Dashboard_agt_net import get_agt_net_layout, prepare_agt_net_callbacks
+from .Dashboard_Control import _Dashboard_Control
 
 
 class AgentDashboard:
