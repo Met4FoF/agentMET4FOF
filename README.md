@@ -65,7 +65,8 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
 
 ### Create a virtual environment on Mac and Linux
 
-To do this, issue the following commands on your Shell:
+In your terminal execute the following to set up a virtual environment
+in a folder of your choice and execute the first tutorial.
 
 ```shell
 $ cd /LOCAL/PATH/TO/ENVS
@@ -171,7 +172,7 @@ In your Windows command prompt execute the following to terminate all python pro
 >
 ```
 
-#### Killing all Python processes on Mac and Linux
+### Killing all Python processes on Mac and Linux
 
 In your terminal execute the following to terminate all python processes.
 
