@@ -2,11 +2,7 @@
 In this example, we extend the ML_Experiment to include two simultaneuous pipelines instead of one.
 Particularly, in the first pipeline, we have only the BNN model which implies direct mapping from
 the raw data to the evaluation agent, while the second pipeline has a StandardScaler before the
-GaussianProcess model.
-
-The example GP model reference derived from here:
-https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpc_iris.html
-
+BNN model.
 
 """
 
@@ -29,8 +25,7 @@ from sklearn.model_selection import ParameterGrid
 from pprint import pprint
 import copy
 
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
+from agentMET4FOF.ml_uncertainty.bnn import BNN_Model
 from agentMET4FOF.ml_uncertainty.evaluate_pred_unc import *
 
 def main():
@@ -38,17 +33,14 @@ def main():
 
     ml_exp_name = "multiple"
 
-    kernel_iso = 1.0 * RBF([1.0])
-    kernel_ani = 1.0 * RBF([1.0]*4)
-
     ML_Agent_pipelines_A = AgentPipeline(agentNetwork,
-                                             [GaussianProcessClassifier], hyperparameters=[
-                                                                           [{"kernel":[kernel_iso]}]
+                                             [BNN_Model], hyperparameters=[
+                                                                           [{"num_epochs":[500],"task":["classification"],"architecture":[["d1","d1"],["d1","d1","d1"],["d1","d1","d1","d1"]]}]
                                                                            ])
     ML_Agent_pipelines_B = AgentPipeline(agentNetwork,
                                              [StandardScaler],
-                                             [GaussianProcessClassifier], hyperparameters=[[],
-                                                                           [{"kernel":[kernel_ani]}]
+                                             [BNN_Model], hyperparameters=[[],
+                                                                           [{"num_epochs":[500],"task":["classification"],"architecture":[["d1","d1"],["d1","d1","d1"],["d1","d1","d1","d1"]]}]
                                                                            ])
 
 
@@ -57,7 +49,7 @@ def main():
     evaluation_agent = agentNetwork.add_agent(agentType=EvaluationAgent)
 
     datastream_agent.init_parameters(data_name="iris", x=datasets.load_iris().data,y=datasets.load_iris().target)
-    evaluation_agent.init_parameters([f1_score],[{"average":'micro'}], ML_exp=True)
+    evaluation_agent.init_parameters([f1_score,p_acc_unc,avg_unc],[{"average":'micro'},{},{}], ML_exp=True)
 
     #setup ml experiment
     ml_experiment = ML_Experiment(datasets=[datastream_agent], pipelines=[ML_Agent_pipelines_A, ML_Agent_pipelines_B], evaluation=[evaluation_agent], name=ml_exp_name, train_mode="Kfold5")
