@@ -15,16 +15,13 @@ https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpc_iris.htm
 
 from agentMET4FOF.agents import AgentNetwork, MonitorAgent
 
-from agentMET4FOF_ml_extension.datastream import *
-from agentMET4FOF_ml_extension.evaluator import *
-from agentMET4FOF_ml_extension.ML_Experiment import *
-from agentMET4FOF_ml_extension.agents import AgentPipeline
+from agentMET4FOF_ml_extension.ML_Experiment import ML_Experiment
+from agentMET4FOF_ml_extension.agents import AgentPipeline, ML_DataStreamAgent, ML_EvaluatorAgent
 from agentMET4FOF_ml_extension.Dashboard_ml_exp import Dashboard_ML_Experiment
 
 from sklearn import datasets
 from sklearn.metrics import f1_score
 from sklearn.preprocessing import StandardScaler
-
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
 

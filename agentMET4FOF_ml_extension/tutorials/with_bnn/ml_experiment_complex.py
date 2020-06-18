@@ -7,22 +7,18 @@ hyperparameter range are made too large.
 
 
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF_ml_extension.datastream import *
-from agentMET4FOF_ml_extension.evaluator import *
-from agentMET4FOF_ml_extension.ML_Experiment import *
-from agentMET4FOF_ml_extension.agents import AgentPipeline
+
+from agentMET4FOF_ml_extension.ML_Experiment import ML_Experiment
+from agentMET4FOF_ml_extension.agents import AgentPipeline, ML_DataStreamAgent, ML_EvaluatorAgent
 from agentMET4FOF_ml_extension.Dashboard_ml_exp import Dashboard_ML_Experiment
-
-
+from agentMET4FOF_ml_extension.ml_uncertainty.bnn import BNN_Model
+from agentMET4FOF_ml_extension.ml_uncertainty.evaluate_pred_unc import *
 
 from sklearn import datasets
 from sklearn.metrics import f1_score
-
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler,PowerTransformer
 
-from agentMET4FOF_ml_extension.ml_uncertainty.bnn import BNN_Model
-from agentMET4FOF_ml_extension.ml_uncertainty.evaluate_pred_unc import *
 
 def main():
     agentNetwork = AgentNetwork(dashboard_extensions=Dashboard_ML_Experiment)

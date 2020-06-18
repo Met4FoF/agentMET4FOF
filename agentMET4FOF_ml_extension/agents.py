@@ -1,8 +1,9 @@
 from agentMET4FOF.agents import AgentMET4FOF
+import pandas as pd
 from sklearn.model_selection import ParameterGrid
 import copy
 
-class TransformerAgent(AgentMET4FOF):
+class ML_TransformerAgent(AgentMET4FOF):
     def init_parameters(self,method=None, **kwargs):
         if ("function" in type(method).__name__) or ("method" in type(method).__name__):
             self.method = method
@@ -69,6 +70,85 @@ class TransformerAgent(AgentMET4FOF):
             chain = message['from']
         return chain
 
+class ML_DataStreamAgent(AgentMET4FOF):
+    def init_parameters(self, data_name="unnamed_data", train_mode={"Prequential","Kfold5","Kfold10"}, x=None, y=None):
+        #if data_name is provided, will assign to pre-made datasets,
+        #otherwise for custom dataset, three parameters : data_name, x and y will need to be assigned
+        self.data_name = data_name
+        self.x = x
+        self.y = y
+        if type(train_mode) == set:
+            self.train_mode = "Kfold5"
+
+    def agent_loop(self):
+        if self.current_state == "Running":
+            if self.train_mode == "Kfold5":
+                self.kf = KFold(n_splits=5,shuffle=True)
+                for train_index, test_index in self.kf.split(self.x):
+                    x_train, x_test = self.x[train_index], self.x[test_index]
+                    y_train, y_test = self.y[train_index], self.y[test_index]
+                    self.send_output({'x':x_train,'y':y_train},channel="train")
+                    self.send_output({'x':x_test,'y':y_test},channel="test")
+            self.current_state = "Stop"
+
+
+class ML_EvaluatorAgent(AgentMET4FOF):
+    def init_parameters(self, methods=None, eval_params=[], ML_exp=True, **kwargs):
+        if type(methods) is not list:
+            methods = [methods]
+        self.methods = methods
+        self.eval_params = eval_params
+        self.kwargs = kwargs
+        self.ML_exp = ML_exp
+
+    def on_received_message(self, message):
+        #only evaluate if it is not train channel
+        if message['channel'] != 'train':
+            results = {}
+            check_y_unc = False
+            if "y_unc" in message['data'].keys():
+                check_y_unc = True
+
+            for method_id, method in enumerate(self.methods):
+                if len(self.eval_params) !=0:
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], message['data']['y_unc'], **self.eval_params[method_id])}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.eval_params[method_id])}
+                elif len(self.methods) == 1 and len(self.eval_params) == 0:
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], message['data']['y_unc'], **self.kwargs)}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'], **self.kwargs)}
+                else:
+                    if "y_unc" in method.__code__.co_varnames and check_y_unc:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'],message['data']['y_unc'])}
+                    else:
+                        new_res={str(method.__name__):method(message['data']['y_true'], message['data']['y_pred'])}
+                results.update(new_res)
+            if type(message['data']) == dict and 'chain' in message['data'].keys():
+                agent_chain = message['data']['chain']
+                for key in results.keys():
+                    self.send_output({agent_chain+"-"+key: results[key]})
+
+            else:
+                self.send_output(results)
+
+            if self.ML_exp:
+                self.log_info("WALAO")
+                if check_y_unc:
+                    log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred'],'y_unc':message['data']['y_unc']})}
+                else:
+                    log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})}
+                log_results.update(results)
+                self.log_info(str(results))
+                self.log_ML(log_results)
+
+
+
+
+
+
 class AgentPipeline:
     def __init__(self, agentNetwork=None,*argv, hyperparameters=None):
 
@@ -80,13 +160,13 @@ class AgentPipeline:
 
     def make_transform_agent(self,agentNetwork, pipeline_component=None, hyperparameters={}):
         if ("function" in type(pipeline_component).__name__) or ("method" in type(pipeline_component).__name__):
-            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__ +"_Agent", agentType=ML_TransformerAgent)
             transform_agent.init_parameters(pipeline_component,**hyperparameters)
         elif issubclass(type(pipeline_component), AgentMET4FOF):
             transform_agent = pipeline_component
             transform_agent.init_parameters(**hyperparameters)
         else: #class objects with fit and transform
-            transform_agent = agentNetwork.add_agent(pipeline_component.__name__+"_Agent",agentType=TransformerAgent)
+            transform_agent = agentNetwork.add_agent(pipeline_component.__name__ +"_Agent", agentType=ML_TransformerAgent)
             transform_agent.init_parameters(pipeline_component,**hyperparameters)
         return transform_agent
 
