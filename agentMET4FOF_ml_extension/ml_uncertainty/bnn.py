@@ -3,7 +3,7 @@ import torch
 from scipy import stats
 from torch.autograd import Variable
 
-from agentMET4FOF.ml_uncertainty.bnn_utils import parse_architecture_string
+from agentMET4FOF_ml_extension.ml_uncertainty.bnn_utils import parse_architecture_string
 
 
 class BNN_Dropout(torch.nn.Module):

@@ -101,8 +101,6 @@ class AgentDashboard:
                     dashboard_layout.dcc_tab for dashboard_layout in self.dashboard_layouts
                 ]),
                 html.Div(id="page-div",children=[
-                # get_agt_net_layout(update_interval_seconds,app.num_monitors),
-                # get_ml_exp_layout(),
                 dashboard_layout.get_layout() for dashboard_layout in self.dashboard_layouts
                 ]),
         ])

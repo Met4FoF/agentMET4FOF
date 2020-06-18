@@ -2,7 +2,6 @@ import os
 import datetime
 import pickle
 
-
 def get_pipeline_details(pipelines):
     pipeline_details = [pipeline.agents(ret_hyperparams=True) for pipeline in pipelines]
     return pipeline_details
@@ -13,20 +12,24 @@ def save_experiment(ml_experiment):
     pickle.dump(ml_experiment, file)
     file.close()
 
-def load_experiment(ml_experiment_name="run_1",base_directory=""):
-    experiment_folder = "ML_EXP"
-    try:
-        file_path = experiment_folder+"/"+ml_experiment_name+"/"+ml_experiment_name+".pkl"
-        file = open(file_path, 'rb')
-        # dump information to that file
-        data = pickle.load(file)
-        file.close()
-        return data
-    except Exception as e:
-        print("Error in loading experiment: "+ str(e))
+def load_experiment(ml_experiment_name="run_1",experiment_folder="ML_EXP"):
+    file_path = experiment_folder+"/"+ml_experiment_name+"/"+ml_experiment_name+".pkl"
+    if os.path.exists(file_path):
+        try:
+            file = open(file_path, 'rb')
+            # dump information to that file
+            data = pickle.load(file)
+            file.close()
+            return data
+        except Exception as e:
+            print("Error in loading experiment: "+ str(e))
+            return -1
+    else:
+        return -1
+
 
 class ML_Experiment:
-    def __init__(self, datasets=[], pipelines=[], evaluation=[], name="run", train_mode={"Prequential","Kfold5","Kfold10"}):
+    def __init__(self, agentNetwork, datasets=[], pipelines=[], evaluation=[], name="run", train_mode={"Prequential","Kfold5","Kfold10"}):
 
         experiment_folder = "ML_EXP"
         if type(pipelines) is not list:
@@ -70,7 +73,8 @@ class ML_Experiment:
             for pipeline in pipelines:
                 for evaluation_agent in evaluation:
                     pipeline.bind_output(evaluation_agent)
-                    datastream_agent.bind_output(pipeline)
+
+                    datastream_agent.bind_output([agent_proxy for agent_proxy in pipeline.pipeline[0]])
 
         #handle training mode
         if type(train_mode) == set:
@@ -78,7 +82,31 @@ class ML_Experiment:
         else:
             self.train_mode = train_mode
 
+        #connect agent network
+        if agentNetwork is not None:
+            self.setup_ml_logger(agentNetwork,self)
+
     def update_chain_results(self,res):
         self.chain_results.append(res)
 
 
+    def setup_ml_logger(self, agentNetwork, ml_experiment):
+        def set_ml_experiment(self, ml_experiment=False):
+            self.ml_experiment = ml_experiment
+
+        def log_handler_ML(self, message, topic):
+            """
+            Handles the results coming from Evaluation agent to be saved into the provided ML experiment file.
+            This updates the results of individual "chains" to be aggregated later for comparisons of chains/pipelines
+            The mechanism relies on regularly saving the ml_experiment object into the pickled file in default ML_EXP folder.
+
+            """
+            if self.ml_experiment:
+                self.ml_experiment.update_chain_results(message)
+                save_experiment(self.ml_experiment)
+
+        #update logger agent
+        logger_agent = agentNetwork._get_logger()
+        logger_agent.set_method(set_ml_experiment=set_ml_experiment)
+        logger_agent.set_ml_experiment(ml_experiment)
+        logger_agent.bind_log_handler({"ML_EXP":log_handler_ML})

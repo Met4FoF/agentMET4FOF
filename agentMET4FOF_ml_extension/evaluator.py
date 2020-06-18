@@ -1,8 +1,8 @@
-from ..agents import AgentMET4FOF
+from agentMET4FOF.agents import AgentMET4FOF
 import pandas as pd
 
-class EvaluationAgent(AgentMET4FOF):
-    def init_parameters(self, methods=None, eval_params=[], ML_exp=False, **kwargs):
+class ML_EvaluatorAgent(AgentMET4FOF):
+    def init_parameters(self, methods=None, eval_params=[], ML_exp=True, **kwargs):
         if type(methods) is not list:
             methods = [methods]
         self.methods = methods
@@ -44,11 +44,13 @@ class EvaluationAgent(AgentMET4FOF):
                 self.send_output(results)
 
             if self.ML_exp:
+                self.log_info("WALAO")
                 if check_y_unc:
                     log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred'],'y_unc':message['data']['y_unc']})}
                 else:
                     log_results = {"chain":agent_chain, "raw": pd.DataFrame.from_dict({'y_true': message['data']['y_true'],'y_pred':message['data']['y_pred']})}
                 log_results.update(results)
+                self.log_info(str(results))
                 self.log_ML(log_results)
 
 

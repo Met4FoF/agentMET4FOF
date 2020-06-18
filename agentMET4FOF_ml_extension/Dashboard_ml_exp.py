@@ -43,9 +43,9 @@ class Dashboard_ML_Experiment(Dashboard_Layout_Base):
             experiment_list = {}
         return experiment_list
 
-    def get_layout(self,experiments_df={}):
+    def get_layout(self):
         #update with the latest experiments list
-        self.get_experiments_list()
+        experiments_df=self.get_experiments_list()
 
         #body
         return html.Div(className="row",children=[
@@ -165,14 +165,15 @@ class Dashboard_ML_Experiment(Dashboard_Layout_Base):
             if derived_virtual_selected_rows is None:
                 derived_virtual_selected_rows = []
                 raise PreventUpdate
-
             ml_experiments = []
             pipeline_details = []
             chain_results =[]
 
             #collect all selected experiments
             for selected_experiment in derived_virtual_selected_rows:
-                ml_experiments.append(load_experiment(ml_experiment_name=rows[selected_experiment]['Name']))
+                loaded_experiment = load_experiment(ml_experiment_name=rows[selected_experiment]['Name'])
+                if loaded_experiment != -1:
+                    ml_experiments.append(loaded_experiment)
 
             #extract pipeline details from every experiment
             if len(ml_experiments) != 0:

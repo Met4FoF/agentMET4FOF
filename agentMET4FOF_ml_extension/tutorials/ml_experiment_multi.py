@@ -11,30 +11,24 @@ https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpc_iris.htm
 """
 
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, AgentPipeline
-from agentMET4FOF.develop.datastream import *
-from agentMET4FOF.develop.evaluator import *
-from agentMET4FOF.develop.ML_Experiment import *
+from agentMET4FOF.agents import AgentNetwork, MonitorAgent
+from agentMET4FOF_ml_extension.Dashboard_ml_exp import Dashboard_ML_Experiment
+from agentMET4FOF_ml_extension.datastream import *
+from agentMET4FOF_ml_extension.evaluator import *
+from agentMET4FOF_ml_extension.ML_Experiment import *
+from agentMET4FOF_ml_extension.agents import AgentPipeline
 
-from sklearn.model_selection import KFold
 from sklearn import datasets
 from sklearn.metrics import f1_score
 
-from sklearn.neighbors import KNeighborsClassifier as KNN
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler,PowerTransformer
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import ParameterGrid
-from pprint import pprint
-import copy
 
+from sklearn.preprocessing import StandardScaler
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
-from agentMET4FOF.ml_uncertainty.evaluate_pred_unc import *
 
 def main():
-    agentNetwork = AgentNetwork()
+    #initialise with dashboard ml experiments
+    agentNetwork = AgentNetwork(dashboard_extensions=Dashboard_ML_Experiment)
 
     ml_exp_name = "multiple"
 
@@ -53,15 +47,14 @@ def main():
 
 
     #init
-    datastream_agent = agentNetwork.add_agent(agentType=DataStreamAgent)
-    evaluation_agent = agentNetwork.add_agent(agentType=EvaluationAgent)
+    datastream_agent = agentNetwork.add_agent(agentType=ML_DataStreamAgent)
+    evaluation_agent = agentNetwork.add_agent(agentType=ML_EvaluatorAgent)
 
     datastream_agent.init_parameters(data_name="iris", x=datasets.load_iris().data,y=datasets.load_iris().target)
     evaluation_agent.init_parameters([f1_score],[{"average":'micro'}], ML_exp=True)
 
     #setup ml experiment
     ml_experiment = ML_Experiment(datasets=[datastream_agent], pipelines=[ML_Agent_pipelines_A, ML_Agent_pipelines_B], evaluation=[evaluation_agent], name=ml_exp_name, train_mode="Kfold5")
-    agentNetwork.get_agent("Logger").set_ml_experiment(ml_experiment)
 
     #optional: connect evaluation agent to monitor agent
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)

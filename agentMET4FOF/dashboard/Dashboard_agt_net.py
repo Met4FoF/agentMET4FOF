@@ -257,7 +257,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 agentTypes = app.dashboard_ctrl.get_agentTypes()
                 datasets = app.dashboard_ctrl.get_datasets()
                 chosen_dataset = datasets[add_dropdown_val]()
-                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=type(chosen_dataset).__name__,agentType=agentmet4fof_module.DataStreamAgent)
+                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=type(chosen_dataset).__name__, agentType=agentmet4fof_module.ML_DataStreamAgent)
 
                 new_agent.init_parameters(stream=chosen_dataset)
             raise PreventUpdate
