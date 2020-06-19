@@ -22,7 +22,7 @@ from plotly import tools as tls
 from sklearn.model_selection import ParameterGrid
 import copy
 
-from .dashboard.Dashboard import AgentDashboard
+
 from .streams import DataStreamMET4FOF
 
 from .develop.ML_Experiment import save_experiment
@@ -774,6 +774,7 @@ class AgentNetwork:
                 self.start_server(ip_addr,port)
 
         if dashboard_modules is not False:
+            from .dashboard.Dashboard import AgentDashboard
             self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
             self.dashboard_proc.start()
         else:
