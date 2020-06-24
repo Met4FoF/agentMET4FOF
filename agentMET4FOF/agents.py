@@ -1469,3 +1469,12 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles+=1
             except:
                 raise Exception
+
+class JitterAgent(AgentMET4FOF):
+    def on_received_message(self, message):
+        raise NotImplementedError
+
+class NoiseAgent(AgentMET4FOF):
+    def on_received_message(self, message):
+        raise NotImplementedError
+    
