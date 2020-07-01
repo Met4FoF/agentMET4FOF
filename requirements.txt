@@ -12,3 +12,4 @@ networkx
 plotly
 torch
 torchvision
+time-series-buffer
