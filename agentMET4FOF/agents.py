@@ -20,7 +20,6 @@ import copy
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .dashboard.Dashboard import AgentDashboard as AgentDashboard
-from .streams import DataStreamMET4FOF
 
 class AgentMET4FOF(Agent):
     """
@@ -769,11 +768,11 @@ class AgentNetwork:
             dashboard_extensions = [dashboard_extensions]
 
         if dashboard_modules is not False:
+            from .dashboard.Dashboard import AgentDashboard
             self.dashboard_proc = Process(target=AgentDashboard, args=(dashboard_modules,[Dashboard_agt_net]+dashboard_extensions,dashboard_update_interval,dashboard_max_monitors, ip_addr,dashboard_port,self))
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
-
 
     def connect(self,ip_addr="127.0.0.1", port = 3333,verbose=True):
         """
