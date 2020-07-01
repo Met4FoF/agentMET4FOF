@@ -16,10 +16,10 @@ from osbrain import NSProxy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
-import copy
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
-from .dashboard.Dashboard import AgentDashboard as AgentDashboard
+from .streams import DataStreamMET4FOF
+
 
 class AgentMET4FOF(Agent):
     """
