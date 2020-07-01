@@ -1225,11 +1225,6 @@ class _Logger(AgentMET4FOF):
         self.current_log_handlers.update(log_handler_functions)
         self.subscribe('sub', self.current_log_handlers)
 
-    def log_handler_ML_EXP(self, message, topic):
-        sys.stdout.write("YOLO ML EXP"+'\n')
-        sys.stdout.flush()
-        self.save_log_info(str(message))
-
     def log_handler(self, message, topic):
         sys.stdout.write(message+'\n')
         sys.stdout.flush()
