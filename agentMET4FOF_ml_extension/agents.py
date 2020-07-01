@@ -1,6 +1,6 @@
 from agentMET4FOF.agents import AgentMET4FOF
 import pandas as pd
-from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import ParameterGrid, KFold
 import copy
 
 class ML_TransformerAgent(AgentMET4FOF):
