@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
+import socket
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
 
-from .Dashboard_ml_exp import get_ml_exp_layout, prepare_ml_exp_callbacks, get_experiments_list
-from .Dashboard_agt_net import get_agt_net_layout, prepare_agt_net_callbacks
 from .Dashboard_Control import _Dashboard_Control
 
 
@@ -14,7 +13,7 @@ class AgentDashboard:
     Optional to run the dashboard on a separate IP by providing the right parameters. See example for an implementation of a separate run of dashboard to connect to an existing agent network. If there is no existing agent network, error will show up.
     An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
     """
-    def __init__(self, dashboard_modules=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,agent_port=None):
+    def __init__(self, dashboard_modules=[], dashboard_layouts=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,agent_port=None):
         """
         Parameters
         ----------
@@ -52,7 +51,7 @@ class AgentDashboard:
                 #initialise the dashboard layout and its control here
                 self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
                 self.external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
-                self.app = self.init_app_layout(update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors)
+                self.app = self.init_app_layout(update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts)
                 self.app.dashboard_ctrl = _Dashboard_Control(modules=dashboard_modules,agent_ip_addr=agent_ip_addr,agent_port=agent_port,agentNetwork=agentNetwork)
                 self.app.run_server(debug=False,host=ip_addr, port=8050)
 
@@ -61,7 +60,7 @@ class AgentDashboard:
 
 
 
-    def init_app_layout(self,update_interval_seconds=3, max_monitors=10):
+    def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
         """
         Initialises the overall dash app "layout" which has two sub-pages (Agent network and ML experiment)
 
@@ -84,6 +83,10 @@ class AgentDashboard:
                         )
         app.update_interval_seconds = update_interval_seconds
         app.num_monitors = max_monitors
+
+        #initialise dashboard layout objects
+        self.dashboard_layouts = [dashboard_layout(app) for dashboard_layout in dashboard_layouts]
+
         app.layout = html.Div(children=[
                 #header
                 html.Nav([
@@ -94,31 +97,24 @@ class AgentDashboard:
                     ], className="nav-wrapper container")
                 ], className="light-blue lighten-1"),
                 dcc.Tabs(id="main-tabs", value="agt-net", children=[
-                    dcc.Tab(id="agt-net-tab", value="agt-net",label='Agent Network', children=[
-                    ]),
-                    dcc.Tab(id="ml-exp-tab",value="ml-exp", label='ML Experiments',  children=[
-                    ]),
+                    dashboard_layout.dcc_tab for dashboard_layout in self.dashboard_layouts
                 ]),
                 html.Div(id="page-div",children=[
-                get_agt_net_layout(update_interval_seconds,app.num_monitors),
-                get_ml_exp_layout(),
+                dashboard_layout.get_layout() for dashboard_layout in self.dashboard_layouts
                 ]),
         ])
-        prepare_agt_net_callbacks(app)
-        prepare_ml_exp_callbacks(app)
+
+        for dashboard_layout in self.dashboard_layouts:
+            dashboard_layout.prepare_callbacks(app)
 
         @app.callback([dash.dependencies.Output('page-div', 'children')],
                       [dash.dependencies.Input('main-tabs', 'value')])
         def render_content(tab):
-            if tab == 'ml-exp':
-                experiments_df = get_experiments_list()
-                return [get_ml_exp_layout(experiments_df)]
-            else:
-                return [get_agt_net_layout(app.update_interval_seconds,app.num_monitors)]
-
+            for dashboard_layout in self.dashboard_layouts:
+                if dashboard_layout.id == tab:
+                    return [dashboard_layout.get_layout()]
         return app
 
     def is_port_in_use(self,ip_addr,_port):
-        import socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex((ip_addr, _port)) == 0
