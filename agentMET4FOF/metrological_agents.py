@@ -46,9 +46,6 @@ class MetrologicalAgent(Agent):
                     data = buffer.pop(n_samples=buffer_len)
                     self.send_output({self.name: data}, channel=channel)
 
-    # def bind_output(self, output_agent):
-    #     parent().bind_output()
-
 
 class MetrologicalPlotAgent(MetrologicalAgent):
     pass
