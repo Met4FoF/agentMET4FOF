@@ -4,7 +4,6 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 
-# from agentMET4FOF_ml_extension import Dashboard_ml_exp
 from .Dashboard_Control import _Dashboard_Control
 
 
@@ -107,8 +106,6 @@ class AgentDashboard:
 
         for dashboard_layout in self.dashboard_layouts:
             dashboard_layout.prepare_callbacks(app)
-        # prepare_agt_net_callbacks(app)
-        # prepare_ml_exp_callbacks(app)
 
         @app.callback([dash.dependencies.Output('page-div', 'children')],
                       [dash.dependencies.Input('main-tabs', 'value')])
@@ -116,13 +113,6 @@ class AgentDashboard:
             for dashboard_layout in self.dashboard_layouts:
                 if dashboard_layout.id == tab:
                     return [dashboard_layout.get_layout()]
-
-            # if tab == 'ml-exp':
-            #     experiments_df = get_experiments_list()
-            #     return [get_ml_exp_layout(experiments_df)]
-            # else:
-            #     return [get_agt_net_layout(app.update_interval_seconds,app.num_monitors)]
-
         return app
 
     def is_port_in_use(self,ip_addr,_port):
