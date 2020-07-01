@@ -2,7 +2,7 @@ from agentMET4FOF.agents import AgentMET4FOF as Agent
 from time_series_buffer import TimeSeriesBuffer
 
 
-class MetroAgent(Agent):
+class MetrologicalAgent(Agent):
     def init_parameters(self):
 
         # TODO: for every connected agent, init the below objects
@@ -50,7 +50,7 @@ class MetroAgent(Agent):
     #     parent().bind_output()
 
 
-class MetroPlotAgent(MetroAgent):
+class MetrologicalPlotAgent(MetrologicalAgent):
     pass
 
     def custom_plot_function(self):
