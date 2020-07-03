@@ -67,6 +67,7 @@ setup(
         "networkx",
         "plotly",
     ],
+    extras_require={"examples": ["scikit-multiflow"]},
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -81,5 +82,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    cmdclass={"verify": VerifyVersionCommand,},
+    cmdclass={"verify": VerifyVersionCommand},
 )
