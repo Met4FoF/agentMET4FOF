@@ -67,7 +67,6 @@ setup(
         "networkx",
         "plotly",
     ],
-    extras_require={"examples": ["scikit-multiflow"]},
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
