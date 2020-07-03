@@ -1,18 +1,18 @@
 import plotly.graph_objs as go
-from agentMET4FOF.agents import AgentMET4FOF as Agent
+from agentMET4FOF.agents import AgentMET4FOF
 from time_series_buffer import TimeSeriesBuffer
 
 
-class MetrologicalAgent(Agent):
-    def init_parameters(self, input_data_maxlen=100):
+class MetrologicalAgent(AgentMET4FOF):
+    def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
 
-        # TODO: for every connected agent, init the below objects
         # dict of {<from> : {"buffer" : TimeSeriesBuffer(maxlen=buffer_size), "metadata" : MetaData(**kwargs).metadata}}
         self.input_data = {}
         self.input_data_maxlen = input_data_maxlen
 
         # dict of {<channel> : {"buffer" : TimeSeriesBuffer(maxlen=buffer_size), "metadata" : MetaData(**kwargs)}
         self.output_data = {}
+        self.output_data_maxlen = output_data_maxlen
 
     def on_received_message(self, message):
         channel = message["channel"]
@@ -20,59 +20,86 @@ class MetrologicalAgent(Agent):
 
         if channel == "default":
             data = message["data"]
-            self.append_to_input_buffer(sender, data)
+            metadata = None
+            if "metadata" in message.keys():
+                metadata = message["metadata"]
 
-        elif channel == "metadata":
-            metadata = message["data"]
-            self.set_metadata(sender, metadata)
+            self._set_input_data(sender, data, metadata)
 
-    def append_to_input_buffer(self, sender, data):
+    def _set_input_data(self, sender, data=None, metadata=None):
         # create storage for new senders
-        if not sender in self.input_data.keys():
-            self.input_data[sender] = {}
-            self.input_data[sender]["buffer"] = TimeSeriesBuffer(
-                maxlen=self.input_data_maxlen
-            )
+        if sender not in self.input_data.keys():
+            self.input_data[sender] = {
+                "metadata": metadata,
+                "buffer": TimeSeriesBuffer(maxlen=self.input_data_maxlen),
+            }
 
-        # append received data
-        self.input_data[sender]["buffer"].append(data=data)
+        if not metadata is None:
+            # update received metadata
+            self.input_data[sender]["metadata"] = metadata
 
-    def set_metadata(self, sender, metadata):
+        if not data is None:
+            # append received data
+            self.input_data[sender]["buffer"].add(data=data)
+
+    def set_output_data(self, channel, data=None, metadata=None):
         # create storage for new senders
-        if not sender in self.input_data.keys():
-            self.input_data[sender] = {}
+        if channel not in self.output_data.keys():
+            self.output_data[channel] = {
+                "metadata": metadata,
+                "buffer": TimeSeriesBuffer(maxlen=self.output_data_maxlen),
+            }
 
-        # update received metadata
-        self.input_data[sender]["metadata"] = metadata
+        if not metadata is None:
+            # update received metadata
+            self.output_data[channel]["metadata"] = metadata
+
+        if not data is None:
+            # append received data
+            self.output_data[channel]["buffer"].add(data=data)
 
     def agent_loop(self):
         if self.current_state == "Running":
 
             for channel, channel_dict in self.output_data.items():
-
-                # send metadata
+                # short names
                 metadata = channel_dict["metadata"]
-                self.send_output({self.name: metadata}, channel="metadata")
-
-                # send data
                 buffer = channel_dict["buffer"]
+
+                # if there is something in the buffer, send it all
                 buffer_len = len(buffer)
-                if buffer_len:
+                if buffer_len > 0:
                     data = buffer.pop(n_samples=buffer_len)
-                    self.send_output({self.name: data}, channel=channel)
+
+                    # send data+metadata
+                    self.send_output([data, metadata], channel=channel)
+
+    def pack_data(self, data, channel):
+
+        # include metadata in the packed data
+        packed_data = {
+            "from": self.name,
+            "data": data[0],
+            "metadata": data[1],
+            "senderType": type(self).__name__,
+            "channel": channel,
+        }
+
+        return packed_data
 
 
 class MetrologicalMonitorAgent(MetrologicalAgent):
     def init_parameters(self, *args, **kwargs):
         super().init_parameters(*args, **kwargs)
 
-        # create aliases and dummies to match dashboard expectations
+        # create alias/dummies to match dashboard expectations
         self.memory = self.input_data
         self.plot_filter = []
         self.plots = {}
         self.custom_plot_parameters = {}
 
-    def custom_plot_function(self, data, sender_agent):
+    def custom_plot_function(self, data, sender_agent, **kwargs):
+        # TODO: cannot set the label of the xaxis within this method
 
         # data display
         if "buffer" in data.keys():
@@ -94,14 +121,13 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 trace = go.Scatter(
                     x=t,
                     y=v,
-                    error_x=ut,
-                    error_y=uv,
+                    error_x=dict(type="data", array=ut, visible=True),
+                    error_y=dict(type="data", array=uv, visible=True),
                     mode="lines",
-                    name=sender_agent,
-                    xaxis_title=x_label,
-                    yaxis_title=y_label,
+                    name=f"{y_label} ({sender_agent})"
                 )
-
+            else:
+                trace = go.Scatter()
         else:
             trace = go.Scatter()
 
