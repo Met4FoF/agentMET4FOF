@@ -58,7 +58,6 @@ setup(
     },
     install_requires=[
         "numpy",
-        "scikit-learn",
         "matplotlib",
         "pandas",
         "osbrain",
@@ -81,5 +80,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    cmdclass={"verify": VerifyVersionCommand,},
+    cmdclass={"verify": VerifyVersionCommand},
 )

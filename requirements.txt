@@ -1,7 +1,5 @@
 ipykernel
 numpy
-scikit-learn
-scikit-multiflow
 scipy
 matplotlib
 pandas
@@ -10,6 +8,4 @@ dash
 dash_cytoscape
 networkx
 plotly
-torch
-torchvision
 time-series-buffer
