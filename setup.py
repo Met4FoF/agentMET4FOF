@@ -58,7 +58,6 @@ setup(
     },
     install_requires=[
         "numpy",
-        "scikit-learn",
         "matplotlib",
         "pandas",
         "osbrain",

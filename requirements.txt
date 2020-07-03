@@ -1,6 +1,5 @@
 ipykernel
 numpy
-scikit-learn
 scipy
 matplotlib
 pandas
