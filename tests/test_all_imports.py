@@ -3,7 +3,6 @@ from agentMET4FOF.dashboard import (
     Dashboard,
     Dashboard_agt_net,
     Dashboard_Control,
-    Dashboard_ml_exp,
 )
 from agentMET4FOF_tutorials import (
     tutorial_1_generator_agent,
