@@ -1041,14 +1041,19 @@ class AgentNetwork:
         return agent
 
     def shutdown(self):
-        """
-        Shutdowns the entire agent network and all agents
-        """
+        """Shuts down the entire agent network and all agents"""
 
+        # Shutdown the nameserver.
+        # This leaves some process clutter in the process list, but the actual
+        # processes are ended.
         self._get_controller().get_attr('ns').shutdown()
 
+        # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
+            # First shutdown the child process.
             self.dashboard_proc.terminate()
+            # Then clean up the dangling process list entry.
+            self.dashboard_proc.join()
         return 0
 
 
