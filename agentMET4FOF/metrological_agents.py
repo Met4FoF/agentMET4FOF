@@ -1,18 +1,35 @@
+from typing import Dict, Union
+
 import plotly.graph_objs as go
-from agentMET4FOF.agents import AgentMET4FOF
 from time_series_buffer import TimeSeriesBuffer
+from time_series_metadata.scheme import MetaData
+
+from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
+
+    # dict like {
+    #     <from>: {
+    #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+    #         "metadata": MetaData(**kwargs).metadata,
+    #     }
+    _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
+    _input_data_maxlen: int
+
+    # dict like {
+    #     <channel> : {
+    #         "buffer" : TimeSeriesBuffer(maxlen=buffer_size),
+    #         "metadata" : MetaData(**kwargs)
+    #     }
+    _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
+    _output_data_maxlen: int
+
     def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
-
-        # dict of {<from> : {"buffer" : TimeSeriesBuffer(maxlen=buffer_size), "metadata" : MetaData(**kwargs).metadata}}
-        self.input_data = {}
-        self.input_data_maxlen = input_data_maxlen
-
-        # dict of {<channel> : {"buffer" : TimeSeriesBuffer(maxlen=buffer_size), "metadata" : MetaData(**kwargs)}
-        self.output_data = {}
-        self.output_data_maxlen = output_data_maxlen
+        self._input_data = {}
+        self._input_data_maxlen = input_data_maxlen
+        self._output_data = {}
+        self._output_data_maxlen = output_data_maxlen
 
     def on_received_message(self, message):
         channel = message["channel"]
@@ -28,40 +45,40 @@ class MetrologicalAgent(AgentMET4FOF):
 
     def _set_input_data(self, sender, data=None, metadata=None):
         # create storage for new senders
-        if sender not in self.input_data.keys():
-            self.input_data[sender] = {
+        if sender not in self._input_data.keys():
+            self._input_data[sender] = {
                 "metadata": metadata,
-                "buffer": TimeSeriesBuffer(maxlen=self.input_data_maxlen),
+                "buffer": TimeSeriesBuffer(maxlen=self._input_data_maxlen),
             }
 
         if not metadata is None:
             # update received metadata
-            self.input_data[sender]["metadata"] = metadata
+            self._input_data[sender]["metadata"] = metadata
 
         if not data is None:
             # append received data
-            self.input_data[sender]["buffer"].add(data=data)
+            self._input_data[sender]["buffer"].add(data=data)
 
     def set_output_data(self, channel, data=None, metadata=None):
         # create storage for new senders
-        if channel not in self.output_data.keys():
-            self.output_data[channel] = {
+        if channel not in self._output_data.keys():
+            self._output_data[channel] = {
                 "metadata": metadata,
-                "buffer": TimeSeriesBuffer(maxlen=self.output_data_maxlen),
+                "buffer": TimeSeriesBuffer(maxlen=self._output_data_maxlen),
             }
 
         if not metadata is None:
             # update received metadata
-            self.output_data[channel]["metadata"] = metadata
+            self._output_data[channel]["metadata"] = metadata
 
         if not data is None:
             # append received data
-            self.output_data[channel]["buffer"].add(data=data)
+            self._output_data[channel]["buffer"].add(data=data)
 
     def agent_loop(self):
         if self.current_state == "Running":
 
-            for channel, channel_dict in self.output_data.items():
+            for channel, channel_dict in self._output_data.items():
                 # short names
                 metadata = channel_dict["metadata"]
                 buffer = channel_dict["buffer"]
@@ -93,7 +110,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         super().init_parameters(*args, **kwargs)
 
         # create alias/dummies to match dashboard expectations
-        self.memory = self.input_data
+        self.memory = self._input_data
         self.plot_filter = []
         self.plots = {}
         self.custom_plot_parameters = {}
@@ -124,7 +141,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                     error_x=dict(type="data", array=ut, visible=True),
                     error_y=dict(type="data", array=uv, visible=True),
                     mode="lines",
-                    name=f"{y_label} ({sender_agent})"
+                    name=f"{y_label} ({sender_agent})",
                 )
             else:
                 trace = go.Scatter()
