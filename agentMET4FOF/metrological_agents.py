@@ -74,7 +74,7 @@ class MetrologicalAgent(AgentMET4FOF):
                     # send data+metadata
                     self.send_output([data, metadata], channel=channel)
 
-    def pack_data(self, data, channel):
+    def pack_data(self, data, channel="default"):
 
         # include metadata in the packed data
         packed_data = {
@@ -113,7 +113,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 # use description
                 desc = data["metadata"]
                 t_name, t_unit = desc.time.values()
-                v_name, v_unit = desc.quantity.values()
+                v_name, v_unit = desc.get_quantity().values()
 
                 x_label = f"{t_name} [{t_unit}]"
                 y_label = f"{v_name} [{v_unit}]"

@@ -9,3 +9,4 @@ dash_cytoscape
 networkx
 plotly
 time-series-buffer
+time-series-metadata
