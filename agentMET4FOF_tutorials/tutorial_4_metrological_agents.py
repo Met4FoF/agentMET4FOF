@@ -75,6 +75,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         """
         self._sine_stream = signal
         super().init_parameters()
+        self.set_output_data(channel="default", metadata=self._sine_stream.metadata)
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -84,7 +85,9 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         :py:method:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            self.set_output_data(channel="default", data=[self._sine_stream.current_datapoint])
+            self.set_output_data(
+                channel="default", data=[self._sine_stream.current_datapoint]
+            )
             super().agent_loop()
 
     @property
@@ -97,26 +100,28 @@ def main():
     # start agent network server
     agent_network = AgentNetwork(dashboard_modules=True)
 
-    # create and init agent
+    # Initialize signal generating class outside of agent framework.
     signal = Signal()
-    t_name, t_unit = signal.metadata.time.values()
-    v_name, v_unit = signal.metadata.get_quantity().values()
+
+    # Initialize metrologically enabled agent taking name from signal source metadata.
     source_name = signal.metadata.metadata["device_id"]
-    source_agent = agent_network.add_agent(name=source_name,
-                                           agentType=MetrologicalSineGeneratorAgent)
+    source_agent = agent_network.add_agent(
+        name=source_name, agentType=MetrologicalSineGeneratorAgent
+    )
     source_agent.init_parameters(signal)
-    source_agent.set_output_data(channel="default", metadata=signal.metadata)
+
+    # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
         "MonitorAgent", agentType=MetrologicalMonitorAgent
     )
 
-    # bind it to the monitor and activate it
+    # Bind agents.
     source_agent.bind_output(monitor_agent)
 
-    # set all agents states to "Running"
+    # Set all agents states to "Running".
     agent_network.set_running_state()
 
-    # allow for shutting down the network after execution
+    # Allow for shutting down the network after execution.
     return agent_network
 
 
