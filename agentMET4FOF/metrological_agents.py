@@ -8,7 +8,6 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
-
     # dict like {
     #     <from>: {
     #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
@@ -51,11 +50,11 @@ class MetrologicalAgent(AgentMET4FOF):
                 "buffer": TimeSeriesBuffer(maxlen=self._input_data_maxlen),
             }
 
-        if not metadata is None:
+        if metadata is not None:
             # update received metadata
             self._input_data[sender]["metadata"] = metadata
 
-        if not data is None:
+        if data is not None:
             # append received data
             self._input_data[sender]["buffer"].add(data=data)
 
@@ -67,11 +66,11 @@ class MetrologicalAgent(AgentMET4FOF):
                 "buffer": TimeSeriesBuffer(maxlen=self._output_data_maxlen),
             }
 
-        if not metadata is None:
+        if metadata is not None:
             # update received metadata
             self._output_data[channel]["metadata"] = metadata
 
-        if not data is None:
+        if data is not None:
             # append received data
             self._output_data[channel]["buffer"].add(data=data)
 
