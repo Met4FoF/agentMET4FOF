@@ -60,7 +60,7 @@ class MetrologicalAgent(AgentMET4FOF):
             self._input_data[sender]["buffer"].add(data=data)
 
     def set_output_data(self, channel, data=None, metadata=None):
-        # create storage for new senders
+        # create storage for new output channels
         if channel not in self._output_data.keys():
             self._output_data[channel] = {
                 "metadata": metadata,
