@@ -25,7 +25,8 @@ workflows:
               only: /.*/
       - test:
           name: "test_against_setup.py"
-          requirements: "agentMET4FOF"
+          requirements: ". -r requirements.txt"
+          cache: false
           filters:
               tags:
                 # Include tag filter to trigger as well on tag pushes.
@@ -58,6 +59,9 @@ jobs:
       send_cov:
         type: boolean
         default: false
+      cache:
+        type: boolean
+        default: true
 
     executor: python
 
@@ -71,13 +75,16 @@ jobs:
           command: |
             mkdir test-reports
 
-      # Download and cache dependencies.
-      - restore_cache:
-          keys:
-            # Specify the unique identifier for the cache.
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
-            - v1-dependencies-
+      # Download and cache dependencies if the according parameter is set to `true`.
+      - when:
+          condition: << parameters.cache >>
+          steps:
+            - restore_cache:
+                keys:
+                  # Specify the unique identifier for the cache.
+                  - v1-dependencies-{{ checksum "requirements.txt" }}
+                  # Fallback to using the latest cache if no exact match is found.
+                  - v1-dependencies-
 
       # Install dependencies if necessary.
       - run:
@@ -89,10 +96,14 @@ jobs:
            pip install --upgrade << parameters.requirements >>
            pip install pytest pytest-cov pytest-timeout
 
-      - save_cache:
-          paths:
-            - ./agent_venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      # Save cached venv if the according parameter is set to `true`.
+      - when:
+          condition: << parameters.cache >>
+          steps:
+            - save_cache:
+                paths:
+                  - ./agent_venv
+                key: v1-dependencies-{{ checksum "requirements.txt" }}
 
       # Run tests with coverage report! We use pytest's test-runner.
       - run:
