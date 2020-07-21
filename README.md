@@ -20,20 +20,63 @@ under the project Metrology for the Factory of the Future (Met4FoF), project num
 
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
-on Python 3.6 or later, activate it, first install numpy, then install *agentMET4FOF*
+on Python 3.6 or later, activate it, then install *agentMET4FOF*
 from PyPI.org and then work through the [tutorials
 ](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
 or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
-To do this, issue the following commands on your Shell:
+At the moment there seems to be something wrong with one of our dependencies, so
+please install the specified dependency versions. We included the according step in
+the following guides.
+
+
+### Create a virtual environment on Windows
+
+In your Windows PowerShell execute the following to set up a virtual environment
+in a folder of your choice and execute the first tutorial.
+```shell
+PS C:> cd C:\LOCAL\PATH\TO\ENVS
+PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
+PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
+(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python -m pip install --upgrade pip agentMET4FOF
+Collecting agentMET4FOF
+...
+Successfully installed agentMET4FOF-... ...
+(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python -m pip install --upgrade -r requirements.txt
+(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python
+Python ... (default, ..., ...) 
+[GCC ...] on ...
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
+>>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
+Starting NameServer...
+Broadcast server running on 0.0.0.0:9091
+NS running on 127.0.0.1:3333 (127.0.0.1)
+URI = PYRO:Pyro.NameServer@127.0.0.1:3333
+INFO [2020-02-21 19:04:26.961014] (AgentController): INITIALIZED
+INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
+ * Serving Flask app "agentMET4FOF.dashboard.Dashboard" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+...
+```
+
+### Create a virtual environment on Mac and Linux
+
+In your terminal execute the following to set up a virtual environment
+in a folder of your choice and execute the first tutorial.
 
 ```shell
 $ cd /LOCAL/PATH/TO/ENVS
 $ python3 -m venv agentMET4FOF_venv
 $ source agentMET4FOF_venv/bin/activate
-(agentMET4FOF_venv) $ pip install agentMET4FOF
+(agentMET4FOF_venv) $ pip install --upgrade pip agentMET4FOF
 Collecting agentMET4FOF
 ...
 Successfully installed agentMET4FOF-... ...
+(agentMET4FOF_venv) $ python -m pip install --upgrade -r requirements.txt
 (agentMET4FOF_venv) $ python
 Python ... (default, ..., ...) 
 [GCC ...] on ...
@@ -54,6 +97,8 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
  * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
 ...
 ```
+
+### Inspect dashboard
 
 Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
  SineGenerator agent you just spawned.
@@ -106,14 +151,29 @@ Alternatively, watch the tutorial webinar [here
  - Implemented interactive web application with user interface
 
 ## Screenshot of web visualization
+
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
-## Note
+## Orphaned processes
 
-- In the event of agents not terminating cleanly, run
- 
-  ```python
-  taskkill /f /im python.exe /t
-  ```
+In the event of agents not terminating cleanly, you can end all Python processes
+running on your system (caution: the following commands affect **all** running Python
+ processes, not just those that emerged from the agents).
 
-  in Windows Command Prompt to terminate all background python processes.
+### Killing all Python processes in Windows
+
+In your Windows command prompt execute the following to terminate all python processes.
+
+```shell
+> taskkill /f /im python.exe /t
+>
+```
+
+### Killing all Python processes on Mac and Linux
+
+In your terminal execute the following to terminate all python processes.
+
+```shell
+$ pkill python
+$
+```

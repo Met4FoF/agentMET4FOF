@@ -7,6 +7,7 @@ version: 2.1
 executors:
   # Specify a common so-called executor containing the desired Python interpreter.
   python:
+    working_directory: ~/repo
     docker:
       - image: circleci/python:3.7
 
@@ -16,6 +17,15 @@ workflows:
     jobs:
       # Create 'test' job to test agentMET4FOF for every commit.
       - test:
+          name: "test_against_requirements"
+          send_cov: true
+          filters:
+            tags:
+              # Include tag filter to trigger as well on tag pushes.
+              only: /.*/
+      - test:
+          name: "test_against_setup.py"
+          requirements: "agentMET4FOF"
           filters:
               tags:
                 # Include tag filter to trigger as well on tag pushes.
@@ -24,7 +34,8 @@ workflows:
           # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
           # pushes, which successfully run 'test' job and are tagged with version.
           requires:
-              - test
+              - test_against_requirements
+              - test_against_setup.py
           filters:
               tags:
                 # Specify the tags which trigger the job as regular expression.
@@ -35,9 +46,20 @@ workflows:
 
 jobs:
   test:
-    executor: python
+    # Define a parameter for the job, to be able to run all tests against different
+    # sets of dependencies. This allows specifically to run the tests against the
+    # possibly pinned versions from requirements.txt and against the automatically
+    # installed most current versions from setup.py. The send_cov variable is only to
+    # ensure that only one coverage report gets send for each commit.
+    parameters:
+      requirements:
+        type: string
+        default: "-r requirements.txt"
+      send_cov:
+        type: boolean
+        default: false
 
-    working_directory: ~/repo
+    executor: python
 
     steps:
       # Checkout code.
@@ -64,7 +86,7 @@ jobs:
            python3 -m venv agent_venv
            source agent_venv/bin/activate
            pip install --upgrade pip
-           pip install --upgrade -r requirements.txt
+           pip install --upgrade << parameters.requirements >>
            pip install pytest pytest-cov pytest-timeout
 
       - save_cache:
@@ -80,12 +102,16 @@ jobs:
             pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
             test-reports/agentMET4FOF.log
 
-      # Upload coverage report.
-      - run:
-          name: Upload coverage report
-          command: |
-            source agent_venv/bin/activate
-            bash <(curl -s https://codecov.io/bash)
+
+      # Upload coverage report if the according parameter is set to `true`.
+      - when:
+          condition: << parameters.send_cov >>
+          steps:
+            - run:
+                name: Upload coverage report
+                command: |
+                  source agent_venv/bin/activate
+                  bash <(curl -s https://codecov.io/bash)
 
       # Store test results as artifacts.
       - store_artifacts:
