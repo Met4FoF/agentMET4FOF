@@ -65,6 +65,8 @@ setup(
         "dash_cytoscape",
         "networkx",
         "plotly",
+        "time-series-buffer",
+        "time-series-metadata",
     ],
     python_requires=">=3.6",
     classifiers=[
