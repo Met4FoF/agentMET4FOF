@@ -78,13 +78,13 @@ jobs:
       # Download and cache dependencies if the according parameter is set to `true`.
       - when:
           condition: << parameters.cache >>
-            steps:
-              - restore_cache:
-                  keys:
-                    # Specify the unique identifier for the cache.
-                    - v1-dependencies-{{ checksum "requirements.txt" }}
-                    # Fallback to using the latest cache if no exact match is found.
-                    - v1-dependencies-
+          steps:
+            - restore_cache:
+                keys:
+                  # Specify the unique identifier for the cache.
+                  - v1-dependencies-{{ checksum "requirements.txt" }}
+                  # Fallback to using the latest cache if no exact match is found.
+                  - v1-dependencies-
 
       # Install dependencies if necessary.
       - run:
