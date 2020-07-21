@@ -68,10 +68,6 @@ in a folder of your choice and execute the first tutorial.
 $ cd /LOCAL/PATH/TO/ENVS
 $ python3 -m venv agentMET4FOF_venv
 $ source agentMET4FOF_venv/bin/activate
-(agentMET4FOF_venv) $ pip install numpy
-Collecting numpy
-...
-Successfully installed numpy-...
 (agentMET4FOF_venv) $ pip install agentMET4FOF
 Collecting agentMET4FOF
 ...

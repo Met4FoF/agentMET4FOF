@@ -38,6 +38,7 @@ For the *agentMET4FOF* homepage go to
 
    agentMET4FOF_agents
    agentMET4FOF_streams
+   agentMET4FOF_dashboard
 
 
 Indices and tables
