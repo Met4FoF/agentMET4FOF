@@ -25,7 +25,7 @@ workflows:
               only: /.*/
       - test:
           name: "test_against_setup.py"
-          requirements: "agentMET4FOF"
+          requirements: "."
           cache: false
           filters:
               tags:
