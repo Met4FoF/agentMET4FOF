@@ -31,12 +31,14 @@ For the *agentMET4FOF* homepage go to
    agentMET4FOF_tutorials/tutorial_1_generator_agent.ipynb
    agentMET4FOF_tutorials/tutorial_2_math_agent.ipynb
    agentMET4FOF_tutorials/tutorial_3_multi_channel.ipynb
+   agentMET4FOF_tutorials/tutorial_4_metrological_agents.ipynb
 
 .. toctree::
    :maxdepth: 1
    :caption: Code Reference:
 
    agentMET4FOF_agents
+   agentMET4FOF_metrological_agents
    agentMET4FOF_streams
    agentMET4FOF_dashboard
 

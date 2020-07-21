@@ -8,6 +8,7 @@ from agentMET4FOF_tutorials import (
     tutorial_1_generator_agent,
     tutorial_2_math_agent,
     tutorial_3_multi_channel,
+    tutorial_4_metrological_agents,
 )
 
 # During a pytest execution this file gets interpreted once and all imports at the

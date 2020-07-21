@@ -1,10 +1,12 @@
 ipykernel
 numpy
 scipy
-matplotlib
+matplotlib != 3.3 # Version 3.3 caused an error. Details you can find in docs/matplotlib3.3_pytest_error_log
 pandas
 osbrain
 dash
 dash_cytoscape
 networkx
 plotly
+time-series-buffer
+time-series-metadata

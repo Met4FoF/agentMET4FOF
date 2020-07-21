@@ -1,0 +1,342 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.8, pytest-5.4.2, py-1.8.1, pluggy-0.13.1 -- /home/circleci/repo/agent_venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/circleci/repo
+plugins: dash-1.13.4, timeout-1.3.4, cov-2.9.0
+collecting ... collected 14 items
+
+tests/test_memory_monitor_agent.py::test_simpleAgent[SingleValueAgent-expected_monitor_results0] PASSED [  7%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[ListAgent-expected_monitor_results1] PASSED [ 14%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[NpArrayAgent-expected_monitor_results2] PASSED [ 21%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[PdDataFrameAgent-expected_monitor_results3] PASSED [ 28%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[NestedDict_SingleValueAgent-expected_monitor_results4] PASSED [ 35%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[NestedDict_ListAgent-expected_monitor_results5] PASSED [ 42%]
+tests/test_memory_monitor_agent.py::test_simpleAgent[NestedDict_NpArrayAgent-expected_monitor_results6] PASSED [ 50%]
+tests/test_remove_agent.py::test_remove_agent PASSED                     [ 57%]
+tests/test_send_plot_image.py::test_send_plot PASSED                     [ 64%]
+tests/test_send_plot_plotly.py::test_send_plot FAILED                    [ 71%]
+tests/test_tutorials.py::test_tutorial_1 PASSED                          [ 78%]
+tests/test_tutorials.py::test_tutorial_2 PASSED                          [ 85%]
+tests/test_tutorials.py::test_tutorial_3 PASSED                          [ 92%]
+tests/test_tutorials.py::test_tutorial_4 PASSED                          [100%]
+
+=================================== FAILURES ===================================
+________________________________ test_send_plot ________________________________
+
+    def test_send_plot():
+        # start agent network server
+        agentNetwork = AgentNetwork(dashboard_modules=False)
+
+        # init agents
+        gen_agent = agentNetwork.add_agent(agentType=GeneratorAgent)
+        monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
+
+        agentNetwork.bind_agents(gen_agent, monitor_agent)
+
+>       gen_agent.dummy_send_graph(mode="plotly")
+
+tests/test_send_plot_plotly.py:49:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+agent_venv/lib/python3.7/site-packages/Pyro4/core.py:185: in __call__
+    return self.__send(self.__name, args, kwargs)
+agent_venv/lib/python3.7/site-packages/osbrain/proxy.py:219: in _pyroInvoke
+    methodname, args, kwargs, flags, objectId)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <osbrain.proxy.Proxy at 0x7f3f51c03a90; connected IPv4; for PYRONAME:GeneratorAgent_1@127.0.0.1:3333>
+methodname = 'dummy_send_graph', args = (), kwargs = {'mode': 'plotly'}
+flags = 0, objectId = None
+
+    def _remote_call(self, methodname, args, kwargs, flags,
+                     objectId):  # noqa: N803
+        """
+        Call a remote method from the proxy.
+        """
+        if self._next_oneway:
+            flags |= FLAGS_ONEWAY
+            result = super()._pyroInvoke(
+                methodname, args, kwargs, flags=flags, objectId=objectId)
+            return result
+        if self._safe and self._is_safe_method(methodname):
+            safe_args = [methodname] + list(args)
+            result = super()._pyroInvoke(
+                'safe_call', safe_args, kwargs,
+                flags=flags, objectId=objectId)
+            if isinstance(result, Exception):
+>               raise result
+E               AttributeError: Error executing `dummy_send_graph`! ('Spine' object has no attribute 'is_frame_like')
+E
+E               > method: dummy_send_graph
+E               > args: ()
+E               > kwargs: {'mode': 'plotly'}
+E
+E               |>>>>>>>>Traceback (most recent call last):
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe
+E               |     response = getattr(self, method)(*args, **kwargs)
+E               |   File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph
+E               |     self.send_plot(self.create_graph(), mode=mode)
+E               |   File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot
+E               |     graph = self._convert_to_plotly(fig)
+E               |   File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly
+E               |     plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly
+E               |     matplotlylib.Exporter(renderer).run(fig)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run
+E               |     self.crawl_fig(fig)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig
+E               |     self.crawl_ax(ax)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax
+E               |     props=utils.get_axes_properties(ax)):
+E               |   File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__
+E               |     return next(self.gen)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes
+E               |     self.open_axes(ax=ax, props=props)
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes
+E               |     bottom_spine = mpltools.get_spine_visible(ax, "bottom")
+E               |   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible
+E               |     spine_frame_like = spine.is_frame_like()
+E               | AttributeError: 'Spine' object has no attribute 'is_frame_like'
+E               |<<<<<<<<
+
+agent_venv/lib/python3.7/site-packages/osbrain/proxy.py:265: AttributeError
+----------------------------- Captured stdout call -----------------------------
+NS shut down.
+Starting NameServer...
+Broadcast server running on 0.0.0.0:9091
+NS running on 127.0.0.1:3333 (127.0.0.1)
+URI = PYRO:Pyro.NameServer@127.0.0.1:3333
+INFO [2020-07-21 10:07:21.788251] (AgentController): INITIALIZED
+INFO [2020-07-21 10:07:22.212927] (GeneratorAgent_1): INITIALIZED
+INFO [2020-07-21 10:07:22.572351] (MonitorAgent_1): INITIALIZED
+[2020-07-21 10:07:22.921354] (GeneratorAgent_1): Connected output module: MonitorAgent_1
+----------------------------------------------------
+ EXCEPTION <class 'AttributeError'>: Error executing `dummy_send_graph`! ('Spine' object has no attribute 'is_frame_like')
+
+> method: dummy_send_graph
+> args: ()
+> kwargs: {'mode': 'plotly'}
+
+|>>>>>>>>Traceback (most recent call last):
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe
+|     response = getattr(self, method)(*args, **kwargs)
+|   File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph
+|     self.send_plot(self.create_graph(), mode=mode)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot
+|     graph = self._convert_to_plotly(fig)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly
+|     plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly
+|     matplotlylib.Exporter(renderer).run(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run
+|     self.crawl_fig(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig
+|     self.crawl_ax(ax)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax
+|     props=utils.get_axes_properties(ax)):
+|   File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__
+|     return next(self.gen)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes
+|     self.open_axes(ax=ax, props=props)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes
+|     bottom_spine = mpltools.get_spine_visible(ax, "bottom")
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible
+|     spine_frame_like = spine.is_frame_like()
+| AttributeError: 'Spine' object has no attribute 'is_frame_like'
+|<<<<<<<<
+ Extended stacktrace follows (most recent call last)
+----------------------------------------------------
+File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/proxy.py", line 219, in Proxy._pyroInvoke
+Source code:
+    methodname, args, kwargs, flags, objectId)
+----------------------------------------------------
+File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/proxy.py", line 265, in Proxy._remote_call
+Source code:
+    raise result
+Local values:
+    __class__ = <class 'osbrain.proxy.Proxy'>
+    args = ()
+    flags = 0
+    kwargs = {'mode': 'plotly'}
+    methodname = 'dummy_send_graph'
+    objectId = None
+    result = AttributeError('Error executing `dummy_send_graph`! (\'Spine\' object has no attribute \'is_frame_like\')\n\n> method: dummy_send_graph\n> args: ()\n> kwargs: {\'mode\': \'plotly\'}\n\n|>>>>>>>>Traceback (most recent call last):\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe\n|     response = getattr(self, method)(*args, **kwargs)\n|   File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph\n|     self.send_plot(self.create_graph(), mode=mode)\n|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot\n|     graph = self._convert_to_plotly(fig)\n|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly\n|     plotly_fig = tls.mpl_to_plotly(matplotlib_fig)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly\n|     matplotlylib.Exporter(renderer).run(fig)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run\n|     self.crawl_fig(fig)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig\n|     self.crawl_ax(ax)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax\n|     props=utils.get_axes_properties(ax)):\n|   File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__\n|     return next(self.gen)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes\n|     self.open_axes(ax=ax, props=props)\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes\n|     bottom_spine = mpltools.get_spine_visible(ax, "bottom")\n|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible\n|     spine_frame_like = spine.is_frame_like()\n| AttributeError: \'Spine\' object has no attribute \'is_frame_like\'\n|<<<<<<<<')
+    safe_args = ['dummy_send_graph']
+    self = <osbrain.proxy.Proxy at 0x7f3f51c03a90; connected IPv4; for PYRONAME:GeneratorAgent_1@127.0.0.1:3333>
+        self._pyroUri = <Pyro4.core.URI at 0x7f3f51c03810; PYRONAME:GeneratorAgent_1@127.0.0.1:3333>
+        self._pyroOneway = {'run'}
+        self._pyroMethods = {'log_warning', 'dummy_send_graph', 'update_data_memory', 'list_timers', 'is_running', 'stop', 'handle_process_data', 'init_agent_loop', 'raise_exception', 'bind_output', 'on_received_message', 'set_method', 'set_logger', 'log_debug', 'after', 'close_all', 'bind', 'execute_as_function', 'create_graph', 'log_ML', 'recv', 'stop_agent_loop', 'subscribe', 'each', 'set_attr', 'get_all_attr', 'log_info', 'idle', 'run', 'has_socket', 'unsubscribe', 'unbind_output', 'stop_timer', 'safe_call', 'send_output', 'init_parameters', 'send', 'addr', 'send_recv', 'agent_loop', 'shutdown', 'kill', 'get_attr', 'pack_data', 'on_init', 'reset', 'before_loop', 'connect', 'ping', 'send_plot', 'stop_all_timers', 'log_error', 'close', 'execute_as_method'}
+        self._pyroAttrs = {'buffer_filled'}
+        self._Proxy__pyroHmacKey = None
+        self._pyroHandshake = 'hello'
+        self._pyroSerializer = None
+        self._Proxy__pyroTimeout = 0.0
+        self._pyroMaxRetries = 0
+        self._pyroConnection = <Pyro4.socketutil.SocketConnection object at 0x7f3f51c36890>
+        self._pyroSeq = 2
+        self._pyroRawWireResponse = False
+        self._Proxy__pyroConnLock = <unlocked _thread.RLock object owner=0 count=0 at 0x7f3f51cd81e0>
+        self._Proxy__async = False
+        self._next_oneway = False
+        self._default_safe = True
+        self._safe = True
+----------------------------------------------------
+ EXCEPTION <class 'AttributeError'>: Error executing `dummy_send_graph`! ('Spine' object has no attribute 'is_frame_like')
+
+> method: dummy_send_graph
+> args: ()
+> kwargs: {'mode': 'plotly'}
+
+|>>>>>>>>Traceback (most recent call last):
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe
+|     response = getattr(self, method)(*args, **kwargs)
+|   File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph
+|     self.send_plot(self.create_graph(), mode=mode)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot
+|     graph = self._convert_to_plotly(fig)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly
+|     plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly
+|     matplotlylib.Exporter(renderer).run(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run
+|     self.crawl_fig(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig
+|     self.crawl_ax(ax)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax
+|     props=utils.get_axes_properties(ax)):
+|   File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__
+|     return next(self.gen)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes
+|     self.open_axes(ax=ax, props=props)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes
+|     bottom_spine = mpltools.get_spine_visible(ax, "bottom")
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible
+|     spine_frame_like = spine.is_frame_like()
+| AttributeError: 'Spine' object has no attribute 'is_frame_like'
+|<<<<<<<<
+----------------------------------------------------
+----------------------------- Captured stderr call -----------------------------
+ERROR [2020-07-21 10:07:23.528526] (GeneratorAgent_1): An exception occurred while running! ('Spine' object has no attribute 'is_frame_like')
+
+|>>>>>>>>Traceback (most recent call last):
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1680, in run
+|     self._loop()
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1208, in _loop
+|     if self._iterate():
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1245, in _iterate
+|     self._process_events(events)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1282, in _process_events
+|     self._process_single_event(socket)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1300, in _process_single_event
+|     self._process_rep_event(socket, address, data)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1342, in _process_rep_event
+|     execute_code_after_yield(generator)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 158, in execute_code_after_yield
+|     next(generator)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe
+|     response = getattr(self, method)(*args, **kwargs)
+|   File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph
+|     self.send_plot(self.create_graph(), mode=mode)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot
+|     graph = self._convert_to_plotly(fig)
+|   File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly
+|     plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly
+|     matplotlylib.Exporter(renderer).run(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run
+|     self.crawl_fig(fig)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig
+|     self.crawl_ax(ax)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax
+|     props=utils.get_axes_properties(ax)):
+|   File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__
+|     return next(self.gen)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes
+|     self.open_axes(ax=ax, props=props)
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes
+|     bottom_spine = mpltools.get_spine_visible(ax, "bottom")
+|   File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible
+|     spine_frame_like = spine.is_frame_like()
+| AttributeError: 'Spine' object has no attribute 'is_frame_like'
+|<<<<<<<<
+Exception in thread oneway-call:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/threading.py", line 926, in _bootstrap_inner
+    self.run()
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/Pyro4/core.py", line 1893, in run
+    super(_OnewayCallThread, self).run()
+  File "/usr/local/lib/python3.7/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1680, in run
+    self._loop()
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1208, in _loop
+    if self._iterate():
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1245, in _iterate
+    self._process_events(events)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1282, in _process_events
+    self._process_single_event(socket)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1300, in _process_single_event
+    self._process_rep_event(socket, address, data)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 1342, in _process_rep_event
+    execute_code_after_yield(generator)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 158, in execute_code_after_yield
+    next(generator)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/osbrain/agent.py", line 310, in _handle_loopback_safe
+    response = getattr(self, method)(*args, **kwargs)
+  File "/home/circleci/repo/tests/test_send_plot_plotly.py", line 37, in dummy_send_graph
+    self.send_plot(self.create_graph(), mode=mode)
+  File "/home/circleci/repo/agentMET4FOF/agents.py", line 472, in send_plot
+    graph = self._convert_to_plotly(fig)
+  File "/home/circleci/repo/agentMET4FOF/agents.py", line 417, in _convert_to_plotly
+    plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/tools.py", line 112, in mpl_to_plotly
+    matplotlylib.Exporter(renderer).run(fig)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 51, in run
+    self.crawl_fig(fig)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 118, in crawl_fig
+    self.crawl_ax(ax)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/exporter.py", line 123, in crawl_ax
+    props=utils.get_axes_properties(ax)):
+  File "/usr/local/lib/python3.7/contextlib.py", line 112, in __enter__
+    return next(self.gen)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mplexporter/renderers/base.py", line 57, in draw_axes
+    self.open_axes(ax=ax, props=props)
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/renderer.py", line 169, in open_axes
+    bottom_spine = mpltools.get_spine_visible(ax, "bottom")
+  File "/home/circleci/repo/agent_venv/lib/python3.7/site-packages/plotly/matplotlylib/mpltools.py", line 368, in get_spine_visible
+    spine_frame_like = spine.is_frame_like()
+AttributeError: 'Spine' object has no attribute 'is_frame_like'
+
+=============================== warnings summary ===============================
+agent_venv/lib/python3.7/site-packages/_pytest/junitxml.py:417
+  /home/circleci/repo/agent_venv/lib/python3.7/site-packages/_pytest/junitxml.py:417: PytestDeprecationWarning: The 'junit_family' default value will change to 'xunit2' in pytest 6.0.
+  Add 'junit_family=xunit1' to your pytest.ini file to keep the current format in future versions of pytest and silence this warning.
+    _issue_warning_captured(deprecated.JUNIT_XML_DEFAULT_FAMILY, config.hook, 2)
+
+-- Docs: https://docs.pytest.org/en/latest/warnings.html
+------- generated xml file: /home/circleci/repo/test-reports/pytest.xml --------
+
+----------- coverage: platform linux, python 3.7.8-final-0 -----------
+Name                                                       Stmts   Miss Branch BrPart  Cover
+--------------------------------------------------------------------------------------------
+agentMET4FOF/__init__.py                                       1      0      0      0   100%
+agentMET4FOF/agents.py                                       553    166    224     43    65%
+agentMET4FOF/dashboard/Dashboard.py                           31     22     14      0    20%
+agentMET4FOF/dashboard/Dashboard_Control.py                   34     27     16      0    14%
+agentMET4FOF/dashboard/Dashboard_agt_net.py                  161    147     76      0     6%
+agentMET4FOF/dashboard/Dashboard_layout_base.py               15      7      0      0    53%
+agentMET4FOF/dashboard/LayoutHelper.py                        47     34     16      0    21%
+agentMET4FOF/dashboard/__init__.py                             0      0      0      0   100%
+agentMET4FOF/metrological_agents.py                           74     40     26      4    38%
+agentMET4FOF/streams.py                                       67     30     20      6    49%
+agentMET4FOF_tutorials/__init__.py                             0      0      0      0   100%
+agentMET4FOF_tutorials/tutorial_1_generator_agent.py          18      2      2      1    85%
+agentMET4FOF_tutorials/tutorial_2_math_agent.py               40     10      2      1    74%
+agentMET4FOF_tutorials/tutorial_3_multi_channel.py            37      0      6      1    98%
+agentMET4FOF_tutorials/tutorial_4_metrological_agents.py      49     12      2      1    75%
+--------------------------------------------------------------------------------------------
+TOTAL                                                       1127    497    404     57    50%
+
+=========================== short test summary info ============================
+FAILED tests/test_send_plot_plotly.py::test_send_plot - AttributeError: Error...
+============= 1 failed, 13 passed, 1 warning in 132.91s (0:02:12) ==============
+NS shut down.
