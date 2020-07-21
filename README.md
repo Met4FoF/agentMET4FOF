@@ -31,14 +31,14 @@ In your Windows PowerShell execute the following to set up a virtual environment
 in a folder of your choice and execute the first tutorial.
 
 ```shell
-PS cd C:\LOCAL\PATH\TO\ENVS
-PS py -3 -m venv agentMET4FOF_venv
-PS agentMET4FOF_venv\Scripts\activate
-(agentMET4FOF_venv) PS pip install agentMET4FOF
+PS C:> cd C:\LOCAL\PATH\TO\ENVS
+PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
+PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
+(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python -m pip install --upgrade pip agentMET4FOF
 Collecting agentMET4FOF
 ...
 Successfully installed agentMET4FOF-... ...
-(agentMET4FOF_venv) > python
+(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python
 Python ... (default, ..., ...) 
 [GCC ...] on ...
 Type "help", "copyright", "credits" or "license" for more information.
@@ -68,7 +68,7 @@ in a folder of your choice and execute the first tutorial.
 $ cd /LOCAL/PATH/TO/ENVS
 $ python3 -m venv agentMET4FOF_venv
 $ source agentMET4FOF_venv/bin/activate
-(agentMET4FOF_venv) $ pip install agentMET4FOF
+(agentMET4FOF_venv) $ pip install --upgrade pip agentMET4FOF
 Collecting agentMET4FOF
 ...
 Successfully installed agentMET4FOF-... ...
