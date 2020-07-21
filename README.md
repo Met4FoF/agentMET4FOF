@@ -27,18 +27,14 @@ or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/example
 
 ### Create a virtual environment on Windows
 
-In your Windows command prompt execute the following to set up a virtual environment
+In your Windows PowerShell execute the following to set up a virtual environment
 in a folder of your choice and execute the first tutorial.
 
 ```shell
-> cd /LOCAL/PATH/TO/ENVS
-> python -m venv agentMET4FOF_venv
-> agentMET4FOF_venv\Scripts\activate.bat
-(agentMET4FOF_venv) > pip install numpy
-Collecting numpy
-...
-Successfully installed numpy-...
-(agentMET4FOF_venv) > pip install agentMET4FOF
+PS cd C:\LOCAL\PATH\TO\ENVS
+PS py -3 -m venv agentMET4FOF_venv
+PS agentMET4FOF_venv\Scripts\activate
+(agentMET4FOF_venv) PS pip install agentMET4FOF
 Collecting agentMET4FOF
 ...
 Successfully installed agentMET4FOF-... ...
