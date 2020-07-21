@@ -7,6 +7,6 @@ osbrain
 dash
 dash_cytoscape
 networkx
-plotly
+plotly < 4.9
 time-series-buffer
 time-series-metadata
