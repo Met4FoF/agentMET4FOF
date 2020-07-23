@@ -1,12 +1,15 @@
 import dash
+import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
-import dash_core_components as dcc
-from . import LayoutHelper
-from .LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, \
-    create_monitor_graph
-from dash.exceptions import PreventUpdate
 import networkx as nx
+from dash.exceptions import PreventUpdate
+
+from . import LayoutHelper
+from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
+    create_nodes_cytoscape
+from .. import agents as agentmet4fof_module
+
 
 from .Dashboard_layout_base import Dashboard_Layout_Base
 
@@ -214,11 +217,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 app.dashboard_ctrl.agentNetwork.set_stop_state()
             raise PreventUpdate
 
-        #Stop button click
-        @app.callback( dash.dependencies.Output('reset-button', 'children'),
-                      [dash.dependencies.Input('reset-button', 'n_clicks')
-                       ])
-        def stop_button_click(n_clicks):
+        #Handle click of the reset button.
+        @app.callback(
+            dash.dependencies.Output("reset-button", "children"),
+            [dash.dependencies.Input("reset-button", "n_clicks")],
+        )
+        def reset_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.reset_agents()
             raise PreventUpdate
@@ -356,7 +360,22 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     #otherwise call custom plot function and load up custom plot parameters
                     else:
                         custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_parameters')
-                        data.append(custom_plot_function(memory_data[sender_agent],sender_agent,**custom_plot_parameters))
+                        data.append(custom_plot_function(memory_data[sender_agent], sender_agent, **custom_plot_parameters))
+                        # Handle iterable of traces.
+                        traces = custom_plot_function(
+                            memory_data[sender_agent],
+                            sender_agent,
+                            **custom_plot_parameters
+                        )
+                        if (
+                            isinstance(traces, tuple)
+                            or isinstance(traces, list)
+                            or isinstance(traces, set)
+                        ):
+                            for trace in traces:
+                                data.append(trace)
+                        else:
+                            data.append(traces)
                 if len(data) > 5:
                     y_title_offset = 0.1
                 else:
