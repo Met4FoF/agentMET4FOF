@@ -1,12 +1,15 @@
 import dash
+import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
-import dash_core_components as dcc
-from . import LayoutHelper
-from .LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, \
-    create_monitor_graph
-from dash.exceptions import PreventUpdate
 import networkx as nx
+from dash.exceptions import PreventUpdate
+
+from . import LayoutHelper
+from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
+    create_nodes_cytoscape
+from .. import agents as agentmet4fof_module
+
 
 def get_multiple_graphs(num_monitors=10):
     return [dcc.Graph(id='monitors-graph-'+str(i), figure={},style={'height':'90vh'}) for i in range(num_monitors)]
