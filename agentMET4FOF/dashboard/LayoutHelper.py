@@ -18,7 +18,7 @@ def html_button(icon="play_circle_filled", text="Start",id=" ", style ={}):
 
 def create_nodes_cytoscape(agent_graph):
     pos = nx.fruchterman_reingold_layout(agent_graph)
-    new_elements = [{'data': {'id': k, 'label': k}, 'position': {'x': pos[k][0], 'y': pos[k][1]}} for k in agent_graph.nodes()]
+    new_elements = [{'data': {'id': k, 'label': k}, 'position': {'x': pos[k][0], 'y': pos[k][1]}, 'classes':agent_graph.nodes[k]['stylesheet']} for k in agent_graph.nodes()]
 
     return new_elements
 

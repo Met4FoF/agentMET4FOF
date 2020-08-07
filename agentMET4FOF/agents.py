@@ -80,7 +80,7 @@ class AgentMET4FOF(Agent):
         self.loop_wait = None
         self.memory = {}
         self.log_mode = True
-
+        self.stylesheet = ""
         self.output_channels_info = {}
 
         try:
@@ -489,7 +489,7 @@ class AgentMET4FOF(Agent):
         self.send_output(graph, channel="plot")
         return graph
 
-    def update_data_memory(self,agent_from,data=None):
+    def update_data_memory(self,agent_from,data=None, concat_axis=0):
         """
         Updates data stored in `self.memory` with the received message
 
@@ -503,6 +503,9 @@ class AgentMET4FOF(Agent):
             otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
         data
             optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffer.
+
+        concat_axis : int
+            axis to concatenate on with the buffer for numpy arrays.
 
         """
         # if first argument is the agentMET4FOF dict message
@@ -553,7 +556,7 @@ class AgentMET4FOF(Agent):
                 self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
         # handle if data type is np.ndarray
         elif type(message['data']).__name__ == "ndarray":
-            self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']))
+            self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']),axis=concat_axis)
             if len(self.memory[message['from']]) > self.memory_buffer_size:
                 truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
                 self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
@@ -582,7 +585,7 @@ class AgentMET4FOF(Agent):
                         self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
                 # handle : dict value is numpy array
                 elif type(message['data'][key]).__name__== "ndarray":
-                    self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]))
+                    self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]), axis=concat_axis)
                     if len(self.memory[message['from']][key]) > self.memory_buffer_size:
                         truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
                         self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
@@ -631,6 +634,7 @@ class _AgentController(AgentMET4FOF):
         self.ns = ns
         self.G = nx.DiGraph()
         self._logger = None
+        self.coalitions = []
 
     def get_agentType_count(self, agentType):
         num_count = 1
@@ -657,7 +661,9 @@ class _AgentController(AgentMET4FOF):
 
     def generate_module_name_byUnique(self, agent_name):
         name = agent_name
-        name += "_"+str(self.get_agent_name_count(agent_name))
+        agent_copy_count = self.get_agent_name_count(agent_name) #number of agents with same name
+        if agent_copy_count>1:
+            name += "("+str(self.get_agent_name_count(agent_name))+")"
         return name
 
     def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000,ip_addr=None):
@@ -677,6 +683,16 @@ class _AgentController(AgentMET4FOF):
         except Exception as e:
             self.log_info("ERROR:" + str(e))
 
+    def get_agents_stylesheets(self, agent_names):
+        #for customising display purposes in dashboard
+        agents_stylesheets = []
+        for agent in agent_names:
+            try:
+                stylesheet = self.ns.proxy(agent).get_attr("stylesheet")
+                agents_stylesheets.append({"stylesheet":stylesheet})
+            except Exception as e:
+                self.log_info("Error:"+str(e))
+        return agents_stylesheets
 
     def agents(self):
         exclude_names = ["AgentController","Logger"]
@@ -688,8 +704,9 @@ class _AgentController(AgentMET4FOF):
         edges = self.get_latest_edges(agent_names)
 
         if len(agent_names) != self.G.number_of_nodes() or len(edges) != self.G.number_of_edges():
+            agent_stylesheets = self.get_agents_stylesheets(agent_names)
             new_G = nx.DiGraph()
-            new_G.add_nodes_from(agent_names)
+            new_G.add_nodes_from(list(zip(agent_names,agent_stylesheets)))
             new_G.add_edges_from(edges)
             self.G = new_G
 
@@ -712,6 +729,14 @@ class _AgentController(AgentMET4FOF):
         if self._logger is None:
             self._logger = self.ns.proxy('Logger')
         return self._logger
+
+    def add_coalition(self, new_coalition):
+        """
+        Instantiates a coalition of agents.
+        """
+        self.coalitions.append(new_coalition)
+        return new_coalition
+
 
 class AgentNetwork:
     """
@@ -1011,7 +1036,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000, ip_addr=None):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000, ip_addr=None, stylesheet=""):
         """
         Instantiates a new agent in the network.
 
@@ -1038,7 +1063,20 @@ class AgentNetwork:
             else:
                 new_name= self._get_controller().generate_module_name_byUnique(name)
             agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            agent.set_attr(stylesheet=stylesheet)
         return agent
+
+    def add_coalition(self, name="Coalition_1", agents=[]):
+        """
+        Instantiates a coalition of agents.
+        """
+        new_coalition = Coalition(name, agents)
+        self._get_controller().add_coalition(new_coalition)
+        return new_coalition
+
+    @property
+    def coalitions(self):
+        return self._get_controller().get_attr("coalitions")
 
     def shutdown(self):
         """
@@ -1051,6 +1089,14 @@ class AgentNetwork:
             self.dashboard_proc.terminate()
         return 0
 
+
+class Coalition():
+    def __init__(self, name="Coalition", agents=[]):
+        self.agents = agents
+        self.name = name
+
+    def agent_names(self):
+        return [agent.get_attr("name") for agent in self.agents]
 
 class DataStreamAgent(AgentMET4FOF):
     """
