@@ -1,7 +1,11 @@
 import dash
 import dash_cytoscape as cyto
+import dash_dangerously_set_inner_html
 import dash_html_components as html
 import dash_core_components as dcc
+import visdcc
+from dash.dependencies import ClientsideFunction
+
 from . import LayoutHelper
 from .LayoutHelper import create_nodes_cytoscape, create_edges_cytoscape, \
     create_monitor_graph
@@ -17,7 +21,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
     def get_multiple_graphs(self,num_monitors=10):
         return [dcc.Graph(id='monitors-graph-'+str(i), figure={},style={'height':'90vh'}) for i in range(num_monitors)]
-
 
     def get_layout(self, update_interval_seconds=3, num_monitors=10):
        #body
@@ -107,8 +110,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                             ]),
                             html.H5(className="card", id="matplotlib-division", children=" "),
-
-                            html.Div(className="card", id="monitors-temp-division", children=self.get_multiple_graphs(num_monitors))
+                            html.Div(className="card", id="monitors-temp-division", children=self.get_multiple_graphs(num_monitors)),
 
                     ]),
 
@@ -153,13 +155,10 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                                 ]),
                                 html.H6(id='agent-parameters', children="Not selected", className="flow-text"),
-
                                 html.P(id="connect_placeholder", className="black-text", children=" "),
                                 html.P(id="disconnect_placeholder", className="black-text", children=" "),
                                 html.P(id="monitor_placeholder", className="black-text", children=" "),
-
-
-
+                                html.P(id="mpld3_placeholder", className="black-text", children=" "),
                             ])
 
                         ])
@@ -237,8 +236,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
             else:
                 raise PreventUpdate
-
-
 
         @app.callback( [dash.dependencies.Output('add-modules-dropdown', 'options'),
                         dash.dependencies.Output('add-dataset-dropdown', 'options')
@@ -462,6 +459,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
             return monitor_graphs+ style_graphs
 
+
         def _handle_matplotlib_figure(input_data, from_agent_name: str):
             """
             Internal function. Checks the mode of matplotlib.figure.Fig to be plotted
@@ -469,12 +467,22 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
             This is used in plotting the received matplotlib figures in the MonitorAgent's plot memory.
             """
+            if input_data["mode"] == "plotly":
+                new_graph = dcc.Graph(figure=input_data["fig"])
+            elif input_data["mode"] == "image":
+                new_graph = html.Img(src=input_data["fig"], title=from_agent_name)
+            elif input_data["mode"] == "mpld3":
+                new_input_data = str(input_data["fig"]).replace("'",'"')
+                new_input_data = new_input_data.replace("(", "[")
+                new_input_data = new_input_data.replace(")", "]")
+                new_input_data = new_input_data.replace("None", "null")
+                new_input_data = new_input_data.replace("False", "false")
+                new_input_data = new_input_data.replace("True", "true")
+                fig_json = html.P(new_input_data,style={'display': 'none'})
+                new_graph = html.Div(id="d3_"+from_agent_name,children=fig_json)
 
-            if isinstance(input_data, str):
-                new_graph = html.Img(src=input_data, title=from_agent_name)
-            else:
-                new_graph = dcc.Graph(figure=input_data)
             return new_graph
+
         #load Monitors data and draw - all at once
         @app.callback([dash.dependencies.Output('matplotlib-division', 'children')],
                      [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
@@ -515,14 +523,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     # get the graph relevant to 'monitor_agent_input'
                     graph = plot_data[from_agent_name]
 
-                    if isinstance(graph, dict):
-                        for graph_ in graph.values():
-                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
-                            html_div_monitor.append(new_graph)
-
                     #handle list of graphs
-                    elif (isinstance(graph, tuple) or isinstance(graph, list) or isinstance(graph, set)):
-                        for graph_ in graph:
+                    if (isinstance(graph["fig"], tuple) or isinstance(graph["fig"], list) or isinstance(graph["fig"], set)):
+                        for graph_ in graph["fig"]:
                             new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
                             html_div_monitor.append(new_graph)
                     else:
@@ -535,4 +538,14 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
             # set dimensions of each monitor agent's graph
             return [all_graphs]
+
+        app.clientside_callback(
+            ClientsideFunction(
+                namespace='clientside',
+                function_name='render_mpld3_each'
+            ),
+            dash.dependencies.Output('mpld3_placeholder', 'children'),
+            [dash.dependencies.Input('matplotlib-division', 'children')]
+        )
+
         return app

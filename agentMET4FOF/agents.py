@@ -8,6 +8,7 @@ import time
 from typing import Union, Dict, Optional
 import matplotlib.figure
 import matplotlib.pyplot as plt
+import mpld3
 import networkx as nx
 import numpy as np
 from multiprocessing.context import Process
@@ -469,11 +470,14 @@ class AgentMET4FOF(Agent):
 
         if isinstance(fig, matplotlib.figure.Figure):
             if mode == "plotly":
-                graph = self._convert_to_plotly(fig)
+                fig = self._convert_to_plotly(fig)
             elif mode == "image":
-                graph = self._fig_to_uri(fig)
+                fig = self._fig_to_uri(fig)
+            elif mode == "mpld3":
+                fig = mpld3.fig_to_dict(fig)
             else:
                 raise NotImplementedError(error_msg)
+            graph = {"mode":mode,"fig":fig}
         elif isinstance(fig, dict): #nested
             if mode == "plotly":
                 for key in fig.keys():
@@ -481,11 +485,14 @@ class AgentMET4FOF(Agent):
             elif mode == "image":
                 for key in fig.keys():
                     fig[key] = self._fig_to_uri(fig[key])
+            elif mode == "mpld3":
+                for key in fig.keys():
+                    fig[key] = mpld3.fig_to_dict(fig[key])
             else:
                 raise NotImplementedError(error_msg)
-            graph = fig
+            graph = {"mode":mode,"fig":fig}
         else: #a plotly figure
-            graph = fig
+            graph = {"mode":mode,"fig":fig}
         self.send_output(graph, channel="plot")
         return graph
 
