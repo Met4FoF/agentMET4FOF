@@ -460,19 +460,19 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             return monitor_graphs+ style_graphs
 
 
-        def _handle_matplotlib_figure(input_data, from_agent_name: str):
+        def _handle_matplotlib_figure(input_data, from_agent_name: str, mode="image"):
             """
             Internal function. Checks the mode of matplotlib.figure.Fig to be plotted
             Either it is a base64 str image, or a plotly graph
 
             This is used in plotting the received matplotlib figures in the MonitorAgent's plot memory.
             """
-            if input_data["mode"] == "plotly":
-                new_graph = dcc.Graph(figure=input_data["fig"])
-            elif input_data["mode"] == "image":
-                new_graph = html.Img(src=input_data["fig"], title=from_agent_name)
-            elif input_data["mode"] == "mpld3":
-                new_input_data = str(input_data["fig"]).replace("'",'"')
+            if mode == "plotly":
+                new_graph = dcc.Graph(figure=input_data)
+            elif mode == "image":
+                new_graph = html.Img(src=input_data, title=from_agent_name)
+            elif mode == "mpld3":
+                new_input_data = str(input_data).replace("'",'"')
                 new_input_data = new_input_data.replace("(", "[")
                 new_input_data = new_input_data.replace(")", "]")
                 new_input_data = new_input_data.replace("None", "null")
@@ -522,14 +522,15 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 for from_agent_name in plot_data:
                     # get the graph relevant to 'monitor_agent_input'
                     graph = plot_data[from_agent_name]
-
+                    print(graph)
                     #handle list of graphs
                     if (isinstance(graph["fig"], tuple) or isinstance(graph["fig"], list) or isinstance(graph["fig"], set)):
-                        for graph_ in graph["fig"]:
-                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
+                        for graph_id, graph_ in enumerate(graph["fig"]):
+
+                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name+str(graph_id), graph["mode"])
                             html_div_monitor.append(new_graph)
                     else:
-                        new_graph = _handle_matplotlib_figure(graph, from_agent_name)
+                        new_graph = _handle_matplotlib_figure(graph["fig"], from_agent_name, graph["mode"])
                         html_div_monitor.append(new_graph)
 
                 #only add the graph if there is some plots in the Monitor Agent

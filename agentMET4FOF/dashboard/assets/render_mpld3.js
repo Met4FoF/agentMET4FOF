@@ -38,6 +38,7 @@ function render_mpld3(fig_id, fig_content){
 if(!window.dash_clientside) {window.dash_clientside = {};}
 window.dash_clientside.clientside = {
     render_mpld3_each: function(value){
+//        console.log(value)
         for (mpld3_children of value[0].props.children) {
             if ("id" in mpld3_children.props && mpld3_children.type == "Div") {
                 fig_id = mpld3_children.props.id
