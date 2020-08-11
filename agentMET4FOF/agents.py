@@ -184,6 +184,13 @@ class AgentMET4FOF(Agent):
 
     @property
     def buffer_filled(self):
+        """
+        Checks whether the internal buffer has been filled to the maximum allowed specified by self.buffer_size
+
+        Returns
+        -------
+        status of buffer filled : boolean
+        """
         return len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size
 
     def pack_data(self,data, channel='default'):
