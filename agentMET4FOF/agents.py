@@ -1208,6 +1208,13 @@ class MonitorAgent(AgentMET4FOF):
 
 
 class _Logger(AgentMET4FOF):
+    """
+    An internal logger agent which are instantiated immediately with each AgentNetwork.
+    It collects all the logs which are sent to it, and print them and optionally save them into a csv log file.
+    Since the user is not expected to directly access the logger agent, its initialisation option and interface are provided via the AgentNetwork object.
+
+    When log_info of any agent is called, the agent will send the data to the logger agent.
+    """
 
     def init_parameters(self,log_filename= "log_file.csv", save_logfile=True):
         self.current_log_handlers={"INFO":self.log_handler}
