@@ -508,10 +508,10 @@ class AgentMET4FOF(Agent):
             if type is dict, we expect it to be the agentMET4FOF dict message to be compliant with older code
             otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
         data
-            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffer.
+            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffering.
 
         concat_axis : int
-            axis to concatenate on with the buffer for numpy arrays.
+            axis to concatenate on with the buffering for numpy arrays.
 
         """
         # if first argument is the agentMET4FOF dict message
@@ -556,7 +556,7 @@ class AgentMET4FOF(Agent):
         # handle list
         if type(message['data']).__name__ == "list":
             self.memory[message['from']] += message['data']
-            #check if exceed memory buffer size, remove the first n elements which exceeded the size
+            #check if exceed memory buffering size, remove the first n elements which exceeded the size
             if len(self.memory[message['from']]) > self.memory_buffer_size:
                 truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
                 self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
