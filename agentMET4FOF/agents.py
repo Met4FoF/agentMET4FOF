@@ -746,11 +746,11 @@ class AgentNetwork:
             Port of the dashboard to be hosted on. By default is port 8050.
         """
 
-        self.ip_addr= ip_addr
+        self.ip_addr  = ip_addr
         self.port = port
         self._controller = None
         self._logger = None
-        self.log_filename= log_filename
+        self.log_filename = log_filename
 
         if type(self.log_filename) == str and '.csv' in self.log_filename:
             self.save_logfile = True
