@@ -346,7 +346,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             style_graphs = [{'opacity':0, 'width':10,'height':10} for i in range(app.num_monitors)]
 
             for monitor_id, monitor_agent in enumerate(agent_names):
-                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
                 custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
                 data =[]
                 for sender_agent in memory_data.keys():
