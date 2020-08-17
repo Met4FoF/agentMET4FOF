@@ -4,7 +4,7 @@ from typing import Dict
 import numpy as np
 from time_series_metadata.scheme import MetaData
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork
+from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
 
 

@@ -834,7 +834,7 @@ class AgentNetwork:
 
         return self._get_controller().get_attr('current_state')
 
-    def set_running_state(self, filter_agent=None):
+    def  set_running_state(self, filter_agent=None):
         """
         Blanket operation on all agents to set their `current_state` attribute to "Running"
 
