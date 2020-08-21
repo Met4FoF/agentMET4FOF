@@ -186,7 +186,7 @@ class AgentMET4FOF(Agent):
     def buffer_filled(self):
         return len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size
 
-    def pack_data(self,data, channel='default'):
+    def pack_data(self, data, channel='default'):
         """
         Internal method to pack the data content into a dictionary before sending out.
 
@@ -272,7 +272,7 @@ class AgentMET4FOF(Agent):
 
         return packed_data
 
-    def _update_output_channels_info(self, data,channel):
+    def _update_output_channels_info(self, data, channel):
         """
         Internal method to update the dict of output_channels_info. This is used in conjunction with send_output().
 
