@@ -119,7 +119,7 @@ def test_simple_metrological_agent():
 
     time.sleep(test_timeout)
 
-    # test to see if monitor agents have received the correct data
+    # test to see if key 'metadata' is present in the received data
     memory_dict = monitor_agent_1.get_attr('memory')
     memory_dict_value = list(memory_dict.values())[0]
     assert 'metadata' in memory_dict_value.keys()
@@ -128,9 +128,3 @@ def test_simple_metrological_agent():
 
     # shutdown agent network
     agentNetwork.shutdown()
-    # return agentNetwork
-
-# if __name__ == "__main__":
-#     agentNetwork = main()
-#     print(agentNetwork.get_agent('my_virtual_sensor_1').get_attr('memory'))
-#     agentNetwork.shutdown()
