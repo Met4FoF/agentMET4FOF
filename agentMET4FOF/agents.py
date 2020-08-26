@@ -81,7 +81,6 @@ class AgentMET4FOF(Agent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.log_mode = True
         self.stylesheet = ""
         self.output_channels_info = {}
         if not hasattr(self,'buffer_size'):
@@ -308,8 +307,9 @@ class AgentMET4FOF(Agent):
 
         # LOGGING
         try:
-            self.log_info("Pack time: " + str(duration_time_pack))
-            self.log_info("Sending: "+str(data))
+            if self.log_mode:
+                self.log_info("Pack time: " + str(duration_time_pack))
+                self.log_info("Sending: "+str(data))
         except Exception as e:
             print(e)
 
