@@ -87,11 +87,10 @@ class AgentMET4FOF(Agent):
         if not hasattr(self,'buffer_size'):
             self.buffer_size = default_buffer_size
         self.buffer = AgentBuffer(self.buffer_size)
-
         try:
             self.init_parameters()
-        except Exception:
-            return 0
+        except Exception as e:
+            print(e)
 
     def reset(self):
         """
