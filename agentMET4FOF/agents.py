@@ -8,6 +8,7 @@ import time
 from typing import Union, Dict, Optional
 import matplotlib.figure
 import matplotlib.pyplot as plt
+import mpld3
 import networkx as nx
 import numpy as np
 from multiprocessing.context import Process
@@ -437,6 +438,22 @@ class AgentMET4FOF(Agent):
         encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
         return "data:image/png;base64,{}".format(encoded)
 
+    def _convert_matplotlib_fig(self, fig:matplotlib.figure.Figure, mode:str="image"):
+        """
+        Internal method to convert matplotlib figure which can be rendered by the dashboard.
+
+        """
+        error_msg = "Conversion mode "+mode+" is not implemented."
+        if mode == "plotly":
+            fig = self._convert_to_plotly(fig)
+        elif mode == "image":
+            fig = self._fig_to_uri(fig)
+        elif mode == "mpld3":
+            fig = mpld3.fig_to_dict(fig)
+        else:
+            raise NotImplementedError(error_msg)
+        return fig
+
     def send_plot(self, fig: Union[matplotlib.figure.Figure, Dict[str,matplotlib.figure.Figure]], mode:str ="image"):
         """
         Sends plot to agents connected to this agent's Output channel.
@@ -465,27 +482,16 @@ class AgentMET4FOF(Agent):
 
         """
 
-        error_msg = "Conversion mode "+mode+" is not implemented."
-
         if isinstance(fig, matplotlib.figure.Figure):
-            if mode == "plotly":
-                graph = self._convert_to_plotly(fig)
-            elif mode == "image":
-                graph = self._fig_to_uri(fig)
-            else:
-                raise NotImplementedError(error_msg)
+            graph = {"mode":mode,"fig":self._convert_matplotlib_fig(fig,mode)}
         elif isinstance(fig, dict): #nested
-            if mode == "plotly":
-                for key in fig.keys():
-                    fig[key] = self._convert_to_plotly(fig[key])
-            elif mode == "image":
-                for key in fig.keys():
-                    fig[key] = self._fig_to_uri(fig[key])
-            else:
-                raise NotImplementedError(error_msg)
-            graph = fig
-        else: #a plotly figure
-            graph = fig
+            for key in fig.keys():
+                fig[key] = self._convert_matplotlib_fig(fig[key],mode)
+            graph = {"mode":mode,"fig":list(fig.values())}
+        elif isinstance(fig, list):
+            graph = {"mode":mode,"fig":[self._convert_matplotlib_fig(fig_,mode) for fig_ in fig]}
+        else:
+            graph = {"mode":mode,"fig":fig}
         self.send_output(graph, channel="plot")
         return graph
 
@@ -502,10 +508,10 @@ class AgentMET4FOF(Agent):
             if type is dict, we expect it to be the agentMET4FOF dict message to be compliant with older code
             otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
         data
-            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffer.
+            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffering.
 
         concat_axis : int
-            axis to concatenate on with the buffer for numpy arrays.
+            axis to concatenate on with the buffering for numpy arrays.
 
         """
         # if first argument is the agentMET4FOF dict message
@@ -550,7 +556,7 @@ class AgentMET4FOF(Agent):
         # handle list
         if type(message['data']).__name__ == "list":
             self.memory[message['from']] += message['data']
-            #check if exceed memory buffer size, remove the first n elements which exceeded the size
+            #check if exceed memory buffering size, remove the first n elements which exceeded the size
             if len(self.memory[message['from']]) > self.memory_buffer_size:
                 truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
                 self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
