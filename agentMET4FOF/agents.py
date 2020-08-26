@@ -103,15 +103,6 @@ class AgentMET4FOF(Agent):
         """
         return 0
 
-    def before_loop(self):
-        """
-        This action is executed before initiating the loop
-        """
-        if self.loop_wait is None:
-            self.init_agent_loop()
-        else:
-            self.init_agent_loop(self.loop_wait)
-
     def log_ML(self, message):
         self.send("_logger", message, topic="ML_EXP")
 
@@ -132,7 +123,7 @@ class AgentMET4FOF(Agent):
         except Exception:
                 return -1
 
-    def init_agent_loop(self, loop_wait: Optional[int] = 1.0):
+    def init_agent_loop(self, loop_wait: Optional[int] = None):
         """
         Initiates the agent loop, which iterates every `loop_wait` seconds
 
@@ -143,7 +134,17 @@ class AgentMET4FOF(Agent):
         loop_wait : int, optional
             The wait between each iteration of the loop
         """
-        self.loop_wait = loop_wait
+
+        #most default: loop wait has not been set in init_parameters() not init_agent_loop()
+        if self.loop_wait is None and loop_wait is None:
+            set_loop_wait = 1.0
+        #init_agent_loop overrides loop_wait parameter
+        elif loop_wait is not None:
+            set_loop_wait = loop_wait
+        #otherwise assume init_parameters() have set loop_wait
+        elif self.loop_wait is not None:
+            set_loop_wait = self.loop_wait
+        self.loop_wait = set_loop_wait
         self.stop_all_timers()
         # check if agent_loop is overridden by user
         if self.__class__.agent_loop == AgentMET4FOF.agent_loop:
@@ -799,7 +800,7 @@ class _AgentController(AgentMET4FOF):
             name += "("+str(self.get_agent_name_count(agent_name))+")"
         return name
 
-    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000,ip_addr=None):
+    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000,ip_addr=None, loop_wait=None, **kwargs):
         try:
             if ip_addr is None:
                 ip_addr = 'localhost'
@@ -809,6 +810,8 @@ class _AgentController(AgentMET4FOF):
             else:
                 new_name= self.generate_module_name_byUnique(name)
             new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            new_agent.init_parameters(**kwargs)
+            new_agent.init_agent_loop(loop_wait)
 
             if log_mode:
                 new_agent.set_logger(self._get_logger())
@@ -1169,7 +1172,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, **kwargs):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, loop_wait=None, **kwargs):
         """
         Instantiates a new agent in the network.
 
@@ -1189,8 +1192,7 @@ class AgentNetwork:
         """
         if ip_addr is None:
             ip_addr = self.ip_addr
-            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, buffer_size=buffer_size,ip_addr=ip_addr)
-            agent.init_parameters(**kwargs)
+            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, buffer_size=buffer_size,ip_addr=ip_addr, loop_wait=loop_wait, **kwargs)
         else:
             if name == " ":
                 new_name= self._get_controller().generate_module_name_byType(agentType)
@@ -1198,6 +1200,7 @@ class AgentNetwork:
                 new_name= self._get_controller().generate_module_name_byUnique(name)
             agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
             agent.init_parameters(**kwargs)
+            agent.init_agent_loop(loop_wait)
         return agent
 
     def add_coalition(self, name="Coalition_1", agents=[]):
