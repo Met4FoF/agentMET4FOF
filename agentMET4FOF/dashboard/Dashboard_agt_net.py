@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
 import networkx as nx
+from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
 from . import LayoutHelper
