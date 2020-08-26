@@ -17,6 +17,8 @@ from osbrain import NSProxy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
+import pandas as pd
+import copy
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF
@@ -30,7 +32,7 @@ class AgentMET4FOF(Agent):
     Communicative functions are bind_output, unbind_output and send_output.
 
     """
-    def on_init(self):
+    def on_init(self, default_buffer_size = 1000):
         """
         Internal initialization to setup the agent: mainly on setting the dictionary of Inputs, Outputs, PubAddr.
 
@@ -64,8 +66,8 @@ class AgentMET4FOF(Agent):
             The interval to wait between loop.
             Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
 
-        memory_buffer_size : int
-            The total number of elements to be stored in the agent `memory`
+        buffer_size : int
+            The total number of elements to be stored in the agent `buffer`
             When total elements exceeds this number, the latest elements will be replaced with the incoming data elements
         """
         self.Inputs = {}
@@ -79,10 +81,12 @@ class AgentMET4FOF(Agent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.memory = {}
         self.log_mode = True
         self.stylesheet = ""
         self.output_channels_info = {}
+        if not hasattr(self,'buffer_size'):
+            self.buffer_size = default_buffer_size
+        self.buffer = AgentBuffer(self.buffer_size)
 
         try:
             self.init_parameters()
@@ -183,9 +187,51 @@ class AgentMET4FOF(Agent):
         """
         return message
 
-    @property
-    def buffer_filled(self):
-        return len(self.memory[self.name][next(iter(self.memory[self.name]))]) >= self.buffer_size
+    def buffer_filled(self, agent_name=None):
+        """
+        Checks whether the internal buffer has been filled to the maximum allowed specified by self.buffer_size
+
+        Parameters
+        ----------
+        agent_name : str
+            Index of the buffer which is the name of input agent.
+
+        Returns
+        -------
+        status of buffer filled : boolean
+        """
+        return self.buffer.buffer_filled(agent_name)
+
+    def buffer_clear(self, agent_name=None):
+        """
+        Empties buffer which is a dict indexed by the `agent_name`.
+
+        Parameters
+        ----------
+        agent_name : str
+            Key of the memory dict, which can be the name of input agent, or self.name. If one is not supplied, we assume to clear the entire memory.
+
+        """
+        self.buffer.clear(agent_name)
+
+    def buffer_store(self,agent_from:str,data=None):
+        """
+        Updates data stored in `self.buffer` with the received message
+
+        Checks if sender agent has sent any message before
+        If it did,then append, otherwise create new entry for it
+
+        Parameters
+        ----------
+        agent_from : str
+            Name of agent sender
+        data
+            Any supported data which can be stored in dict as buffer. See AgentBuffer for more information.
+
+        """
+
+        self.buffer.store(agent_from=agent_from,data=data)
+        self.log_info("Buffer: " + str(self.buffer.buffer))
 
     def pack_data(self,data, channel='default'):
         """
@@ -495,12 +541,172 @@ class AgentMET4FOF(Agent):
         self.send_output(graph, channel="plot")
         return graph
 
-    def update_data_memory(self,agent_from,data=None, concat_axis=0):
+    def get_all_attr(self):
+        _all_attr = self.__dict__
+        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias","PubAddr","states","log_mode","get_all_attr","plots","name","agent_loop"]
+        filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
+        filtered_attr = {key: val for key, val in filtered_attr.items() if key not in excludes and type(val).__name__ != 'function'}
+        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(val) == str or key == 'output_channels_info') else str(val) for key, val in filtered_attr.items()}
+        filtered_attr = {key: val for key, val in filtered_attr.items() if "object" not in str(val)}
+
+        return filtered_attr
+
+class AgentBuffer():
+    """
+    Buffer class which is instantiated in every agent to store data incrementally.
+    This buffer is necessary to handle multiple inputs coming from agents.
+    The buffer can be a dict of iterables, or a dict of dict of iterables for nested named data.
+    The keys are the names of agents.
+    """
+    def __init__(self, buffer_size = 1000):
         """
-        Updates data stored in `self.memory` with the received message
+        Parameters
+        ----------
+
+        buffer_size: int
+            Length of buffer allowed.
+        """
+        self.buffer = {}
+        self.buffer_size = buffer_size
+        self.supported_datatype = (list, pd.DataFrame, np.ndarray)
+
+    def __getitem__(self, key):
+         return self.buffer[key]
+
+    def check_supported_datatype(self, value):
+        for supported_datatype in self.supported_datatype:
+            if isinstance(value,supported_datatype):
+                return True
+        return False
+
+    def update(self, agent_from:str, data):
+        """
+        Overrides data in the buffer dict keyed by `agent_from` with value `data`
+
+        If `data` is a single value, this converts it into a list first before storing in the buffer dict.
+        """
+        # handle if data type nested in dict
+        if isinstance(data, dict):
+            # check for each value datatype
+            for key, value in data.items():
+                # if the value is not list types, turn it into a list of single value i.e [value]
+                if not self.check_supported_datatype(value):
+                    data[key] = [value]
+        elif not self.check_supported_datatype(data):
+            data = [data]
+        self.buffer.update({agent_from:data})
+        return self.buffer
+
+    def _concatenate(self, iterable, data):
+        """
+        Concatenate the given `iterable`, with `data`.
+        Handles the concatenation function depending on the datatype, and truncates it if the buffer is filled to `buffer_size`.
+
+        Parameters
+        ----------
+        iterable : any in supported_datatype
+            The current buffer to be concatenated with.
+
+        data : any in supported_datatype
+            New incoming data
+        """
+        # handle list
+        if isinstance(iterable, list):
+            iterable += data
+            #check if exceed memory buffer size, remove the first n elements which exceeded the size
+            if len(iterable) > self.buffer_size:
+                truncated_element_index = len(iterable) - self.buffer_size
+                iterable = iterable[truncated_element_index:]
+
+        # handle if data type is np.ndarray
+        elif isinstance(iterable, np.ndarray):
+            iterable = np.concatenate((iterable, data))
+            if len(iterable) > self.buffer_size:
+                truncated_element_index = len(iterable) - self.buffer_size
+                iterable = iterable[truncated_element_index:]
+
+        # handle if data type is pd.DataFrame
+        elif isinstance(iterable, pd.DataFrame):
+            iterable = iterable.append(data,ignore_index=True)
+            if len(iterable) > self.buffer_size:
+                truncated_element_index = len(iterable) - self.buffer_size
+                iterable = iterable.truncate(before=truncated_element_index)
+        return iterable
+
+    def buffer_filled(self, agent_from=None):
+        """
+        Checks whether buffer is filled.
+
+        Parameters
+        ----------
+        agent_from : str
+            Name of input agent in the buffer dict to be looked up for.
+            If `agent_from` is not provided, we check for all iterables in the buffer.
+            For nested dict, this returns true for any iterable which is beyond the `buffer_size`.
+        """
+        if agent_from is None:
+            return any([self._iterable_filled(iterable) for iterable in self.buffer.values()])
+        elif isinstance(self.buffer[agent_from], dict):
+            return any([self._iterable_filled(iterable) for iterable in self.buffer[agent_from].values()])
+        else:
+            return self._iterable_filled(self.buffer[agent_from])
+
+    def _iterable_filled(self, iterable):
+        """
+        Internal method for checking on length of iterable.
+        """
+        if self.check_supported_datatype(iterable):
+            if len(iterable) >= self.buffer_size:
+                return True
+            else:
+                return False
+
+    def popleft(self, n=1):
+        """
+        Pops the first n entries in the buffer.
+        """
+        popped_buffer = copy.copy(self.buffer)
+        remaining_buffer = copy.copy(self.buffer)
+        if isinstance(popped_buffer, dict):
+            for key in popped_buffer.keys():
+                popped_buffer[key], remaining_buffer[key] = self._popleft(popped_buffer[key],n)
+        else:
+            popped_buffer, remaining_buffer = self._popleft(popped_buffer,n)
+        self.buffer = remaining_buffer
+        return popped_buffer
+
+    def _popleft(self, iterable, n=1):
+        popped_item = 0
+        if isinstance(iterable, list):
+            popped_item = iterable[:n]
+            iterable = iterable[n:]
+        elif isinstance(iterable, np.ndarray):
+            popped_item = iterable[:n]
+            iterable = iterable[n:]
+        elif isinstance(iterable, pd.DataFrame):
+            popped_item = iterable.iloc[:n]
+            iterable = iterable.iloc[n:]
+        return popped_item, iterable
+
+    def clear(self, agent_from=None):
+        """
+        Clears the data in the buffer. if `agent_from` is not given, the entire buffer is removed.
+
+        agent_from : str
+            Name of agent
+        """
+        if agent_from is None:
+            del self.buffer
+            self.buffer = {}
+        else:
+            del self.buffer[agent_from]
+
+    def store(self, agent_from, data=None):
+        """
+        Stores data into `self.buffer` with the received message
 
         Checks if sender agent has sent any message before
-        If it did,then append, otherwise create new entry for it
+        If it did, then append, otherwise create new entry for it
 
         Parameters
         ----------
@@ -521,110 +727,36 @@ class AgentMET4FOF(Agent):
         else:
             message = {"from":agent_from, "data":data}
 
+        #store into a separate variables, it will be used frequently later for the type checks
+        message_from = message["from"]
+        message_data = message["data"]
+
         # check if sender agent has sent any message before:
-        # if it did,then append, otherwise create new entry for it
-        if message['from'] not in self.memory:
-            # handle if data type is list
-            if type(message['data']).__name__ == "list":
-                self.memory.update({message['from']:message['data']})
-
-            # handle if data type is np.ndarray
-            elif type(message['data']).__name__ == "ndarray":
-                self.memory.update({message['from']:message['data']})
-
-            # handle if data type is pd.DataFrame
-            elif type(message['data']).__name__ == "DataFrame":
-                self.memory.update({message['from']:message['data']})
-
-            # handle if data type is dict
-            elif type(message['data']).__name__ == "dict":
-                # check for each value datatype
-                for key in message['data'].keys():
-                    # if the value is not list types, turn it into a list
-                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray" and type(message['data'][key]).__name__ != "DataFrame":
-                        message['data'][key] = [message['data'][key]]
-                    self.memory.update({message['from']: message['data']})
-
-            else:
-                self.memory.update({message['from']:[message['data']]})
-            # self.log_info("Memory: "+ str(self.memory))
+        # if it did,then append, otherwise create new entry for the input agent
+        if message_from not in self.buffer:
+            self.update(message_from, message_data)
             return 0
 
         # otherwise 'sender' exists in memory, handle appending
         # acceptable data types : list, dict, ndarray, dataframe, single values
 
-        # handle list
-        if type(message['data']).__name__ == "list":
-            self.memory[message['from']] += message['data']
-            #check if exceed memory buffering size, remove the first n elements which exceeded the size
-            if len(self.memory[message['from']]) > self.memory_buffer_size:
-                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
-                self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
-        # handle if data type is np.ndarray
-        elif type(message['data']).__name__ == "ndarray":
-            self.memory[message['from']] = np.concatenate((self.memory[message['from']], message['data']),axis=concat_axis)
-            if len(self.memory[message['from']]) > self.memory_buffer_size:
-                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
-                self.memory[message['from']]= self.memory[message['from']][truncated_element_index:]
-
-        # handle if data type is pd.DataFrame
-        elif type(message['data']).__name__ == "DataFrame":
-            self.memory[message['from']] = self.memory[message['from']].append(message['data']).reset_index(drop=True)
-            if len(self.memory[message['from']]) > self.memory_buffer_size:
-                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
-                self.memory[message['from']]= self.memory[message['from']].truncate(before=truncated_element_index)
-
-        # handle dict
-        elif type(message['data']).__name__ == "dict":
-            for key in message['data'].keys():
-                # handle : check if key is in dictionary, otherwise add new key in dictionary
-                if key not in self.memory[message['from']].keys():
-                    if type(message['data'][key]).__name__ != "list" and type(message['data'][key]).__name__ != "ndarray" and type(message['data'][key]).__name__ != "DataFrame":
-                        message['data'][key] = [message['data'][key]]
-                    self.memory[message['from']].update(message['data'])
-
-                # handle : dict value is list
-                elif type(message['data'][key]).__name__ == "list":
-                    self.memory[message['from']][key] += message['data'][key]
-                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
-                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
-                        self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
-                # handle : dict value is numpy array
-                elif type(message['data'][key]).__name__== "ndarray":
-                    self.memory[message['from']][key] = np.concatenate((self.memory[message['from']][key],message['data'][key]), axis=concat_axis)
-                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
-                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
-                        self.memory[message['from']][key]= self.memory[message['from']][key][truncated_element_index:]
-
-                elif type(message['data'][key]).__name__== "DataFrame":
-                    self.memory[message['from']][key] = self.memory[message['from']][key].append(message['data'][key])
-                    self.memory[message['from']][key].reset_index(drop=True, inplace=True)
-                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
-                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
-                        self.memory[message['from']][key]= self.memory[message['from']][key].truncate(before=truncated_element_index)
-
-                # handle: dict value is int/float/single value to be converted into list
+        # handle nested data in dict
+        if isinstance(message_data, dict):
+            for key, value in message_data.items():
+                #if it is a single value, then we convert it into a single element list
+                if not self.check_supported_datatype(value):
+                    value = [value]
+                #check if the key exist
+                #if it does, then append
+                if key in self.buffer[agent_from].keys():
+                    self.buffer[agent_from][key] = self._concatenate(self.buffer[agent_from][key], value)
+                #otherwise, create new entry
                 else:
-                    self.memory[message['from']][key] += [message['data'][key]]
-                    if len(self.memory[message['from']][key]) > self.memory_buffer_size:
-                        truncated_element_index = len(self.memory[message['from']][key]) -self.memory_buffer_size
-                        self.memory[message['from']][key] = self.memory[message['from']][key][truncated_element_index:]
+                    self.buffer[agent_from].update({key:value})
         else:
-            self.memory[message['from']].append(message['data'])
-            if len(self.memory[message['from']]) > self.memory_buffer_size:
-                truncated_element_index = len(self.memory[message['from']]) -self.memory_buffer_size
-                self.memory[message['from']] = self.memory[message['from']][truncated_element_index:]
-        self.log_info("Memory: " + str(self.memory))
-
-    def get_all_attr(self):
-        _all_attr = self.__dict__
-        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias","PubAddr","states","log_mode","get_all_attr","plots","name","agent_loop"]
-        filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
-        filtered_attr = {key: val for key, val in filtered_attr.items() if key not in excludes and type(val).__name__ != 'function'}
-        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(val) == str or key == 'output_channels_info') else str(val) for key, val in filtered_attr.items()}
-        filtered_attr = {key: val for key, val in filtered_attr.items() if "object" not in str(val)}
-
-        return filtered_attr
+            if not self.check_supported_datatype(message_data):
+                message_data = [message_data]
+            self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data)
 
 
 class _AgentController(AgentMET4FOF):
@@ -672,7 +804,7 @@ class _AgentController(AgentMET4FOF):
             name += "("+str(self.get_agent_name_count(agent_name))+")"
         return name
 
-    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000,ip_addr=None):
+    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000,ip_addr=None):
         try:
             if ip_addr is None:
                 ip_addr = 'localhost'
@@ -681,7 +813,7 @@ class _AgentController(AgentMET4FOF):
                 new_name= self.generate_module_name_byType(agentType)
             else:
                 new_name= self.generate_module_name_byUnique(name)
-            new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
 
             if log_mode:
                 new_agent.set_logger(self._get_logger())
@@ -1042,7 +1174,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000, ip_addr=None, stylesheet=""):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000, ip_addr=None):
         """
         Instantiates a new agent in the network.
 
@@ -1062,14 +1194,13 @@ class AgentNetwork:
         """
         if ip_addr is None:
             ip_addr = self.ip_addr
-            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, memory_buffer_size=memory_buffer_size,ip_addr=ip_addr)
+            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, buffer_size=buffer_size,ip_addr=ip_addr)
         else:
             if name == " ":
                 new_name= self._get_controller().generate_module_name_byType(agentType)
             else:
                 new_name= self._get_controller().generate_module_name_byUnique(name)
-            agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
-            agent.set_attr(stylesheet=stylesheet)
+            agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
         return agent
 
     def add_coalition(self, name="Coalition_1", agents=[]):
@@ -1222,10 +1353,9 @@ class MonitorAgent(AgentMET4FOF):
         if message['channel'] == 'default':
             if self.plot_filter != []:
                 message['data'] = {key: message['data'][key] for key in self.plot_filter}
-            self.update_data_memory(message)
+            self.buffer_store(agent_from=message["from"],data=message["data"])
         elif message['channel'] == 'plot':
             self.update_plot_memory(message)
-
         return 0
 
     def update_plot_memory(self, message):
@@ -1249,10 +1379,18 @@ class MonitorAgent(AgentMET4FOF):
 
     def reset(self):
         super(MonitorAgent, self).reset()
+        del self.plots
         self.plots = {}
 
 
 class _Logger(AgentMET4FOF):
+    """
+    An internal logger agent which are instantiated immediately with each AgentNetwork.
+    It collects all the logs which are sent to it, and print them and optionally save them into a csv log file.
+    Since the user is not expected to directly access the logger agent, its initialisation option and interface are provided via the AgentNetwork object.
+
+    When log_info of any agent is called, the agent will send the data to the logger agent.
+    """
 
     def init_parameters(self,log_filename= "log_file.csv", save_logfile=True):
         self.current_log_handlers={"INFO":self.log_handler}

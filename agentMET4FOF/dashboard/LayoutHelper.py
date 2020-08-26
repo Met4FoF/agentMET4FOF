@@ -29,9 +29,25 @@ def create_edges_cytoscape(edges):
     return new_elements
 
 def create_monitor_graph(data,sender_agent = 'Monitor Agent'):
-    y = data
-    x = np.arange(len(y))
-    trace = go.Scatter(x=x, y=y,mode="lines", name=sender_agent)
+    """
+    Parameters
+    ----------
+    data : dict or np.darray
+        The data saved in the MonitorAgent's memory, for each Inputs (Agents) it is connected to.
+    sender_agent : str
+        Name of the sender agent
+    **kwargs
+        Custom parameters
+    """
+    if isinstance(data, dict):
+        if 'time' not in data.keys():
+            trace = [go.Scatter(x=np.arange(len(data[key])), y=data[key],mode="lines", name=sender_agent+':'+key) for key in data.keys()]
+        else:
+            trace = [go.Scatter(x=data['time'], y=data[key],mode="lines", name=sender_agent+':'+key) for key in data.keys() if key !='time']
+    else:
+        y = data
+        x = np.arange(len(y))
+        trace = go.Scatter(x=x, y=y,mode="lines", name=sender_agent)
     return trace
 
 def create_params_table(table_name="",data={}, columns=None, **kwargs):

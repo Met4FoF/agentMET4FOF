@@ -403,36 +403,31 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             style_graphs = [{'opacity':0, 'width':10,'height':10} for i in range(app.num_monitors)]
 
             for monitor_id, monitor_agent in enumerate(agent_names):
-                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
                 custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
                 data =[]
                 for sender_agent in memory_data.keys():
                     #if custom plot function is not provided, resolve to default plotting
                     if type(custom_plot_function).__name__ == "int":
-                        if type(memory_data[sender_agent]) == dict:
-                            for attribute in memory_data[sender_agent].keys():
-                                data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
-                        else:
-                            data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
+                        traces=create_monitor_graph(memory_data[sender_agent],sender_agent)
                     #otherwise call custom plot function and load up custom plot parameters
                     else:
                         custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_parameters')
-                        data.append(custom_plot_function(memory_data[sender_agent], sender_agent, **custom_plot_parameters))
                         # Handle iterable of traces.
                         traces = custom_plot_function(
                             memory_data[sender_agent],
                             sender_agent,
                             **custom_plot_parameters
                         )
-                        if (
-                            isinstance(traces, tuple)
-                            or isinstance(traces, list)
-                            or isinstance(traces, set)
-                        ):
-                            for trace in traces:
-                                data.append(trace)
-                        else:
-                            data.append(traces)
+                    if (
+                        isinstance(traces, tuple)
+                        or isinstance(traces, list)
+                        or isinstance(traces, set)
+                    ):
+                        for trace in traces:
+                            data.append(trace)
+                    else:
+                        data.append(traces)
                 if len(data) > 5:
                     y_title_offset = 0.1
                 else:
