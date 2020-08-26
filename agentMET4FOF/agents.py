@@ -86,10 +86,6 @@ class AgentMET4FOF(Agent):
         if not hasattr(self,'buffer_size'):
             self.buffer_size = default_buffer_size
         self.buffer = AgentBuffer(self.buffer_size)
-        try:
-            self.init_parameters()
-        except Exception as e:
-            print(e)
 
     def reset(self):
         """
@@ -1173,7 +1169,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000, ip_addr=None):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, **kwargs):
         """
         Instantiates a new agent in the network.
 
@@ -1194,12 +1190,14 @@ class AgentNetwork:
         if ip_addr is None:
             ip_addr = self.ip_addr
             agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, buffer_size=buffer_size,ip_addr=ip_addr)
+            agent.init_parameters(**kwargs)
         else:
             if name == " ":
                 new_name= self._get_controller().generate_module_name_byType(agentType)
             else:
                 new_name= self._get_controller().generate_module_name_byUnique(name)
             agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            agent.init_parameters(**kwargs)
         return agent
 
     def add_coalition(self, name="Coalition_1", agents=[]):
