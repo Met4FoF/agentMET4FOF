@@ -1,7 +1,6 @@
 import dash
 import dash_core_components as dcc
 import dash_cytoscape as cyto
-import dash_dangerously_set_inner_html
 import dash_html_components as html
 import networkx as nx
 from dash.exceptions import PreventUpdate
