@@ -58,9 +58,52 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                                                           'shape': 'rectangle' }
                                                          },
                                                     { 'selector': 'edge',
-                                                      'style': { 'mid-target-arrow-shape': 'triangle','arrow-scale': 3},
-                                                    }
+                                                      'style': { 'curve-style': 'bezier', 'mid-target-arrow-shape':
+                                                          'triangle','arrow-scale': 2, 'line-color': '#4287f5',
+                                                                 'mid-target-arrow-color': '#4287f5'},
+                                                    },
+                                                    {
+                                                        'selector': '.rectangle',
+                                                        'style': {
+                                                            'shape': 'rectangle'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.triangle',
+                                                        'style': {
+                                                            'shape': 'triangle'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.octagon',
+                                                        'style': {
+                                                            'shape': 'octagon'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.ellipse',
+                                                        'style': {
+                                                            'shape': 'ellipse'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.bluebackground',
+                                                        'style': {
+                                                            'background-color': '#c4fdff'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.blue',
+                                                        'style': {
+                                                            'background-color': '#006db5'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.coalition',
+                                                        'style': {'line-style': 'dashed'}
+                                                    },
                                                   ]
+
                                    )
 
                                 ])
@@ -150,7 +193,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                       [dash.dependencies.Input('interval-component-network-graph', 'n_intervals')],
                       [dash.dependencies.State('agents-network', 'elements')]
                        )
-        def update_network_graph(n_intervals,graph_elements):
+        def update_network_graph(n_intervals, graph_elements):
             #get nameserver
             agentNetwork = app.dashboard_ctrl.agentNetwork
 
@@ -158,22 +201,42 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             agentNetwork.update_networkx()
             nodes, edges = agentNetwork.get_nodes_edges()
 
+            #get coalitions of agents
+            coalitions = agentNetwork.coalitions
+
             #if current graph number is different more than before, then update graph
-            if len(graph_elements) != (len(nodes) + len(edges)):
+            if len(graph_elements) != (len(nodes) + len(edges) + len(coalitions)):
             #if(app.dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes) or app.dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
                 new_G = nx.DiGraph()
-                new_G.add_nodes_from(nodes)
+                new_G.add_nodes_from(nodes(data=True))
                 new_G.add_edges_from(edges)
 
                 nodes_elements = create_nodes_cytoscape(new_G)
                 edges_elements = create_edges_cytoscape(edges)
+                # print(edges_elements)
+                #draw coalition nodes, and assign child nodes to coalition nodes
+                if len(agentNetwork.coalitions)>0:
+                    parent_elements = [{"data":{'id':coalition.name, 'label':coalition.name},
+                                        'classes':'bluebackground'} for coalition in agentNetwork.coalitions]
+                    for coalition in coalitions:
+                        #check if agent is in the coalition, set its parents
+                        for agent_node in nodes_elements:
+                            if agent_node["data"]["id"] in coalition.agent_names():
+                                agent_node["data"].update({'parent':coalition.name})
+                        # print(coalition.agent_names())
+                        #change edge styles within coalition to dashed
+                        for edges in edges_elements:
+                            if edges["data"]["source"] in coalition.agent_names() and edges["data"]["target"] in coalition.agent_names():
+                                edges.update({'classes':"coalition"})
+                else:
+                    parent_elements = []
 
                 app.dashboard_ctrl.agent_graph = new_G
 
                 # update agents connect options
                 node_connect_options = [{'label': agentName, 'value': agentName} for agentName in nodes]
 
-                return [nodes_elements + edges_elements, node_connect_options]
+                return [nodes_elements + edges_elements + parent_elements, node_connect_options]
 
             else:
                 raise PreventUpdate
@@ -453,6 +516,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                     if isinstance(graph, dict):
                         for graph_ in graph.values():
+                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
+                            html_div_monitor.append(new_graph)
+
+                    #handle list of graphs
+                    elif (isinstance(graph, tuple) or isinstance(graph, list) or isinstance(graph, set)):
+                        for graph_ in graph:
                             new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
                             html_div_monitor.append(new_graph)
                     else:

@@ -81,7 +81,7 @@ class AgentMET4FOF(Agent):
         self.current_state = self.states[0]
         self.loop_wait = None
         self.log_mode = True
-
+        self.stylesheet = ""
         self.output_channels_info = {}
         if not hasattr(self,'buffer_size'):
             self.buffer_size = default_buffer_size
@@ -709,6 +709,10 @@ class AgentBuffer():
             otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
         data
             optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffer.
+
+        concat_axis : int
+            axis to concatenate on with the buffer for numpy arrays.
+
         """
         # if first argument is the agentMET4FOF dict message
         if isinstance(agent_from, dict):
@@ -762,6 +766,7 @@ class _AgentController(AgentMET4FOF):
         self.ns = ns
         self.G = nx.DiGraph()
         self._logger = None
+        self.coalitions = []
 
     def get_agentType_count(self, agentType):
         num_count = 1
@@ -788,7 +793,9 @@ class _AgentController(AgentMET4FOF):
 
     def generate_module_name_byUnique(self, agent_name):
         name = agent_name
-        name += "_"+str(self.get_agent_name_count(agent_name))
+        agent_copy_count = self.get_agent_name_count(agent_name) #number of agents with same name
+        if agent_copy_count>1:
+            name += "("+str(self.get_agent_name_count(agent_name))+")"
         return name
 
     def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000,ip_addr=None):
@@ -808,6 +815,16 @@ class _AgentController(AgentMET4FOF):
         except Exception as e:
             self.log_info("ERROR:" + str(e))
 
+    def get_agents_stylesheets(self, agent_names):
+        #for customising display purposes in dashboard
+        agents_stylesheets = []
+        for agent in agent_names:
+            try:
+                stylesheet = self.ns.proxy(agent).get_attr("stylesheet")
+                agents_stylesheets.append({"stylesheet":stylesheet})
+            except Exception as e:
+                self.log_info("Error:"+str(e))
+        return agents_stylesheets
 
     def agents(self):
         exclude_names = ["AgentController","Logger"]
@@ -819,8 +836,9 @@ class _AgentController(AgentMET4FOF):
         edges = self.get_latest_edges(agent_names)
 
         if len(agent_names) != self.G.number_of_nodes() or len(edges) != self.G.number_of_edges():
+            agent_stylesheets = self.get_agents_stylesheets(agent_names)
             new_G = nx.DiGraph()
-            new_G.add_nodes_from(agent_names)
+            new_G.add_nodes_from(list(zip(agent_names,agent_stylesheets)))
             new_G.add_edges_from(edges)
             self.G = new_G
 
@@ -843,6 +861,14 @@ class _AgentController(AgentMET4FOF):
         if self._logger is None:
             self._logger = self.ns.proxy('Logger')
         return self._logger
+
+    def add_coalition(self, new_coalition):
+        """
+        Instantiates a coalition of agents.
+        """
+        self.coalitions.append(new_coalition)
+        return new_coalition
+
 
 class AgentNetwork:
     """
@@ -1171,6 +1197,18 @@ class AgentNetwork:
             agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
         return agent
 
+    def add_coalition(self, name="Coalition_1", agents=[]):
+        """
+        Instantiates a coalition of agents.
+        """
+        new_coalition = Coalition(name, agents)
+        self._get_controller().add_coalition(new_coalition)
+        return new_coalition
+
+    @property
+    def coalitions(self):
+        return self._get_controller().get_attr("coalitions")
+
     def shutdown(self):
         """Shuts down the entire agent network and all agents"""
 
@@ -1187,6 +1225,14 @@ class AgentNetwork:
             self.dashboard_proc.join()
         return 0
 
+
+class Coalition():
+    def __init__(self, name="Coalition", agents=[]):
+        self.agents = agents
+        self.name = name
+
+    def agent_names(self):
+        return [agent.get_attr("name") for agent in self.agents]
 
 class DataStreamAgent(AgentMET4FOF):
     """
