@@ -31,7 +31,7 @@ class AgentMET4FOF(Agent):
     Communicative functions are bind_output, unbind_output and send_output.
 
     """
-    def on_init(self):
+    def on_init(self, default_buffer_size = 1000):
         """
         Internal initialization to setup the agent: mainly on setting the dictionary of Inputs, Outputs, PubAddr.
 
@@ -80,11 +80,12 @@ class AgentMET4FOF(Agent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.buffer = {}
         self.log_mode = True
 
         self.output_channels_info = {}
-        self.buffer = AgentBuffer()
+        if not hasattr(self,'buffer_size'):
+            self.buffer_size = default_buffer_size
+        self.buffer = AgentBuffer(self.buffer_size)
 
         try:
             self.init_parameters()
@@ -790,7 +791,7 @@ class _AgentController(AgentMET4FOF):
         name += "_"+str(self.get_agent_name_count(agent_name))
         return name
 
-    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000,ip_addr=None):
+    def add_module(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000,ip_addr=None):
         try:
             if ip_addr is None:
                 ip_addr = 'localhost'
@@ -799,7 +800,7 @@ class _AgentController(AgentMET4FOF):
                 new_name= self.generate_module_name_byType(agentType)
             else:
                 new_name= self.generate_module_name_byUnique(name)
-            new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            new_agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
 
             if log_mode:
                 new_agent.set_logger(self._get_logger())
@@ -1141,7 +1142,7 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
-    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, memory_buffer_size=1000000, ip_addr=None):
+    def add_agent(self, name=" ", agentType= AgentMET4FOF, log_mode=True, buffer_size=1000000, ip_addr=None):
         """
         Instantiates a new agent in the network.
 
@@ -1161,13 +1162,13 @@ class AgentNetwork:
         """
         if ip_addr is None:
             ip_addr = self.ip_addr
-            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, memory_buffer_size=memory_buffer_size,ip_addr=ip_addr)
+            agent = self._get_controller().add_module(name=name, agentType= agentType, log_mode=log_mode, buffer_size=buffer_size,ip_addr=ip_addr)
         else:
             if name == " ":
                 new_name= self._get_controller().generate_module_name_byType(agentType)
             else:
                 new_name= self._get_controller().generate_module_name_byUnique(name)
-            agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode,memory_buffer_size=memory_buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
+            agent = run_agent(new_name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size), nsaddr=self.ns.addr(), addr=ip_addr)
         return agent
 
     def shutdown(self):
