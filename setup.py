@@ -58,6 +58,7 @@ setup(
     },
     install_requires=[
         "numpy",
+        "scipy",
         "matplotlib!=3.3",
         "pandas",
         "osbrain",
