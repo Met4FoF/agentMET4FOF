@@ -67,6 +67,7 @@ setup(
         "plotly",
         "time-series-buffer",
         "time-series-metadata",
+        "mpld3",
     ],
     python_requires=">=3.6",
     classifiers=[
