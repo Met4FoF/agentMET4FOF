@@ -309,6 +309,6 @@ def extract_x_y(message):
         x = message['data']['x']
         y = message['data']['y']
     else:
-        return -1
+        return 1
     return x, y
 

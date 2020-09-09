@@ -183,7 +183,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         except Exception as e:
             print(e)
-            return -1
+            return 1
 
     def init_agent_loop(self, loop_wait: Optional[int] = None):
         """
