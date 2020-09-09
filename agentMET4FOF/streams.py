@@ -6,19 +6,23 @@ class DataStreamMET4FOF():
     """
     Abstract class for creating datastream.
 
-    Data can be fetched sequentially using `next_sample()` or all at once `all_samples()`
-    This increments the internal sample index `sample_idx`.
+    Data can be fetched sequentially using `next_sample()` or all at once
+    `all_samples()`. This increments the internal sample index `sample_idx`.
 
     For sensors data, we assume:
     The format shape for 2D data stream (timesteps, n_sensors)
     The format shape for 3D data stream (num_cycles, timesteps , n_sensors)
 
-    To create a new DataStreamMET4FOF class, inherit this class and call `set_metadata` in the constructor.
-    Choose one of two types of datastreams to be created: from dataset file (`set_data_source`), or a waveform generator function (`set_generator_function`).
-    Alternatively, override the `next_sample` function if neither option suits the application.
-    For generator functions, `sfreq` is a required variable to be set on `init` which sets the sampling frequency and the time-step which occurs when next_sample() is called.
+    To create a new DataStreamMET4FOF class, inherit this class and call
+    `set_metadata` in the constructor. Choose one of two types of datastreams to be
+    created: from dataset file (`set_data_source`), or a waveform generator function
+    (`set_generator_function`). Alternatively, override the `next_sample` function if
+    neither option suits the application. For generator functions, `sfreq` is a
+    required variable to be set on `init` which sets the sampling frequency and the
+    time-step which occurs when `next_sample()` is called.
 
-    For an example implementation of using generator function, see the built-in `SineGenerator` class. See tutorials for more implementations.
+    For an example implementation of using generator function, see the built-in
+    `SineGenerator` class. See tutorials for more implementations.
     """
 
     def __init__(self):
@@ -37,7 +41,8 @@ class DataStreamMET4FOF():
 
     def set_data_source_type(self, dt_type="function"):
         """
-        To explicitly account for the type of data source: either from dataset, or a generator function
+        To explicitly account for the type of data source: either from dataset,
+        or a generator function.
 
         Parameters
         ----------
@@ -119,7 +124,8 @@ class DataStreamMET4FOF():
 
     def set_data_source(self, quantities=None, target=None, time=None):
         """
-        This sets the data source by providing three iterables: `quantities` , `time` and `target` which are assumed to be aligned.
+        This sets the data source by providing three iterables: `quantities` ,
+        `time` and `target` which are assumed to be aligned.
 
         For sensors data, we assume:
         The format shape for 2D data stream (timesteps, n_sensors)
@@ -131,11 +137,14 @@ class DataStreamMET4FOF():
             Measured quantities such as sensors readings.
 
         target : iterable
-            (Optional) Target label in the context of machine learning. This can be Remaining Useful Life in predictive maintenance application.
-            Note this can be an unobservable variable in real-time and applies only for validation during offline analysis.
+            (Optional) Target label in the context of machine learning. This can be
+            Remaining Useful Life in predictive maintenance application. Note this
+            can be an unobservable variable in real-time and applies only for
+            validation during offline analysis.
 
         time : iterable
-            (Optional) dtype can be either float or datetime64 to indicate the time when the `quantities` were measured.
+            (Optional) dtype can be either float or datetime64 to indicate the time
+            when the `quantities` were measured.
 
         """
         self.sample_idx = 0
@@ -179,8 +188,9 @@ class DataStreamMET4FOF():
 
     def next_sample(self, batch_size=1):
         """
-        Fetches the latest `batch_size` samples from the iterables: quantities, time and target.
-        This advances the internal pointer `current_idx` by `batch_size`.
+        Fetches the latest `batch_size` samples from the iterables: quantities,
+        time and target. This advances the internal pointer `current_idx` by
+        `batch_size`.
 
         Parameters
         ----------
@@ -189,7 +199,8 @@ class DataStreamMET4FOF():
 
         Returns
         -------
-        samples : dict of the form `{'time':current_sample_time,'quantities': current_sample_quantities, 'target': current_sample_target}`
+        samples : dict of the form `{'time':current_sample_time,'quantities':
+        current_sample_quantities, 'target': current_sample_target}`
         """
 
         if self.data_source_type == 'function':
@@ -208,7 +219,8 @@ class DataStreamMET4FOF():
 
         Returns
         -------
-        samples : dict of the form `{'quantities': current_sample_quantities, 'target': current_sample_target}`
+        samples : dict of the form `{'quantities': current_sample_quantities,
+        'target': current_sample_target}`
 
         """
         if batch_size < 0:
@@ -249,7 +261,8 @@ class SineGenerator(DataStreamMET4FOF):
     Built-in class of sine wave generator.
     `sfreq` is sampling frequency which determines the time step when next_sample is called
     `F` is frequency of wave function
-    `sine_wave_function` is a custom defined function which has a required keyword `time` as argument and any number of optional additional arguments (e.g `F`).
+    `sine_wave_function` is a custom defined function which has a required keyword
+    `time` as argument and any number of optional additional arguments (e.g `F`).
     to be supplied to the `set_generator_function`
 
     """
@@ -265,10 +278,11 @@ class SineGenerator(DataStreamMET4FOF):
 class CosineGenerator(DataStreamMET4FOF):
     """
     Built-in class of cosine wave generator.
-    `sfreq` is sampling frequency which determines the time step when next_sample is called
-    `F` is frequency of wave function
-    `cosine_wave_function` is a custom defined function which has a required keyword `time` as argument and any number of optional additional arguments (e.g `F`).
-    to be supplied to the `set_generator_function`
+    `sfreq` is sampling frequency which determines the time step when next_sample is
+    called `F` is frequency of wave function `cosine_wave_function` is a custom
+    defined function which has a required keyword `time` as argument and any number
+    of optional additional arguments (e.g `F`).to be supplied to the
+    `set_generator_function`
 
     """
     def __init__(self,sfreq = 500, F=5):
