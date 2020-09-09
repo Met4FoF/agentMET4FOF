@@ -68,6 +68,7 @@ setup(
         "time-series-buffer",
         "time-series-metadata",
         "mpld3",
+        "mesa",
     ],
     python_requires=">=3.6",
     classifiers=[
