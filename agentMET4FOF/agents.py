@@ -839,6 +839,14 @@ class AgentBuffer():
                 message_data = [message_data]
             self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
 
+    def values(self):
+        return self.buffer.values()
+
+    def items(self):
+        return self.buffer.items()
+
+    def keys(self):
+        return self.buffer.keys()
 
 class _AgentController(AgentMET4FOF):
     """
