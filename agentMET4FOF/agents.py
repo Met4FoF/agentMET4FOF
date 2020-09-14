@@ -69,7 +69,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         # check if there's message in queue
         while len(self.mesa_message_queue) > 0:
-            self.handle_process_data(self.mesa_message_queue.pop())
+            self.handle_process_data(self.mesa_message_queue.popleft())
 
         # proceed with user-defined agent-loop
         self.agent_loop()
