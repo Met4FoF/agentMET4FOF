@@ -275,7 +275,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         self.buffer.clear(agent_name)
 
-    def buffer_store(self, agent_from: str, data=None):
+    def buffer_store(self, agent_from: str, data=None, concat_axis=0):
         """
         Updates data stored in `self.buffer` with the received message
 
@@ -291,7 +291,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         """
 
-        self.buffer.store(agent_from=agent_from, data=data)
+        self.buffer.store(agent_from=agent_from, data=data, concat_axis=concat_axis)
         self.log_info("Buffer: " + str(self.buffer.buffer))
 
     def pack_data(self, data, channel='default'):
@@ -678,7 +678,7 @@ class AgentBuffer():
         self.buffer.update({agent_from: data})
         return self.buffer
 
-    def _concatenate(self, iterable, data):
+    def _concatenate(self, iterable, data, concat_axis=0):
         """
         Concatenate the given `iterable`, with `data`.
         Handles the concatenation function depending on the datatype, and truncates it if the buffer is filled to `buffer_size`.
@@ -701,14 +701,14 @@ class AgentBuffer():
 
         # handle if data type is np.ndarray
         elif isinstance(iterable, np.ndarray):
-            iterable = np.concatenate((iterable, data))
+            iterable = np.concatenate((iterable, data),axis=concat_axis)
             if len(iterable) > self.buffer_size:
                 truncated_element_index = len(iterable) - self.buffer_size
                 iterable = iterable[truncated_element_index:]
 
         # handle if data type is pd.DataFrame
         elif isinstance(iterable, pd.DataFrame):
-            iterable = iterable.append(data, ignore_index=True)
+            iterable = pd.concat([iterable,data], ignore_index=True, axis=concat_axis)
             if len(iterable) > self.buffer_size:
                 truncated_element_index = len(iterable) - self.buffer_size
                 iterable = iterable.truncate(before=truncated_element_index)
@@ -782,7 +782,7 @@ class AgentBuffer():
         else:
             del self.buffer[agent_from]
 
-    def store(self, agent_from, data=None):
+    def store(self, agent_from, data=None, concat_axis=0):
         """
         Stores data into `self.buffer` with the received message
 
@@ -830,14 +830,14 @@ class AgentBuffer():
                 # check if the key exist
                 # if it does, then append
                 if key in self.buffer[agent_from].keys():
-                    self.buffer[agent_from][key] = self._concatenate(self.buffer[agent_from][key], value)
+                    self.buffer[agent_from][key] = self._concatenate(self.buffer[agent_from][key], value,concat_axis)
                 # otherwise, create new entry
                 else:
                     self.buffer[agent_from].update({key: value})
         else:
             if not self.check_supported_datatype(message_data):
                 message_data = [message_data]
-            self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data)
+            self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
 
 
 class _AgentController(AgentMET4FOF):
