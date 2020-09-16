@@ -792,13 +792,16 @@ class AgentBuffer():
         Parameters
         ----------
         agent_from : dict | str
-            if type is dict, we expect it to be the agentMET4FOF dict message to be compliant with older code
-            otherwise, we expect it to be name of agent sender and `data` will need to be passed as parameter
+            if type is dict, we expect it to be the agentMET4FOF dict message to be
+            compliant with older code otherwise, we expect it to be name of agent
+            sender and `data` will need to be passed as parameter
         data
-            optional if agent_from is a dict. Otherwise this parameter is compulsory. Any supported data which can be stored in dict as buffering.
+            optional if agent_from is a dict. Otherwise this parameter is compulsory.
+            Any supported data which can be stored in dict as buffering.
 
         concat_axis : int
-            axis to concatenate on with the buffering for numpy arrays.
+            optional axis to concatenate on with the buffering for numpy arrays.
+            Default is 0.
 
         """
         # if first argument is the agentMET4FOF dict message
