@@ -72,23 +72,26 @@ class DataStreamMET4FOF():
 
     def set_generator_function(self, generator_function=None, sfreq=None, **kwargs):
         """
-        Sets the data source to a generator function. By default, this function resorts to a sine wave generator function.
-        Initialisation of the generator's parameters should be done here such as setting the sampling frequency and wave frequency.
-        For setting it with a dataset instead, see `set_data_source`.
+        Sets the data source to a generator function. By default, this function resorts
+        to a sine wave generator function. Initialisation of the generator's
+        parameters should be done here such as setting the sampling frequency and
+        wave frequency. For setting it with a dataset instead, see `set_data_source`.
 
         Parameters
         ----------
         generator_function : method
-            A generator function which takes in at least one argument `time` which will be used in `next_sample`.
-            Parameters of the function can be fixed by providing additional arguments such as the wave frequency.
+            A generator function which takes in at least one argument `time` which
+            will be used in `next_sample`. Parameters of the function can be fixed by
+            providing additional arguments such as the wave frequency.
 
         sfreq : int
             Sampling frequency.
 
         **kwargs
-            Any addtional keyword arguments to be supplied to the generator function.
-            The **kwargs will be saved as `generator_parameters`.
-            The generator function call for every sample will be supplied with the **generator_parameters.
+            Any additional keyword arguments to be supplied to the generator function.
+            The ``**kwargs`` will be saved as `generator_parameters`.
+            The generator function call for every sample will be supplied with the
+            ``**generator_parameters``.
 
         """
         #save the kwargs into generator_parameters
