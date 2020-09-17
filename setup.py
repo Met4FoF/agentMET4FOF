@@ -58,7 +58,8 @@ setup(
     },
     install_requires=[
         "numpy",
-        "matplotlib!=3.3",
+        "scipy",
+        "matplotlib<=3.3",
         "pandas",
         "osbrain",
         "dash",
