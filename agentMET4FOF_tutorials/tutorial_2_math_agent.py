@@ -47,7 +47,7 @@ class SineGeneratorAgent(AgentMET4FOF):
     def agent_loop(self):
         if self.current_state == "Running":
             sine_data = self._stream.next_sample()  # dictionary
-            self.send_output(sine_data["x"])
+            self.send_output(sine_data["quantities"])
 
 
 def main():

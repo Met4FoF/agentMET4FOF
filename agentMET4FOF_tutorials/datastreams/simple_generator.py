@@ -1,6 +1,24 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
+from agentMET4FOF.streams import DataStreamMET4FOF
+import numpy as np
 
+class SineGenerator(DataStreamMET4FOF):
+    """
+    Built-in class of sine wave generator.
+    `sfreq` is sampling frequency which determines the time step when next_sample is called
+    `F` is frequency of wave function
+    `sine_wave_function` is a custom defined function which has a required keyword `time` as argument and any number of optional additional arguments (e.g `F`).
+    to be supplied to the `set_generator_function`
+
+    """
+    def __init__(self,sfreq = 500, F=5):
+        super().__init__()
+        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
+        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
+
+    def sine_wave_function(self, time, F=50):
+        amplitude = np.sin(2*np.pi*F*time)
+        return amplitude
 
 class SineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal
@@ -9,7 +27,7 @@ class SineGeneratorAgent(AgentMET4FOF):
     to connected agents via its output channel.
     """
 
-    # The datatype of the stream will be SineGenerator.
+    # # The datatype of the stream will be SineGenerator.
     _sine_stream: SineGenerator
 
     def init_parameters(self):
@@ -18,7 +36,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         Initialize the input data stream as an instance of the
         :py:mod:`SineGenerator` class
         """
-        self._sine_stream = SineGenerator()
+        self.sine_stream = SineGenerator()
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -27,7 +45,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         streams content and push it via invoking :py:method:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            sine_data = self._sine_stream.next_sample()  # dictionary
+            sine_data = self.sine_stream.next_sample()  # dictionary
             self.send_output(sine_data["quantities"])
 
 
@@ -37,6 +55,7 @@ def demonstrate_generator_agent_use():
 
     # Initialize agents by adding them to the agent network.
     gen_agent = agent_network.add_agent(agentType=SineGeneratorAgent)
+    gen_agent.init_parameters()
     monitor_agent = agent_network.add_agent(agentType=MonitorAgent)
 
     # Interconnect agents by either way:

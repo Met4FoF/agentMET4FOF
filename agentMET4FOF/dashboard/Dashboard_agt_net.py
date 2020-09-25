@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
 import networkx as nx
+from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
 from . import LayoutHelper
@@ -20,7 +21,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
     def get_multiple_graphs(self,num_monitors=10):
         return [dcc.Graph(id='monitors-graph-'+str(i), figure={},style={'height':'90vh'}) for i in range(num_monitors)]
-
 
     def get_layout(self, update_interval_seconds=3, num_monitors=10):
        #body
@@ -58,17 +58,59 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                                                           'shape': 'rectangle' }
                                                          },
                                                     { 'selector': 'edge',
-                                                      'style': { 'mid-target-arrow-shape': 'triangle','arrow-scale': 3},
-                                                    }
+                                                      'style': { 'curve-style': 'bezier', 'mid-target-arrow-shape':
+                                                          'triangle','arrow-scale': 2, 'line-color': '#4287f5',
+                                                                 'mid-target-arrow-color': '#4287f5'},
+                                                    },
+                                                    {
+                                                        'selector': '.rectangle',
+                                                        'style': {
+                                                            'shape': 'rectangle'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.triangle',
+                                                        'style': {
+                                                            'shape': 'triangle'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.octagon',
+                                                        'style': {
+                                                            'shape': 'octagon'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.ellipse',
+                                                        'style': {
+                                                            'shape': 'ellipse'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.bluebackground',
+                                                        'style': {
+                                                            'background-color': '#c4fdff'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.blue',
+                                                        'style': {
+                                                            'background-color': '#006db5'
+                                                        }
+                                                    },
+                                                    {
+                                                        'selector': '.coalition',
+                                                        'style': {'line-style': 'dashed'}
+                                                    },
                                                   ]
+
                                    )
 
                                 ])
 
                             ]),
                             html.H5(className="card", id="matplotlib-division", children=" "),
-
-                            html.Div(className="card", id="monitors-temp-division", children=self.get_multiple_graphs(num_monitors))
+                            html.Div(className="card", id="monitors-temp-division", children=self.get_multiple_graphs(num_monitors)),
 
                     ]),
 
@@ -113,13 +155,10 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                                 ]),
                                 html.H6(id='agent-parameters', children="Not selected", className="flow-text"),
-
                                 html.P(id="connect_placeholder", className="black-text", children=" "),
                                 html.P(id="disconnect_placeholder", className="black-text", children=" "),
                                 html.P(id="monitor_placeholder", className="black-text", children=" "),
-
-
-
+                                html.P(id="mpld3_placeholder", className="black-text", children=" "),
                             ])
 
                         ])
@@ -150,7 +189,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                       [dash.dependencies.Input('interval-component-network-graph', 'n_intervals')],
                       [dash.dependencies.State('agents-network', 'elements')]
                        )
-        def update_network_graph(n_intervals,graph_elements):
+        def update_network_graph(n_intervals, graph_elements):
             #get nameserver
             agentNetwork = app.dashboard_ctrl.agentNetwork
 
@@ -158,27 +197,45 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             agentNetwork.update_networkx()
             nodes, edges = agentNetwork.get_nodes_edges()
 
+            #get coalitions of agents
+            coalitions = agentNetwork.coalitions
+
             #if current graph number is different more than before, then update graph
-            if len(graph_elements) != (len(nodes) + len(edges)):
+            if len(graph_elements) != (len(nodes) + len(edges) + len(coalitions)):
             #if(app.dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes) or app.dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
                 new_G = nx.DiGraph()
-                new_G.add_nodes_from(nodes)
+                new_G.add_nodes_from(nodes(data=True))
                 new_G.add_edges_from(edges)
 
                 nodes_elements = create_nodes_cytoscape(new_G)
                 edges_elements = create_edges_cytoscape(edges)
+                # print(edges_elements)
+                #draw coalition nodes, and assign child nodes to coalition nodes
+                if len(agentNetwork.coalitions)>0:
+                    parent_elements = [{"data":{'id':coalition.name, 'label':coalition.name},
+                                        'classes':'bluebackground'} for coalition in agentNetwork.coalitions]
+                    for coalition in coalitions:
+                        #check if agent is in the coalition, set its parents
+                        for agent_node in nodes_elements:
+                            if agent_node["data"]["id"] in coalition.agent_names():
+                                agent_node["data"].update({'parent':coalition.name})
+                        # print(coalition.agent_names())
+                        #change edge styles within coalition to dashed
+                        for edges in edges_elements:
+                            if edges["data"]["source"] in coalition.agent_names() and edges["data"]["target"] in coalition.agent_names():
+                                edges.update({'classes':"coalition"})
+                else:
+                    parent_elements = []
 
                 app.dashboard_ctrl.agent_graph = new_G
 
                 # update agents connect options
                 node_connect_options = [{'label': agentName, 'value': agentName} for agentName in nodes]
 
-                return [nodes_elements + edges_elements, node_connect_options]
+                return [nodes_elements + edges_elements + parent_elements, node_connect_options]
 
             else:
                 raise PreventUpdate
-
-
 
         @app.callback( [dash.dependencies.Output('add-modules-dropdown', 'options'),
                         dash.dependencies.Output('add-dataset-dropdown', 'options')
@@ -346,36 +403,31 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             style_graphs = [{'opacity':0, 'width':10,'height':10} for i in range(app.num_monitors)]
 
             for monitor_id, monitor_agent in enumerate(agent_names):
-                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('memory')
+                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
                 custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
                 data =[]
                 for sender_agent in memory_data.keys():
                     #if custom plot function is not provided, resolve to default plotting
                     if type(custom_plot_function).__name__ == "int":
-                        if type(memory_data[sender_agent]) == dict:
-                            for attribute in memory_data[sender_agent].keys():
-                                data.append(create_monitor_graph(memory_data[sender_agent][attribute],sender_agent+':'+attribute))
-                        else:
-                            data.append(create_monitor_graph(memory_data[sender_agent],sender_agent))
+                        traces=create_monitor_graph(memory_data[sender_agent],sender_agent)
                     #otherwise call custom plot function and load up custom plot parameters
                     else:
                         custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_parameters')
-                        data.append(custom_plot_function(memory_data[sender_agent], sender_agent, **custom_plot_parameters))
                         # Handle iterable of traces.
                         traces = custom_plot_function(
                             memory_data[sender_agent],
                             sender_agent,
                             **custom_plot_parameters
                         )
-                        if (
-                            isinstance(traces, tuple)
-                            or isinstance(traces, list)
-                            or isinstance(traces, set)
-                        ):
-                            for trace in traces:
-                                data.append(trace)
-                        else:
-                            data.append(traces)
+                    if (
+                        isinstance(traces, tuple)
+                        or isinstance(traces, list)
+                        or isinstance(traces, set)
+                    ):
+                        for trace in traces:
+                            data.append(trace)
+                    else:
+                        data.append(traces)
                 if len(data) > 5:
                     y_title_offset = 0.1
                 else:
@@ -403,19 +455,30 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # monitor_graphs = monitor_graphs+ [{'displayModeBar': False, 'editable': False, 'scrollZoom':False}]
             return monitor_graphs+ style_graphs
 
-        def _handle_matplotlib_figure(input_data, from_agent_name: str):
+
+        def _handle_matplotlib_figure(input_data, from_agent_name: str, mode="image"):
             """
             Internal function. Checks the mode of matplotlib.figure.Fig to be plotted
             Either it is a base64 str image, or a plotly graph
 
             This is used in plotting the received matplotlib figures in the MonitorAgent's plot memory.
             """
-
-            if isinstance(input_data, str):
-                new_graph = html.Img(src=input_data, title=from_agent_name)
-            else:
+            if mode == "plotly":
                 new_graph = dcc.Graph(figure=input_data)
+            elif mode == "image":
+                new_graph = html.Img(src=input_data, title=from_agent_name)
+            elif mode == "mpld3":
+                new_input_data = str(input_data).replace("'",'"')
+                new_input_data = new_input_data.replace("(", "[")
+                new_input_data = new_input_data.replace(")", "]")
+                new_input_data = new_input_data.replace("None", "null")
+                new_input_data = new_input_data.replace("False", "false")
+                new_input_data = new_input_data.replace("True", "true")
+                fig_json = html.P(new_input_data,style={'display': 'none'})
+                new_graph = html.Div(id="d3_"+from_agent_name,children=fig_json)
+
             return new_graph
+
         #load Monitors data and draw - all at once
         @app.callback([dash.dependencies.Output('matplotlib-division', 'children')],
                      [dash.dependencies.Input('interval-update-monitor-graph', 'n_intervals')])
@@ -455,13 +518,15 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 for from_agent_name in plot_data:
                     # get the graph relevant to 'monitor_agent_input'
                     graph = plot_data[from_agent_name]
+                    print(graph)
+                    #handle list of graphs
+                    if (isinstance(graph["fig"], tuple) or isinstance(graph["fig"], list) or isinstance(graph["fig"], set)):
+                        for graph_id, graph_ in enumerate(graph["fig"]):
 
-                    if isinstance(graph, dict):
-                        for graph_ in graph.values():
-                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name)
+                            new_graph = _handle_matplotlib_figure(graph_, from_agent_name+str(graph_id), graph["mode"])
                             html_div_monitor.append(new_graph)
                     else:
-                        new_graph = _handle_matplotlib_figure(graph, from_agent_name)
+                        new_graph = _handle_matplotlib_figure(graph["fig"], from_agent_name, graph["mode"])
                         html_div_monitor.append(new_graph)
 
                 #only add the graph if there is some plots in the Monitor Agent
@@ -470,4 +535,14 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
             # set dimensions of each monitor agent's graph
             return [all_graphs]
+
+        app.clientside_callback(
+            ClientsideFunction(
+                namespace='clientside',
+                function_name='render_mpld3_each'
+            ),
+            dash.dependencies.Output('mpld3_placeholder', 'children'),
+            [dash.dependencies.Input('matplotlib-division', 'children')]
+        )
+
         return app
