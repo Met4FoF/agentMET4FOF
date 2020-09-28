@@ -625,7 +625,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def shutdown(self):
         if self.backend == "osbrain":
-            osBrainAgent.shutdown()
+            osBrainAgent.shutdown(self)
         elif self.backend == "mesa":
             self.mesa_model.schedule.remove(self)
             del self
