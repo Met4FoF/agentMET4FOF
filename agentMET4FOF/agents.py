@@ -637,6 +637,9 @@ class AgentBuffer():
     This buffer is necessary to handle multiple inputs coming from agents.
     The buffer can be a dict of iterables, or a dict of dict of iterables for nested named data.
     The keys are the names of agents.
+
+    We can access the buffer like a dict with exposed functions such as .values(), .keys() and .items(),
+    The actual dict object is stored in the variable `self.buffer`
     """
 
     def __init__(self, buffer_size=1000):
@@ -655,6 +658,18 @@ class AgentBuffer():
         return self.buffer[key]
 
     def check_supported_datatype(self, value):
+        """
+        Checks whether `value` is one of the supported data types.
+
+        Parameters
+        ----------
+        value : iterable
+            Value to be checked.
+
+        Returns
+        ------
+        result : boolean
+        """
         for supported_datatype in self.supported_datatype:
             if isinstance(value, supported_datatype):
                 return True
@@ -716,7 +731,7 @@ class AgentBuffer():
 
     def buffer_filled(self, agent_from=None):
         """
-        Checks whether buffer is filled.
+        Checks whether buffer is filled, by comparing against the `buffer_size`.
 
         Parameters
         ----------
@@ -757,6 +772,9 @@ class AgentBuffer():
         return popped_buffer
 
     def _popleft(self, iterable, n=1):
+        """
+        Internal method to handle the actual popping mechanism based on the type of iterable.
+        """
         popped_item = 0
         if isinstance(iterable, list):
             popped_item = iterable[:n]
@@ -843,12 +861,21 @@ class AgentBuffer():
             self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
 
     def values(self):
+        """
+        Interface to access the internal dict's values()
+        """
         return self.buffer.values()
 
     def items(self):
+        """
+        Interface to access the internal dict's items()
+        """
         return self.buffer.items()
 
     def keys(self):
+        """
+        Interface to access the internal dict's keys()
+        """
         return self.buffer.keys()
 
 class _AgentController(AgentMET4FOF):
