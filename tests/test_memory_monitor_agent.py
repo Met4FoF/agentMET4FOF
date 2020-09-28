@@ -135,7 +135,7 @@ def test_simpleAgent(agentType, expected_monitor_results):
     time.sleep(test_timeout)
 
     # test to see if monitor agents have received the correct data
-    assert str(monitor_agent_1.get_attr('memory')) == str(expected_monitor_results)
+    assert str(monitor_agent_1.get_attr('buffer').buffer) == str(expected_monitor_results)
 
     # shutdown agent network
     agentNetwork.shutdown()
