@@ -9,7 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from multiprocessing.context import Process
-from threading import Thread
+from threading import Thread, Timer
 from typing import Union, Dict, Optional
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -27,7 +27,6 @@ from osbrain import run_nameserver
 from plotly import tools as tls
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF
-from .utils import RepeatTimer
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
@@ -898,6 +897,23 @@ class _AgentController(AgentMET4FOF):
             self.mesa_model = mesa_model
 
     def start_mesa_timer(self, mesa_update_interval):
+        class RepeatTimer():
+            def __init__(self, t, repeat_function):
+                self.t = t
+                self.repeat_function = repeat_function
+                self.thread = Timer(self.t, self.handle_function)
+
+            def handle_function(self):
+                self.repeat_function()
+                self.thread = Timer(self.t, self.handle_function)
+                self.thread.start()
+
+            def start(self):
+                self.thread.start()
+
+            def cancel(self):
+                self.thread.cancel()
+
         self.mesa_update_interval = mesa_update_interval
         self.mesa_timer = RepeatTimer(t=mesa_update_interval, repeat_function=self.mesa_model.step)
         self.mesa_timer.start()
