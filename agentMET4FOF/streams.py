@@ -275,9 +275,9 @@ class CosineGenerator(DataStreamMET4FOF):
 
     """
     def __init__(self,sfreq = 500, F=5):
-        super().__init__(sfreq =sfreq)
-        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.cosine_wave_function,  F=F)
+        super().__init__()
+        self.set_metadata("CosineGenerator","time","s",("Voltage"),("V"),"Simple cosine wave generator")
+        self.set_generator_function(generator_function=self.cosine_wave_function, sfreq=sfreq, F=F)
 
     def cosine_wave_function(self, time, F=50):
         amplitude = np.cos(2*np.pi*F*time)
