@@ -116,7 +116,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
 
     def custom_plot_function(self, data, sender_agent, **kwargs):
         # TODO: cannot set the label of the xaxis within this method
-
         # data display
         if "buffer" in data.keys():
             if len(data["buffer"]):
@@ -133,6 +132,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
 
                 x_label = f"{t_name} [{t_unit}]"
                 y_label = f"{v_name} [{v_unit}]"
+
 
                 trace = go.Scatter(
                     x=t,
