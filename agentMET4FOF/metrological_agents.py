@@ -3,8 +3,8 @@ from typing import Dict, Union
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
-
-from agentMET4FOF.agents import AgentMET4FOF
+import numpy as np
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
 
 
 class MetrologicalAgent(AgentMET4FOF):
@@ -25,6 +25,7 @@ class MetrologicalAgent(AgentMET4FOF):
     _output_data_maxlen: int
 
     def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
+        super(MetrologicalAgent, self).init_parameters()
         self._input_data = {}
         self._input_data_maxlen = input_data_maxlen
         self._output_data = {}
@@ -106,27 +107,73 @@ class MetrologicalAgent(AgentMET4FOF):
 
 class MetrologicalMonitorAgent(MetrologicalAgent):
     def init_parameters(self, *args, **kwargs):
-        super().init_parameters(*args, **kwargs)
-
+        super(MetrologicalMonitorAgent, self).init_parameters(*args, **kwargs)
+        #super().init_parameters(*args, **kwargs)
         # create alias/dummies to match dashboard expectations
         self.memory = self._input_data
         self.plot_filter = []
         self.plots = {}
         self.custom_plot_parameters = {}
 
+
+    def on_received_message(self, message):
+        """
+        Handles incoming data from 'default' and 'plot' channels.
+
+        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+
+        Parameters
+        ----------
+        message : dict
+            Acceptable channel values are 'default' or 'plot'
+        """
+        if message['channel'] == 'default':
+            if self.plot_filter != []:
+                message['data'] = {key: message['data'][key] for key in self.plot_filter}
+                message['metadata'] = {key: message['metadata'][key] for key in self.plot_filter}
+            self.buffer_store(agent_from=message["from"], data={"data": message["data"], "metadata": message["metadata"]})
+        elif message['channel'] == 'plot':
+            self.update_plot_memory(message)
+        return 0
+
+    def update_plot_memory(self, message):
+        """
+        Updates plot figures stored in `self.plots` with the received message
+
+        Parameters
+        ----------
+        message : dict
+            Standard message format specified by AgentMET4FOF class
+            Message['data'] needs to be base64 image string and can be nested in dictionary for multiple plots
+            Only the latest plot will be shown kept and does not keep a history of the plots.
+        """
+
+        if type(message['data']) != dict or message['from'] not in self.plots.keys():
+            self.plots[message['from']] = message['data']
+        elif type(message['data']) == dict:
+            for key in message['data'].keys():
+                self.plots[message['from']].update({key: message['data'][key]})
+        self.log_info("PLOTS: " + str(self.plots))
+
+    def reset(self):
+        super(MonitorAgent, self).reset()
+        del self.plots
+        self.plots = {}
+
     def custom_plot_function(self, data, sender_agent, **kwargs):
         # TODO: cannot set the label of the xaxis within this method
         # data display
-        if "buffer" in data.keys():
-            if len(data["buffer"]):
-                values = data["buffer"].show(n_samples=-1)  # -1 --> all
+        if "data" in data.keys():
+            if len(data["data"]):
+                # values = data["buffer"].show(n_samples=-1)  # -1 --> all
+                values = data["data"]
                 t = values[:, 0]
                 ut = values[:, 1]
                 v = values[:, 2]
                 uv = values[:, 3]
 
                 # use description
-                desc = data["metadata"]
+                desc = data["metadata"][0]
                 t_name, t_unit = desc.time.values()
                 v_name, v_unit = desc.get_quantity().values()
 
@@ -146,5 +193,17 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 trace = go.Scatter()
         else:
             trace = go.Scatter()
-
+        # print(data.shape)
+        # t=np.linspace(0,1,50)
+        # v=np.sin(2*np.pi*t)
+        # ut=.001*np.ones_like(t)
+        # uv=.005*np.ones_like(v)
+        # trace = go.Scatter(
+        #     x=t,
+        #     y=v,
+        #     error_x=dict(type="data", array=ut, visible=True),
+        #     error_y=dict(type="data", array=uv, visible=True),
+        #     mode="lines",
+        #     name=f"blah blah",
+        # )
         return trace
