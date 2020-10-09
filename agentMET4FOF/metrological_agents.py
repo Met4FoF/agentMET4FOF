@@ -4,7 +4,7 @@ import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
 import numpy as np
-from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
@@ -156,7 +156,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         self.log_info("PLOTS: " + str(self.plots))
 
     def reset(self):
-        super(MonitorAgent, self).reset()
+        super(MetrologicalMonitorAgent, self).reset()
         del self.plots
         self.plots = {}
 
