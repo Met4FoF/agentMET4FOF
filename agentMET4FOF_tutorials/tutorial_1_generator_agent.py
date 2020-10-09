@@ -41,7 +41,7 @@ def demonstrate_generator_agent_use():
 
     # Interconnect agents by either way:
     # 1) by agent network.bind_agents(source, target).
-   # agent_network.bind_agents(gen_agent, monitor_agent)
+    agent_network.bind_agents(gen_agent, monitor_agent)
 
     # 2) by the agent.bind_output().
     gen_agent.bind_output(monitor_agent)
