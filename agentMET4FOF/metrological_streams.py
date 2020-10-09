@@ -68,3 +68,4 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     def sine_wave_function(self, time, F=50):
         amplitude = np.sin(2*np.pi*F*time)
         return amplitude
+    
