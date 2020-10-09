@@ -193,17 +193,4 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 trace = go.Scatter()
         else:
             trace = go.Scatter()
-        # print(data.shape)
-        # t=np.linspace(0,1,50)
-        # v=np.sin(2*np.pi*t)
-        # ut=.001*np.ones_like(t)
-        # uv=.005*np.ones_like(v)
-        # trace = go.Scatter(
-        #     x=t,
-        #     y=v,
-        #     error_x=dict(type="data", array=ut, visible=True),
-        #     error_y=dict(type="data", array=uv, visible=True),
-        #     mode="lines",
-        #     name=f"blah blah",
-        # )
         return trace
