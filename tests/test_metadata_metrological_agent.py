@@ -128,3 +128,4 @@ def test_simple_metrological_agent():
 
     # shutdown agent network
     agentNetwork.shutdown()
+    
