@@ -1615,7 +1615,6 @@ class MonitorAgent(AgentMET4FOF):
     """
 
     def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
-        # super(MonitorAgent, self).init_parameters()
         self.memory = {}
         self.plots = {}
         self.plot_filter = plot_filter
