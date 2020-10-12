@@ -1,12 +1,15 @@
-import time
+from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
 from typing import Dict
 
 import numpy as np
 from time_series_metadata.scheme import MetaData
-
-from agentMET4FOF.agents import AgentNetwork
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
-
+import pandas as pd
+import time
+#init params
+np.random.seed(123)
+num_samples = 10
+test_timeout = 5
 
 class Signal:
     """
@@ -32,7 +35,7 @@ class Signal:
 
     @staticmethod
     def _value(timestamp):
-        return 1013.25 + 10 * np.sin(timestamp)
+        return 1013.25
 
     @staticmethod
     def _value_unc():
@@ -94,36 +97,35 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     def metadata(self) -> Dict:
         return self._sine_stream.metadata.metadata
 
+# agentType=MetrologicalAgent
+#start agent network server
+def test_simple_metrological_agent():
+    agentNetwork = AgentNetwork(dashboard_modules=False)
 
-def main():
-
-    # start agent network server
-    agent_network = AgentNetwork(dashboard_modules=True)
-
-    # Initialize signal generating class outside of agent framework.
     signal = Signal()
-
-    # Initialize metrologically enabled agent taking name from signal source metadata.
+    #init agents by adding into the agent network
     source_name = signal.metadata.metadata["device_id"]
-    source_agent = agent_network.add_agent(
-        name=source_name, agentType=MetrologicalSineGeneratorAgent
-    )
-    source_agent.init_parameters(signal)
+    simple_agent = agentNetwork.add_agent(name=source_name, agentType=MetrologicalSineGeneratorAgent)
+    monitor_agent_1 = agentNetwork.add_agent(agentType=MetrologicalMonitorAgent)
+    simple_agent.init_parameters(signal)
+    #shorten n wait loop time
+    simple_agent.init_agent_loop(1)
 
-    # Initialize metrologically enabled plotting agent.
-    monitor_agent = agent_network.add_agent(
-        "MonitorAgent", agentType=MetrologicalMonitorAgent
-    )
+    #connect agents
+    agentNetwork.bind_agents(simple_agent, monitor_agent_1)
 
-    # Bind agents.
-    source_agent.bind_output(monitor_agent)
+    # set all agents states to "Running"
+    agentNetwork.set_running_state()
 
-    # Set all agents states to "Running".
-    agent_network.set_running_state()
+    time.sleep(test_timeout)
 
-    # Allow for shutting down the network after execution.
-    return agent_network
+    # test to see if key 'metadata' is present in the received data
+    memory_dict = monitor_agent_1.get_attr('memory')
+    memory_dict_value = list(memory_dict.values())[0]
+    assert 'metadata' in memory_dict_value.keys()
 
+    time.sleep(3)
 
-if __name__ == "__main__":
-    main()
+    # shutdown agent network
+    agentNetwork.shutdown()
+    

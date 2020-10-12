@@ -1123,12 +1123,15 @@ class AgentNetwork:
         dashboard_port: int
             Port of the dashboard to be hosted on. By default is port 8050.
         """
+
+
         self.backend = backend
         self.ip_addr = ip_addr
         self.port = port
         self._controller = None
         self._logger = None
         self.log_filename = log_filename
+
         self.mesa_update_interval = mesa_update_interval
         if connect:
             self.is_parent_mesa = False
@@ -1611,7 +1614,7 @@ class MonitorAgent(AgentMET4FOF):
         Used to specifically select only a few keys to be plotted
     """
 
-    def init_parameters(self, plot_filter=[], custom_plot_function=-1, **kwargs):
+    def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
         self.memory = {}
         self.plots = {}
         self.plot_filter = plot_filter
