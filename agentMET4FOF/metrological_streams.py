@@ -16,25 +16,12 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
     @staticmethod
     def _time_unc():
-        return time.get_clock_info("time").resolution
+        return .01*time.get_clock_info("time").resolution
 
-    @staticmethod
-    def _value(timestamp):
-        return 1013.25 + 10 * np.sin(timestamp)
 
     @staticmethod
     def _value_unc():
-        return 0.5
-
-    @property
-    def current_datapoint(self):
-        t = self._time()
-        ut = self._time_unc()
-        v = self._value(t)
-        uv = self._value_unc()
-
-        return np.array((t, ut, v, uv))
-
+        return 0.05
 
     def _next_sample_generator(self, batch_size=1):
         """
@@ -60,7 +47,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+    def __init__(self, sfreq = 500, F=5):
         super().__init__()
         self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)

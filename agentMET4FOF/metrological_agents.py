@@ -108,7 +108,6 @@ class MetrologicalAgent(AgentMET4FOF):
 class MetrologicalMonitorAgent(MetrologicalAgent):
     def init_parameters(self, *args, **kwargs):
         super(MetrologicalMonitorAgent, self).init_parameters(*args, **kwargs)
-        #super().init_parameters(*args, **kwargs)
         # create alias/dummies to match dashboard expectations
         self.memory = self._input_data
         self.plot_filter = []
@@ -179,7 +178,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
 
                 x_label = f"{t_name} [{t_unit}]"
                 y_label = f"{v_name} [{v_unit}]"
-
 
                 trace = go.Scatter(
                     x=t,
