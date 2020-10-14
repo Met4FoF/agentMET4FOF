@@ -1,66 +1,41 @@
+import time
 import numpy as np
 from agentMET4FOF.streams import DataStreamMET4FOF
 
-
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
     """
-    Abstract  class for creating datastreams with metrological information
+    Simple class to request time-series datapoints of a signal
     """
 
     def __init__(self):
         super().__init__()
 
-    def set_uncertainty_generator(self, generator_function=None, **kwargs):
-        """
-        Sets the uncertainty based on a user-defined function. By default,
-        this function resorts to a constant (zero) uncertainty. The function returns
-        a tuple corresponding to the amplitude and time uncertainty at a given time
+    @staticmethod
+    def _time():
+        return time.time()
 
-        Parameters
-        ----------
-        generator_function : method
-            A generator function which takes in at least one argument `time` which
-            will be used in `next_sample`.
+    @staticmethod
+    def _time_unc():
+        return .01*time.get_clock_info("time").resolution
 
-        **kwargs
-            Any additional keyword arguments to be supplied to the generator function.
-            The ``**kwargs`` will be saved as `uncertainty_parameters`.
-            The generator function call for every sample will be supplied with the
-            ``**uncertainty_parameters``.
 
-        """
-        #save the kwargs into uncertainty_parameters
-        self.uncertainty_parameters = kwargs
-
-        #resort to default wave generator if one is not supplied
-        if generator_function is None:
-            self.generator_function_unc = self.default_uncertainty_generator
-        else:
-            self.generator_function_unc = generator_function
-        return self.generator_function_unc
-
-    def default_uncertainty_generator(self, time):
-        """
-        Default uncertainty generator function. Returns a tuple of constant (zero) time and amplitude uncertainties
-        """
-        value_unc = 0
-        time_unc = 0
-        return time_unc, value_unc
+    @staticmethod
+    def _value_unc():
+        return 0.05
 
     def _next_sample_generator(self, batch_size=1):
         """
         Internal method for generating a batch of samples from the generator function. Overrides
-        _next_sample_generator() from DataStreamMET4FOF. Adds time uncertainty ut and measurement uncertainty
+        _next_sample_generator() from DataStreamMET4FOF. Includes time uncertainty ut and measurement uncertainty
         uv to sample
         """
-        timeelement = np.arange(self.sample_idx, self.sample_idx + batch_size, 1) / self.sfreq
-        self._time = timeelement.item()
+        time = np.arange(self.sample_idx, self.sample_idx + batch_size, 1) / self.sfreq
         self.sample_idx += batch_size
 
-        self._time_unc, self._value_unc = self.default_uncertainty_generator(self._time)
-        amplitude = self.generator_function(self._time, **self.generator_parameters)
+        amplitude = self.generator_function(time, **self.generator_parameters)
 
-        return np.array((self._time, self._time_unc, amplitude.item(), self._value_unc))
+        #return {'quantities': amplitude, 'time': time}
+        return np.array((time.item(), self._time_unc(), amplitude.item(), self._value_unc()))
 
 
 class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
@@ -72,9 +47,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq=500, F=50, value_unc=0.0):
+    def __init__(self, sfreq = 500, F=5):
         super().__init__()
-        self.set_metadata(device_id="SineGenerator", time_name="time", time_unit="s", quantity_names=("Voltage"), quantity_units=("V"), misc="Simple sine wave generator")
+        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
 
     def sine_wave_function(self, time, F=50):
