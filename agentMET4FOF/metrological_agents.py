@@ -4,7 +4,7 @@ import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
 import numpy as np
-from agentMET4FOF.agents import AgentMET4FOF
+from agentMET4FOF.agents import AgentMET4FOF, AgentBuffer
 
 
 class MetrologicalAgent(AgentMET4FOF):
@@ -193,3 +193,49 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         else:
             trace = go.Scatter()
         return trace
+
+class MetrologicalAgentBuffer(AgentBuffer):
+    def convert_single_to_tsbuffer(self, single_data):
+        ts = TimeSeriesBuffer()
+        ts.add(single_data)
+        return ts
+
+    def update(self, agent_from: str, data):
+        """
+        Overrides data in the buffer dict keyed by `agent_from` with value `data`
+
+        If `data` is a single value, this converts it into a list first before storing in the buffer dict.
+        """
+        # handle if data type nested in dict
+        if isinstance(data, dict):
+            # check for each value datatype
+            for key, value in data.items():
+                data[key] = self.convert_single_to_tsbuffer(value)
+        else:
+            data = self.convert_single_to_tsbuffer(data)
+            self.buffer.update({agent_from: data})
+        return self.buffer
+
+    def store(self, agent_from, data=None, concat_axis=0):
+        # if first argument is the agentMET4FOF dict message
+        if isinstance(agent_from, dict):
+            message = agent_from
+        # otherwise, we expect the name of agent_sender and the data to be passed
+        else:
+            message = {"from": agent_from, "data": data}
+
+        # store into a separate variables, it will be used frequently later for the type checks
+        message_from = message["from"]
+        message_data = message["data"]
+
+        # check if sender agent has sent any message before:
+        # if it did,then append, otherwise create new entry for the input agent
+        if message_from not in self.buffer:
+            self.update(message_from, message_data)
+            return 0
+        else:
+            self._concatenate(self.buffer[message_from])
+
+    def _concatenate(self, iterable, data, concat_axis=0):
+        iterable.add(data)
+        return iterable
