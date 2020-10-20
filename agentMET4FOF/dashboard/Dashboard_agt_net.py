@@ -430,6 +430,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                             sender_agent,
                             **custom_plot_parameters
                         )
+
                     if (
                             isinstance(traces, tuple)
                             or isinstance(traces, list)
@@ -443,6 +444,19 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     y_title_offset = 0.1
                 else:
                     y_title_offset = -0.1
+
+                #Check if any metadata is present that can be used to generate axis labels
+                if isinstance(memory_data[sender_agent], dict) and 'metadata' in memory_data[sender_agent].keys():
+                    desc = memory_data[sender_agent]["metadata"][0]
+                    t_name, t_unit = desc.time.values()
+                    v_name, v_unit = desc.get_quantity().values()
+
+                    x_label = f"{t_name} [{t_unit}]"
+                    y_label = f"{v_name} [{v_unit}]"
+                else:
+                    x_label = 'default X'
+                    y_label = 'default Y'
+
                 monitor_graph = {
                     'data': data,
                     'layout': {
@@ -453,6 +467,8 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                             'xanchor': 'center',
                             'yanchor': 'bottom'
                         },
+                        'xaxis': {'title': {'text': x_label}},
+                        'yaxis': {'title': {'text': y_label}},
                         'uirevision': app.num_monitor,
                         'showlegend': True,
                         'legend': dict(xanchor='auto', yanchor='bottom', x=1, y=1, orientation="h"),
