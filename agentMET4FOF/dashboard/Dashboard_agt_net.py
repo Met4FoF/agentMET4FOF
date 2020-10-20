@@ -1,3 +1,7 @@
+import sys
+import warnings
+from collections import Iterable
+
 import dash
 import dash_core_components as dcc
 import dash_cytoscape as cyto
@@ -5,6 +9,7 @@ import dash_html_components as html
 import networkx as nx
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
+from time_series_metadata.scheme import MetaData
 
 from . import LayoutHelper
 from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
@@ -445,16 +450,47 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 else:
                     y_title_offset = -0.1
 
-                #Check if any metadata is present that can be used to generate axis labels
-                if isinstance(memory_data[sender_agent], dict) and 'metadata' in memory_data[sender_agent].keys():
-                    desc = memory_data[sender_agent]["metadata"][0]
-                    t_name, t_unit = desc.time.values()
-                    v_name, v_unit = desc.get_quantity().values()
+                # Check if any metadata is present that can be used to generate axis
+                # labels.
+                if isinstance(memory_data[sender_agent], dict) and \
+                        'metadata' in memory_data[sender_agent].keys():
+                    # The metadata might be a list of metadata items each
+                    # corresponding to one element of the list of datapoints in
+                    # memory_data[sender_agent]["data"] or a single metadata element
+                    # shared corresponding to all datapoints.
+                    if isinstance(memory_data[sender_agent]["metadata"], Iterable):
+                        desc = memory_data[sender_agent]["metadata"][0]
+                    else:
+                        desc = memory_data[sender_agent]["metadata"]
 
+                    # We now expect metadata to be of type
+                    # time-series-metadata.scheme.MetaData. We try to access the
+                    # object correspondingly and throw a meaningful error message in
+                    # case something goes wrong.
+                    try:
+                        t_name, t_unit = desc.time.values()
+                        v_name, v_unit = desc.get_quantity().values()
+                    except TypeError:
+                        raise TypeError(f"The Dashboard tried to access an agents "
+                                        f"metadata but an error occurred. Metadata is "
+                                        f"of type {type(desc)} but is "
+                                        f"expected to be of type {type(MetaData)}. "
+                                        f"Its value is: \n\n{desc}")
+
+                    # After successfully extracting the metadata itself, we concatenate
+                    # the important parts to get the labels.
                     x_label = f"{t_name} [{t_unit}]"
                     y_label = f"{v_name} [{v_unit}]"
                 else:
-                    x_label = 'time [s]'
+                    # If no metadata is available we set reasonable defaults. Since
+                    # we could deal with any data in the time as well as in the
+                    # frequency domain, we keep it fairly generic.
+                    warnings.warn(f"The Dashboard shows a plot for monitor "
+                                  f"agent '{monitor_agent}' without any axes "
+                                  f"labels specified. The labels will be represented "
+                                  f"by generic place holders. Check out tutorial 4 to "
+                                  f"find out how to specify custom labels.")
+                    x_label = 'X'
                     y_label = 'Y'
 
                 monitor_graph = {
