@@ -2,6 +2,7 @@ import time
 from typing import Dict
 
 import numpy as np
+import pytest
 from time_series_metadata.scheme import MetaData
 
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
@@ -95,6 +96,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         return self._sine_stream.metadata.metadata
 
 
+@pytest.mark.timeout(test_timeout)
 def test_simple_metrological_agent(agent_network):
     # Create an agent with data source and metadata, attach it to a monitor agent and
     # check, if the metadata is present at the right place in the monitor agent after
