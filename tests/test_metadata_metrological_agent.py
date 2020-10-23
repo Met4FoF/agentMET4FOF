@@ -117,10 +117,19 @@ def test_simple_metrological_agent(agent_network):
     # Set all agents states to "Running".
     agent_network.set_running_state()
 
-    # Wait for data and metadata to be passed through.
-    time.sleep(test_timeout)
+    # Run check of expected and actual result until test times out.
+    is_present = True
+    while not is_present:
+        try:
+            # Run actual check. This reduces test runtime in case of passed tests but
+            # results in quite cryptic error messages in case it fails due to the
+            # timeout causing the actual fail. So, if this line fails, regardless of
+            # the error message, it means, the addressed attribute'S content does not
+            # match the expected expression.
+            # Check if key 'metadata' is present in the received data
+            memory_dict = list(monitor_agent_1.get_attr('buffer').values())[0]
+            is_present = "metadata" in memory_dict.keys()
+        except IndexError:
+            pass
 
-    # test to see if key 'metadata' is present in the received data
-    memory_dict = monitor_agent_1.get_attr('buffer')
-    memory_dict_value = list(memory_dict.values())[0]
-    assert "metadata" in memory_dict_value.keys()
+
