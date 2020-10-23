@@ -7,7 +7,7 @@ from tests.conftest import test_timeout
 
 num_samples = 10
 
-#prepare dummy data stream
+# prepare dummy data stream
 datastream_x = list(np.arange(num_samples))
 datastream_y = list(np.arange(num_samples))
 datastream_y.reverse()
@@ -15,103 +15,144 @@ datastream_y.reverse()
 print(datastream_x)
 print(datastream_y)
 
-#test different types of message type & see how the agent handles the memory storage
+
+# test different types of message type & see how the agent handles the memory storage
 class SingleValueAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data = self.stream['x'][self.pointer]
+                data = self.stream["x"][self.pointer]
                 self.pointer += 1
                 self.send_output(data)
+
 
 class ListAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data = [self.stream['x'][self.pointer]]
+                data = [self.stream["x"][self.pointer]]
                 self.pointer += 1
                 self.send_output(data)
+
 
 class NpArrayAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data = np.array([self.stream['x'][self.pointer]])
+                data = np.array([self.stream["x"][self.pointer]])
                 self.pointer += 1
                 self.send_output(data)
+
 
 class PdDataFrameAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data = pd.DataFrame.from_dict(self.stream).iloc[self.pointer:self.pointer+1]
+                data = pd.DataFrame.from_dict(self.stream).iloc[
+                    self.pointer : self.pointer + 1
+                ]
                 self.pointer += 1
                 self.send_output(data)
 
+
 class NestedDict_SingleValueAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data_x = self.stream['x'][self.pointer:self.pointer+1]
-                data_y = self.stream['y'][self.pointer:self.pointer+1]
+                data_x = self.stream["x"][self.pointer : self.pointer + 1]
+                data_y = self.stream["y"][self.pointer : self.pointer + 1]
                 self.pointer += 1
-                self.send_output({'x':data_x,'y':data_y})
+                self.send_output({"x": data_x, "y": data_y})
+
 
 class NestedDict_ListAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data_x = self.stream['x'][self.pointer:self.pointer+1]
-                data_y = self.stream['y'][self.pointer:self.pointer+1]
+                data_x = self.stream["x"][self.pointer : self.pointer + 1]
+                data_y = self.stream["y"][self.pointer : self.pointer + 1]
                 self.pointer += 1
-                self.send_output({'x':data_x,'y':data_y})
+                self.send_output({"x": data_x, "y": data_y})
+
 
 class NestedDict_NpArrayAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = {'x':datastream_x,'y':datastream_y}
+        self.stream = {"x": datastream_x, "y": datastream_y}
         self.pointer = 0
 
     def agent_loop(self):
         if self.current_state == "Running":
             if self.pointer < num_samples:
-                data_x = np.array(self.stream['x'][self.pointer:self.pointer+1])
-                data_y = np.array(self.stream['y'][self.pointer:self.pointer+1])
+                data_x = np.array(self.stream["x"][self.pointer : self.pointer + 1])
+                data_y = np.array(self.stream["y"][self.pointer : self.pointer + 1])
                 self.pointer += 1
-                self.send_output({'x':data_x,'y':data_y})
+                self.send_output({"x": data_x, "y": data_y})
 
 
-params = [(SingleValueAgent, {'SingleValueAgent_1': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
-          (ListAgent, {'ListAgent_1': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
-          (NpArrayAgent, {'NpArrayAgent_1': np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])}),
-          (PdDataFrameAgent, {'PdDataFrameAgent_1': pd.DataFrame.from_dict({'x':datastream_x , 'y':datastream_y})}),
-          (NestedDict_SingleValueAgent, {'NestedDict_SingleValueAgent_1': {'x': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'y': [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]}}),
-          (NestedDict_ListAgent, {'NestedDict_ListAgent_1': {'x': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'y': [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]}}),
-          (NestedDict_NpArrayAgent, {'NestedDict_NpArrayAgent_1': {'x': np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), 'y': np.array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])}})
-          ]
+params = [
+    (SingleValueAgent, {"SingleValueAgent_1": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+    (ListAgent, {"ListAgent_1": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+    (NpArrayAgent, {"NpArrayAgent_1": np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])}),
+    (
+        PdDataFrameAgent,
+        {
+            "PdDataFrameAgent_1": pd.DataFrame.from_dict(
+                {"x": datastream_x, "y": datastream_y}
+            )
+        },
+    ),
+    (
+        NestedDict_SingleValueAgent,
+        {
+            "NestedDict_SingleValueAgent_1": {
+                "x": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                "y": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+            }
+        },
+    ),
+    (
+        NestedDict_ListAgent,
+        {
+            "NestedDict_ListAgent_1": {
+                "x": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                "y": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+            }
+        },
+    ),
+    (
+        NestedDict_NpArrayAgent,
+        {
+            "NestedDict_NpArrayAgent_1": {
+                "x": np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                "y": np.array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0]),
+            }
+        },
+    ),
+]
 
 
 @pytest.mark.timeout(test_timeout)
