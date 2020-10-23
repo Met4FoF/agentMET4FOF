@@ -1,6 +1,12 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
+from agentMET4FOF.agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agentMET4FOF.streams import SineGenerator
 
+#We demonstrate the use of Coalition of agents to group agents together
+#Rationale of grouping depends on the users and application
+#For example, we can group sensors which are measuring the same measurand
+#To this end, the coalition consists of a list of agent names and
+#provides aesthetic differences in the dashboard
+#All coalitions visible by the `agent_network` can be accessed via `agent_network.coalitions`
 
 class SineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal
@@ -28,7 +34,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         """
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
-            self.send_output(sine_data["quantities"])
+            self.send_output(sine_data["x"])
 
 
 def demonstrate_generator_agent_use():
@@ -36,15 +42,17 @@ def demonstrate_generator_agent_use():
     agent_network = AgentNetwork()
 
     # Initialize agents by adding them to the agent network.
-    gen_agent = agent_network.add_agent(agentType=SineGeneratorAgent)
+    gen_agent_1 = agent_network.add_agent(agentType=SineGeneratorAgent)
+    gen_agent_2 = agent_network.add_agent(agentType=SineGeneratorAgent)
     monitor_agent = agent_network.add_agent(agentType=MonitorAgent)
 
-    # Interconnect agents by either way:
-    # 1) by agent network.bind_agents(source, target).
-    agent_network.bind_agents(gen_agent, monitor_agent)
+    #bind generator agents outputs to monitor
+    agent_network.bind_agents(gen_agent_1, monitor_agent)
+    agent_network.bind_agents(gen_agent_2, monitor_agent)
 
-    # 2) by the agent.bind_output().
-    gen_agent.bind_output(monitor_agent)
+    #setup health coalition group
+    agent_network.add_coalition("REDUNDANT_SENSORS", [gen_agent_1, gen_agent_2, monitor_agent])
+
 
     # Set all agents' states to "Running".
     agent_network.set_running_state()
