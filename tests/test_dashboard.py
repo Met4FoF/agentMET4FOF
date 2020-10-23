@@ -8,6 +8,7 @@ from requests.exceptions import ConnectionError
 from agentMET4FOF_tutorials.tutorial_1_generator_agent import (
     demonstrate_generator_agent_use,
 )
+from tests.conftest import test_timeout
 
 
 @pytest.fixture()
@@ -23,7 +24,7 @@ def dashboard():
     dashboard.join()
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(test_timeout)
 @pytest.mark.usefixtures("dashboard")
 def test_demo_dashboard():
     # This test calls demonstrate_generator_agent_use and waits for five seconds for the

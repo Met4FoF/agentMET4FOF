@@ -178,7 +178,7 @@ def test_simpleAgent(agent_network, agentType, expected_monitor_results):
             # Run actual check. This reduces test runtime in case of passed tests but
             # results in quite cryptic error messages in case it fails due to the
             # timeout causing the actual fail. So, if this line fails, regardless of
-            # the error message, it means, the addressed attribute'S content does not
+            # the error message, it means, the addressed attribute's content does not
             # match the expected expression.
             assert str(monitor_agent_1.get_attr("buffer").buffer) == str(
                 expected_monitor_results
