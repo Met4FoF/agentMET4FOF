@@ -1,3 +1,13 @@
+#Extending the mechanism of plotting from MonitorAgent's data memory, custom plot function can be provided via the MonitorAgent which are in the form of plotly graph objects
+#This example is derived from Tutorial 1, but the SineGeneratorAgent now provides an additional timestamp field in sending out
+#the data to the MonitorAgent
+#By providing a `custom_plot_function` function to the MonitorAgent, together with any named parameters for the plotting,
+#the dashboard will read and run these functions with the provided parameters
+
+#To define a custom function, the first two parameters are mandatory namely `data` and `label`
+#while any number of additional user-defined keyword arguments can be supplied arbitrarily
+#The function needs to return either a single plotly figure, or a list of plotly figures.
+
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
 
@@ -5,16 +15,7 @@ import numpy as np
 import plotly.graph_objs as go
 from datetime import datetime
 
-#Custom plots can be provided via the MonitorAgent which are in the form of plotly graph objects
-#This example is derived from Tutorial 1, but the SineGeneratorAgent now provides an additional timestamp field in sending out
-#the data to the MonitorAgent
-#By providing a `custom_plot_function` function to the MonitorAgent, together with any named parameters for the plotting,
-#the dashboard will read and run these functions with the provided parameters
-
-#To define a custom function, the first two parameters are mandatory namely `data` and `label`
-#The following parameters are user-defined keyword arguments
-
-def custom_create_monitor_graph(data, sender_agent, xname=0,yname=0):
+def custom_create_monitor_graph(data, sender_agent, xname='Time',yname='Y'):
     """
     Parameters
     ----------
@@ -25,7 +26,8 @@ def custom_create_monitor_graph(data, sender_agent, xname=0,yname=0):
         Name of the sender agent
 
     **kwargs
-        Custom parameters
+        Custom parameters.
+        In this example, xname and yname  are the keys of the data in the Monitor agent's memory.
     """
     if xname and yname:
         x = data[xname]
@@ -48,7 +50,7 @@ class TimeSineGeneratorAgent(AgentMET4FOF):
             #read current time stamp
             current_time = datetime.today().strftime("%H:%M:%S")
             #send out data in form of dictionary {"Time","Y"}
-            self.send_output({"Time":current_time,"Y":sine_data['x']})
+            self.send_output({"Time":current_time,"Y":sine_data['quantities']})
 
 
 def main():
@@ -74,6 +76,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-

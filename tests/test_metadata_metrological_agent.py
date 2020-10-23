@@ -122,8 +122,5 @@ def test_simple_metrological_agent(agent_network):
 
     # Test to see if key 'metadata' is present in the received data.
     memory_dict = monitor_agent_1.get_attr("memory")
-    monitor_agent_1.log_info(f"memory_dict = {memory_dict}")
-    monitor_agent_1.log_info(f"memory_dict.values() = {memory_dict.values()}")
-    simple_agent.log_info(f"list(memory_dict.values()) = {list(memory_dict.values())}")
     memory_dict_value = list(memory_dict.values())[0]
     assert "metadata" in memory_dict_value.keys()
