@@ -1,13 +1,11 @@
-import pytest
-
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 import numpy as np
 import pandas as pd
-import time
-#init params
-np.random.seed(123)
+import pytest
+
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from tests.conftest import test_timeout
+
 num_samples = 10
-test_timeout = 5
 
 #prepare dummy data stream
 datastream_x = list(np.arange(num_samples))
@@ -115,28 +113,32 @@ params = [(SingleValueAgent, {'SingleValueAgent_1': [0, 1, 2, 3, 4, 5, 6, 7, 8, 
           (NestedDict_NpArrayAgent, {'NestedDict_NpArrayAgent_1': {'x': np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), 'y': np.array([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])}})
           ]
 
+
+@pytest.mark.timeout(test_timeout)
 @pytest.mark.parametrize("agentType,expected_monitor_results", params)
-def test_simpleAgent(agentType, expected_monitor_results):
-    #start agent network server
-    agentNetwork = AgentNetwork(dashboard_modules=False)
+def test_simpleAgent(agent_network, agentType, expected_monitor_results):
+    # init agents by adding into the agent network
+    simple_agent = agent_network.add_agent(agentType=agentType)
+    monitor_agent_1 = agent_network.add_agent(agentType=MonitorAgent)
 
-    #init agents by adding into the agent network
-    simple_agent = agentNetwork.add_agent(agentType=agentType)
-    monitor_agent_1 = agentNetwork.add_agent(agentType=MonitorAgent)
-
-    #shorten n wait loop time
+    # shorten n wait loop time
     simple_agent.init_agent_loop(0.01)
 
-    #connect agents
-    agentNetwork.bind_agents(simple_agent, monitor_agent_1)
+    # connect agents
+    agent_network.bind_agents(simple_agent, monitor_agent_1)
 
     # set all agents states to "Running"
-    agentNetwork.set_running_state()
-    time.sleep(test_timeout)
+    agent_network.set_running_state()
 
-    # test to see if monitor agents have received the correct data
-    assert str(monitor_agent_1.get_attr('memory')) == str(expected_monitor_results)
-
-    # shutdown agent network
-    agentNetwork.shutdown()
-    time.sleep(3)
+    # Run check of expected and actual result until test times out.
+    is_not_expected = True
+    while is_not_expected:
+        try:
+            # Run actual check.
+            assert str(monitor_agent_1.get_attr("memory")) == str(
+                expected_monitor_results
+            )
+            # End test execution, if test passes.
+            is_not_expected = False
+        except AssertionError:
+            pass
