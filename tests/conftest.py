@@ -4,6 +4,9 @@ import pytest
 
 from agentMET4FOF.agents import AgentNetwork
 
+# Set time to wait for before agents should have done their jobs in networks.
+test_timeout = 5
+
 
 @pytest.fixture
 def agent_network():
