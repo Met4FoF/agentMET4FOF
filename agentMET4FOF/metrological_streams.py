@@ -1,54 +1,42 @@
 import time
 import numpy as np
 from agentMET4FOF.streams import DataStreamMET4FOF
+import Dict
 
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
     """
-    Simple class to request time-series datapoints of a signal
+    Abstract  class for creating datastreams with metrological information
     """
 
-    def __init__(self):
+    def __init__(self, value_unc=0, absolute_timestamps=False):
+        if value_unc < 0:
+            raise ValueError("Uncertainty must be non-negative")
+        else:
+            self._value_unc = value_unc
+        self.absolute_timestamps = absolute_timestamps
         super().__init__()
-
-    @staticmethod
-    def _time():
-        return time.time()
-
-    @staticmethod
-    def _time_unc():
-        return time.get_clock_info("time").resolution
-
-    @staticmethod
-    def _value(timestamp):
-        return 1013.25 + 10 * np.sin(timestamp)
-
-    @staticmethod
-    def _value_unc():
-        return 0.5
-
-    @property
-    def current_datapoint(self):
-        t = self._time()
-        ut = self._time_unc()
-        v = self._value(t)
-        uv = self._value_unc()
-
-        return np.array((t, ut, v, uv))
 
 
     def _next_sample_generator(self, batch_size=1):
         """
         Internal method for generating a batch of samples from the generator function. Overrides
-        _next_sample_generator() from DataStreamMET4FOF. Includes time uncertainty ut and measurement uncertainty
+        _next_sample_generator() from DataStreamMET4FOF. Adds time uncertainty ut and measurement uncertainty
         uv to sample
         """
-        time = np.arange(self.sample_idx, self.sample_idx + batch_size, 1) / self.sfreq
-        self.sample_idx += batch_size
+        if self.absolute_timestamps:
+            self._time = time.time()
+            self._time_unc = time.get_clock_info("time").resolution
+            self.sample_idx += batch_size
+        else:
+            timeelement = np.arange(self.sample_idx, self.sample_idx + batch_size, 1) / self.sfreq
+            self._time = timeelement.item()
+            self._time_unc = 0.0
+            self.sample_idx += batch_size
 
-        amplitude = self.generator_function(time, **self.generator_parameters)
+        amplitude = self.generator_function(self._time, **self.generator_parameters)
 
         #return {'quantities': amplitude, 'time': time}
-        return np.array((time.item(), self._time_unc(), amplitude.item(), self._value_unc()))
+        return np.array((self._time, self._time_unc, amplitude.item(), self._value_unc))
 
 
 class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
@@ -60,9 +48,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
-        super().__init__()
-        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
+    def __init__(self,sfreq=500, F=50, value_unc=0.0):
+        super().__init__(value_unc=value_unc, absolute_timestamps=False)
+        self.set_metadata(device_id="SineGenerator", time_name="time", time_unit="s", quantity_names=("Voltage"), quantity_units=("V"), misc="Simple sine wave generator")
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
 
     def sine_wave_function(self, time, F=50):

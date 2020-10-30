@@ -19,7 +19,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     # The datatype of the stream will be SineGenerator.
     _sine_stream: MetrologicalSineGenerator
 
-    def init_parameters(self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(), **kwargs):
+    def init_parameters(self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(value_unc=0.0), value_unc = 0.0, **kwargs):
         """Initialize the input data
 
         Initialize the input data stream as an instance of the
@@ -31,6 +31,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
             the underlying signal for the generator
         """
         self._sine_stream = signal
+        self._value_unc = value_unc
         super().init_parameters()
         self.set_output_data(channel="default", metadata=self._sine_stream.metadata)
 
@@ -43,7 +44,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         """
         if self.current_state == "Running":
             self.set_output_data(
-                channel="default", data=[self._sine_stream._next_sample_generator()]
+                channel="default", data=[self._sine_stream.next_sample()]
             )
             super().agent_loop()
 
