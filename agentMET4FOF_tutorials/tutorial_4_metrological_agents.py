@@ -72,7 +72,6 @@ def main():
         "MonitorAgent", agentType=MetrologicalMonitorAgent
     )
 
-    #agent_network.bind_agents(source_agent, monitor_agent)
     # Bind agents.
     source_agent.bind_output(monitor_agent)
 
