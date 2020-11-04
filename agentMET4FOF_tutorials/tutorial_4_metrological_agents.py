@@ -1,55 +1,8 @@
-import time
 from typing import Dict
-
-import numpy as np
-from time_series_metadata.scheme import MetaData
 
 from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
-
-
-class Signal:
-    """
-    Simple class to request time-series datapoints of a signal
-    """
-
-    def __init__(self):
-        self._description = MetaData(
-            device_id="my_virtual_sensor",
-            time_name="time",
-            time_unit="s",
-            quantity_names="pressure",
-            quantity_units="Pa",
-        )
-
-    @staticmethod
-    def _time():
-        return time.time()
-
-    @staticmethod
-    def _time_unc():
-        return time.get_clock_info("time").resolution
-
-    @staticmethod
-    def _value(timestamp):
-        return 1013.25 + 10 * np.sin(timestamp)
-
-    @staticmethod
-    def _value_unc():
-        return 0.5
-
-    @property
-    def current_datapoint(self):
-        t = self._time()
-        ut = self._time_unc()
-        v = self._value(t)
-        uv = self._value_unc()
-
-        return np.array((t, ut, v, uv))
-
-    @property
-    def metadata(self) -> MetaData:
-        return self._description
+from agentMET4FOF.metrological_streams import MetrologicalSineGenerator
 
 
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
@@ -60,9 +13,9 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     """
 
     # The datatype of the stream will be SineGenerator.
-    _sine_stream: Signal
+    _sine_stream: MetrologicalSineGenerator
 
-    def init_parameters(self, signal: Signal = Signal(), **kwargs):
+    def init_parameters(self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(), **kwargs):
         """Initialize the input data
 
         Initialize the input data stream as an instance of the
@@ -86,7 +39,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         """
         if self.current_state == "Running":
             self.set_output_data(
-                channel="default", data=[self._sine_stream.current_datapoint]
+                channel="default", data=[self._sine_stream._next_sample_generator()]
             )
             super().agent_loop()
 
@@ -101,7 +54,7 @@ def main():
     agent_network = AgentNetwork(dashboard_modules=True)
 
     # Initialize signal generating class outside of agent framework.
-    signal = Signal()
+    signal = MetrologicalSineGenerator()
 
     # Initialize metrologically enabled agent taking name from signal source metadata.
     source_name = signal.metadata.metadata["device_id"]
