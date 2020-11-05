@@ -451,17 +451,14 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     y_title_offset = -0.1
 
                 # Check if any metadata is present that can be used to generate axis
-                # labels.
-                if isinstance(memory_data[sender_agent], dict) and \
-                        'metadata' in memory_data[sender_agent].keys():
-                    # The metadata might be a list of metadata items each
-                    # corresponding to one element of the list of datapoints in
-                    # memory_data[sender_agent]["data"] or a single metadata element
-                    # shared corresponding to all datapoints.
-                    if isinstance(memory_data[sender_agent]["metadata"], Iterable):
-                        desc = memory_data[sender_agent]["metadata"][0]
-                    else:
-                        desc = memory_data[sender_agent]["metadata"]
+                # labels or otherwise use default labels.
+                if (
+                    isinstance(memory_data[sender_agent], dict)
+                    and "metadata" in memory_data[sender_agent].keys()
+                ):
+                    # The metadata currently is always a list in the
+                    # beginning containing at least one element.
+                    desc = memory_data[sender_agent]["metadata"][0]
 
                     # We now expect metadata to be of type
                     # time-series-metadata.scheme.MetaData. We try to access the
@@ -471,11 +468,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         t_name, t_unit = desc.time.values()
                         v_name, v_unit = desc.get_quantity().values()
                     except TypeError:
-                        raise TypeError(f"The Dashboard tried to access an agents "
-                                        f"metadata but an error occurred. Metadata is "
-                                        f"of type {type(desc)} but is "
-                                        f"expected to be of type {type(MetaData)}. "
-                                        f"Its value is: \n\n{desc}")
+                        raise TypeError(
+                            f"The Dashboard tried to access an agents metadata but an"
+                            f"error occurred. Metadata is " f"of type {type(desc)} "
+                            f"but is expected to be of type ""{type(MetaData)}. " 
+                            f"Its value is: \n\n{desc}"
+                        )
 
                     # After successfully extracting the metadata itself, we concatenate
                     # the important parts to get the labels.
@@ -485,13 +483,14 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     # If no metadata is available we set reasonable defaults. Since
                     # we could deal with any data in the time as well as in the
                     # frequency domain, we keep it fairly generic.
-                    warnings.warn(f"The Dashboard shows a plot for monitor "
-                                  f"agent '{monitor_agent}' without any axes "
-                                  f"labels specified. The labels will be represented "
-                                  f"by generic place holders. Check out tutorial 4 to "
-                                  f"find out how to specify custom labels.")
-                    x_label = 'X'
-                    y_label = 'Y'
+                    warnings.warn(
+                        f"The Dashboard shows a plot for monitor agent '"
+                        f"{monitor_agent}' without any axes labels specified. The "
+                        f"labels will be represented by generic place holders. Check "
+                        f"out tutorial 4 to find out how to specify custom labels."
+                    )
+                    x_label = "X"
+                    y_label = "Y"
 
                 monitor_graph = {
                     'data': data,
