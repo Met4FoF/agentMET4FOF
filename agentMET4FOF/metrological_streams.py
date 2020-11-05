@@ -16,7 +16,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
     @staticmethod
     def _time_unc():
-        return .01*time.get_clock_info("time").resolution
+        return time.get_clock_info("time").resolution
 
 
     @staticmethod
