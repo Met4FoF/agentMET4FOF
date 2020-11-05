@@ -1,15 +1,13 @@
-from agentMET4FOF.agents import AgentNetwork
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
+import time
 from typing import Dict
 
 import numpy as np
+import pytest
 from time_series_metadata.scheme import MetaData
-import pandas as pd
-import time
-#init params
-np.random.seed(123)
-num_samples = 10
-test_timeout = 5
+
+from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
+from tests.conftest import test_timeout
+
 
 class Signal:
     """
@@ -97,35 +95,43 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     def metadata(self) -> Dict:
         return self._sine_stream.metadata.metadata
 
-# agentType=MetrologicalAgent
-#start agent network server
-def test_simple_metrological_agent():
-    agentNetwork = AgentNetwork(dashboard_modules=False)
 
+@pytest.mark.timeout(test_timeout)
+def test_simple_metrological_agent(agent_network):
+    # Create an agent with data source and metadata, attach it to a monitor agent and
+    # check, if the metadata is present at the right place in the monitor agent after
+    # a short while.
+
+    # Create a data source.
     signal = Signal()
-    #init agents by adding into the agent network
     source_name = signal.metadata.metadata["device_id"]
-    simple_agent = agentNetwork.add_agent(name=source_name, agentType=MetrologicalSineGeneratorAgent)
-    monitor_agent_1 = agentNetwork.add_agent(agentType=MetrologicalMonitorAgent)
+
+    # Init agents by adding into the agent network.
+    simple_agent = agent_network.add_agent(
+        name=source_name, agentType=MetrologicalSineGeneratorAgent
+    )
     simple_agent.init_parameters(signal)
-    #shorten n wait loop time
-    simple_agent.init_agent_loop(1)
+    monitor_agent_1 = agent_network.add_agent(agentType=MetrologicalMonitorAgent)
 
-    #connect agents
-    agentNetwork.bind_agents(simple_agent, monitor_agent_1)
+    # Connect agents.
+    agent_network.bind_agents(simple_agent, monitor_agent_1)
 
-    # set all agents states to "Running"
-    agentNetwork.set_running_state()
+    # Set all agents states to "Running".
+    agent_network.set_running_state()
 
-    time.sleep(test_timeout)
+    # Run check of expected and actual result until test times out.
+    is_present = True
+    while not is_present:
+        try:
+            # Run actual check. This reduces test runtime in case of passed tests but
+            # results in quite cryptic error messages in case it fails due to the
+            # timeout causing the actual fail. So, if this line fails, regardless of
+            # the error message, it means, the addressed attribute'S content does not
+            # match the expected expression.
+            # Check if key 'metadata' is present in the received data
+            memory_dict = list(monitor_agent_1.get_attr('buffer').values())[0]
+            is_present = "metadata" in memory_dict.keys()
+        except IndexError:
+            pass
 
-    # test to see if key 'metadata' is present in the received data
-    memory_dict = monitor_agent_1.get_attr('buffer')
-    memory_dict_value = list(memory_dict.values())[0]
-    assert 'metadata' in memory_dict_value.keys()
 
-    time.sleep(3)
-
-    # shutdown agent network
-    agentNetwork.shutdown()
-    
