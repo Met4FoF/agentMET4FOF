@@ -1,26 +1,43 @@
 import numpy as np
 from agentMET4FOF.streams import DataStreamMET4FOF
+import warnings
 
 
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
     """
-    Abstract  class for creating datastreams with metrological information
+    Abstract  class for creating datastreams with metrological information. Inherits
+    from the DataStreamMET4FOF class
+
+    To create a new MetrologicalDataStreamMET4FOF class, inherit this class and call
+    `set_metadata` in the constructor. Choose one of two types of datastreams to be
+    created: from dataset file (`set_data_source`), or a waveform generator function
+    (`set_generator_function`). Alternatively, override the `next_sample` function if
+    neither option suits the application. For generator functions, `sfreq` is a
+    required variable to be set on `init` which sets the sampling frequency and the
+    time-step which occurs when `next_sample()` is called.
     """
 
     def __init__(self):
         super().__init__()
 
-    def set_uncertainty_generator(self, generator_function=None, **kwargs):
+    def set_generator_function(self, generator_function=None, uncertainty_generator=None, sfreq=None, **kwargs):
         """
-        Sets the uncertainty based on a user-defined function. By default,
-        this function resorts to a constant (zero) uncertainty. The function returns
-        a tuple corresponding to the amplitude and time uncertainty at a given time
+        Sets the a generator and uncertainty based on user-defined functions. By default,
+        this function resorts to a sine wave generator function and a constant (zero) uncertainty.
+        Initialisation of the generator's parameters should be done here such as setting the sampling frequency and
+        wave frequency. For setting it with a dataset instead, see `set_data_source`. Overwrites the default
+        set_generator_function method in DataStreamMET4FO
 
         Parameters
         ----------
         generator_function : method
             A generator function which takes in at least one argument `time` which
             will be used in `next_sample`.
+
+        uncertainty_generator : method
+
+        sfreq : int
+            Sampling frequency.
 
         **kwargs
             Any additional keyword arguments to be supplied to the generator function.
@@ -29,15 +46,19 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             ``**uncertainty_parameters``.
 
         """
-        # save the kwargs into uncertainty_parameters
+        # Call the set_generator_function from the parent class to set the generator function
+        super().set_generator_function(generator_function=generator_function, sfreq=sfreq, **kwargs)
+
         self.uncertainty_parameters = kwargs
 
         # resort to default wave generator if one is not supplied
-        if generator_function is None:
+        if uncertainty_generator is None:
+            warnings.warn("No uncertainty generator function specified. Setting to default (zero).")
             self.generator_function_unc = self.default_uncertainty_generator
         else:
-            self.generator_function_unc = generator_function
+            self.generator_function_unc = uncertainty_generator
         return self.generator_function_unc
+
 
     def default_uncertainty_generator(self, time):
         """
@@ -54,13 +75,13 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         uv to sample
         """
         timeelement = np.arange(self.sample_idx, self.sample_idx + batch_size, 1) / self.sfreq
-        self._time = timeelement.item()
+        _time = timeelement.item()
         self.sample_idx += batch_size
 
-        self._time_unc, self._value_unc = self.default_uncertainty_generator(self._time)
-        amplitude = self.generator_function(self._time, **self.generator_parameters)
+        _time_unc, _value_unc = self.generator_function_unc(_time)
+        amplitude = self.generator_function(_time, **self.generator_parameters)
 
-        return np.array((self._time, self._time_unc, amplitude.item(), self._value_unc))
+        return np.array((_time, _time_unc, amplitude.item(), _value_unc))
 
 
 class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
@@ -73,7 +94,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     """
 
-    def __init__(self, sfreq=500, F=50, value_unc=0.0):
+    def __init__(self, sfreq=500, F=50):
         super().__init__()
         self.set_metadata(device_id="SineGenerator", time_name="time", time_unit="s", quantity_names=("Voltage"),
                           quantity_units=("V"), misc="Simple sine wave generator")
