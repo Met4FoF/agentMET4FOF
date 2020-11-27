@@ -236,7 +236,7 @@ jobs:
 
   # Define one 'test' job to run their test suites against the
   # installed dependencies from the environment.yml.
-  test_against_setup.py:
+  test_against_setup:
 
     executor: tester
 
