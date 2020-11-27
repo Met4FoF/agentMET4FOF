@@ -6,3 +6,4 @@ dependencies:
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
         - -r requirements.txt
+        - -r dev-requirements.txt
