@@ -24,10 +24,6 @@ on Python 3.8, activate it, then install *agentMET4FOF*
 from PyPI.org and then work through the [tutorials
 ](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
 or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
-At the moment there seems to be something wrong with one of our dependencies, so
-please install the specified dependency versions. We included the according step in
-the following guides.
-
 
 ### Create a virtual environment on Windows
 
