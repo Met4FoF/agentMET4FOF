@@ -157,7 +157,7 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            pytest -v --junitxml=test-results/junit.xml . > test-reports/pytest.log
+            pytest -v --junitxml=test-reports/junit.xml . > test-reports/pytest.log
 
       - store_test_artifacts_and_results
 
