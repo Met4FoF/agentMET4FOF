@@ -143,7 +143,7 @@ commands:
         name: Run tests
         command: |
           source $HOME/conda/etc/profile.d/conda.sh
-          conda activate Met4FoF_Code
+          conda activate agentMET4FOF
           pytest -v --junitxml=test-results/junit.xml . > test-reports/pytest.log
 
     - store_test_artifacts_and_results
