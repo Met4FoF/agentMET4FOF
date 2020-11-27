@@ -1,9 +1,9 @@
 name: agentMET4FOF
 channels:
     - defaults
-    - conda-forge
 dependencies:
-    - python >=3.6
+    - python = 3.8
     # pip dependencies have to be provided in `requirements.txt` syntax
     - pip:
         - -r requirements.txt
+        - -r dev-requirements.txt
