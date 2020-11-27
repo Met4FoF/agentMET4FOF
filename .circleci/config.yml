@@ -20,24 +20,20 @@ workflows:
   test_and_deploy:
     jobs:
       - test_against_venv
-      - test_against_conda
-      - test_against_setup
-      # Create 'test' job to test agentMET4FOF for every commit.
-      - test:
-          name: "test_against_requirements"
-          send_cov: true
           filters:
             tags:
               # Include tag filter to trigger as well on tag pushes.
               only: /.*/
-      - test:
-          name: "test_against_setup.py"
-          requirements: ". -r dev-requirements.txt"
-          cache: false
+      - test_against_conda
           filters:
-              tags:
-                # Include tag filter to trigger as well on tag pushes.
-                only: /.*/
+            tags:
+              # Include tag filter to trigger as well on tag pushes.
+              only: /.*/
+      - test_against_setup
+          filters:
+            tags:
+              # Include tag filter to trigger as well on tag pushes.
+              only: /.*/
       - deploy:
           # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
           # pushes, which successfully run 'test' job and are tagged with version.
@@ -45,8 +41,6 @@ workflows:
               - test_against_venv
               - test_against_conda
               - test_against_setup
-              - test_against_requirements
-              - test_against_setup.py
           filters:
               tags:
                 # Specify the tags which trigger the job as regular expression.
@@ -55,124 +49,16 @@ workflows:
                 # This assures the job only being triggered by tag pushes.
                 ignore: /.*/
 
-
 commands:
   # Reusable command to prepare the environment for testing.
-  install_and_cache_venv_dependencies:
-    description: "Install pip dependencies of all packages."
-    steps:
-    # Download and cache dependencies.
-    - restore_cache:
-        keys:
-          # Specify the unique identifier for the cache.
-          - v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-          # Fallback to using the latest cache if no exact match is found.
-          - v3-venv-dependencies-
-
-    # Install dependencies.
-    - run:
-        name: Install dependencies
-        command: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip pip-tools
-          pip-sync dev-requirements.txt requirements.txt
-
-    - save_cache:
-        paths:
-          - ./venv
-        key: >-
-          v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
-  install_and_cache_setup_dependencies:
-    description: "Install pip dependencies of all packages."
-    steps:
-    # Download and cache dependencies.
-    - restore_cache:
-        keys:
-          # Specify the unique identifier for the cache.
-          - v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-          # Fallback to using the latest cache if no exact match is found.
-          - v1-setup-dependencies-
-
-    # Install dependencies.
-    - run:
-        name: Install dependencies
-        command: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install . -r dev-requirements.txt
-
-    - save_cache:
-        paths:
-          - ./venv
-        key: >-
-          v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-
-  # Reusable command to prepare the environment for testing.
-  install_and_cache_conda_dependencies:
-    description: "Install Miniconda and conda dependencies of all packages."
-    steps:
-    - run:
-        name: Install Miniconda
-        command: |
-          wget "https://repo.anaconda.com/miniconda/\
-          Miniconda3-latest-Linux-x86_64.sh" -O $HOME/miniconda.sh
-          mkdir -p $HOME/.conda
-          bash $HOME/miniconda.sh -b -p /home/circleci/conda
-          source $HOME/conda/etc/profile.d/conda.sh
-          hash -r
-          conda config --set always_yes yes --set changeps1 no
-          conda update -q conda
-          echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
-
-    # Download and cache dependencies.
-    - restore_cache:
-        keys:
-          # Specify the unique identifier for the cache.
-          - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-          # Fallback to using the latest cache if no exact match is found.
-          - v1-conda-dependencies-
-
-    # Create environment.
-    - run:
-        name: Create or update environment
-        command: |
-          if [ -d "$HOME/conda/envs/" ]; then
-              conda env update --prune --file environment.yml
-          else
-              conda env create -f environment.yml
-          fi
-
-    - save_cache:
-        paths:
-          - /home/circleci/conda/envs/
-        key: >-
-          v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
   create_result_folder:
     description: "Create test-result folder."
-
     steps:
     # Create folder for test results.
     - run:
         name: Create test result folder
         command: |
           mkdir -p test-reports
-
-  run_conda_tests:
-    description: "Run and store test results."
-    steps:
-    # Run tests! We use pytest's test-runner.
-    - run:
-        name: Run tests
-        command: |
-          source $HOME/conda/etc/profile.d/conda.sh
-          conda activate agentMET4FOF
-          pytest -v --junitxml=test-results/junit.xml . > test-reports/pytest.log
-
-    - store_test_artifacts_and_results
 
   run_venv_tests:
     description: "Run and store test results."
@@ -228,10 +114,52 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - install_and_cache_conda_dependencies
+      - run:
+          name: Install Miniconda
+          command: |
+            wget "https://repo.anaconda.com/miniconda/\
+            Miniconda3-latest-Linux-x86_64.sh" -O $HOME/miniconda.sh
+            mkdir -p $HOME/.conda
+            bash $HOME/miniconda.sh -b -p /home/circleci/conda
+            source $HOME/conda/etc/profile.d/conda.sh
+            hash -r
+            conda config --set always_yes yes --set changeps1 no
+            conda update -q conda
+            echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
+
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v1-conda-dependencies-
+
+      # Create environment.
+      - run:
+          name: Create or update environment
+          command: |
+            if [ -d "$HOME/conda/envs/" ]; then
+                conda env update --prune --file environment.yml
+            else
+                conda env create -f environment.yml
+            fi
+
+      - save_cache:
+          paths:
+            - /home/circleci/conda/envs/
+          key: >-
+            v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
-      - run_conda_tests
+      - run:
+          name: Run tests
+          command: |
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
+            pytest -v --junitxml=test-results/junit.xml . > test-reports/pytest.log
+
+      - store_test_artifacts_and_results
 
 
   # Define one 'test' job to run their test suites against the
@@ -243,7 +171,28 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - install_and_cache_setup_dependencies
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v1-setup-dependencies-
+
+      # Install dependencies.
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip wheel
+            pip install . -r dev-requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner and request to send coverage report.
       - run_venv_tests:
@@ -258,95 +207,31 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - install_and_cache_venv_dependencies
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v3-venv-dependencies-
+
+      # Install dependencies.
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip pip-tools
+            pip-sync dev-requirements.txt requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
       - run_venv_tests
-
-  test:
-    # Define a parameter for the job, to be able to run all tests against different
-    # sets of dependencies. This allows specifically to run the tests against the
-    # possibly pinned versions from requirements.txt and against the automatically
-    # installed most current versions from setup.py. The send_cov variable is only to
-    # ensure that only one coverage report gets send for each commit.
-    parameters:
-      requirements:
-        type: string
-        default: "-r requirements.txt -r dev-requirements.txt"
-      send_cov:
-        type: boolean
-        default: false
-      cache:
-        type: boolean
-        default: true
-
-    executor: tester
-
-    steps:
-      # Checkout code.
-      - checkout
-
-      # Create folder for test results.
-      - run:
-          name: Create test result folder
-          command: |
-            mkdir test-reports
-
-      # Download and cache dependencies if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.cache >>
-          steps:
-            - restore_cache:
-                keys:
-                  # Specify the unique identifier for the cache.
-                  - v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-                  # Fallback to using the latest cache if no exact match is found.
-                  - v2-dependencies-
-
-      # Install dependencies if necessary.
-      - run:
-         name: Install dependencies
-         command: |
-           python3 -m venv agent_venv
-           source agent_venv/bin/activate
-           pip install --upgrade pip << parameters.requirements >>
-
-      # Save cached venv if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.cache >>
-          steps:
-            - save_cache:
-                paths:
-                  - ./agent_venv
-                key: v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
-      # Run tests with coverage report! We use pytest's test-runner.
-      - run:
-          name: Run agentMET4FOF tests
-          command: |
-            source agent_venv/bin/activate
-            pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
-            test-reports/agentMET4FOF.log
-
-
-      # Upload coverage report if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.send_cov >>
-          steps:
-            - run:
-                name: Upload coverage report
-                command: |
-                  source agent_venv/bin/activate
-                  bash <(curl -s https://codecov.io/bash)
-
-      # Store test results as artifacts.
-      - store_artifacts:
-         path: test-reports
-         destination: test-reports
-
-      # Show test results as summary on job page.
-      - store_test_results:
-         path: test-reports
 
   deploy:
     executor: publisher
