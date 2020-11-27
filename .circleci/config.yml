@@ -19,17 +19,17 @@ workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      - test_against_venv
+      - test_against_venv:
           filters:
             tags:
               # Include tag filter to trigger as well on tag pushes.
               only: /.*/
-      - test_against_conda
+      - test_against_conda:
           filters:
             tags:
               # Include tag filter to trigger as well on tag pushes.
               only: /.*/
-      - test_against_setup
+      - test_against_setup:
           filters:
             tags:
               # Include tag filter to trigger as well on tag pushes.
