@@ -20,7 +20,7 @@ under the project Metrology for the Factory of the Future (Met4FoF), project num
 
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
-on Python 3.6 or later, activate it, then install *agentMET4FOF*
+on Python 3.8, activate it, then install *agentMET4FOF*
 from PyPI.org and then work through the [tutorials
 ](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
 or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
