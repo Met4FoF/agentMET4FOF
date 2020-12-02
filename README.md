@@ -15,6 +15,10 @@ under the project Metrology for the Factory of the Future (Met4FoF), project num
  - Includes agent-based simulation and implementation
  - Readthedocs documentation is available at (https://agentmet4fof.readthedocs.io)
 
+## The agentMET4FOF dashboard
+
+![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
+
 ## Use agentMET4FOF
 
 
@@ -25,58 +29,24 @@ from PyPI.org and then work through the [tutorials
 ](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
 or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
 
-### Create a virtual environment on Windows
 
-In your Windows PowerShell execute the following to set up a virtual environment
-in a folder of your choice and execute the first tutorial.
+### Quickstart
+
+In your terminal execute the following in [a virtual environment](README.md#detailed-instructions-on-preparations)
+to run the first tutorial.
+
 ```shell
-PS C:> cd C:\LOCAL\PATH\TO\ENVS
-PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
-PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
-(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python -m pip install --upgrade pip agentMET4FOF
-Collecting agentMET4FOF
-...
-Successfully installed agentMET4FOF-... ...
-(agentMET4FOF_venv) PS C:\LOCAL\PATH\TO\ENVS> python
-Python ... (default, ..., ...) 
-[GCC ...] on ...
-Type "help", "copyright", "credits" or "license" for more information.
 >>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
 >>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
-Starting NameServer...
-Broadcast server running on 0.0.0.0:9091
-NS running on 127.0.0.1:3333 (127.0.0.1)
-URI = PYRO:Pyro.NameServer@127.0.0.1:3333
-INFO [2020-02-21 19:04:26.961014] (AgentController): INITIALIZED
-INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
- * Serving Flask app "agentMET4FOF.dashboard.Dashboard" (lazy loading)
- * Environment: production
-   WARNING: This is a development server. Do not use it in a production deployment.
-   Use a production WSGI server instead.
- * Debug mode: off
- * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
-...
 ```
 
-### Create a virtual environment on Mac and Linux
-
-In your terminal execute the following to set up a virtual environment
-in a folder of your choice and execute the first tutorial.
-
 ```shell
-$ cd /LOCAL/PATH/TO/ENVS
-$ python3 -m venv agentMET4FOF_venv
-$ source agentMET4FOF_venv/bin/activate
-(agentMET4FOF_venv) $ pip install --upgrade pip agentMET4FOF
 Collecting agentMET4FOF
 ...
 Successfully installed agentMET4FOF-... ...
-(agentMET4FOF_venv) $ python
 Python ... (default, ..., ...) 
 [GCC ...] on ...
 Type "help", "copyright", "credits" or "license" for more information.
->>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
->>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
 Starting NameServer...
 Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
@@ -99,6 +69,38 @@ Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
  
 To get some insights and really get going please visit [agentMET4FOF.readthedocs.io
 ](https://agentmet4fof.readthedocs.io/).
+
+## Installation
+
+### Create a virtual environment on Windows
+
+In your Windows PowerShell execute the following to set up a virtual environment
+in a folder of your choice.
+
+```shell
+PS C:> cd C:\LOCAL\PATH\TO\ENVS
+PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
+PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
+```
+
+### Create a virtual environment on Mac & Linux
+
+In your terminal execute the following to [set up a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments)
+in a folder of your choice.
+
+```shell
+$ cd /LOCAL/PATH/TO/ENVS
+$ python3 -m venv agentMET4FOF_venv
+$ source agentMET4FOF_venv/bin/activate
+```
+
+### Install agentMET4FOF
+
+Once you activated your virtual environment, you can install agentmET4FOF via:
+
+```shell
+pip install agentMET4FOF
+```
 
 ## Get started developing
 
@@ -143,10 +145,6 @@ Alternatively, watch the tutorial webinar [here
  - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case 
    [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
  - Implemented interactive web application with user interface
-
-## Screenshot of web visualization
-
-![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
 ## Orphaned processes
 
