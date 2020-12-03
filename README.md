@@ -21,32 +21,22 @@ under the project Metrology for the Factory of the Future (Met4FoF), project num
 
 ## Use agentMET4FOF
 
-
 The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
 on Python 3.8, activate it, then install *agentMET4FOF*
 from PyPI.org and then work through the [tutorials
-](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
-or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
-
+](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials).
 
 ### Quickstart
 
-In your terminal execute the following in [a virtual environment](README.md#detailed-instructions-on-preparations)
-to run the first tutorial.
+In your Python console execute the following to run the first tutorial.
 
-```shell
+```python
 >>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
 >>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
 ```
 
 ```shell
-Collecting agentMET4FOF
-...
-Successfully installed agentMET4FOF-... ...
-Python ... (default, ..., ...) 
-[GCC ...] on ...
-Type "help", "copyright", "credits" or "license" for more information.
 Starting NameServer...
 Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
@@ -59,7 +49,7 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
    Use a production WSGI server instead.
  * Debug mode: off
  * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
-...
+[...]
 ```
 
 ### Inspect dashboard
@@ -72,10 +62,11 @@ To get some insights and really get going please visit [agentMET4FOF.readthedocs
 
 ## Installation
 
+The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests. The process basically consists of setting up [a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) and then [installing angentMET4FOF via `pip`](README.md#install-agentMET4FOF).
+
 ### Create a virtual environment on Windows
 
-In your Windows PowerShell execute the following to set up a virtual environment
-in a folder of your choice.
+In your Windows PowerShell execute the following to set up a virtual environment in a folder of your choice.
 
 ```shell
 PS C:> cd C:\LOCAL\PATH\TO\ENVS
@@ -85,8 +76,7 @@ PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
 
 ### Create a virtual environment on Mac & Linux
 
-In your terminal execute the following to [set up a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments)
-in a folder of your choice.
+In your terminal execute the following to set up a virtual environment in a folder of your choice.
 
 ```shell
 $ cd /LOCAL/PATH/TO/ENVS
@@ -100,6 +90,12 @@ Once you activated your virtual environment, you can install agentmET4FOF via:
 
 ```shell
 pip install agentMET4FOF
+```
+
+```shell
+Collecting agentMET4FOF
+[...]
+Successfully installed agentMET4FOF-[...] [...]
 ```
 
 ## Get started developing
@@ -126,12 +122,11 @@ first, then create the virtual environment as stated above and then proceed.
 
 Alternatively, for non-conda environments, you can install the dependencies using pip
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt -r dev-requirements.txt
 ```
 
 First take a look at the [tutorials
 ](https://github.com/bangxiangyong/agentMET4FOF/blob/develop/agentMET4FOF_tutorials/tutorial_1_generator_agent.py)
-and [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples)
 or start hacking if you already are familiar with agentMET4FOF and want to customize
 your agents' network.
 
