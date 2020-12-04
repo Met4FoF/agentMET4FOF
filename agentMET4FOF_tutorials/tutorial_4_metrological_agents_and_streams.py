@@ -84,4 +84,4 @@ def demonstrate_metrological_stream():
 
 
 if __name__ == "__main__":
-    main()
+    demonstrate_metrological_stream()
