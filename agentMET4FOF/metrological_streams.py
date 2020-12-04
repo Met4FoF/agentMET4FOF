@@ -60,7 +60,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         return self.generator_function_unc
 
 
-    def default_uncertainty_generator(self, time):
+    def default_uncertainty_generator(self):
         """
         Default uncertainty generator function. Returns a tuple of constant (zero) time and amplitude uncertainties
         """
