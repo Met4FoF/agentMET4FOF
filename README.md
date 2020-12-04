@@ -68,7 +68,7 @@ and then [installing angentMET4FOF via `pip`](README.md#install-agentMET4FOF).
 
 ### Create a virtual Python environment
 
-For the motivation of creating to virtual environment fpor your installation of the agents check 
+For the motivation of creating to virtual environment for your installation of the agents check 
 [the official Python docs on that topic](https://docs.python.org/3/tutorial/venv.html#introduction).
 The commands differ slightly between Windows and Mac/Linux.
 
