@@ -25,7 +25,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         Set value and uncertainty generators based on user-defined functions. By default,
         this function resorts to a sine wave generator function and a constant (zero) uncertainty.
         Initialisation of the generator's parameters should be done here such as setting the sampling frequency and
-        wave frequency. For setting it with a dataset instead, see `set_data_source`. Overwrites the default
+        wave frequency. For setting it with a dataset instead, see :func:`set_data_source`. Overwrites the default
         set_generator_function method in DataStreamMET4FO
 
         Parameters
