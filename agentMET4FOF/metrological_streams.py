@@ -30,7 +30,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
         Parameters
         ----------
-        generator_function : method
+        generator_function : callable
             A generator function which takes in at least one argument `time` which
             will be used in :func:`next_sample`.
 
