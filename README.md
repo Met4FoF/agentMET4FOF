@@ -57,14 +57,22 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
 Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
  SineGenerator agent you just spawned.
  
-To get some insights and really get going please visit [agentMET4FOF.readthedocs.io
-](https://agentmet4fof.readthedocs.io/).
+To get some insights and really get going please visit [the docs](https://agentmet4fof.readthedocs.io/).
 
 ## Installation
 
-The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests. The process basically consists of setting up [a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) and then [installing angentMET4FOF via `pip`](README.md#install-agentMET4FOF).
+The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests. 
+The process basically consists of setting up
+[a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) 
+and then [installing angentMET4FOF via `pip`](README.md#install-agentMET4FOF).
 
-### Create a virtual environment on Windows
+### Create a virtual Python environment
+
+For the motivation of creating to virtual environment fpor your installation of the agents check 
+[the official Python docs on that topic](https://docs.python.org/3/tutorial/venv.html#introduction).
+The commands differ slightly between Windows and Mac/Linux.
+
+#### Create a virtual Python environment on Windows
 
 In your Windows PowerShell execute the following to set up a virtual environment in a folder of your choice.
 
@@ -74,7 +82,7 @@ PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
 PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
 ```
 
-### Create a virtual environment on Mac & Linux
+#### Create a virtual Python environment on Mac & Linux
 
 In your terminal execute the following to set up a virtual environment in a folder of your choice.
 
@@ -106,13 +114,13 @@ with your present *Anaconda* installation just go to *Anaconda
 prompt*, navigate to your local clone
 
 ```shell
-cd /LOCAL/PATH/TO/agentMET4FOF
+$ cd /LOCAL/PATH/TO/agentMET4FOF
 ```
 
 and execute
 
 ```shell
-conda env create --file environment.yml 
+$ conda env create --file environment.yml 
 ```
 
 This will create an *Anaconda* virtual environment with all dependencies
@@ -121,8 +129,9 @@ satisfied. If you don't have *Anaconda* installed already follow [this guide
 first, then create the virtual environment as stated above and then proceed.
 
 Alternatively, for non-conda environments, you can install the dependencies using pip
-```
-pip install -r requirements.txt -r dev-requirements.txt
+
+```shell
+$ pip install -r requirements.txt -r dev-requirements.txt
 ```
 
 First take a look at the [tutorials
@@ -145,7 +154,7 @@ Alternatively, watch the tutorial webinar [here
 
 In the event of agents not terminating cleanly, you can end all Python processes
 running on your system (caution: the following commands affect **all** running Python
- processes, not just those that emerged from the agents).
+processes, not just those that emerged from the agents).
 
 ### Killing all Python processes in Windows
 
