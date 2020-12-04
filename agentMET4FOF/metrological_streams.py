@@ -32,7 +32,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         ----------
         generator_function : method
             A generator function which takes in at least one argument `time` which
-            will be used in `next_sample`.
+            will be used in :func:`next_sample`.
 
         uncertainty_generator : method
 
@@ -103,4 +103,3 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     def sine_wave_function(self, time, F=50):
         amplitude = np.sin(2 * np.pi * F * time)
         return amplitude
-
