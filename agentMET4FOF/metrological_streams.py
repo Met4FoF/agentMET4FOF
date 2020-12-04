@@ -110,8 +110,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         misc="Simple sine wave generator"
     ):
         super().__init__()
-        self.set_metadata(device_id="SineGenerator", time_name="time", time_unit="s", quantity_names=("Voltage"),
-                          quantity_units=("V"), misc="Simple sine wave generator")
+        self.set_metadata(device_id=device_id, time_name=time_name, time_unit=time_unit, quantity_names=quantity_names,
+                          quantity_units=quantity_units, misc=misc)
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
 
     def sine_wave_function(self, time, F=50):
