@@ -52,7 +52,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         return self._sine_stream.metadata.metadata
 
 
-def main():
+def demonstrate_metrological_stream():
 
     # start agent network server
     agent_network = AgentNetwork(dashboard_modules=True)
