@@ -1,8 +1,4 @@
-import time
 from typing import Dict
-
-import numpy as np
-from time_series_metadata.scheme import MetaData
 
 from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
@@ -12,14 +8,16 @@ from agentMET4FOF.metrological_streams import MetrologicalSineGenerator
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     """An agent streaming a sine signal
 
-    Takes samples from the :py:mod:`MetrologicalSineGenerator` and pushes them sample by sample
-    to connected agents via its output channel.
+    Takes samples from the :py:class:`MetrologicalSineGenerator` and pushes them sample
+    by sample to connected agents via its output channel.
     """
 
-    # The datatype of the stream will be SineGenerator.
+    # The datatype of the stream will be MetrologicalSineGenerator.
     _sine_stream: MetrologicalSineGenerator
 
-    def init_parameters(self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(), **kwargs):
+    def init_parameters(
+        self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(), **kwargs
+    ):
         """Initialize the input data
 
         Initialize the input data stream as an instance of the
@@ -72,7 +70,7 @@ def demonstrate_metrological_stream():
         "MonitorAgent", agentType=MetrologicalMonitorAgent
     )
 
-    #agent_network.bind_agents(source_agent, monitor_agent)
+    # agent_network.bind_agents(source_agent, monitor_agent)
     # Bind agents.
     source_agent.bind_output(monitor_agent)
 
