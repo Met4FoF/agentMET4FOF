@@ -12,7 +12,7 @@ from agentMET4FOF.metrological_streams import MetrologicalSineGenerator
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     """An agent streaming a sine signal
 
-    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
+    Takes samples from the :py:mod:`MetrologicalSineGenerator` and pushes them sample by sample
     to connected agents via its output channel.
     """
 
@@ -27,7 +27,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        signal : Signal
+        signal : MetrologicalSineGenerator
             the underlying signal for the generator
         """
         self._sine_stream = signal
