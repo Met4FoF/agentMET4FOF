@@ -25,7 +25,7 @@ class DataStreamMET4FOF():
     `SineGenerator` class. See tutorials for more implementations.
     """
 
-    def __init__(self, data_source=None, generator_function=None):
+    def __init__(self):
         super().__init__()
         self.quantities = None
         self.target = None
