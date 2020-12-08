@@ -3,7 +3,12 @@ from agentMET4FOF_tutorials.tutorial_1_generator_agent import (
 )
 from agentMET4FOF_tutorials.tutorial_2_math_agent import main as tut2
 from agentMET4FOF_tutorials.tutorial_3_multi_channel import main as tut3
-from agentMET4FOF_tutorials.tutorial_4_metrological_agents import main as tut4
+from agentMET4FOF_tutorials.tutorial_4_metrological_streams import (
+    demonstrate_metrological_stream as tut4,
+)
+from agentMET4FOF_tutorials.tutorial_5_coalition import (
+    demonstrate_generator_agent_use as tut5,
+)
 
 
 def test_tutorial_1():
@@ -22,5 +27,10 @@ def test_tutorial_3():
 
 
 def test_tutorial_4():
-    # Test executability of tutorial_4_metrological_agents.py.
+    # Test executability of tutorial_4_metrological_streams.py.
     tut4().shutdown()
+
+
+def test_tutorial_5():
+    # Test executability of tutorial_5_coalition.py.
+    tut5().shutdown()
