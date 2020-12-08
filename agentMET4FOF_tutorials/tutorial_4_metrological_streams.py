@@ -2,35 +2,37 @@ from typing import Dict
 
 from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
-from agentMET4FOF.metrological_streams import MetrologicalSineGenerator
+from agentMET4FOF.metrological_streams import (
+    MetrologicalDataStreamMET4FOF,
+    MetrologicalSineGenerator,
+)
 
 
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     """An agent streaming a sine signal
 
-    Takes samples from the :py:class:`MetrologicalSineGenerator` and pushes them sample
-    by sample to connected agents via its output channel.
+    Takes samples from an instance of :py:class:`MetrologicalSineGenerator` pushes
+    them sample by sample to connected agents via its output channel.
     """
 
     # The datatype of the stream will be MetrologicalSineGenerator.
-    _sine_stream: MetrologicalSineGenerator
+    _stream: MetrologicalDataStreamMET4FOF
 
     def init_parameters(
-        self, signal: MetrologicalSineGenerator = MetrologicalSineGenerator(), **kwargs
+        self,
+        signal: MetrologicalDataStreamMET4FOF = MetrologicalSineGenerator(),
+        **kwargs
     ):
-        """Initialize the input data
-
-        Initialize the input data stream as an instance of the
-        :py:mod:`SineGenerator` class
+        """Initialize the input data stream
 
         Parameters
         ----------
-        signal : MetrologicalSineGenerator
+        signal : MetrologicalDataStreamMET4FOF
             the underlying signal for the generator
         """
-        self._sine_stream = signal
+        self._stream = signal
         super().init_parameters()
-        self.set_output_data(channel="default", metadata=self._sine_stream.metadata)
+        self.set_output_data(channel="default", metadata=self._stream.metadata)
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -40,14 +42,12 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         :py:method:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            self.set_output_data(
-                channel="default", data=[self._sine_stream.next_sample()]
-            )
+            self.set_output_data(channel="default", data=[self._stream.next_sample()])
             super().agent_loop()
 
     @property
     def metadata(self) -> Dict:
-        return self._sine_stream.metadata.metadata
+        return self._stream.metadata.metadata
 
 
 def demonstrate_metrological_stream():
