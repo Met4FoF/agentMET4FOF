@@ -1,5 +1,3 @@
-from typing import Dict
-
 from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
 from agentMET4FOF.metrological_streams import (
@@ -11,7 +9,7 @@ from agentMET4FOF.metrological_streams import (
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     """An agent streaming a sine signal
 
-    Takes samples from an instance of :py:class:`MetrologicalSineGenerator` pushes
+    Takes samples from an instance of :py:class:`MetrologicalSineGenerator` and pushes
     them sample by sample to connected agents via its output channel.
     """
 
@@ -37,17 +35,12 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
     def agent_loop(self):
         """Model the agent's behaviour
 
-        On state *Running* the agent will extract sample by sample the input data
-        streams content and push it via invoking
-        :py:method:`AgentMET4FOF.send_output`.
+        On state *Running* the agent will extract sample by sample the input
+        datastream's content and push it into its output buffer.
         """
         if self.current_state == "Running":
             self.set_output_data(channel="default", data=[self._stream.next_sample()])
             super().agent_loop()
-
-    @property
-    def metadata(self) -> Dict:
-        return self._stream.metadata.metadata
 
 
 def demonstrate_metrological_stream():
@@ -70,7 +63,6 @@ def demonstrate_metrological_stream():
         "MonitorAgent", agentType=MetrologicalMonitorAgent
     )
 
-    # agent_network.bind_agents(source_agent, monitor_agent)
     # Bind agents.
     source_agent.bind_output(monitor_agent)
 
