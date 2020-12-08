@@ -74,8 +74,13 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             self.generator_function_unc = uncertainty_generator
         return self.generator_function_unc
 
-    def default_uncertainty_generator(self):
+    def default_uncertainty_generator(self, _):
         """Default uncertainty generator function
+
+        Parameters
+        ----------
+        _ : Any
+            unused parameters in place of the normally required time parameter
         
         Returns
         -------
