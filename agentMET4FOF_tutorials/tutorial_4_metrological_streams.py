@@ -60,7 +60,7 @@ def demonstrate_metrological_stream():
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
-        "MonitorAgent", agentType=MetrologicalMonitorAgent
+        "MonitorAgent", agentType=MetrologicalMonitorAgent, buffer_size=50,
     )
 
     # Bind agents.
