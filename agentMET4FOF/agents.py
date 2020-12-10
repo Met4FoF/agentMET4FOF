@@ -1502,7 +1502,7 @@ class AgentNetwork:
             # Then clean up the dangling process list entry or at least finish the
             # execution of the join method in case of the "Mesa" backend. See #163
             # for a proper solution to this workaround.
-            self.dashboard_proc.join()
+            self.dashboard_proc.join(timeout=5)
         return 0
 
     def start_mesa_timer(self, update_interval):
