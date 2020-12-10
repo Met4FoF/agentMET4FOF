@@ -13,8 +13,8 @@ np.random.seed(123)
 
 
 @pytest.fixture
-def agent_network(request):
+def agent_network():
     # Create an agent network and shut it down after usage.
-    a_network = AgentNetwork(dashboard_modules=False, backend=request.param)
+    a_network = AgentNetwork(dashboard_modules=False, backend="osbrain")
     yield a_network
     a_network.shutdown()
