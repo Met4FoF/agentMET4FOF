@@ -6,7 +6,6 @@ from tests.conftest import test_timeout
 
 
 @pytest.mark.timeout(test_timeout)
-@pytest.mark.last
 @pytest.mark.parametrize("backend", ["osbrain"])
 def test_shutdown(backend):
     # Check if the agent network gets properly setup and stopped again. The tear down
