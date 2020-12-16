@@ -10,23 +10,21 @@ from collections import deque
 from io import BytesIO
 from multiprocessing.context import Process
 from threading import Thread, Timer
-from typing import Union, Dict, Optional
+from typing import Dict, Optional, Union
+
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import mpld3
 import networkx as nx
 import numpy as np
 import pandas as pd
-from mesa import Agent as MesaAgent
-from mesa import Model
+from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
-from osbrain import Agent as osBrainAgent
-from osbrain import NSProxy
-from osbrain import run_agent
-from osbrain import run_nameserver
+from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
+
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
-from .streams import DataStreamMET4FOF
+from .streams import DataStreamMET4FOF, SineGenerator
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
@@ -1738,3 +1736,32 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles += 1
             except:
                 raise Exception
+
+
+class SineGeneratorAgent(AgentMET4FOF):
+    """An agent streaming a sine signal
+
+    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
+    to connected agents via its output channel.
+    """
+
+    # The datatype of the stream will be SineGenerator.
+    _sine_stream: SineGenerator
+
+    def init_parameters(self):
+        """Initialize the input data
+
+        Initialize the input data stream as an instance of the
+        :py:mod:`SineGenerator` class
+        """
+        self._sine_stream = SineGenerator()
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input data
+        streams content and push it via invoking :py:method:`AgentMET4FOF.send_output`.
+        """
+        if self.current_state == "Running":
+            sine_data = self._sine_stream.next_sample()  # dictionary
+            self.send_output(sine_data["quantities"])
