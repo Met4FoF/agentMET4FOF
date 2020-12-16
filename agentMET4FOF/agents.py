@@ -8,23 +8,20 @@ import sys
 import time
 from collections import deque
 from io import BytesIO
-from multiprocessing.context import Process
-from threading import Thread, Timer
-from typing import Union, Dict, Optional
+from threading import Timer
+from typing import Dict, Optional, Union
+
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import mpld3
 import networkx as nx
 import numpy as np
 import pandas as pd
-from mesa import Agent as MesaAgent
-from mesa import Model
+from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
-from osbrain import Agent as osBrainAgent
-from osbrain import NSProxy
-from osbrain import run_agent
-from osbrain import run_nameserver
+from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
+
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF
 
@@ -1162,15 +1159,27 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
-            from .dashboard.Dashboard import AgentDashboard
             if self.backend == "osbrain":
-                self.dashboard_proc = Process(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardProcess
+                self.dashboard_proc = AgentDashboardProcess(
+                    dashboard_modules,
+                    [Dashboard_agt_net] + dashboard_extensions,
+                    dashboard_update_interval,
+                    dashboard_max_monitors,
+                    ip_addr,
+                    dashboard_port,
+                    self)
             elif self.backend == "mesa":
-                self.dashboard_proc = Thread(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardThread
+                self.dashboard_proc = AgentDashboardThread(
+                    dashboard_modules,
+                    [Dashboard_agt_net] + dashboard_extensions,
+                    dashboard_update_interval,
+                    dashboard_max_monitors,
+                    ip_addr,
+                    dashboard_port,
+                    self
+                )
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -1496,13 +1505,15 @@ class AgentNetwork:
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
-            if self.backend == "osbrain":
-                # First shutdown the child process.
-                self.dashboard_proc.terminate()
-            # Then clean up the dangling process list entry or at least finish the
+            # This calls either the provided method Process.terminate() which
+            # abruptly stops the running multiprocess.Process in case of the osBrain
+            # backend or the self-written method in the class AgentDashboardThread
+            # ensuring the proper termination of the dash.Dash app.
+            self.dashboard_proc.terminate()
+            # Then wait for the termination of the actual thread or at least finish the
             # execution of the join method in case of the "Mesa" backend. See #163
             # for the search for a proper solution to this issue.
-            self.dashboard_proc.join(timeout=5)
+            self.dashboard_proc.join(timeout=10)
         return 0
 
     def start_mesa_timer(self, update_interval):

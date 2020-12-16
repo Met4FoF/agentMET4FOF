@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 import socket
+from multiprocessing import Process
+from threading import Thread
+from time import sleep
+from wsgiref.simple_server import make_server
+
 import dash
-import dash_html_components as html
 import dash_core_components as dcc
+import dash_html_components as html
 
 from .Dashboard_Control import _Dashboard_Control
 
@@ -13,7 +18,10 @@ class AgentDashboard:
     Optional to run the dashboard on a separate IP by providing the right parameters. See example for an implementation of a separate run of dashboard to connect to an existing agent network. If there is no existing agent network, error will show up.
     An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
     """
-    def __init__(self, dashboard_modules=[], dashboard_layouts=[], dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,agent_port=None):
+    def __init__(self, dashboard_modules=[], dashboard_layouts=[],
+                 dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",
+                 port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,
+                 agent_port=None):
         """
         Parameters
         ----------
@@ -45,20 +53,28 @@ class AgentDashboard:
             Port of the Agent Network port. The rationale is similar to that of the argument `agent_ip_addr`.
 
         """
+        super(AgentDashboard, self).__init__()
         if self.is_port_in_use(ip_addr,port) is False:
             if dashboard_modules is not None and dashboard_modules is not False:
 
                 #initialise the dashboard layout and its control here
+                self.ip_addr = ip_addr
+                self.port = port
                 self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
                 self.external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
-                self.app = self.init_app_layout(update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts)
+                self.app = self.init_app_layout(
+                    update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts)
                 self.app.dashboard_ctrl = _Dashboard_Control(modules=dashboard_modules,agent_ip_addr=agent_ip_addr,agent_port=agent_port,agentNetwork=agentNetwork)
-                self.app.run_server(debug=False,host=ip_addr, port=8050)
+                # Spawn a very simple WSGI server.
+                self._server = make_server(host=self.ip_addr, port=self.port, app=self.app.server)
 
         else:
             print("Dashboard is running on: " + ip_addr+":"+str(port))
+        # Ensure we can stop this process later on from outside.
 
-
+    def run(self):
+        """This is actually executed on calling start() and brings up the server"""
+        self._server.serve_forever()
 
     def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
         """
@@ -118,3 +134,51 @@ class AgentDashboard:
     def is_port_in_use(self,ip_addr,_port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             return s.connect_ex((ip_addr, _port)) == 0
+
+
+class AgentDashboardProcess(AgentDashboard, Process):
+    """Represents an agent dashboard for the osBrain backend"""
+
+
+class AgentDashboardThread(AgentDashboard, Thread):
+    """Represents an agent dashboard for the Mesa backend"""
+
+    def __init__(
+            self,
+            dashboard_modules=[],
+            dashboard_layouts=[],
+            dashboard_update_interval=3,
+            max_monitors=10,
+            ip_addr="127.0.0.1",
+            port=8050,
+            agentNetwork="127.0.0.1",
+            agent_ip_addr=3333,
+            agent_port=None
+    ):
+        super(AgentDashboardThread, self).__init__(
+            dashboard_modules=dashboard_modules,
+            dashboard_layouts=dashboard_layouts,
+            dashboard_update_interval = dashboard_update_interval,
+            max_monitors=max_monitors,
+            ip_addr=ip_addr,
+            port=port,
+            agentNetwork=agentNetwork,
+            agent_ip_addr=agent_ip_addr,
+            agent_port=agent_port
+        )
+        # Make sure, we are actually able to stop the server running from outside by
+        # calling terminate() later.
+        self._supposed_to_run = True
+
+    def run(self):
+        """This is actually executed on calling start() and brings up the server"""
+        super().run()
+        # Make sure, we are actually able to stop the server running from outside.
+        while not self._supposed_to_run:
+            sleep(9)
+        return 0
+
+    def terminate(self):
+        """This is shutting down the application server serving the web interface"""
+        self._server.shutdown()
+        self._supposed_to_run = False
