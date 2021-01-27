@@ -1,6 +1,6 @@
 [![CircleCI](https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield)](https://circleci.com/gh/Met4FoF/agentMET4FOF)
 [![Documentation Status](https://readthedocs.org/projects/agentmet4fof/badge/?version=latest)](https://agentmet4fof.readthedocs.io/en/latest/?badge=latest)
-[![Codecov Badge](https://codecov.io/gh/bangxiangyong/agentMet4FoF/branch/master/graph/badge.svg)](https://codecov.io/gh/bangxiangyong/agentMet4FoF)
+[![codecov](https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy)](https://codecov.io/gh/Met4FoF/agentMET4FOF)
 
 # Multi-Agent System for Metrology for Factory of the Future (Met4FoF) Code
 
