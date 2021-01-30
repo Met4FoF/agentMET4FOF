@@ -134,13 +134,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                                                      id="remove-module-button", style={"margin-left": '4px'})
 
                         ]),
-
-                        html.Div(style={'margin-top': '20px'}, children=[
-                            html.H6(className="black-text", children="Dataset"),
-                            dcc.Dropdown(id="add-dataset-dropdown"),
-                            LayoutHelper.html_button(icon="add_to_queue", text="Add Datastream Agent",
-                                                     id="add-dataset-button")
-                        ])
                     ])
                 ]),
 
@@ -248,7 +241,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 raise PreventUpdate
 
         @app.callback([dash.dependencies.Output('add-modules-dropdown', 'options'),
-                       dash.dependencies.Output('add-dataset-dropdown', 'options')
                        ],
                       [dash.dependencies.Input('interval-add-module-list', 'n_intervals')
                        ])
@@ -264,7 +256,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             datasets = app.dashboard_ctrl.get_datasets()
             module_dataset_options = [{'label': dataset, 'value': dataset} for dataset in list(datasets.keys())]
 
-            return [module_add_options, module_dataset_options]
+            return [module_add_options]
 
         # Start button click
         @app.callback(dash.dependencies.Output('start-button', 'children'),
@@ -315,23 +307,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # for add agent button click
             if n_clicks is not None and current_agent_id != "Not selected":
                 app.dashboard_ctrl.agentNetwork.remove_agent(current_agent_id)
-            raise PreventUpdate
-
-        # Add agent button click
-        @app.callback(dash.dependencies.Output('add-dataset-button', 'children'),
-                      [dash.dependencies.Input('add-dataset-button', 'n_clicks')],
-                      [dash.dependencies.State('add-dataset-dropdown', 'value')]
-                      )
-        def add_dataset_button_click(n_clicks, add_dropdown_val):
-            # for add agent button click
-            if n_clicks is not None:
-                agentTypes = app.dashboard_ctrl.get_agentTypes()
-                datasets = app.dashboard_ctrl.get_datasets()
-                chosen_dataset = datasets[add_dropdown_val]()
-                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=type(chosen_dataset).__name__,
-                                                                      agentType=agentmet4fof_module.ML_DataStreamAgent)
-
-                new_agent.init_parameters(stream=chosen_dataset)
             raise PreventUpdate
 
         @app.callback(dash.dependencies.Output('connect_placeholder', 'children'),
