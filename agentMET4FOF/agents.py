@@ -1164,7 +1164,7 @@ class AgentNetwork:
         if dashboard_modules is not False:
             from .dashboard.Dashboard import AgentDashboard
             if self.backend == "osbrain":
-                self.dashboard_proc = Process(target=AgentDashboard, args=(
+                self.dashboard_proc = Thread(target=AgentDashboard, args=(
                     dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
                     dashboard_max_monitors, ip_addr, dashboard_port, self))
             elif self.backend == "mesa":
