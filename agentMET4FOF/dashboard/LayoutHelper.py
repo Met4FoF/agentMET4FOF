@@ -101,3 +101,28 @@ def visualise_agent_parameters(k,v):
         return html.Div([html.H6(k),output_info_table])
     else:
         return html.H6(k +": "+str(v))
+
+def get_param_dash_component(param_key,param_set):
+    """
+    Converts param_key:iterable (param_set) into a list of dash dropdowns
+    """
+    if isinstance(param_set, set) or isinstance(param_set, list):
+        dropdown_options = [{'label':param, 'value':param} for param in param_set]
+        return dcc.Dropdown(
+            options = dropdown_options,
+            # value=dropdown_options[0]['value'],
+            placeholder=param_key
+        )
+    else:
+        return []
+
+def extract_param_dropdown(params_div):
+    """
+    Extracts parameters from the init_param dropdown list.
+    These extracted parameters will be passed to the agent's initialisation in the add agent button.
+    """
+    init_params = {}
+    for div in params_div:
+        if isinstance(div,dict):
+            init_params.update({div['props']['placeholder']:div['props']['value']})
+    return init_params

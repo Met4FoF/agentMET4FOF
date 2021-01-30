@@ -1,6 +1,4 @@
-import sys
 import warnings
-from collections import Iterable
 
 import dash
 import dash_core_components as dcc
@@ -9,12 +7,10 @@ import dash_html_components as html
 import networkx as nx
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
-from time_series_metadata.scheme import MetaData
 
 from . import LayoutHelper
 from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
-    create_nodes_cytoscape
-from .. import agents as agentmet4fof_module
+    create_nodes_cytoscape, get_param_dash_component, extract_param_dropdown
 
 from .Dashboard_layout_base import Dashboard_Layout_Base
 
@@ -129,6 +125,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         html.Div(style={'margin-top': '20px'}, children=[
                             html.H6(className="black-text", children="Add Agent"),
                             dcc.Dropdown(id="add-modules-dropdown"),
+                            html.Div(style={'margin-top': '10px'}, id="agent-init-params", children=[
+
+                            ]),
                             LayoutHelper.html_button(icon="person_add", text="Add Agent", id="add-module-button"),
                             LayoutHelper.html_button(icon="delete_forever", text="Remove Agent",
                                                      id="remove-module-button", style={"margin-left": '4px'})
@@ -246,10 +245,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                        ])
         def update_add_module_list(n_interval):
             # get nameserver
-            # agentNetwork = dashboard_ctrl.agentNetwork
-
-            # agentTypes = dashboard_ctrl.get_agentTypes()
-            # module_add_options = [ {'label': agentType, 'value': agentType} for agentType in list(agentTypes.keys())]
             agentTypes = app.dashboard_ctrl.get_agentTypes()
             module_add_options = [{'label': agentType, 'value': agentType} for agentType in list(agentTypes.keys())]
 
@@ -286,16 +281,35 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 app.dashboard_ctrl.agentNetwork.reset_agents()
             raise PreventUpdate
 
+
+        # Init Agent Parameters choices
+        @app.callback(dash.dependencies.Output('agent-init-params', 'children'),
+                      [dash.dependencies.Input('add-modules-dropdown', 'value')],
+                      )
+        def add_agent_init_params(add_dropdown_val):
+            if add_dropdown_val is not None:
+                selected_agent_class = app.dashboard_ctrl.get_agentTypes()[add_dropdown_val]
+                if hasattr(selected_agent_class,'parameter_choices'):
+                    # return str(selected_agent_class.parameter_choices)
+                    return [get_param_dash_component(key,val) for key,val in selected_agent_class.parameter_choices.items()]
+                else:
+                    return []
+            else:
+                return []
+
         # Add agent button click
         @app.callback(dash.dependencies.Output('add-module-button', 'children'),
                       [dash.dependencies.Input('add-module-button', 'n_clicks')],
-                      [dash.dependencies.State('add-modules-dropdown', 'value')]
+                      [dash.dependencies.State('add-modules-dropdown', 'value'),
+                       dash.dependencies.State('agent-init-params', 'children'),
+                       ]
                       )
-        def add_agent_button_click(n_clicks, add_dropdown_val):
+        def add_agent_button_click(n_clicks, add_dropdown_val, init_params_div):
             # for add agent button click
             if n_clicks is not None:
                 agentTypes = app.dashboard_ctrl.get_agentTypes()
-                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val])
+                init_params_kwargs = extract_param_dropdown(init_params_div)
+                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val], **init_params_kwargs)
             raise PreventUpdate
 
         # Add agent button click
