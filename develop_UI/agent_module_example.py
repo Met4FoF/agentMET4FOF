@@ -13,9 +13,10 @@ class ParameterisedSineGeneratorAgent(AgentMET4FOF):
 
     # dictionary of possible parameter options for init
     # every {key:iterable} will be displayed on the dashboard as a dropdown
+    # NOTE: Currently supports keyword arguments only.
     parameter_choices = {"amplitude": {0,1,2,3,4,5,6}, "frequency": {1,2,3}}
 
-    def init_parameters(self, amplitude, frequency):
+    def init_parameters(self, amplitude=1.0, frequency=0.5):
         """Initialize the input data
         Initialize the input data stream as an instance of the
         :py:mod:`SineGenerator` class
