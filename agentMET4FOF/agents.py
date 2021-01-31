@@ -1069,6 +1069,33 @@ class _AgentController(AgentMET4FOF):
         self.coalitions.append(new_coalition)
         return new_coalition
 
+    def add_coalition_agent(self, name, agents=[]):
+        """
+        Add agents into the coalition
+        """
+        # update coalition
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == name:
+                self.coalitions[coalition_i].agents = coalition.agents + agents
+
+    def remove_coalition_agent(self, coalition_name, agent_name=""):
+        """
+        Remove agent from coalition
+        """
+        # update coalition
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == coalition_name:
+                self.coalitions[coalition_i].agents = [agent for agent in coalition.agents if agent.name != agent_name]
+
+    def get_coalition(self, name):
+        """
+        Gets the coalition based on provided name
+        """
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == name:
+                return coalition
+        return -1
+
 
 class MesaModel(Model):
     """A MESA Model"""
@@ -1484,6 +1511,24 @@ class AgentNetwork:
         new_coalition = Coalition(name, agents)
         self._get_controller().add_coalition(new_coalition)
         return new_coalition
+
+    def add_coalition_agent(self, name="Coalition_1", agents=[]):
+        """
+        Add agents into the coalition
+        """
+        self._get_controller().add_coalition_agent(name, agents)
+
+    def remove_coalition_agent(self, coalition_name, agent_name=""):
+        """
+        Remove agent from coalition
+        """
+        self._get_controller().remove_coalition_agent(coalition_name, agent_name)
+
+    def get_coalition(self, name):
+        """
+        Returns the coalition with the provided name
+        """
+        return self._get_controller().get_coalition(name)
 
     @property
     def coalitions(self):
