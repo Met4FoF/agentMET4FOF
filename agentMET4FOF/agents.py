@@ -1085,7 +1085,7 @@ class _AgentController(AgentMET4FOF):
         # update coalition
         for coalition_i, coalition in enumerate(self.coalitions):
             if coalition.name == coalition_name:
-                self.coalitions[coalition_i].agents = [agent for agent in coalition.agents if agent.name != agent_name]
+                self.coalitions[coalition_i].remove_agent(agent_name)
 
     def get_coalition(self, name):
         """
@@ -1583,6 +1583,12 @@ class Coalition():
 
     def add_agent(self, agent):
         self.agents.append(agent)
+
+    def remove_agent(self, agent):
+        if isinstance(agent, str):
+            self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent]
+        elif isinstance(agent, AgentMET4FOF):
+            self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent.name]
 
 class DataStreamAgent(AgentMET4FOF):
     """
