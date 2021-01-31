@@ -1568,6 +1568,12 @@ class AgentNetwork:
 
 
 class Coalition():
+    """
+    A special class for grouping agents.
+
+    It is rendered as a parent group on the dashboard, along with its member agents.
+
+    """
     def __init__(self, name="Coalition", agents=[]):
         self.agents = agents
         self.name = name
@@ -1575,6 +1581,8 @@ class Coalition():
     def agent_names(self):
         return [agent.get_attr("name") for agent in self.agents]
 
+    def add_agent(self, agent):
+        self.agents.append(agent)
 
 class DataStreamAgent(AgentMET4FOF):
     """
