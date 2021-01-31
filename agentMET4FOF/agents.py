@@ -1445,6 +1445,9 @@ class AgentNetwork:
             agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
         return agent_names
 
+    def generate_module_name_byType(self,agentType):
+        return (self._get_controller().generate_module_name_byType(agentType))
+
     def add_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, loop_wait=None,
                   **kwargs):
         """
