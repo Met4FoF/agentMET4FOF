@@ -124,7 +124,18 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                         html.Div(style={'margin-top': '20px'}, children=[
                             html.H6(className="black-text", children="Add Agent"),
-                            dcc.Dropdown(id="add-modules-dropdown"),
+                            dcc.Dropdown(id="add-modules-dropdown", style={'margin-bottom': '35px'}),
+
+                            html.Div(className="input-field", id="agent-init-div", children=[
+                                html.I(className="material-icons prefix", children=["account_circle"]),
+                                dcc.Input(
+                                    id="agent-init-name",
+                                    type="text",
+                                    value="",
+                                    className="validate"
+                                ),
+                                html.Label(children="New Agent Name", htmlFor="agent-init-name", className="active")
+                            ]),
                             html.Div(style={'margin-top': '10px'}, id="agent-init-params", children=[
 
                             ]),
@@ -133,6 +144,22 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                                                      id="remove-module-button", style={"margin-left": '4px'})
 
                         ]),
+
+                        html.Div(style={'margin-top': '30px'}, children=[
+                            html.H6(className="black-text", children="Add Coalition", style={'margin-bottom': '20px'}),
+                            html.Div(className="input-field", children=[
+                                html.I(className="material-icons prefix", children=["dvr"]),
+                                dcc.Input(
+                                    id="coalition-name",
+                                    type="text",
+                                    value="",
+                                    className="validate"
+                                ),
+                                html.Label(children="New Coalition Name", htmlFor="coalition-name")
+                            ]),
+                            LayoutHelper.html_button(icon="add_to_queue", text="Add Coalition",
+                                                     id="add-coalition-button")
+                        ])
                     ])
                 ]),
 
@@ -141,7 +168,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     html.Div(className="card-content", children=[
                         # side panel contents here
                         html.H5("Agent Configuration"),
-                        html.H5(id='selected-node', children="Not selected", className="flow-text",
+                        html.H6(id='selected-node', children="Not selected", className="flow-text",
                                 style={"font-weight": "bold"}),
 
                         html.H6(id='input-names', children="Not selected", className="flow-text"),
@@ -187,10 +214,13 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         # Update network graph per interval
         @app.callback([dash.dependencies.Output('agents-network', 'elements'),
                        dash.dependencies.Output('connect-modules-dropdown', 'options')],
-                      [dash.dependencies.Input('interval-component-network-graph', 'n_intervals')],
+                      [dash.dependencies.Input('interval-component-network-graph', 'n_intervals'),
+                       # dash.dependencies.Input('connect-module-button', 'n_clicks')
+                       ],
                       [dash.dependencies.State('agents-network', 'elements')]
                       )
         def update_network_graph(n_intervals, graph_elements):
+
             # get nameserver
             agentNetwork = app.dashboard_ctrl.agentNetwork
 
@@ -200,9 +230,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
             # get coalitions of agents
             coalitions = agentNetwork.coalitions
+            num_agent_coalitions = sum([len(coalition.agent_names()) for coalition in coalitions])
+            if not hasattr(app, "num_agent_coalitions"):
+                app.num_agent_coalitions = num_agent_coalitions
 
             # if current graph number is different more than before, then update graph
-            if len(graph_elements) != (len(nodes) + len(edges) + len(coalitions)):
+            if (len(graph_elements) != (len(nodes) + len(edges) + len(coalitions))) or (app.num_agent_coalitions != num_agent_coalitions):
                 # if(app.dashboard_ctrl.agent_graph.number_of_nodes() != len(nodes) or app.dashboard_ctrl.agent_graph.number_of_edges() != len(edges)) or n_intervals == 0:
                 new_G = nx.DiGraph()
                 new_G.add_nodes_from(nodes(data=True))
@@ -229,7 +262,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 else:
                     parent_elements = []
 
+                # update agent graph and number of coalitions
                 app.dashboard_ctrl.agent_graph = new_G
+                app.num_agent_coalitions = num_agent_coalitions
 
                 # update agents connect options
                 node_connect_options = [{'label': agentName, 'value': agentName} for agentName in nodes]
@@ -283,33 +318,41 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
 
         # Init Agent Parameters choices
-        @app.callback(dash.dependencies.Output('agent-init-params', 'children'),
+        @app.callback([dash.dependencies.Output('agent-init-name', 'value'),
+                       dash.dependencies.Output('agent-init-div', 'style'),
+                       dash.dependencies.Output('agent-init-params', 'children')],
                       [dash.dependencies.Input('add-modules-dropdown', 'value')],
                       )
         def add_agent_init_params(add_dropdown_val):
+            # selected a class from the dropdown
+            agentNetwork = app.dashboard_ctrl.agentNetwork
             if add_dropdown_val is not None:
                 selected_agent_class = app.dashboard_ctrl.get_agentTypes()[add_dropdown_val]
                 if hasattr(selected_agent_class,'parameter_choices'):
-                    # return str(selected_agent_class.parameter_choices)
-                    return [get_param_dash_component(key,val) for key,val in selected_agent_class.parameter_choices.items()]
+                    init_param_components =  [get_param_dash_component(key,val) for key,val in selected_agent_class.parameter_choices.items()]
                 else:
-                    return []
+                    init_param_components = []
+
+                unique_agent_name =agentNetwork.generate_module_name_byType(selected_agent_class)
+
+                return [unique_agent_name, {"display":"block"}, init_param_components]
             else:
-                return []
+                return ["", {"display":"none"},[]]
 
         # Add agent button click
         @app.callback(dash.dependencies.Output('add-module-button', 'children'),
                       [dash.dependencies.Input('add-module-button', 'n_clicks')],
                       [dash.dependencies.State('add-modules-dropdown', 'value'),
+                       dash.dependencies.State('agent-init-name', 'value'),
                        dash.dependencies.State('agent-init-params', 'children'),
                        ]
                       )
-        def add_agent_button_click(n_clicks, add_dropdown_val, init_params_div):
+        def add_agent_button_click(n_clicks, add_dropdown_val, init_name_input, init_params_div):
             # for add agent button click
             if n_clicks is not None:
                 agentTypes = app.dashboard_ctrl.get_agentTypes()
                 init_params_kwargs = extract_param_dropdown(init_params_div)
-                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(agentType=agentTypes[add_dropdown_val], **init_params_kwargs)
+                new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=init_name_input, agentType=agentTypes[add_dropdown_val], **init_params_kwargs)
             raise PreventUpdate
 
         # Add agent button click
@@ -323,6 +366,20 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 app.dashboard_ctrl.agentNetwork.remove_agent(current_agent_id)
             raise PreventUpdate
 
+        # Add coalition button click
+        @app.callback([dash.dependencies.Output('coalition-name', 'value')],
+                      [dash.dependencies.Input('add-coalition-button', 'n_clicks')],
+                      [dash.dependencies.State('coalition-name', 'value'),
+                       ]
+                      )
+        def add_coalition_button_click(n_clicks, coalition_name):
+            # for add agent button click
+            if n_clicks is not None:
+                if coalition_name is not "":
+                    new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
+            return [""]
+
+
         @app.callback(dash.dependencies.Output('connect_placeholder', 'children'),
                       [dash.dependencies.Input('connect-module-button', 'n_clicks')],
                       [dash.dependencies.State('connect-modules-dropdown', 'value'),
@@ -333,23 +390,38 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 agentNetwork = app.dashboard_ctrl.agentNetwork
 
                 # for connect module button click
-                if current_agent_id != dropdown_value:
-                    agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id),
-                                             agentNetwork.get_agent(dropdown_value))
+                # connect agents
+                if current_agent_id in agentNetwork.agents():
+                    if current_agent_id != dropdown_value:
+                        agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id),
+                                                 agentNetwork.get_agent(dropdown_value))
+                # otherwise, selected is a coalition
+                # add it into coalition
+                else:
+                    agentNetwork.add_coalition_agent(name=current_agent_id, agents=[agentNetwork.get_agent(dropdown_value)])
+
             raise PreventUpdate
 
         @app.callback(dash.dependencies.Output('disconnect_placeholder', 'children'),
                       [dash.dependencies.Input('disconnect-module-button', 'n_clicks')],
                       [dash.dependencies.State('connect-modules-dropdown', 'value'),
                        dash.dependencies.State('selected-node', 'children')])
-        def unbind_module_click(n_clicks_connect, dropdown_value, current_agent_id):
-            if (n_clicks_connect is not None):
+        def unbind_module_click(n_clicks_disconnect, dropdown_value, current_agent_id):
+            if (n_clicks_disconnect is not None):
                 # get nameserver
                 agentNetwork = app.dashboard_ctrl.agentNetwork
 
                 # for connect module button click
-                agentNetwork.unbind_agents(agentNetwork.get_agent(current_agent_id),
-                                           agentNetwork.get_agent(dropdown_value))
+                # disconnect agents
+                if current_agent_id in agentNetwork.agents():
+                    if current_agent_id != dropdown_value:
+                        agentNetwork.unbind_agents(agentNetwork.get_agent(current_agent_id),
+                                                 agentNetwork.get_agent(dropdown_value))
+                # otherwise, selected is a coalition
+                # remove it from coalition
+                else:
+                    agentNetwork.remove_coalition_agent(coalition_name=current_agent_id, agent_name=agentNetwork.get_agent(dropdown_value).name)
+
             raise PreventUpdate
 
         @app.callback([dash.dependencies.Output('selected-node', 'children'),
@@ -368,19 +440,29 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 # get nameserver
                 agentNetwork = app.dashboard_ctrl.agentNetwork
 
-                app.dashboard_ctrl.current_selected_agent = agentNetwork.get_agent(current_agent_id)
-                input_names = list(app.dashboard_ctrl.current_selected_agent.get_attr('Inputs').keys())
-                output_names = list(app.dashboard_ctrl.current_selected_agent.get_attr('Outputs').keys())
-                agent_parameters = app.dashboard_ctrl.current_selected_agent.get_all_attr()
+                # selected agent
+                if current_agent_id in agentNetwork.agents():
+                    app.dashboard_ctrl.current_selected_agent = agentNetwork.get_agent(current_agent_id)
+                    input_names = list(app.dashboard_ctrl.current_selected_agent.get_attr('Inputs').keys())
+                    output_names = list(app.dashboard_ctrl.current_selected_agent.get_attr('Outputs').keys())
+                    agent_parameters = app.dashboard_ctrl.current_selected_agent.get_all_attr()
 
-                # formatting
-                input_names = ["Inputs: "] + [input_name + ", " for input_name in input_names]
-                output_names = ["Outputs: "] + [output_name + ", " for output_name in output_names]
-                agent_parameters_texts = [LayoutHelper.visualise_agent_parameters(k, v) for k, v in
-                                          agent_parameters.items()]
-                agent_parameters_div = [html.H6("Parameters: ")] + agent_parameters_texts
+                    # formatting
+                    input_names = ["Inputs: "] + [input_name + ", " for input_name in input_names]
+                    output_names = ["Outputs: "] + [output_name + ", " for output_name in output_names]
+                    agent_parameters_texts = [LayoutHelper.visualise_agent_parameters(k, v) for k, v in
+                                              agent_parameters.items()]
+                    agent_parameters_div = [html.H6("Parameters: ")] + agent_parameters_texts
 
-                return [current_agent_id, input_names, output_names, agent_parameters_div]
+                    return [current_agent_id,  input_names, output_names, agent_parameters_div]
+
+                # selected coalition
+                else:
+                    coalition = agentNetwork.get_coalition(current_agent_id)
+                    agent_members = [html.H6("Agents: ")] + [str(coalition.agent_names())]
+
+                    return [current_agent_id,[], [], agent_members]
+
             else:
                 return ["Not selected", input_names, output_names, agent_parameters_div]
 
@@ -434,6 +516,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                             data.append(trace)
                     else:
                         data.append(traces)
+
                 if len(data) > 5:
                     y_title_offset = 0.1
                 else:
@@ -441,7 +524,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                 # Check if any metadata is present that can be used to generate axis
                 # labels or otherwise use default labels.
-                if (
+                if (len(memory_data) > 0 and
                     isinstance(memory_data[sender_agent], dict)
                     and "metadata" in memory_data[sender_agent].keys()
                 ):
