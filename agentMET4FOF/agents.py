@@ -956,7 +956,11 @@ class _AgentController(AgentMET4FOF):
         return num_count
 
     def generate_module_name_byType(self, agentType):
-        name = agentType.__name__
+        # handle agent type
+        if isinstance(agentType, str):
+            name = agentType
+        else:
+            name = agentType.__name__
         name += "_" + str(self.get_agentType_count(agentType))
         return name
 
