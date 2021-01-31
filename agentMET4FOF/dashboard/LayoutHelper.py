@@ -111,7 +111,6 @@ def get_param_dash_component(param_key,param_set):
         dropdown_options = [{'label':param, 'value':param} for param in param_set]
         return dcc.Dropdown(
             options = dropdown_options,
-            # value=dropdown_options[0]['value'],
             placeholder=param_key
         )
     else:
@@ -125,5 +124,6 @@ def extract_param_dropdown(params_div):
     init_params = {}
     for div in params_div:
         if isinstance(div,dict):
-            init_params.update({div['props']['placeholder']:div['props']['value']})
+            if 'value' in div['props'].keys():
+                init_params.update({div['props']['placeholder']:div['props']['value']})
     return init_params
