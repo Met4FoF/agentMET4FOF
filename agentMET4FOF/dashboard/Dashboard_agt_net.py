@@ -5,6 +5,8 @@ import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
 import networkx as nx
+import visdcc
+
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
@@ -13,7 +15,6 @@ from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
     create_nodes_cytoscape, get_param_dash_component, extract_param_dropdown
 
 from .Dashboard_layout_base import Dashboard_Layout_Base
-
 
 class Dashboard_agt_net(Dashboard_Layout_Base):
     def set_layout_name(self, id="agt-net", title="Agent Network"):
@@ -188,6 +189,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         html.P(id="disconnect_placeholder", className="black-text", children=" "),
                         html.P(id="monitor_placeholder", className="black-text", children=" "),
                         html.P(id="mpld3_placeholder", className="black-text", children=" "),
+                        visdcc.Run_js(id='toast-js-script')
                     ])
 
                 ])
@@ -206,6 +208,11 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             dcc.Interval(
                 id='interval-update-monitor-graph',
                 interval=update_interval_seconds * 1000,  # in milliseconds
+                n_intervals=0
+            ),
+            dcc.Interval(
+                id='interval-update-toast',
+                interval=1 * 1000,  # in milliseconds
                 n_intervals=0
             )
         ])
@@ -295,6 +302,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def start_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.set_running_state()
+                raise_toast("Set agents state : %s !" % "Running")
             raise PreventUpdate
 
         # Stop button click
@@ -304,6 +312,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def stop_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.set_stop_state()
+                raise_toast("Set agents state : %s !" % "Stop")
             raise PreventUpdate
 
         # Handle click of the reset button.
@@ -314,6 +323,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def reset_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.reset_agents()
+                raise_toast("Reset agent states !")
             raise PreventUpdate
 
 
@@ -353,6 +363,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 agentTypes = app.dashboard_ctrl.get_agentTypes()
                 init_params_kwargs = extract_param_dropdown(init_params_div)
                 new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=init_name_input, agentType=agentTypes[add_dropdown_val], **init_params_kwargs)
+                raise_toast("Spawned new agent : %s !" % init_name_input)
             raise PreventUpdate
 
         # Add agent button click
@@ -364,6 +375,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # for add agent button click
             if n_clicks is not None and current_agent_id != "Not selected":
                 app.dashboard_ctrl.agentNetwork.remove_agent(current_agent_id)
+                raise_toast("Removed agent : %s !" % current_agent_id)
             raise PreventUpdate
 
         # Add coalition button click
@@ -377,6 +389,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if n_clicks is not None:
                 if coalition_name != "":
                     new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
+                    raise_toast("Created new coalition : %s !" % coalition_name)
             return [""]
 
 
@@ -388,17 +401,19 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if n_clicks_connect is not None and current_agent_id != "Not selected":
                 # get nameserver
                 agentNetwork = app.dashboard_ctrl.agentNetwork
-
+                target_agent = agentNetwork.get_agent(dropdown_value)
                 # for connect module button click
                 # connect agents
                 if current_agent_id in agentNetwork.agents():
                     if current_agent_id != dropdown_value:
                         agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id),
-                                                 agentNetwork.get_agent(dropdown_value))
+                                                 target_agent)
+                        raise_toast("Connected %s to %s !" % (current_agent_id, target_agent.name))
                 # otherwise, selected is a coalition
                 # add it into coalition
                 else:
-                    agentNetwork.add_coalition_agent(name=current_agent_id, agents=[agentNetwork.get_agent(dropdown_value)])
+                    agentNetwork.add_coalition_agent(name=current_agent_id, agents=[target_agent])
+                    raise_toast("%s joined %s coalition !" % (target_agent.name, current_agent_id))
 
             raise PreventUpdate
 
@@ -410,18 +425,20 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if (n_clicks_disconnect is not None):
                 # get nameserver
                 agentNetwork = app.dashboard_ctrl.agentNetwork
+                target_agent = agentNetwork.get_agent(dropdown_value)
 
                 # for connect module button click
                 # disconnect agents
                 if current_agent_id in agentNetwork.agents():
                     if current_agent_id != dropdown_value:
                         agentNetwork.unbind_agents(agentNetwork.get_agent(current_agent_id),
-                                                 agentNetwork.get_agent(dropdown_value))
+                                                 target_agent)
+                        raise_toast("Disconnected %s from %s !" % (current_agent_id, target_agent.name))
                 # otherwise, selected is a coalition
                 # remove it from coalition
                 else:
-                    agentNetwork.remove_coalition_agent(coalition_name=current_agent_id, agent_name=agentNetwork.get_agent(dropdown_value).name)
-
+                    agentNetwork.remove_coalition_agent(coalition_name=current_agent_id, agent_name=target_agent.name)
+                    raise_toast("%s removed from %s coalition !" % (target_agent.name, current_agent_id))
             raise PreventUpdate
 
         @app.callback([dash.dependencies.Output('selected-node', 'children'),
@@ -671,6 +688,18 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # set dimensions of each monitor agent's graph
             return [all_graphs]
 
+        @app.callback(
+            dash.dependencies.Output('toast-js-script', 'run'),
+            [dash.dependencies.Input('interval-update-toast', 'n_intervals')])
+        def myfun(n_intervals):
+            # if there are messages in toast contents to be displayed
+            if hasattr(app, "toast_contents") and len(app.toast_contents) > 0:
+                # pop toast contents
+                return "M.toast({html: '%s'})" % app.toast_contents.pop(0)
+
+            else:
+                return ""
+
         app.clientside_callback(
             ClientsideFunction(
                 namespace='clientside',
@@ -679,5 +708,10 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             dash.dependencies.Output('mpld3_placeholder', 'children'),
             [dash.dependencies.Input('matplotlib-division', 'children')]
         )
+
+        app.toast_contents = []
+
+        def raise_toast(message, app=app):
+            app.toast_contents.append(message)
 
         return app

@@ -58,3 +58,4 @@ tqdm==4.53.0              # via mesa
 uncertainties==3.1.5      # via time-series-buffer
 urllib3==1.26.2           # via requests
 werkzeug==1.0.1           # via flask
+visdcc==0.0.40
