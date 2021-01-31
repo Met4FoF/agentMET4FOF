@@ -375,7 +375,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def add_coalition_button_click(n_clicks, coalition_name):
             # for add agent button click
             if n_clicks is not None:
-                if coalition_name is not "":
+                if coalition_name != "":
                     new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
             return [""]
 
