@@ -1076,7 +1076,8 @@ class _AgentController(AgentMET4FOF):
         # update coalition
         for coalition_i, coalition in enumerate(self.coalitions):
             if coalition.name == name:
-                self.coalitions[coalition_i].agents = coalition.agents + agents
+                for agent in agents:
+                    self.coalitions[coalition_i].add_agent(agent)
 
     def remove_coalition_agent(self, coalition_name, agent_name=""):
         """
