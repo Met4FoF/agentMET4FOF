@@ -51,8 +51,9 @@ def create_monitor_graph(data,sender_agent = 'Monitor Agent'):
         trace = go.Scatter(x=x, y=y,mode="lines", name=sender_agent)
     return trace
 
-def create_params_table(table_name="",data={}, columns=None, **kwargs):
+def create_params_table(table_name="",data={}, columns=None, rename_map=None, **kwargs):
     style_table = {'overflowX': 'scroll'}
+    style_header = {'backgroundColor': 'rgb(66, 135, 245)', 'color': 'white'}
     style_cell = {
             'minWidth': '0px', 'maxWidth': '180px',
             'whiteSpace': 'normal',
@@ -79,9 +80,9 @@ def create_params_table(table_name="",data={}, columns=None, **kwargs):
         data = data_pd.reset_index().astype(str)
 
     if columns is None:
-        columns= [{"name": i, "id": i} for i in data.columns]
+        columns= [{"name": rename_map[i], "id": i} if rename_map is not None else {"name": i, "id": i} for i in data.columns]
     else:
-        columns=[{"name": i, "id": i} for i in columns]
+        columns= [{"name": rename_map[i], "id": i} if rename_map is not None else {"name": i, "id": i} for i in columns]
 
     data= data.to_dict('records')
 
@@ -92,6 +93,7 @@ def create_params_table(table_name="",data={}, columns=None, **kwargs):
         style_table=style_table,
         style_cell=style_cell,
         css=css,
+        style_header=style_header,
         **kwargs
     )
     return output_info_table
