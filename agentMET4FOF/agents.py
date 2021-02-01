@@ -25,7 +25,8 @@ from osbrain import NSProxy
 from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
-from .dashboard.Dashboard_agt_net import Dashboard_agt_net
+
+
 from .streams import DataStreamMET4FOF
 
 
@@ -1195,6 +1196,7 @@ class AgentNetwork:
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
             from .dashboard.Dashboard import AgentDashboard
+            from .dashboard.Dashboard_agt_net import Dashboard_agt_net
             if self.backend == "osbrain":
                 self.dashboard_proc = Thread(target=AgentDashboard, args=(
                     dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
