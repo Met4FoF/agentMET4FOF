@@ -1514,6 +1514,9 @@ class AgentNetwork:
         # processes are ended.
         if self.backend == "osbrain":
             self._get_controller().get_attr('ns').shutdown()
+        elif self.backend == "mesa":
+            self._get_controller().stop_mesa_timer()
+            self.mesa_model.shutdown()
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
