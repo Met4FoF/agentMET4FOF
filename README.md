@@ -1,6 +1,6 @@
-[![CircleCI](https://circleci.com/gh/bangxiangyong/agentMET4FOF.svg?style=shield)](https://circleci.com/gh/bangxiangyong/agentMET4FOF)
+[![CircleCI](https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield)](https://circleci.com/gh/Met4FoF/agentMET4FOF)
 [![Documentation Status](https://readthedocs.org/projects/agentmet4fof/badge/?version=latest)](https://agentmet4fof.readthedocs.io/en/latest/?badge=latest)
-[![Codecov Badge](https://codecov.io/gh/bangxiangyong/agentMet4FoF/branch/master/graph/badge.svg)](https://codecov.io/gh/bangxiangyong/agentMet4FoF)
+[![codecov](https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy)](https://codecov.io/gh/Met4FoF/agentMET4FOF)
 
 # Multi-Agent System for Metrology for Factory of the Future (Met4FoF) Code
 
@@ -22,8 +22,8 @@ The easiest way to get started with *agentMET4FOF* is navigating to the folder
 in which you want to create a virtual Python environment (*venv*), create one based
 on Python 3.8, activate it, then install *agentMET4FOF*
 from PyPI.org and then work through the [tutorials
-](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
-or [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples).
+](https://github.com/Met4FoF/agentMET4FOF/tree/develop/agentMET4FOF_tutorials)
+or [examples](https://github.com/Met4FoF/agentMET4FOF/tree/develop/examples).
 
 ### Create a virtual environment on Windows
 
@@ -128,13 +128,13 @@ pip install -r requirements.txt
 ```
 
 First take a look at the [tutorials
-](https://github.com/bangxiangyong/agentMET4FOF/blob/develop/agentMET4FOF_tutorials/tutorial_1_generator_agent.py)
-and [examples](https://github.com/bangxiangyong/agentMET4FOF/tree/develop/examples)
+](https://github.com/Met4FoF/agentMET4FOF/blob/develop/agentMET4FOF_tutorials/tutorial_1_generator_agent.py)
+and [examples](https://github.com/Met4FoF/agentMET4FOF/tree/develop/examples)
 or start hacking if you already are familiar with agentMET4FOF and want to customize
 your agents' network.
 
 Alternatively, watch the tutorial webinar [here
-](https://github.com/bangxiangyong/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
+](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
 
 ## Updates
 
@@ -146,7 +146,7 @@ Alternatively, watch the tutorial webinar [here
 
 ## Screenshot of web visualization
 
-![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
+![Web Screenshot](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
 ## Orphaned processes
 
