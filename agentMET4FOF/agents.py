@@ -134,7 +134,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.stylesheet = ""
+        if not hasattr(self, "stylesheet"):
+            self.stylesheet = ""
+
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
