@@ -14,6 +14,11 @@ from agentMET4FOF_tutorials.tutorial_6_mesa_backend import (
 )
 
 
+def test_tutorial_6():
+    """Test executability of tutorial_6_mesa_backend.py."""
+    tut6().shutdown()
+
+
 def test_tutorial_1():
     """Test executability of tutorial_1_generator_agent."""
     tut1().shutdown()
@@ -37,8 +42,3 @@ def test_tutorial_4():
 def test_tutorial_5():
     """Test executability of tutorial_5_coalition.py."""
     tut5().shutdown()
-
-
-def test_tutorial_6():
-    """Test executability of tutorial_6_mesa_backend.py."""
-    tut6().shutdown()
