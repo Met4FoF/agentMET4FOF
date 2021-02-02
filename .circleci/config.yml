@@ -144,6 +144,7 @@ jobs:
             else
                 conda env create -f environment.yml
             fi
+            source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
             pip install PyDynamic
 
