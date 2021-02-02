@@ -91,7 +91,7 @@ class AgentDashboard:
                 #header
                 html.Nav([
                     html.Div([
-                        html.A("Met4FoF Agent Testbed", className="brand-logo center"),
+                        html.A("Distributed Quality Analytics Testbed", className="brand-logo center"),
                         html.Ul([
                         ], className="right hide-on-med-and-down")
                     ], className="nav-wrapper container")

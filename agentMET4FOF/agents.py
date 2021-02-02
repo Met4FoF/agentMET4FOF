@@ -26,7 +26,6 @@ from osbrain import run_agent
 from osbrain import run_nameserver
 from plotly import tools as tls
 
-
 from .streams import DataStreamMET4FOF
 
 
@@ -134,7 +133,10 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.stylesheet = ""
+
+        if not hasattr(self,"stylesheet"):
+            self.stylesheet = ""
+
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
@@ -994,7 +996,7 @@ class _AgentController(AgentMET4FOF):
                                                  log_mode=log_mode, **kwargs)
             return new_agent
         except Exception as e:
-            self.log_info("ERROR:" + str(e))
+            self.log_info("ERROR ADD AGENT "+str(agentType)+": " + str(e))
 
     def _add_osbrain_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None,
                            loop_wait=None, **kwargs):
@@ -1260,6 +1262,7 @@ class AgentNetwork:
         self.mesa_model = MesaModel()
         self._controller = _AgentController(name="AgentController", backend=self.backend)
         self._controller.init_parameters(backend=self.backend, mesa_model=self.mesa_model)
+        self._controller.log_mode = True
         self.start_mesa_timer(self.mesa_update_interval)
 
     def _set_mode(self, state):
@@ -1514,6 +1517,16 @@ class AgentNetwork:
         new_coalition = Coalition(name, agents)
         self._get_controller().add_coalition(new_coalition)
         return new_coalition
+
+    def add_ml_experiment(self, name="MLEXP_1", agents=[], random_seed=123):
+        """
+        Instantiates an ML Experiment which is a special type of coalition
+        """
+        import agentMET4FOF_ml_extension.agentMET4FOF_ml_extension.ML_Experiment as ml_exp_class
+
+        new_ml_exp = ml_exp_class.ML_Experiment(name, agents, random_seed=random_seed)
+        self._get_controller().add_coalition(new_ml_exp)
+        return new_ml_exp
 
     def add_coalition_agent(self, name="Coalition_1", agents=[]):
         """

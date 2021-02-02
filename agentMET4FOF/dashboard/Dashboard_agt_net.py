@@ -11,7 +11,7 @@ from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
 
-import agentMET4FOF_ml_extension.ML_Experiment as ml_exp_class
+import agentMET4FOF_ml_extension.agentMET4FOF_ml_extension.ML_Experiment as ml_exp_class
 from . import LayoutHelper
 from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
     create_nodes_cytoscape, get_param_dash_component, extract_param_dropdown
@@ -388,21 +388,21 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                       )
         def add_coalition_button_click(n_clicks, coalition_name):
             # for add agent button click
-            def add_ml_experiment(self, name="MLEXP_1", agents=[]):
-                """
-                Instantiates a coalition of agents.
-                """
-                new_ml_exp = ml_exp_class.ML_Experiment(name, agents)
-                self._get_controller().add_coalition(new_ml_exp)
-                return new_ml_exp
+            # def add_ml_experiment(self, name="MLEXP_1", agents=[]):
+            #     """
+            #     Instantiates a coalition of agents.
+            #     """
+            #     new_ml_exp = ml_exp_class.ML_Experiment(name, agents)
+            #     self._get_controller().add_coalition(new_ml_exp)
+            #     return new_ml_exp
 
             agentNetwork = app.dashboard_ctrl.agentNetwork
-            agentNetwork.add_ml_experiment = add_ml_experiment
+            # agentNetwork.add_ml_experiment = add_ml_experiment
 
             if n_clicks is not None:
                 if coalition_name != "":
                     # new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
-                    new_coalition = agentNetwork.add_ml_experiment(agentNetwork, name=coalition_name)
+                    new_coalition = agentNetwork.add_ml_experiment(name=coalition_name)
                     raise_toast("Created new coalition : %s !" % coalition_name)
             return [""]
 
@@ -592,8 +592,8 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         f"labels will be represented by generic place holders. Check "
                         f"out tutorial 4 to find out how to specify custom labels."
                     )
-                    x_label = "X"
-                    y_label = "Y"
+                    x_label = "Product Number"
+                    y_label = "Total Log-likelihood (BAE)"
 
                 monitor_graph = {
                     'data': data,
