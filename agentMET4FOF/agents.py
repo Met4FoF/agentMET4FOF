@@ -1091,6 +1091,12 @@ class MesaModel(Model):
     def agents(self):
         return [agent.name for agent in self.schedule.agents]
 
+    def shutdown(self):
+        """Shutdown entire MESA model with all agents and schedulers"""
+        for agent in self.agents():
+            agent_obj = self.get_agent(agent)
+            agent_obj.shutdown()
+
 
 class AgentNetwork:
     """
