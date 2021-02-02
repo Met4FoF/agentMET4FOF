@@ -180,5 +180,9 @@ class AgentDashboardThread(AgentDashboard, Thread):
 
     def terminate(self):
         """This is shutting down the application server serving the web interface"""
-        self._server.shutdown()
+        try:
+            self._server.shutdown()
+        except AttributeError:
+            # In this case the dashboard has in fact already been shutdown earlier.
+            pass
         self._supposed_to_run = False
