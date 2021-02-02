@@ -1172,27 +1172,26 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
+            # Initialize common dashboard parameters for both types of dashboards
+            # corresponding to different backends.
+            dashboard_params = {
+                "dashboard_modules": dashboard_modules,
+                "dashboard_layouts": [Dashboard_agt_net] + dashboard_extensions,
+                "dashboard_update_interval": dashboard_update_interval,
+                "max_monitors": dashboard_max_monitors,
+                "ip_addr": ip_addr,
+                "port": dashboard_port,
+                "agentNetwork": self,
+            }
+            # Initialize dashboard process/thread.
             if self.backend == "osbrain":
                 from .dashboard.Dashboard import AgentDashboardProcess
-                self.dashboard_proc = AgentDashboardProcess(
-                    dashboard_modules,
-                    [Dashboard_agt_net] + dashboard_extensions,
-                    dashboard_update_interval,
-                    dashboard_max_monitors,
-                    ip_addr,
-                    dashboard_port,
-                    self)
+
+                self.dashboard_proc = AgentDashboardProcess(**dashboard_params)
             elif self.backend == "mesa":
                 from .dashboard.Dashboard import AgentDashboardThread
-                self.dashboard_proc = AgentDashboardThread(
-                    dashboard_modules,
-                    [Dashboard_agt_net] + dashboard_extensions,
-                    dashboard_update_interval,
-                    dashboard_max_monitors,
-                    ip_addr,
-                    dashboard_port,
-                    self
-                )
+
+                self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
