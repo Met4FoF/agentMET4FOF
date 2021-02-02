@@ -76,7 +76,7 @@ setup(
         "mpld3",
         "mesa",
     ],
-    extras_require={"tutorials": ["notebook",]},
+    extras_require={"tutorials": ["notebook", "PyDynamic"]},
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
