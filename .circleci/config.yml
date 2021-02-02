@@ -144,7 +144,8 @@ jobs:
             else
                 conda env create -f environment.yml
             fi
-            conda install PyDynamic
+            conda activate agentMET4FOF
+            pip install PyDynamic
 
       - save_cache:
           paths:
