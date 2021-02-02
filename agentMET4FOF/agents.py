@@ -71,9 +71,16 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.agent_loop()
 
     def _remove_methods(self, cls):
+        """Remove methods from the other backends base class from the current agent"""
         for name in list(vars(cls)):
             if not name.startswith("__"):
-                delattr(cls, name)
+                try:
+                    delattr(self, name)
+                except AttributeError:
+                    # This situation only occurs when we start and stop agent
+                    # networks of differing backends in one sequence. Normally
+                    # ignoring these errors should be no problem.
+                    pass
 
     def set_attr(self, **kwargs):
         for key, val in kwargs.items():
