@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.intersphinx",
     "nbsphinx",
     "recommonmark",
 ]
@@ -47,6 +48,19 @@ extensions = [
 html_theme_options = {
     # True hides the + signs to expand the menu entries in the sidebar.
     'collapse_navigation': False,
+}
+
+# This should make SciPy documentation available inside our docs.
+intersphinx_mapping = {
+    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": (
+        "https://pydynamic.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-metadata": (
+        "https://time-series-metadata.readthedocs.io/en/latest/",
+        None,
+    ),
 }
 
 nbsphinx_allow_errors = True
