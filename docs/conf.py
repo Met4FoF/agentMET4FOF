@@ -87,20 +87,15 @@ def make_path_dict(source: str, destination: str) -> dict:
 
 
 # Set up all paths for source and destination folders.
-examples_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "examples")
-)
 tutorials_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "agentMET4FOF_tutorials")
 )
-examples_dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "examples"))
 tutorials_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
 )
 
 # Assemble the list of dicts of all source and destination folders to copy.
 path_dicts = [
-    make_path_dict(examples_source, examples_dest),
     make_path_dict(tutorials_source, tutorials_dest),
 ]
 
