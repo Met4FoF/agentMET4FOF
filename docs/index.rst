@@ -49,6 +49,13 @@ Programming language version
    agentMET4FOF_metrological_streams
    agentMET4FOF_dashboard
 
+.. toctree::
+   :maxdepth: 1
+   :caption: UML diagrams:
+
+   UMLs
+
+
 
 Indices and tables
 ==================
