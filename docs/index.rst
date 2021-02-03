@@ -38,8 +38,9 @@ For the *agentMET4FOF* homepage go to
    :caption: Code Reference:
 
    agentMET4FOF_agents
-   agentMET4FOF_metrological_agents
    agentMET4FOF_streams
+   agentMET4FOF_metrological_agents
+   agentMET4FOF_metrological_streams
    agentMET4FOF_dashboard
 
 
