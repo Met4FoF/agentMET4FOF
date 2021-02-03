@@ -1586,7 +1586,7 @@ class DataStreamAgent(AgentMET4FOF):
     def send_next_sample(self, num_samples=1):
         if self.stream.has_more_samples():
             data = self.stream.next_sample(num_samples)
-            self.log_info("DATA SAMPLE ID: " + str(self.stream.sample_idx))
+            self.log_info("DATA SAMPLE ID: " + str(self.stream._sample_idx))
             self.send_output(data)
 
     def reset(self):
