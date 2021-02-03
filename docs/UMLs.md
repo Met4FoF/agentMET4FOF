@@ -22,4 +22,4 @@ We start with an overview of all provided and from third-party libraries and thu
 
 ## UML class diagram of _agentMET4FOF.metrological_agents_
 
-[![UML of classes in agentMETFOF.metrological_streams](UML_metrological_streams_full.png)](../UML_metrological_streams_full.png)
+[![UML of classes in agentMETFOF.metrological_streams](UML_metrological_streams_full.png)](UML_metrological_streams_full.png)
