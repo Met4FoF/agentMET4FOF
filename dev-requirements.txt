@@ -14,6 +14,8 @@ attrs==20.3.0
     #   pytest
 babel==2.9.0
     # via sphinx
+backcall==0.2.0
+    # via ipython
 bleach==3.3.0
     # via nbconvert
 certifi==2020.12.5
@@ -24,6 +26,8 @@ commonmark==0.9.1
     # via recommonmark
 coverage==5.4
     # via pytest-cov
+decorator==4.4.2
+    # via ipython
 defusedxml==0.6.0
     # via nbconvert
 docutils==0.16
@@ -43,6 +47,10 @@ ipython-genutils==0.2.0
     # via
     #   nbformat
     #   traitlets
+ipython==7.20.0
+    # via -r dev-requirements.in
+jedi==0.18.0
+    # via ipython
 jinja2==2.11.3
     # via
     #   nbconvert
@@ -83,14 +91,25 @@ packaging==20.9
     #   sphinx
 pandocfilters==1.4.3
     # via nbconvert
+parso==0.8.1
+    # via jedi
+pexpect==4.8.0
+    # via ipython
+pickleshare==0.7.5
+    # via ipython
 pluggy==0.13.1
     # via pytest
+prompt-toolkit==3.0.14
+    # via ipython
 psutil==5.8.0
     # via -r dev-requirements.in
+ptyprocess==0.7.0
+    # via pexpect
 py==1.10.0
     # via pytest
 pygments==2.7.4
     # via
+    #   ipython
     #   jupyterlab-pygments
     #   nbconvert
     #   sphinx
@@ -154,6 +173,7 @@ tornado==6.1
     # via jupyter-client
 traitlets==5.0.5
     # via
+    #   ipython
     #   jupyter-client
     #   jupyter-core
     #   nbclient
@@ -162,6 +182,8 @@ traitlets==5.0.5
     #   nbsphinx
 urllib3==1.26.3
     # via requests
+wcwidth==0.2.5
+    # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
 
