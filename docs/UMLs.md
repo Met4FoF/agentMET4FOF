@@ -2,6 +2,10 @@
 
 In this section UML class diagrams of almost all components of agentMET4FOF are listed and shown. The images are click- and zoomable in the browser but can be downloaded for further investigation via right-click. 
 
+Date of creation for all diagrams: 2021-02-03 on commit 802be6e58f911960fe630bd267d71a1cdfd7685a.
+
+We used PyCharm Professional with the settings 
+
 ## Overview
 
 [![UML of all agentMET4FOF classes](UML_agentMET4FOF_classes_only.png)](_images/UML_agentMET4FOF_classes_only.png)
