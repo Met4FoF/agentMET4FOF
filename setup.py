@@ -47,7 +47,8 @@ setup(
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/bangxiangyong/agentMET4FOF",
-    author=u"Bang Xiang Yong, Björn Ludwig, Haris Lulic",
+    author=u"Bang Xiang Yong, Björn Ludwig, Maximilian Gruber, Anupam Prasad "
+           u"Vedurmudi, Haris Lulic",
     author_email="bxy20@cam.ac.uk",
     keywords="uncertainty metrology MAS agent-based agents",
     packages=find_packages(exclude=["tests"]),

@@ -47,7 +47,7 @@ extensions = [
 # https://sphinx-rtd-theme.readthedocs.io/en/latest/configuring.html
 html_theme_options = {
     # True hides the + signs to expand the menu entries in the sidebar.
-    'collapse_navigation': False,
+    "collapse_navigation": False,
 }
 
 # This should make SciPy documentation available inside our docs.
@@ -133,8 +133,14 @@ master_doc = "index"
 
 # General information about the project.
 project = "agentMET4FOF"
-copyright = "2019, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Haris Lulic (" "PTB)"
-author = "Bang Xiang Yong, Björn Ludwig, Haris Lulic"
+copyright = (
+    "2021, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Maximilian Gruber (PTB), "
+    "Anupam Prasad Vedurmudi (PTB), Haris Lulic (IMBIH)"
+)
+author = (
+    "Bang Xiang Yong, Björn Ludwig, Maximilian Gruber, Anupam Prasad "
+    "Vedurmudi, Haris Lulic"
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
