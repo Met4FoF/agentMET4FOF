@@ -367,7 +367,7 @@ class SineGenerator(DataStreamMET4FOF):
     methods and attributes from :class:`DataStreamMET4FOF`.
     :func:`sine_wave_function` is a custom defined function which has a required
     keyword ``time`` as argument and any number of optional additional arguments
-    (e.g ``F``) to be supplied to the :meth:`.set_generator_function`.
+    (e.g ``F``) to be supplied to the :meth:`.DataStreamMET4FOF.set_generator_function`.
 
     Parameters
     ----------
@@ -395,7 +395,7 @@ class CosineGenerator(DataStreamMET4FOF):
     :func:`cosine_wave_function` is a custom defined function which has a required
     keyword ``time`` as argument and any number of
     optional additional arguments (e.g ``F``) to be supplied to the
-    :meth:`.set_generator_function`.
+    :meth:`.DataStreamMET4FOF.set_generator_function`.
 
     Parameters
     ----------
