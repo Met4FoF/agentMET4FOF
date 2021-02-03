@@ -1496,10 +1496,13 @@ class AgentNetwork:
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
-            # First shutdown the child process.
-            self.dashboard_proc.terminate()
-            # Then clean up the dangling process list entry.
-            self.dashboard_proc.join()
+            if self.backend == "osbrain":
+                # First shutdown the child process.
+                self.dashboard_proc.terminate()
+            # Then clean up the dangling process list entry or at least finish the
+            # execution of the join method in case of the "Mesa" backend. See #163
+            # for the search for a proper solution to this issue.
+            self.dashboard_proc.join(timeout=5)
         return 0
 
     def start_mesa_timer(self, update_interval):

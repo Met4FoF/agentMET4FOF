@@ -4,7 +4,7 @@ from scipy import signal
 
 class DataStreamMET4FOF():
     """
-    Abstract class for creating datastream.
+    Abstract class for creating datastreams.
 
     Data can be fetched sequentially using `next_sample()` or all at once
     `all_samples()`. This increments the internal sample index `sample_idx`.
