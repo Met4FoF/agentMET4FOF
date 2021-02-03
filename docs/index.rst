@@ -1,22 +1,28 @@
-.. agentMET4FOF's documentation master file, which we copied heavily from the
-   docs of https://github.com/cornellius-gp/gpytorch, because we liked so
-   much the way they presented their tutorials, examples and actual
-   documentation of the code side by side.
-
-:github_url: https://github.com/bangxiangyong/agentMET4FOF
+:github_url: https://github.com/Met4FoF/agentMET4FOF
 
 agentMET4FOF - Metrological Agent-based system
 ==============================================
 
-*agentMET4FOF* is a Python library developed at the `Institute for
-Manufacturing of the University of Cambridge <https://www.ifm.eng.cam.ac.uk>`_
-(UK) as part of the European joint Research Project `EMPIR 17IND12 Met4FoF
-<https://met4fof.eu>`_.
+Funding and authorship
+----------------------
 
-For the *agentMET4FOF* homepage go to
-`GitHub <https://github.com/bangxiangyong/agentMet4FoF/tree/master>`_.
+*agentMET4FOF* is a Python library developed as part of the European joint Research
+Project `EMPIR 17IND12 Met4FoF <https://met4fof.eu>`_. As such it is a joint effort
+under the lead of the `Institute for Manufacturing of the
+University of Cambridge <https://www.ifm.eng.cam.ac.uk/>`_ (UK). The following project
+partners are heavily involved in the ongoing efforts:
 
-*agentMET4FOF* is written in Python 3.
+- `Physikalisch-Technische Bundesanstalt <https://www.ptb.de/>`_ (DE)
+- `Van Swinden Laboratory <https://www.vsl.nl/en/>`_ (NL)
+
+Homepage
+--------
+For the *agentMET4FOF* repository go to
+`GitHub <https://github.com/Met4FoF/agentMet4FoF/tree/master>`_.
+
+Programming language version
+----------------------------
+*agentMET4FOF* is written in Python 3.8.
 
 .. toctree::
    :maxdepth: 1
