@@ -12,7 +12,7 @@ For the motivation of creating to virtual environment for your installation of t
 agents check [the official Python docs on that topic](https://docs.python.org/3/tutorial/venv.html#introduction).
 You have the option to do this with _Anaconda_, if you already have it installed,
 or use the Python built-in tool `venv`.
-The commands differ slightly between [Windows](#create-a-venv-python-environment-on-windows) and [Mac/Linux](#create-a-venv-python-environment-on-mac--linux).
+The commands differ slightly between [Windows](#create-a-venv-python-environment-on-windows) and [Mac/Linux](#create-a-venv-python-environment-on-mac-linux).
 
 #### Create a `venv` Python environment on Windows
 
