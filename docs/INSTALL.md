@@ -6,7 +6,7 @@ we guide you through every step until you have agentMET4FOF running on your mach
 
 If you want to take the steps manually we guide you through in this document.
 
-### Set up a [virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments)
+### Set up a virtual environment
 
 For the motivation of creating to virtual environment for your installation of the
 agents check [the official Python docs on that topic](https://docs.python.org/3/tutorial/venv.html#introduction).
