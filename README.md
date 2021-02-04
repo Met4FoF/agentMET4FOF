@@ -91,7 +91,7 @@ more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorials](#video-tutoral-series).
+tutorial 2. For details on the tutorials visit our [video tutorial series](#video-tutoral-series).
 
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
 
