@@ -182,14 +182,14 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v1-setup-dependencies-
 
-      # Install dependencies.
+      # Install dependencies. visdcc should be taken out as soon as possible again.
       - run:
           name: Install dependencies
           command: |
             python3 -m venv venv
             source venv/bin/activate
             pip install --upgrade pip wheel
-            pip install '.[tutorials]' -r dev-requirements.txt
+            pip install '.[tutorials]' -r dev-requirements.txt visdcc
 
       - save_cache:
           paths:
