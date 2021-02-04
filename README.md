@@ -36,15 +36,15 @@ in the section <a href="#about">About</a>.
 
 - [💫 Quickstart](#-quickstart)
 - [💬 About](#-about)
-- [The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
-- [Documentation and video tutorials](#documentation-and-video-tutorials)
-- [Installation](#installation)
-- [💨 Coming soon](#coming-soon)
-- [Acknowledgement](#acknowledgement)
-- [Disclaimer](#disclaimer)
+- [📈 The agentMET4FOF dashboard](#-the-agentmet4fof-dashboard)
+- [📖 Documentation and video tutorials](#-documentation-and-video-tutorials)
+- [💻 Installation](#-installation)
+- [💨 Coming soon](#-coming-soon)
+- [💎 Acknowledgement](#-acknowledgement)
+- [⚠ Disclaimer](#-disclaimer)
 - [©️ License](#-license)
 
-## :dizzy: Quickstart
+## 💫 Quickstart
 
 agentMET4FOF comes bundled with some tutorials to get you started as quick as
 possible. After the installation go
@@ -82,7 +82,7 @@ One of the many questions that drive us in the project is:
 
 > How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
 
-## The agentMET4FOF dashboard
+## 📈 The agentMET4FOF dashboard
 
 agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component 
 of every agent network and provides a web browser based view. You can 
@@ -91,11 +91,11 @@ more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorials](#documentation-and-video-tutorials).
+tutorial 2. For details on the tutorials visit our [video tutorials](#video-tutoral-series-for-agentmet4fof-041).
 
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
 
-## Documentation and video tutorials
+## 📖 Documentation and video tutorials
 
 Extended
 [documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
@@ -113,14 +113,14 @@ on your machine.
 
 In an early development stage we held a live online tutorial based on 
 [agentMET4FOF 0.1.0](https://github.com/Met4FoF/agentMET4FOF/releases/0.1.0/) 
-which you can watch [here](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4).
+which you can [download](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4).
 
 If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
-## Installation
+## 💻 Installation
 
 The installation of agentMET4FOF is as straightforward as the Python 
-ecosystem suggests. In the [video tutorials series](#documentation-and-video-tutorials)
+ecosystem suggests. In the [video tutorials series](#video-tutoral-series-for-agentmet4fof-041)
 we guide you through every step until you have agentMET4FOF running on 
 your machine. Besides that we have more details in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
@@ -137,14 +137,14 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
 
-## Acknowledgement
+## 💎 Acknowledgement
 
 This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://met4fof.eu/)
 of the European Metrology Programme for Innovation and Research (EMPIR). The [EMPIR](http://msu.euramet.org)
 is jointly funded by the EMPIR participating countries within EURAMET and the European 
 Union.
 
-## Disclaimer
+## ⚠ Disclaimer
 
 This software is developed as a joint effort of several project partners namely:
 
