@@ -1,4 +1,4 @@
-<p style="text-align:center">
+<p align="center">
   <!-- CircleCI Tests -->
   <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield"></a>
   <!-- ReadTheDocs Documentation -->
@@ -23,9 +23,9 @@
   </a>
 </p>
 
-<h1 style="text-align:center">Multi-Agent System for IIoT</h1>
+<h1 align="center">Multi-Agent System for IIoT</h1>
 
-<p style="text-align:justify">
+<p align="justify">
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
 analysis and processing of both static data sets and data streams with IIoT 
 applications in mind. More on the motivation that drives the project can be found
