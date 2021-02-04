@@ -182,3 +182,23 @@ In your terminal execute the following to terminate all python processes.
 $ pkill python
 $
 ```
+
+## Disclaimer
+
+This software is developed as a joint effort of several project partners namely:
+
+- [Institute for Manufacturing of the University of Cambridge (IfM)](https://www.ifm.eng.cam.ac.uk/)
+- [Physikalisch-Technische Bundesanstalt (PTB)](https://www.ptb.de/)
+- [Van Swinden Laboratory (VSL)](https://www.vsl.nl/en/)
+
+under the lead of IfM. The software is made available "as is" free of cost. The 
+authors and their institutions assume no responsibility whatsoever for its use by 
+other parties, and makes no guarantees, expressed or implied, about its quality, 
+reliability, safety, suitability or any other characteristic. In no event will the 
+authors be liable for any direct, indirect or consequential damage arising in 
+connection with the use of this software.
+
+## License
+
+agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md.
+
