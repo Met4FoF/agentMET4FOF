@@ -18,13 +18,19 @@ One of the many questions that drive us in the project is:
 
 > How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
 
-## Documentation
+## Documentation and video tutorials
 
 Extended
-[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io). If 
-questions arise, or you feel something is missing, reach out to
-[us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
+[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
 
+Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
+in the section _Tutorials for the multi-agent system agentMET4FOF_. 
+You can self-register on the linked page and get started immediately. The video series
+begins with our motivation for creating agentMET4FOF, guide you through the
+installation of Python and other recommended software until you execute the tutorials
+on your machine.
+
+If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
 ## The agentMET4FOF dashboard
 
