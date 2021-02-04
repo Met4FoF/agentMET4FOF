@@ -3,27 +3,6 @@
 agentMET4FOF - Metrological Agent-based system
 ==============================================
 
-Funding and authorship
-----------------------
-
-*agentMET4FOF* is a Python library developed as part of the European joint Research
-Project `EMPIR 17IND12 Met4FoF <https://met4fof.eu>`_. As such it is a joint effort
-under the lead of the `Institute for Manufacturing of the
-University of Cambridge <https://www.ifm.eng.cam.ac.uk/>`_ (UK). The following project
-partners are heavily involved in the ongoing efforts:
-
-- `Physikalisch-Technische Bundesanstalt <https://www.ptb.de/>`_ (DE)
-- `Van Swinden Laboratory <https://www.vsl.nl/en/>`_ (NL)
-
-Homepage
---------
-For the *agentMET4FOF* repository go to
-`GitHub <https://github.com/Met4FoF/agentMet4FoF/tree/develop>`_.
-
-Programming language version
-----------------------------
-*agentMET4FOF* is written in Python 3.8.
-
 .. toctree::
    :maxdepth: 1
    :caption: Getting started:
@@ -51,8 +30,6 @@ Programming language version
    agentMET4FOF_dashboard
    UMLs
    CONTRIBUTING
-
-
 
 Indices and tables
 ==================

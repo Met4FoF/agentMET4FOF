@@ -125,7 +125,6 @@ we guide you through every step until you have agentMET4FOF running on
 your machine. Besides that we have more details in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
 
-
 ## 💨 Coming soon
 
 - Dockerize agentMET4FOF
