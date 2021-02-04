@@ -18,7 +18,7 @@ partners are heavily involved in the ongoing efforts:
 Homepage
 --------
 For the *agentMET4FOF* repository go to
-`GitHub <https://github.com/Met4FoF/agentMet4FoF/tree/master>`_.
+`GitHub <https://github.com/Met4FoF/agentMet4FoF/tree/develop>`_.
 
 Programming language version
 ----------------------------
@@ -29,6 +29,7 @@ Programming language version
    :caption: Getting started:
 
    README
+   INSTALL
 
 .. toctree::
    :maxdepth: 1
@@ -48,12 +49,8 @@ Programming language version
    agentMET4FOF_metrological_agents
    agentMET4FOF_metrological_streams
    agentMET4FOF_dashboard
-
-.. toctree::
-   :maxdepth: 1
-   :caption: UML diagrams:
-
    UMLs
+   CONTRIBUTING
 
 
 
