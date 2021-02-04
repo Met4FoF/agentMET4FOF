@@ -12,7 +12,7 @@ test_timeout = 10
 np.random.seed(123)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def agent_network():
     # Create an agent network and shut it down after usage.
     a_network = AgentNetwork(dashboard_modules=False)
