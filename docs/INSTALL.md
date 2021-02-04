@@ -1,7 +1,7 @@
 # Installation of agentMET4FOF
 
 The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests.
-In the [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#video-tutoral-series)
+In the [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#video-tutorial-series)
 we guide you through every step until you have agentMET4FOF running on your machine.
 
 If you want to take the steps manually we guide you through in this document.
@@ -67,7 +67,7 @@ That's it!
 ## Get started developing
 
 As a starter we recommend working through the tutorials which we present in detail in
-our [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#documentation-and-video-tutorials). 
+our [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#video-tutorial-seriess). 
 
 ## Orphaned processes
 

@@ -91,7 +91,7 @@ more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorial series](#video-tutoral-series).
+tutorial 2. For details on the tutorials visit our [video tutorial series](#video-tutorial-series).
 
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
 
@@ -100,7 +100,7 @@ tutorial 2. For details on the tutorials visit our [video tutorial series](#vide
 Extended
 [documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
 
-### Video tutoral series
+### Video tutorial series
 
 Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
 in the section _Tutorials for the multi-agent system agentMET4FOF_. 
@@ -120,7 +120,7 @@ If questions arise, or you feel something is missing, reach out to [us](https://
 ## 💻Installation
 
 The installation of agentMET4FOF is as straightforward as the Python 
-ecosystem suggests. In the [video tutorials series](#video-tutoral-series)
+ecosystem suggests. In the [video tutorials series](#video-tutorial-series)
 we guide you through every step until you have agentMET4FOF running on 
 your machine. Besides that we have more details in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
