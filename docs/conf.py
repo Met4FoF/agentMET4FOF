@@ -134,12 +134,12 @@ master_doc = "index"
 # General information about the project.
 project = "agentMET4FOF"
 copyright = (
-    "2021, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Maximilian Gruber (PTB), "
-    "Anupam Prasad Vedurmudi (PTB), Haris Lulic (IMBIH)"
+    "2021, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Anupam Prasad Vedurmudi (PTB), "
+    "Maximilian Gruber (PTB), Haris Lulic (IMBIH)"
 )
 author = (
-    "Bang Xiang Yong, Björn Ludwig, Maximilian Gruber, Anupam Prasad "
-    "Vedurmudi, Haris Lulic"
+    "Bang Xiang Yong, Björn Ludwig, Anupam Prasad Vedurmudi, Maximilian Gruber, "
+    "Haris Lulic"
 )
 
 # The version info for the project you're documenting, acts as replacement for
