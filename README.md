@@ -29,7 +29,7 @@
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
 analysis and processing of both static data sets and data streams with IIoT 
 applications in mind. More on the motivation that drives the project can be found
-in the section <a href="#about">About</a>.
+in the section <a href="#-about">About</a>.
 </p>
 
 ## Table of content
