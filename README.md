@@ -90,7 +90,7 @@ To get some insights and really get going please visit [the docs](https://agentm
 The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests. 
 The process basically consists of setting up
 [a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) 
-and then [installing angentMET4FOF via `pip`](README.md#install-agentMET4FOF).
+and then [installing agentMET4FOF via `pip`](README.md#install-agentMET4FOF).
 
 ### Create a virtual Python environment
 
@@ -120,7 +120,7 @@ $ source agentMET4FOF_venv/bin/activate
 
 ### Install agentMET4FOF
 
-Once you activated your virtual environment, you can install agentmET4FOF via:
+Once you activated your virtual environment, you can install agentMET4FOF via:
 
 ```shell
 pip install agentMET4FOF
@@ -171,7 +171,7 @@ Alternatively, watch the tutorial webinar [here
 ## Updates
 
  - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
- - Implemented class AgentNetwork to start or connect to a agent server
+ - Implemented class AgentNetwork to start or connect to an agent server
  - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case 
    [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
  - Implemented interactive web application with user interface
@@ -217,5 +217,5 @@ connection with the use of this software.
 
 ## License
 
-agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md.
+agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
 
