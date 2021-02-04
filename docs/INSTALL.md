@@ -67,7 +67,7 @@ That's it!
 ## Get started developing
 
 As a starter we recommend working through the tutorials which we present in detail in
-our [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#video-tutorial-seriess). 
+our [video tutorial series linked in the README](https://github.com/Met4FoF/agentMET4FOF#video-tutorial-series). 
 
 ## Orphaned processes
 
