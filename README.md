@@ -1,59 +1,53 @@
-[![CircleCI](https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield)](https://circleci.com/gh/Met4FoF/agentMET4FOF)
-[![Documentation Status](https://readthedocs.org/projects/agentmet4fof/badge/?version=latest)](https://agentmet4fof.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy)](https://codecov.io/gh/Met4FoF/agentMET4FOF)
+<p style="text-align:center">
+  <!-- CircleCI Tests -->
+  <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield"></a>
+  <!-- ReadTheDocs Documentation -->
+  <a href="https://riverml.xyz">
+    <img src="https://readthedocs.org/projects/agentmet4fof/badge/?version=latest" alt="ReadTheDocs badge">
+  </a>
+  <!-- CodeCov(erage) -->
+  <a href="https://codecov.io/gh/Met4FoF/agentMET4FOF">
+    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy"/>
+  </a>
+  <!-- PyPI Version -->
+  <a href="https://pypi.org/project/agentmet4fof">
+    <img src="https://img.shields.io/pypi/v/agentmet4fof.svg?label=release&color=blue&style=flat-square" alt="pypi">
+  </a>
+  <!-- PePy Downloads -->
+  <a href="https://pepy.tech/project/agentMET4FOF">
+    <img src="https://img.shields.io/badge/dynamic/json?style=flat-square&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2FagentMET4FOF" alt="PePy project downloads">
+  </a>
+  <!-- PyPI License -->
+  <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
+    <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
+  </a>
+</p>
 
-# Multi-Agent System for IIoT
+<h1 style="text-align:center">Multi-Agent System for IIoT</h1>
 
-This is supported by European Metrology Programme for Innovation and Research (EMPIR)
-under the project [Metrology for the Factory of the Future (Met4FoF), project number
-17IND12](https://met4fof.eu/).
+<p style="text-align:justify">
+agentMET4FOF is an implementation of a multi-agent system for agent-based 
+analysis and processing of both static data sets and data streams with IIoT 
+applications in mind. More on the motivation that drives the project can be found
+in the section <a href="#about">About</a>.
+</p>
 
-## About
+## Table of content
 
-Sensor deployments in industrial applications usually form networks in all sorts of environments. This requires a flexible framework for the implementation of the corresponding data analysis. An excellent way to represent such networks is a multi-agent system (MAS), where independent software modules (agents) encapsulate properties and functionalities. agentMET4FOF is an interactive and flexible open-source implementation of such a MAS. The software engineering process is driven by several industry-oriented use cases with the aim of impacting on IIoT applications. This leads to a framework that is specialized in representing heterogeneous sensor networks.
+- [💫 Quickstart](#-quickstart)
+- [💬 About](#-about)
+- [The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
+- [Documentation and video tutorials](#documentation-and-video-tutorials)
+- [Installation](#installation)
+- [💨 Coming soon](#coming-soon)
+- [Acknowledgement](#acknowledgement)
+- [Disclaimer](#disclaimer)
+- [©️ License](#-license)
 
-A special emphasize is put on supporting metrological treatment of sensor streaming data. This includes the consideration of measurement uncertainties during data analyses and processing as well as propagating metadata alongside the data itself. 
+## :dizzy: Quickstart
 
-One of the many questions that drive us in the project is:
-
-> How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
-
-## Documentation and video tutorials
-
-Extended
-[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
-
-Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
-in the section _Tutorials for the multi-agent system agentMET4FOF_. 
-You can self-register on the linked page and get started immediately. The video series
-begins with our motivation for creating agentMET4FOF, guide you through the
-installation of Python and other recommended software until you execute the tutorials
-on your machine.
-
-If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
-
-## The agentMET4FOF dashboard
-
-agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component 
-of every agent network and provides a web browser based view. You can 
-observe the state of your agents, modify the connections between them and even add 
-more pre-made agents to your network all during run-time. The address to your
-dashboard is printed to the console on every launch of an agent network.
-
-The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorials](#Documentation-and-video-tutorials).
-
-![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/develop/docs/screenshot_met4fof.png)
-
-## Use agentMET4FOF
-
-The easiest way to get started with *agentMET4FOF* is navigating to the folder
-in which you want to create a virtual Python environment (*venv*), create one based
-on Python 3.8, activate it, then install *agentMET4FOF*
-from PyPI.org and then work through the [tutorials
-](https://github.com/Met4FoF/agentMET4FOF/tree/develop/agentMET4FOF_tutorials).
-
-### Quickstart
+agentMET4FOF comes bundled with some tutorials to get you started as quick as
+possible. After the installation go
 
 In your Python console execute the following to run the first tutorial.
 
@@ -78,127 +72,77 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
 [...]
 ```
 
-### Inspect dashboard
+## 💬 About
 
-Now you can visit `http://127.0.0.1:8050/` with any Browser and watch the
- SineGenerator agent you just spawned.
- 
-To get some insights and really get going please visit [the docs](https://agentmet4fof.readthedocs.io/).
+Sensor deployments in industrial applications usually form networks in all sorts of environments. This requires a flexible framework for the implementation of the corresponding data analysis. An excellent way to represent such networks is a multi-agent system (MAS), where independent software modules (agents) encapsulate properties and functionalities. agentMET4FOF is an interactive and flexible open-source implementation of such a MAS. The software engineering process is driven by several industry-oriented use cases with the aim of impacting on IIoT applications. This leads to a framework that is specialized in representing heterogeneous sensor networks.
+
+A special emphasize is put on supporting metrological treatment of sensor streaming data. This includes the consideration of measurement uncertainties during data analyses and processing as well as propagating metadata alongside the data itself. 
+
+One of the many questions that drive us in the project is:
+
+> How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
+
+## The agentMET4FOF dashboard
+
+agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component 
+of every agent network and provides a web browser based view. You can 
+observe the state of your agents, modify the connections between them and even add 
+more pre-made agents to your network all during run-time. The address to your
+dashboard is printed to the console on every launch of an agent network.
+
+The following image is close to what you will find in your browser on execution of
+tutorial 2. For details on the tutorials visit our [video tutorials](#documentation-and-video-tutorials).
+
+![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
+
+## Documentation and video tutorials
+
+Extended
+[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
+
+### Video tutoral series for agentMET4FOF 0.4.1
+
+Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
+in the section _Tutorials for the multi-agent system agentMET4FOF_. 
+You can self-register on the linked page and get started immediately. The video series
+begins with our motivation for creating agentMET4FOF, guide you through the
+installation of Python and other recommended software until you execute the tutorials
+on your machine.
+
+### Live online tutorial for agentMET4FOF 0.1.0
+
+In an early development stage we held a live online tutorial based on 
+[agentMET4FOF 0.1.0](https://github.com/Met4FoF/agentMET4FOF/releases/0.1.0/) 
+which you can watch [here](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4).
+
+If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
 ## Installation
 
-The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests. 
-The process basically consists of setting up
-[a virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) 
-and then [installing agentMET4FOF via `pip`](README.md#install-agentMET4FOF).
+The installation of agentMET4FOF is as straightforward as the Python 
+ecosystem suggests. In the [video tutorials series](#documentation-and-video-tutorials)
+we guide you through every step until you have agentMET4FOF running on 
+your machine. Besides that we have more details in the [installation 
+section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
 
-### Create a virtual Python environment
 
-For the motivation of creating to virtual environment for your installation of the agents check 
-[the official Python docs on that topic](https://docs.python.org/3/tutorial/venv.html#introduction).
-The commands differ slightly between Windows and Mac/Linux.
+## 💨 Coming soon
 
-#### Create a virtual Python environment on Windows
+- Dockerize agentMET4FOF
+- Improve handling of metadata
+- Further improve plotting
 
-In your Windows PowerShell execute the following to set up a virtual environment in a folder of your choice.
+For a comprehensive overview of current development activities and upcoming tasks,
+take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/projects/1),
+[issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
+[pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
 
-```shell
-PS C:> cd C:\LOCAL\PATH\TO\ENVS
-PS C:\LOCAL\PATH\TO\ENVS> py -3 -m venv agentMET4FOF_venv
-PS C:\LOCAL\PATH\TO\ENVS> agentMET4FOF_venv\Scripts\activate
-```
+## Acknowledgement
 
-#### Create a virtual Python environment on Mac & Linux
-
-In your terminal execute the following to set up a virtual environment in a folder of your choice.
-
-```shell
-$ cd /LOCAL/PATH/TO/ENVS
-$ python3 -m venv agentMET4FOF_venv
-$ source agentMET4FOF_venv/bin/activate
-```
-
-### Install agentMET4FOF
-
-Once you activated your virtual environment, you can install agentMET4FOF via:
-
-```shell
-pip install agentMET4FOF
-```
-
-```shell
-Collecting agentMET4FOF
-[...]
-Successfully installed agentMET4FOF-[...] [...]
-```
-
-## Get started developing
-
-First clone the repository to your local machine as described
-[here](https://help.github.com/en/articles/cloning-a-repository). To get started
-with your present *Anaconda* installation just go to *Anaconda
-prompt*, navigate to your local clone
-
-```shell
-$ cd /LOCAL/PATH/TO/agentMET4FOF
-```
-
-and execute
-
-```shell
-$ conda env create --file environment.yml 
-```
-
-This will create an *Anaconda* virtual environment with all dependencies
-satisfied. If you don't have *Anaconda* installed already follow [this guide
-](https://docs.conda.io/projects/continuumio-conda/en/latest/user-guide/install/download.html)
-first, then create the virtual environment as stated above and then proceed.
-
-Alternatively, for non-conda environments, you can install the dependencies using pip
-
-```shell
-$ pip install -r requirements.txt -r dev-requirements.txt
-```
-
-First take a look at the [tutorials
-](https://github.com/Met4FoF/agentMET4FOF/blob/develop/agentMET4FOF_tutorials/tutorial_1_generator_agent.py)
-or start hacking if you already are familiar with agentMET4FOF and want to customize
-your agents' network.
-
-Alternatively, watch the tutorial webinar [here
-](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4)
-
-## Updates
-
- - Implemented base class AgentMET4FOF with built-in agent classes DataStreamAgent, MonitorAgent
- - Implemented class AgentNetwork to start or connect to an agent server
- - Implemented with ZEMA prognosis of Electromechanical cylinder data set as use case 
-   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1326278.svg)](https://doi.org/10.5281/zenodo.1326278)
- - Implemented interactive web application with user interface
-
-## Orphaned processes
-
-In the event of agents not terminating cleanly, you can end all Python processes
-running on your system (caution: the following commands affect **all** running Python
-processes, not just those that emerged from the agents).
-
-### Killing all Python processes in Windows
-
-In your Windows command prompt execute the following to terminate all python processes.
-
-```shell
-> taskkill /f /im python.exe /t
->
-```
-
-### Killing all Python processes on Mac and Linux
-
-In your terminal execute the following to terminate all python processes.
-
-```shell
-$ pkill python
-$
-```
+This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://met4fof.eu/)
+of the European Metrology Programme for Innovation and Research (EMPIR). The [EMPIR](http://msu.euramet.org)
+is jointly funded by the EMPIR participating countries within EURAMET and the European 
+Union.
 
 ## Disclaimer
 
@@ -215,7 +159,7 @@ reliability, safety, suitability or any other characteristic. In no event will t
 authors be liable for any direct, indirect or consequential damage arising in 
 connection with the use of this software.
 
-## License
+## ©️ License
 
 agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
 
