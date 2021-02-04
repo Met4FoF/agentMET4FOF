@@ -138,7 +138,7 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 
 ## 💎Acknowledgement
 
-This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://met4fof.eu/)
+This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://www.ptb.de/empir2018/met4fof/home/)
 of the European Metrology Programme for Innovation and Research (EMPIR). The [EMPIR](http://msu.euramet.org)
 is jointly funded by the EMPIR participating countries within EURAMET and the European 
 Union.
