@@ -2,7 +2,7 @@
 [![Documentation Status](https://readthedocs.org/projects/agentmet4fof/badge/?version=latest)](https://agentmet4fof.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy)](https://codecov.io/gh/Met4FoF/agentMET4FOF)
 
-# Multi-Agent System for Metrology for Factory of the Future (Met4FoF) Code
+# Multi-Agent System for IIoT
 
 This is supported by European Metrology Programme for Innovation and Research (EMPIR)
 under the project [Metrology for the Factory of the Future (Met4FoF), project number
@@ -21,7 +21,9 @@ One of the many questions that drive us in the project is:
 ## Documentation
 
 Extended
-[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
+[documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io). If 
+questions arise, or you feel something is missing, reach out to
+[us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
 
 ## The agentMET4FOF dashboard
