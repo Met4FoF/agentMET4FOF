@@ -29,22 +29,22 @@
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
 analysis and processing of both static data sets and data streams with IIoT 
 applications in mind. More on the motivation that drives the project can be found
-in the section <a href="#-about">About</a>.
+in the section <a href="#about">About</a>.
 </p>
 
 ## Table of content
 
-- [💫 Quickstart](#-quickstart)
-- [💬 About](#-about)
-- [📈 The agentMET4FOF dashboard](#-the-agentmet4fof-dashboard)
-- [📖 Documentation and video tutorials](#-documentation-and-video-tutorials)
-- [💻 Installation](#-installation)
-- [💨 Coming soon](#-coming-soon)
-- [💎 Acknowledgement](#-acknowledgement)
-- [⚠ Disclaimer](#-disclaimer)
-- [©️ License](#-license)
+- [💫 Quickstart](#quickstart)
+- [💬 About](#about)
+- [📈 The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
+- [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
+- [💻 Installation](#installation)
+- [💨 Coming soon](#coming-soon)
+- [💎 Acknowledgement](#acknowledgement)
+- [⚠ Disclaimer](#disclaimer)
+- [©️ License](#license)
 
-## 💫 Quickstart
+## 💫Quickstart
 
 agentMET4FOF comes bundled with some tutorials to get you started as quick as
 possible. After the installation go
@@ -72,7 +72,7 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
 [...]
 ```
 
-## 💬 About
+## 💬About
 
 Sensor deployments in industrial applications usually form networks in all sorts of environments. This requires a flexible framework for the implementation of the corresponding data analysis. An excellent way to represent such networks is a multi-agent system (MAS), where independent software modules (agents) encapsulate properties and functionalities. agentMET4FOF is an interactive and flexible open-source implementation of such a MAS. The software engineering process is driven by several industry-oriented use cases with the aim of impacting on IIoT applications. This leads to a framework that is specialized in representing heterogeneous sensor networks.
 
@@ -82,7 +82,7 @@ One of the many questions that drive us in the project is:
 
 > How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
 
-## 📈 The agentMET4FOF dashboard
+## 📈The agentMET4FOF dashboard
 
 agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component 
 of every agent network and provides a web browser based view. You can 
@@ -91,16 +91,16 @@ more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorials](#video-tutoral-series-for-agentmet4fof-041).
+tutorial 2. For details on the tutorials visit our [video tutorials](#video-tutoral-series).
 
 ![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
 
-## 📖 Documentation and video tutorials
+## 📖Documentation and video tutorials
 
 Extended
 [documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
 
-### Video tutoral series for agentMET4FOF 0.4.1
+### Video tutoral series
 
 Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
 in the section _Tutorials for the multi-agent system agentMET4FOF_. 
@@ -109,7 +109,7 @@ begins with our motivation for creating agentMET4FOF, guide you through the
 installation of Python and other recommended software until you execute the tutorials
 on your machine.
 
-### Live online tutorial for agentMET4FOF 0.1.0
+### Live online tutorial during early development
 
 In an early development stage we held a live online tutorial based on 
 [agentMET4FOF 0.1.0](https://github.com/Met4FoF/agentMET4FOF/releases/0.1.0/) 
@@ -117,15 +117,15 @@ which you can [download](https://github.com/Met4FoF/agentMET4FOF/releases/downlo
 
 If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
-## 💻 Installation
+## 💻Installation
 
 The installation of agentMET4FOF is as straightforward as the Python 
-ecosystem suggests. In the [video tutorials series](#video-tutoral-series-for-agentmet4fof-041)
+ecosystem suggests. In the [video tutorials series](#video-tutoral-series)
 we guide you through every step until you have agentMET4FOF running on 
 your machine. Besides that we have more details in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
 
-## 💨 Coming soon
+## 💨Coming soon
 
 - Dockerize agentMET4FOF
 - Improve handling of metadata
@@ -136,14 +136,14 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
 
-## 💎 Acknowledgement
+## 💎Acknowledgement
 
 This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://met4fof.eu/)
 of the European Metrology Programme for Innovation and Research (EMPIR). The [EMPIR](http://msu.euramet.org)
 is jointly funded by the EMPIR participating countries within EURAMET and the European 
 Union.
 
-## ⚠ Disclaimer
+## ⚠Disclaimer
 
 This software is developed as a joint effort of several project partners namely:
 
@@ -158,7 +158,7 @@ reliability, safety, suitability or any other characteristic. In no event will t
 authors be liable for any direct, indirect or consequential damage arising in 
 connection with the use of this software.
 
-## ©️ License
+## ©️License
 
 agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
 
