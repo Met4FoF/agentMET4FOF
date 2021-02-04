@@ -1,16 +1,35 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
+from PyDynamic.misc.testsignals import shocklikeGaussian
+
+from agentMET4FOF.agents import (
+    AgentMET4FOF,
+    AgentNetwork,
+    MonitorAgent,
+)
+from agentMET4FOF.streams import DataStreamMET4FOF
 
 
-class SineGeneratorAgent(AgentMET4FOF):
+class GaussianShock(DataStreamMET4FOF):
+    """Class generating signals from PyDynamic's shocklike gaussian pulse"""
+
+    def __init__(self, sfreq=.5, t0=50, sigma=10, m0=100, noise=0.0):
+        super().__init__()
+        self.set_generator_function(
+            generator_function=shocklikeGaussian,
+            sfreq=sfreq,
+            t0=t0,
+            m0=m0,
+            sigma=sigma,
+            noise=noise,
+        )
+
+
+class GaussianShockGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal
 
-    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
+    Takes samples from the :py:class:`shocklikeGaussian` and pushes them sample by
+    sample
     to connected agents via its output channel.
     """
-
-    # The datatype of the stream will be SineGenerator.
-    _sine_stream: SineGenerator
 
     def init_parameters(self):
         """Initialize the input data
@@ -18,7 +37,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         Initialize the input data stream as an instance of the
         :py:mod:`SineGenerator` class
         """
-        self._sine_stream = SineGenerator()
+        self._signal = GaussianShock()
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -27,8 +46,8 @@ class SineGeneratorAgent(AgentMET4FOF):
         streams content and push it via invoking :py:method:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            sine_data = self._sine_stream.next_sample()  # dictionary
-            self.send_output(sine_data["quantities"])
+            _generated_data = self._signal.next_sample()  # dictionary
+            self.send_output(_generated_data["quantities"])
 
 
 def demonstrate_generator_agent_use():
@@ -36,7 +55,11 @@ def demonstrate_generator_agent_use():
     agent_network = AgentNetwork()
 
     # Initialize agents by adding them to the agent network.
-    gen_agent = agent_network.add_agent(agentType=SineGeneratorAgent)
+    gen_agent: AgentMET4FOF = agent_network.add_agent(
+        agentType=GaussianShockGeneratorAgent
+    )
+    # Here we apply the default settings we chose above.
+    gen_agent.init_parameters()
     monitor_agent = agent_network.add_agent(agentType=MonitorAgent)
 
     # Interconnect agents by either way:
