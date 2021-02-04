@@ -78,7 +78,7 @@ commands:
         name: Run tests
         command: |
           source venv/bin/activate
-          pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
+          pytest -v --junitxml=test-reports/pytest.xml --cov=. . | tee \
               test-reports/agentMET4FOF.log
 
     # Upload coverage report if the according parameter is set to `true`.
@@ -135,7 +135,7 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v1-conda-dependencies-
 
-      # Create environment.
+      # Create environment and install extra_requires dependencies manually.
       - run:
           name: Create or update environment
           command: |
@@ -144,6 +144,9 @@ jobs:
             else
                 conda env create -f environment.yml
             fi
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
+            pip install PyDynamic
 
       - save_cache:
           paths:
@@ -157,13 +160,13 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            pytest -v --junitxml=test-reports/junit.xml . > test-reports/pytest.log
+            pytest -v --junitxml=test-reports/junit.xml . | tee test-reports/pytest.log
 
       - store_test_artifacts_and_results
 
 
   # Define one 'test' job to run their test suites against the
-  # installed dependencies from the environment.yml.
+  # installed dependencies from the setup.py.
   test_against_setup:
 
     executor: tester
@@ -186,7 +189,7 @@ jobs:
             python3 -m venv venv
             source venv/bin/activate
             pip install --upgrade pip wheel
-            pip install . -r dev-requirements.txt
+            pip install '.[tutorials]' -r dev-requirements.txt
 
       - save_cache:
           paths:
@@ -215,7 +218,7 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v3-venv-dependencies-
 
-      # Install dependencies.
+      # Install dependencies and extra_requires dependencies manually.
       - run:
           name: Install dependencies
           command: |
@@ -223,6 +226,7 @@ jobs:
             source venv/bin/activate
             pip install --upgrade pip pip-tools
             pip-sync dev-requirements.txt requirements.txt
+            pip install PyDynamic
 
       - save_cache:
           paths:

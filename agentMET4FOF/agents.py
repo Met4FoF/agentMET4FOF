@@ -8,25 +8,19 @@ import sys
 import time
 from collections import deque
 from io import BytesIO
-from multiprocessing.context import Process
-from threading import Thread, Timer
-from typing import Union, Dict, Optional
+from threading import Timer
+from typing import Dict, Optional, Union
+
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import mpld3
 import networkx as nx
 import numpy as np
 import pandas as pd
-from mesa import Agent as MesaAgent
-from mesa import Model
+from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
-from osbrain import Agent as osBrainAgent
-from osbrain import NSProxy
-from osbrain import run_agent
-from osbrain import run_nameserver
+from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
-
-
 from .streams import DataStreamMET4FOF
 
 
@@ -75,9 +69,16 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.agent_loop()
 
     def _remove_methods(self, cls):
+        """Remove methods from the other backends base class from the current agent"""
         for name in list(vars(cls)):
             if not name.startswith("__"):
-                delattr(cls, name)
+                try:
+                    delattr(self, name)
+                except AttributeError:
+                    # This situation only occurs when we start and stop agent
+                    # networks of differing backends in one sequence. Normally
+                    # ignoring these errors should be no problem.
+                    pass
 
     def set_attr(self, **kwargs):
         for key, val in kwargs.items():
@@ -1122,6 +1123,12 @@ class MesaModel(Model):
     def agents(self):
         return [agent.name for agent in self.schedule.agents]
 
+    def shutdown(self):
+        """Shutdown entire MESA model with all agents and schedulers"""
+        for agent in self.agents():
+            agent_obj = self.get_agent(agent)
+            agent_obj.shutdown()
+
 
 class AgentNetwork:
     """
@@ -1199,14 +1206,26 @@ class AgentNetwork:
         if dashboard_modules is not False:
             from .dashboard.Dashboard import AgentDashboard
             from .dashboard.Dashboard_agt_net import Dashboard_agt_net
+            # Initialize common dashboard parameters for both types of dashboards
+            # corresponding to different backends.
+            dashboard_params = {
+                "dashboard_modules": dashboard_modules,
+                "dashboard_layouts": [Dashboard_agt_net] + dashboard_extensions,
+                "dashboard_update_interval": dashboard_update_interval,
+                "max_monitors": dashboard_max_monitors,
+                "ip_addr": ip_addr,
+                "port": dashboard_port,
+                "agentNetwork": self,
+            }
+            # Initialize dashboard process/thread.
             if self.backend == "osbrain":
-                self.dashboard_proc = Thread(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardThread
+
+                self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             elif self.backend == "mesa":
-                self.dashboard_proc = Thread(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardThread
+
+                self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -1550,16 +1569,21 @@ class AgentNetwork:
         # processes are ended.
         if self.backend == "osbrain":
             self._get_controller().get_attr('ns').shutdown()
+        elif self.backend == "mesa":
+            self._get_controller().stop_mesa_timer()
+            self.mesa_model.shutdown()
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
-            if self.backend == "osbrain":
-                # First shutdown the child process.
-                self.dashboard_proc.terminate()
-            # Then clean up the dangling process list entry or at least finish the
+            # This calls either the provided method Process.terminate() which
+            # abruptly stops the running multiprocess.Process in case of the osBrain
+            # backend or the self-written method in the class AgentDashboardThread
+            # ensuring the proper termination of the dash.Dash app.
+            self.dashboard_proc.terminate()
+            # Then wait for the termination of the actual thread or at least finish the
             # execution of the join method in case of the "Mesa" backend. See #163
             # for the search for a proper solution to this issue.
-            self.dashboard_proc.join(timeout=5)
+            self.dashboard_proc.join(timeout=10)
         return 0
 
     def start_mesa_timer(self, update_interval):
@@ -1809,3 +1833,36 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles += 1
             except:
                 raise Exception
+
+
+class SineGeneratorAgent(AgentMET4FOF):
+    """An agent streaming a sine signal
+
+    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
+    to connected agents via its output channel.
+    """
+
+    def init_parameters(self, sfreq=500, sine_freq=5):
+        """Initialize the input data
+
+        Initialize the input data stream as an instance of the
+        :py:mod:`SineGenerator` class
+
+        Parameters
+        ----------
+        sfreq : int
+            sampling frequency for the underlying signal
+        sine_freq : float
+            frequency of the generated sine wave
+        """
+        self._sine_stream = SineGenerator(sfreq=sfreq, sine_freq=sine_freq)
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input data
+        streams content and push it via invoking :py:method:`AgentMET4FOF.send_output`.
+        """
+        if self.current_state == "Running":
+            sine_data = self._sine_stream.next_sample()  # dictionary
+            self.send_output(sine_data["quantities"])
