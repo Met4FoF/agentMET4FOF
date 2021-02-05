@@ -77,6 +77,7 @@ class AgentDashboard:
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
+        print(f"Visit the agentMET4FOF dashboard on http://{self.ip_addr}:{self.port}/")
         self._server.serve_forever()
 
     def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
