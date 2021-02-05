@@ -77,8 +77,17 @@ class AgentDashboard:
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
-        print(f"Visit the agentMET4FOF dashboard on http://{self.ip_addr}:{self.port}/")
-        self._server.serve_forever()
+        if hasattr(self, "_server"):
+            print(
+                f"\n--------------------------------------------------------------\n"
+                f"|                                                            |\n"
+                f"| Your agent network is starting up. Open your browser and   |\n"
+                f"| visit the agentMET4FOF dashboard on "
+                f"http://{self.ip_addr}:{self.port}/ |\n"
+                f"|                                                            |\n"
+                f"--------------------------------------------------------------\n"
+            )
+            self._server.serve_forever()
 
     def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
         """
