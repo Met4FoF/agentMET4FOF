@@ -378,7 +378,7 @@ class SineGenerator(DataStreamMET4FOF):
     sfreq : int
         sampling frequency which determines the time step when :meth:`.next_sample`
         is called
-    sine_freq : int
+    sine_freq : float
         frequency of wave function
     """
     def __init__(self, sfreq = 500, sine_freq=5):

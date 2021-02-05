@@ -149,7 +149,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     sfreq : int, optional
         Sampling frequency which determines the time step when :meth:`.next_sample` is
         called. Defaults to 500.
-    sine_freq : int, optional
+    sine_freq : float, optional
         Frequency of the wave function. Defaults to 50.
     device_id : str, optional
         Name of the represented generator. Defaults to 'SineGenerator'.
@@ -175,7 +175,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     def __init__(
         self,
         sfreq: int=500,
-        sine_freq: int=50,
+        sine_freq: float=50,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
