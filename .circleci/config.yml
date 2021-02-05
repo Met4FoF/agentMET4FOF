@@ -6,37 +6,41 @@ version: 2.1
 
 executors:
   # Specify a common so-called executor containing the desired Python interpreter.
-  python:
+  tester:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
+  publisher:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.8
 
 workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      # Create 'test' job to test agentMET4FOF for every commit.
-      - test:
-          name: "test_against_requirements"
-          send_cov: true
+      - test_against_venv:
           filters:
             tags:
               # Include tag filter to trigger as well on tag pushes.
               only: /.*/
-      - test:
-          name: "test_against_setup.py"
-          requirements: ". -r dev-requirements.txt"
-          cache: false
+      - test_against_conda:
           filters:
-              tags:
-                # Include tag filter to trigger as well on tag pushes.
-                only: /.*/
+            tags:
+              # Include tag filter to trigger as well on tag pushes.
+              only: /.*/
+      - test_against_setup:
+          filters:
+            tags:
+              # Include tag filter to trigger as well on tag pushes.
+              only: /.*/
       - deploy:
           # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
           # pushes, which successfully run 'test' job and are tagged with version.
           requires:
-              - test_against_requirements
-              - test_against_setup.py
+              - test_against_venv
+              - test_against_conda
+              - test_against_setup
           filters:
               tags:
                 # Specify the tags which trigger the job as regular expression.
@@ -45,96 +49,192 @@ workflows:
                 # This assures the job only being triggered by tag pushes.
                 ignore: /.*/
 
-jobs:
-  test:
+commands:
+  # Reusable command to prepare the environment for testing.
+  create_result_folder:
+    description: "Create test-result folder."
+    steps:
+    # Create folder for test results.
+    - run:
+        name: Create test result folder
+        command: |
+          mkdir -p test-reports
+
+  run_venv_tests:
+    description: "Run and store test results."
     # Define a parameter for the job, to be able to run all tests against different
     # sets of dependencies. This allows specifically to run the tests against the
     # possibly pinned versions from requirements.txt and against the automatically
     # installed most current versions from setup.py. The send_cov variable is only to
     # ensure that only one coverage report gets send for each commit.
     parameters:
-      requirements:
-        type: string
-        default: "-r requirements.txt -r dev-requirements.txt"
       send_cov:
         type: boolean
         default: false
-      cache:
-        type: boolean
-        default: true
-
-    executor: python
 
     steps:
-      # Checkout code.
+    # Run tests! We use pytest's test-runner.
+    - run:
+        name: Run tests
+        command: |
+          source venv/bin/activate
+          pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
+              test-reports/agentMET4FOF.log
+
+    # Upload coverage report if the according parameter is set to `true`.
+    - when:
+        condition: << parameters.send_cov >>
+        steps:
+          - run:
+              name: Upload coverage report
+              command: |
+                source venv/bin/activate
+                bash <(curl -s https://codecov.io/bash)
+
+    - store_test_artifacts_and_results
+
+  store_test_artifacts_and_results:
+    description: "Store test results."
+    steps:
+    # Store test results.
+    - store_artifacts:
+        path: test-reports
+        destination: test-reports
+
+    - store_test_results:
+        path: test-reports
+
+jobs:
+  # Define one 'test' job to run their test suites against the
+  # installed dependencies from the environment.yml.
+  test_against_conda:
+
+    executor: tester
+
+    steps:
       - checkout
-
-      # Create folder for test results.
+      - create_result_folder
       - run:
-          name: Create test result folder
+          name: Install Miniconda
           command: |
-            mkdir test-reports
+            wget "https://repo.anaconda.com/miniconda/\
+            Miniconda3-latest-Linux-x86_64.sh" -O $HOME/miniconda.sh
+            mkdir -p $HOME/.conda
+            bash $HOME/miniconda.sh -b -p /home/circleci/conda
+            source $HOME/conda/etc/profile.d/conda.sh
+            hash -r
+            conda config --set always_yes yes --set changeps1 no
+            conda update -q conda
+            echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
 
-      # Download and cache dependencies if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.cache >>
-          steps:
-            - restore_cache:
-                keys:
-                  # Specify the unique identifier for the cache.
-                  - v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-                  # Fallback to using the latest cache if no exact match is found.
-                  - v2-dependencies-
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v1-conda-dependencies-
 
-      # Install dependencies if necessary.
+      # Create environment.
       - run:
-         name: Install dependencies
-         command: |
-           python3 -m venv agent_venv
-           source agent_venv/bin/activate
-           pip install --upgrade pip << parameters.requirements >>
-
-      # Save cached venv if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.cache >>
-          steps:
-            - save_cache:
-                paths:
-                  - ./agent_venv
-                key: v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
-      # Run tests with coverage report! We use pytest's test-runner.
-      - run:
-          name: Run agentMET4FOF tests
+          name: Create or update environment
           command: |
-            source agent_venv/bin/activate
-            pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
-            test-reports/agentMET4FOF.log
+            if [ -d "$HOME/conda/envs/" ]; then
+                conda env update --prune --file environment.yml
+            else
+                conda env create -f environment.yml
+            fi
+
+      - save_cache:
+          paths:
+            - /home/circleci/conda/envs/
+          key: >-
+            v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+
+      # Run tests! We use pytest's test-runner.
+      - run:
+          name: Run tests
+          command: |
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
+            pytest -v --junitxml=test-reports/junit.xml . > test-reports/pytest.log
+
+      - store_test_artifacts_and_results
 
 
-      # Upload coverage report if the according parameter is set to `true`.
-      - when:
-          condition: << parameters.send_cov >>
-          steps:
-            - run:
-                name: Upload coverage report
-                command: |
-                  source agent_venv/bin/activate
-                  bash <(curl -s https://codecov.io/bash)
+  # Define one 'test' job to run their test suites against the
+  # installed dependencies from the environment.yml.
+  test_against_setup:
 
-      # Store test results as artifacts.
-      - store_artifacts:
-         path: test-reports
-         destination: test-reports
+    executor: tester
 
-      # Show test results as summary on job page.
-      - store_test_results:
-         path: test-reports
+    steps:
+      - checkout
+      - create_result_folder
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v1-setup-dependencies-
+
+      # Install dependencies.
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip wheel
+            pip install . -r dev-requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+
+      # Run tests! We use pytest's test-runner and request to send coverage report.
+      - run_venv_tests:
+          send_cov: true
+
+  # Define one 'test' job to run their test suites against the
+  # installed dependencies from the requirements files.
+  test_against_venv:
+
+    executor: tester
+
+    steps:
+      - checkout
+      - create_result_folder
+      # Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            # Fallback to using the latest cache if no exact match is found.
+            - v3-venv-dependencies-
+
+      # Install dependencies.
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip pip-tools
+            pip-sync dev-requirements.txt requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+
+      # Run tests! We use pytest's test-runner.
+      - run_venv_tests
 
   deploy:
-    executor: python
-
-    working_directory: ~/repo
+    executor: publisher
 
     steps:
       # Checkout code.

@@ -59,7 +59,12 @@ setup(
     install_requires=[
         "numpy",
         "scipy",
-        "matplotlib<3.3.0",
+        "matplotlib<3.3.0",  # Version 3.3 caused an error. Details you can find in
+        # docs/matplotlib3.3_pytest_error_log
+        # Actually the mpl_to_plotly feature is considered
+        # deprecated from version 3.3 on. See
+        # https://github.com/plotly/plotly.py/issues/1568
+        # for more details.
         "pandas",
         "osbrain",
         "dash",
@@ -71,6 +76,7 @@ setup(
         "mpld3",
         "mesa",
     ],
+    extras_require={"tutorials": ["notebook",]},
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",

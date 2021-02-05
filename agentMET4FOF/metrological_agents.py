@@ -179,7 +179,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 x_label = f"{t_name} [{t_unit}]"
                 y_label = f"{v_name} [{v_unit}]"
 
-
                 trace = go.Scatter(
                     x=t,
                     y=v,
