@@ -132,8 +132,13 @@ class AgentDashboard:
         return app
 
     def is_port_in_use(self,ip_addr,_port):
+        """Check if desired ip and port are available."""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex((ip_addr, _port)) == 0
+            # Check if connection is possible and shutdown checking connection.
+            if s.connect_ex((ip_addr, _port)) == 0:
+                s.shutdown(socket.SHUT_RDWR)
+                return True
+            return False
 
 
 class AgentDashboardProcess(AgentDashboard, Process):
