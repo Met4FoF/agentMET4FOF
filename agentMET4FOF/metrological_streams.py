@@ -57,7 +57,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         generator_function: Callable = None,
         uncertainty_generator: Callable = None,
         sfreq: int = None,
-        **kwargs: Optional[Dict[str, Any]]
+        **kwargs: Optional[Any]
     ):
         """
         Set value and uncertainty generators based on user-defined functions. By
@@ -149,7 +149,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     sfreq : int, optional
         Sampling frequency which determines the time step when :meth:`.next_sample` is
         called. Defaults to 500.
-    F : int, optional
+    sine_freq : int, optional
         Frequency of the wave function. Defaults to 50.
     device_id : str, optional
         Name of the represented generator. Defaults to 'SineGenerator'.
@@ -175,7 +175,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     def __init__(
         self,
         sfreq: int=500,
-        F: int=50,
+        sine_freq: int=50,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
@@ -200,12 +200,12 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             generator_function=self._sine_wave_function,
             uncertainty_generator=self._uncertainty_generator,
             sfreq=sfreq,
-            F=F,
+            sine_freq=sine_freq,
         )
 
-    def _sine_wave_function(self, time, F):
+    def _sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * F * time) + gauss(0, self.value_unc ** 2)
+        amplitude = np.sin(2 * np.pi * sine_freq * time) + gauss(0, self.value_unc ** 2)
         return amplitude
 
     def _uncertainty_generator(self, _):

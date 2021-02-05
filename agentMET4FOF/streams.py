@@ -168,7 +168,7 @@ class DataStreamMET4FOF():
         return amplitude
 
     def set_generator_function(
-            self, generator_function: Callable = None, sfreq: int = None, **kwargs
+            self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
     ):
         """
         Sets the data source to a generator function. By default, this function resorts
