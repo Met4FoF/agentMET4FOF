@@ -1,9 +1,20 @@
+# IDE clutter #
+###############
 .idea
+venv
+
+# Execution clutter #
+#####################
+__pycache__
 .ipynb_checkpoints
 dataset
 pickles
-venv
-__pycache__
 *.csv
 results/
 *.pkl
+
+# Documentation clutter #
+#########################
+docs/_build
+docs/README.md
+docs/agentMET4FOF_tutorials

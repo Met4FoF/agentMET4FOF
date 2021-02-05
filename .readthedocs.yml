@@ -13,7 +13,7 @@ build:
 
 # Python environment to build the docs for installing the package
 python:
-    version: 3.7
+    version: 3.8
     install:
         - requirements: docs/sphinx-requirements.txt
         - requirements: requirements.txt
