@@ -13,10 +13,6 @@
   <a href="https://pypi.org/project/agentmet4fof">
     <img src="https://img.shields.io/pypi/v/agentmet4fof.svg?label=release&color=blue&style=flat-square" alt="pypi">
   </a>
-  <!-- PePy Downloads -->
-  <a href="https://pepy.tech/project/agentMET4FOF">
-    <img src="https://img.shields.io/badge/dynamic/json?style=flat-square&maxAge=86400&label=downloads&query=%24.total_downloads&url=https%3A%2F%2Fapi.pepy.tech%2Fapi%2Fprojects%2FagentMET4FOF" alt="PePy project downloads">
-  </a>
   <!-- PyPI License -->
   <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
     <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
