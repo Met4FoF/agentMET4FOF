@@ -57,7 +57,7 @@ Starting NameServer...
 Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
 URI = PYRO:Pyro.NameServer@127.0.0.1:3333
-Dashboard running on http://127.0.0.1:8050/
+Visit the agentMET4FOF dashboard on http://127.0.0.1:8050/
 INFO [2021-02-05 18:12:52.277759] (SineGeneratorAgent_1): INITIALIZED
 INFO [2021-02-05 18:12:52.302862] (MonitorAgent_1): INITIALIZED
 [2021-02-05 18:12:52.324078] (SineGeneratorAgent_1): Connected output module: MonitorAgent_1
