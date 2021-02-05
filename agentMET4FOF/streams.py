@@ -114,6 +114,10 @@ class DataStreamMET4FOF():
     def metadata(self):
         return self._metadata
 
+    @property
+    def sample_idx(self):
+        return self._sample_idx
+
     def set_metadata(
             self,
             device_id: str,
