@@ -9,6 +9,8 @@ agentMET4FOF - Metrological Agent-based system
 
    README
    INSTALL
+   UMLs
+   CONTRIBUTING
 
 .. toctree::
    :maxdepth: 1
@@ -28,8 +30,6 @@ agentMET4FOF - Metrological Agent-based system
    agentMET4FOF_metrological_agents
    agentMET4FOF_metrological_streams
    agentMET4FOF_dashboard
-   UMLs
-   CONTRIBUTING
 
 Indices and tables
 ==================
