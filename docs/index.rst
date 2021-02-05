@@ -20,6 +20,8 @@ agentMET4FOF - Metrological Agent-based system
    agentMET4FOF_tutorials/tutorial_2_math_agent.ipynb
    agentMET4FOF_tutorials/tutorial_3_multi_channel.ipynb
    agentMET4FOF_tutorials/tutorial_4_metrological_streams.ipynb
+   agentMET4FOF_tutorials/tutorial_5_coalition.ipynb
+   agentMET4FOF_tutorials/tutorial_6_mesa_backend.ipynb
 
 .. toctree::
    :maxdepth: 1
