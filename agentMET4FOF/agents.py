@@ -21,7 +21,8 @@ from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
-from .streams import DataStreamMET4FOF
+
+from .streams import DataStreamMET4FOF, SineGenerator
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
@@ -1204,7 +1205,6 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
-            from .dashboard.Dashboard import AgentDashboard
             from .dashboard.Dashboard_agt_net import Dashboard_agt_net
             # Initialize common dashboard parameters for both types of dashboards
             # corresponding to different backends.
