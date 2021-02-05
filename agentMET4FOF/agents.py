@@ -137,11 +137,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
-        self.buffer = AgentBuffer(self.buffer_size)
+        self.buffer = self.init_buffer(self.buffer_size)
 
         if self.backend == 'osbrain':
             self.PubAddr_alias = self.name + "_PUB"
             self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias, transport='tcp')
+
+    def init_buffer(self, buffer_size):
+        """
+        A method to initialise the buffer. By overriding this method, user can provide a custom buffer, instead of the regular AgentBuffer.
+        This can be used, for example, to provide a MetrologicalAgentBuffer in the metrological agents.
+        """
+        buffer = AgentBuffer(buffer_size)
+        return buffer
 
     def reset(self):
         """
