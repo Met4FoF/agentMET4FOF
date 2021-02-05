@@ -48,8 +48,8 @@ possible. After the installation go
 In your Python console execute the following to run the first tutorial.
 
 ```python
->>> from agentMET4FOF_tutorials import tutorial_1_generator_agent
->>> tutorial_1_generator_agent.demonstrate_generator_agent_use()
+>>> from agentMET4FOF_tutorials.tutorial_1_generator_agent import demonstrate_generator_agent_use
+>>> generator_agent_network = demonstrate_generator_agent_use()
 ```
 
 ```shell
@@ -57,16 +57,17 @@ Starting NameServer...
 Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
 URI = PYRO:Pyro.NameServer@127.0.0.1:3333
-INFO [2020-02-21 19:04:26.961014] (AgentController): INITIALIZED
-INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
- * Serving Flask app "agentMET4FOF.dashboard.Dashboard" (lazy loading)
- * Environment: production
-   WARNING: This is a development server. Do not use it in a production deployment.
-   Use a production WSGI server instead.
- * Debug mode: off
- * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+Dashboard running on http://127.0.0.1:8050/
+INFO [2021-02-05 18:12:52.277759] (SineGeneratorAgent_1): INITIALIZED
+INFO [2021-02-05 18:12:52.302862] (MonitorAgent_1): INITIALIZED
+[2021-02-05 18:12:52.324078] (SineGeneratorAgent_1): Connected output module: MonitorAgent_1
+SET STATE:   Running
 [...]
 ```
+```python
+>>> generator_agent_network.shutdown()
+```
+
 
 ## 💬About
 
