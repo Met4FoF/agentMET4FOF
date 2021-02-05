@@ -8,6 +8,7 @@ from wsgiref.simple_server import make_server
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import psutil
 
 from .Dashboard_Control import _Dashboard_Control
 
@@ -54,7 +55,7 @@ class AgentDashboard:
 
         """
         super(AgentDashboard, self).__init__()
-        if self.is_port_in_use(ip_addr,port) is False:
+        if self.is_port_available(ip_addr, port):
             if dashboard_modules is not None and dashboard_modules is not False:
 
                 #initialise the dashboard layout and its control here
@@ -69,8 +70,10 @@ class AgentDashboard:
                 self._server = make_server(host=self.ip_addr, port=self.port, app=self.app.server)
 
         else:
-            print("Dashboard is running on: " + ip_addr+":"+str(port))
-        # Ensure we can stop this process later on from outside.
+            print(f"Dashboard or something else is running on: {ip_addr}:{port}. If "
+                  f"you cannot access the dashboard in your browser, try initializing "
+                  f"your agent network with any other port AgentNetwork([...], "
+                  f"port=<OTHER_PORT_THAN_{port}>).")
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
@@ -131,14 +134,23 @@ class AgentDashboard:
                     return [dashboard_layout.get_layout()]
         return app
 
-    def is_port_in_use(self,ip_addr,_port):
+    def is_port_available(self, ip_addr, _port):
         """Check if desired ip and port are available."""
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            # Set timeout to wait for response on ip:port.
+            sock.settimeout(1)
             # Check if connection is possible and shutdown checking connection.
-            if s.connect_ex((ip_addr, _port)) == 0:
-                s.shutdown(socket.SHUT_RDWR)
-                return True
-            return False
+            # Presumably this means, that a dashboard is running.
+            if sock.connect_ex((ip_addr, _port)) == 0:
+                sock.shutdown(socket.SHUT_RDWR)
+                return False
+            # So no dashboard seems to running. Here we check, if anything else is
+            # running on that port.
+            for connection in psutil.net_connections():
+                if connection.laddr.port == _port and connection.laddr.ip == ip_addr:
+                    return False
+            # Seems as if, we can actually start our dashboard server.
+            return True
 
 
 class AgentDashboardProcess(AgentDashboard, Process):
@@ -177,11 +189,13 @@ class AgentDashboardThread(AgentDashboard, Thread):
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
-        super().run()
-        # Make sure, we are actually able to stop the server running from outside.
-        while not self._supposed_to_run:
-            sleep(9)
-        return 0
+        if hasattr(self, "_server"):
+            super().run()
+            # Make sure, we are actually able to stop the server running from outside.
+            while not self._supposed_to_run:
+                sleep(9)
+            return 0
+        return 1
 
     def terminate(self):
         """This is shutting down the application server serving the web interface"""
