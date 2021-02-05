@@ -659,7 +659,7 @@ class AgentBuffer():
         """
         self.buffer = {}
         self.buffer_size = buffer_size
-        self.supported_datatype = (list, pd.DataFrame, np.ndarray)
+        self.supported_datatype = [list, pd.DataFrame, np.ndarray]
 
     def __getitem__(self, key):
         return self.buffer[key]
