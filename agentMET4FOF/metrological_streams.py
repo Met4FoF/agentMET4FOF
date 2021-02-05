@@ -1,4 +1,5 @@
 import warnings
+from random import gauss
 from typing import Any, Callable, Tuple
 
 import numpy as np
@@ -134,6 +135,10 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         This parameter can take any additional metadata which will be handed over to
         the corresponding attribute of the created :class:`Metadata` object. Defaults to
         'Simple sine wave generator'.
+    value_unc : iterable of floats or float, optional
+        standard uncertainty(ies) of the quantity values. Defaults to 0.5.
+    time_unc : iterable of floats or float, optional
+        standard uncertainty of the time stamps. Defaults to 0.
     """
 
     def __init__(
@@ -146,6 +151,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         quantity_names=("Voltage"),
         quantity_units=("V"),
         misc="Simple sine wave generator",
+        value_unc=0.5,
+        time_unc=0,
     ):
         super().__init__()
         self.set_metadata(
@@ -156,11 +163,20 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             quantity_units=quantity_units,
             misc=misc,
         )
+        self.value_unc = value_unc
+        self.time_unc = time_unc
         self.set_generator_function(
-            generator_function=self.sine_wave_function, sfreq=sfreq, F=F
+            generator_function=self._sine_wave_function,
+            uncertainty_generator=self._uncertainty_generator,
+            sfreq=sfreq,
+            F=F,
         )
 
-    def sine_wave_function(self, time, F=50):
+    def _sine_wave_function(self, time, F):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * F * time)
+        amplitude = np.sin(2 * np.pi * F * time) + gauss(0, self.value_unc ** 2)
         return amplitude
+
+    def _uncertainty_generator(self, _):
+        """A simple uncertainty generator"""
+        return self.time_unc ** 2, self.value_unc ** 2

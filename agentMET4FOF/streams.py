@@ -263,38 +263,38 @@ class SineGenerator(DataStreamMET4FOF):
     """
     Built-in class of sine wave generator.
     `sfreq` is sampling frequency which determines the time step when next_sample is called
-    `F` is frequency of wave function
+    `sine_freq` is frequency of wave function
     `sine_wave_function` is a custom defined function which has a required keyword
     `time` as argument and any number of optional additional arguments (e.g `F`).
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+    def __init__(self, sfreq = 500, sine_freq=5):
         super().__init__()
         self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
+        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, sine_freq=sine_freq)
 
-    def sine_wave_function(self, time, F=50):
-        amplitude = np.sin(2*np.pi*F*time)
+    def sine_wave_function(self, time, sine_freq=50):
+        amplitude = np.sin(2 * np.pi * sine_freq * time)
         return amplitude
 
 class CosineGenerator(DataStreamMET4FOF):
     """
     Built-in class of cosine wave generator.
     `sfreq` is sampling frequency which determines the time step when next_sample is
-    called `F` is frequency of wave function `cosine_wave_function` is a custom
+    called `cosine_freq` is frequency of wave function `cosine_wave_function` is a custom
     defined function which has a required keyword `time` as argument and any number
     of optional additional arguments (e.g `F`).to be supplied to the
     `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+    def __init__(self, sfreq = 500, cosine_freq=5):
         super().__init__()
         self.set_metadata("CosineGenerator","time","s",("Voltage"),("V"),"Simple cosine wave generator")
-        self.set_generator_function(generator_function=self.cosine_wave_function, sfreq=sfreq, F=F)
+        self.set_generator_function(generator_function=self.cosine_wave_function, sfreq=sfreq, cosine_freq=cosine_freq)
 
-    def cosine_wave_function(self, time, F=50):
-        amplitude = np.cos(2*np.pi*F*time)
+    def cosine_wave_function(self, time, cosine_freq=50):
+        amplitude = np.cos(2 * np.pi * cosine_freq * time)
         return amplitude
 
 def extract_x_y(message):
