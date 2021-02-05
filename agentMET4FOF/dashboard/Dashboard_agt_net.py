@@ -1,6 +1,4 @@
-import sys
 import warnings
-from collections import Iterable
 
 import dash
 import dash_core_components as dcc
@@ -9,14 +7,15 @@ import dash_html_components as html
 import networkx as nx
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
-from time_series_metadata.scheme import MetaData
 
 from . import LayoutHelper
-from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
-    create_nodes_cytoscape
-from .. import agents as agentmet4fof_module
-
 from .Dashboard_layout_base import Dashboard_Layout_Base
+from .LayoutHelper import (
+    create_edges_cytoscape,
+    create_monitor_graph,
+    create_nodes_cytoscape,
+)
+from .. import agents as agentmet4fof_module
 
 
 class Dashboard_agt_net(Dashboard_Layout_Base):

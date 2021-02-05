@@ -1,5 +1,6 @@
 import warnings
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from random import gauss
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -163,21 +164,26 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         An iterable of units for the quantities' values. Defaults to ('V')
     misc : Any, optional
         This parameter can take any additional metadata which will be handed over to
-        the corresponding attribute of the created
-        :class:`time_series_metadata.scheme.MetaData` object. Defaults to 'Simple sine
-        wave generator'.
+        the corresponding attribute of the created :class:`Metadata` object. Defaults to
+        'Simple sine wave generator'.
+    value_unc : iterable of floats or float, optional
+        standard uncertainty(ies) of the quantity values. Defaults to 0.5.
+    time_unc : iterable of floats or float, optional
+        standard uncertainty of the time stamps. Defaults to 0.
     """
 
     def __init__(
         self,
-        sfreq: int = 500,
-        F: int = 50,
+        sfreq: int=500,
+        F: int=50,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
         quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
         quantity_units: Union[str, Tuple[str, ...]] = "V",
         misc: Optional[Any] = "Simple sine wave generator",
+        value_unc: Union[float, Iterable[float]] = 0.5,
+        time_unc: Union[float, Iterable[float]] = 0,
     ):
         super().__init__()
         self.set_metadata(
@@ -188,11 +194,20 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             quantity_units=quantity_units,
             misc=misc,
         )
+        self.value_unc = value_unc
+        self.time_unc = time_unc
         self.set_generator_function(
-            generator_function=self.sine_wave_function, sfreq=sfreq, F=F
+            generator_function=self._sine_wave_function,
+            uncertainty_generator=self._uncertainty_generator,
+            sfreq=sfreq,
+            F=F,
         )
 
-    def sine_wave_function(self, time, F=50):
+    def _sine_wave_function(self, time, F):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * F * time)
+        amplitude = np.sin(2 * np.pi * F * time) + gauss(0, self.value_unc ** 2)
         return amplitude
+
+    def _uncertainty_generator(self, _):
+        """A simple uncertainty generator"""
+        return self.time_unc ** 2, self.value_unc ** 2
