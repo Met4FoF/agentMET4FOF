@@ -194,8 +194,12 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         return trace
 
 class MetrologicalAgentBuffer(AgentBuffer):
+    def __init__(self, buffer_size=1000):
+        super(MetrologicalAgentBuffer, self).__init__(buffer_size)
+        self.supported_datatype.append(TimeSeriesBuffer)
+
     def convert_single_to_tsbuffer(self, single_data):
-        ts = TimeSeriesBuffer()
+        ts = TimeSeriesBuffer(maxlen=self.buffer_size)
         ts.add(single_data)
         return ts
 
@@ -233,8 +237,9 @@ class MetrologicalAgentBuffer(AgentBuffer):
             self.update(message_from, message_data)
             return 0
         else:
-            self._concatenate(self.buffer[message_from])
+            self._concatenate(iterable=self.buffer[message_from],data=message_data, concat_axis=concat_axis)
 
     def _concatenate(self, iterable, data, concat_axis=0):
         iterable.add(data)
         return iterable
+
