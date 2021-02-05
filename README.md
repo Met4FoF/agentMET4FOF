@@ -116,7 +116,7 @@ dashboard is printed to the console on every launch of an agent network.
 The following image is close to what you will find in your browser on execution of
 tutorial 2. For details on the tutorials visit our [video tutorial series](#video-tutorial-series).
 
-![Web Screenshot](https://raw.githubusercontent.com/bangxiangyong/agentMET4FOF/docs/%23157_simplify_readme/docs/screenshot_met4fof.png)
+![Web Screenshot](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
 ## 📖Documentation and video tutorials
 
@@ -146,7 +146,7 @@ The installation of agentMET4FOF is as straightforward as the Python
 ecosystem suggests. In the [video tutorials series](#video-tutorial-series)
 we guide you through every step until you have agentMET4FOF running on 
 your machine. Besides that we have more details in the [installation 
-section of the docs](https://agentmet4fof.readthedocs.io/en/docs-157_simplify_readme/INSTALL.html).
+section of the docs](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html).
 
 ## 💨Coming soon
 

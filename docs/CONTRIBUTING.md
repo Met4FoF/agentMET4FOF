@@ -94,7 +94,7 @@ In case you add a new feature you generally follow the pattern:
   module in the _tests_ subdirectory with the same name prefixed by _test__
 - if new dependencies are introduced, add them to _setup.py_ or _dev-requirements.in_
 - during development write tests in alignment with existing test modules, for example
-  [_test_addremove_metrological_agents_](https://github.com/Met4FoF/agentMET4FOF/blob/docs/%23157_simplify_readme/tests/test_addremove_metrological_agents.py)
+  [_test_addremove_metrological_agents_](https://github.com/Met4FoF/agentMET4FOF/blob/develop/tests/test_addremove_metrological_agents.py)
 - write docstrings in the
   [NumPy docstring format](https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard)
 - as early as possible create a draft pull request onto the upstream's _develop_
