@@ -70,19 +70,36 @@ INFO [2020-02-21 19:04:27.032258] (Logger): INITIALIZED
 
 ## 💬About
 
-Sensor deployments in industrial applications usually form networks in all sorts of environments. This requires a flexible framework for the implementation of the corresponding data analysis. An excellent way to represent such networks is a multi-agent system (MAS), where independent software modules (agents) encapsulate properties and functionalities. agentMET4FOF is an interactive and flexible open-source implementation of such a MAS. The software engineering process is driven by several industry-oriented use cases with the aim of impacting on IIoT applications. This leads to a framework that is specialized in representing heterogeneous sensor networks.
-
-A special emphasize is put on supporting metrological treatment of sensor streaming data. This includes the consideration of measurement uncertainties during data analyses and processing as well as propagating metadata alongside the data itself. 
-
+<p align="justify">
+Sensor deployments in industrial applications usually form networks in all sorts of
+environments. This requires a flexible framework for the implementation of the
+corresponding data analysis. An excellent way to represent such networks is a
+multi-agent system (MAS), where independent software modules (agents) encapsulate
+properties and functionalities. agentMET4FOF is an interactive and flexible open-source
+implementation of such a MAS. The software engineering process is driven by several
+industry-oriented use cases with the aim of impacting on IIoT applications. This leads
+to a framework that is specialized in representing heterogeneous sensor networks.
+</p>
+<p align="justify">
+A special emphasize is put on supporting metrological treatment of sensor streaming
+data. This includes the consideration of measurement uncertainties during data analyses
+and processing as well as propagating metadata alongside the data itself.
+</p>
+<p align="justify">
 One of the many questions that drive us in the project is:
-
-> How can metrological input be incorporated into an agent-based system for addressing uncertainty of machine learning in future manufacturing?
+</p>
+<p align="justify">
+  <cite>
+  How can metrological input be incorporated into an agent-based system for addressing
+  uncertainty of machine learning in future manufacturing?
+  </cite>
+</p>
 
 ## 📈The agentMET4FOF dashboard
 
-agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component 
-of every agent network and provides a web browser based view. You can 
-observe the state of your agents, modify the connections between them and even add 
+agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component
+of every agent network and provides a web browser based view. You can
+observe the state of your agents, modify the connections between them and even add
 more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
