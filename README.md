@@ -43,9 +43,7 @@ in the section <a href="#about">About</a>.
 ## 💫Quickstart
 
 agentMET4FOF comes bundled with some tutorials to get you started as quick as
-possible. After the installation go
-
-In your Python console execute the following to run the first tutorial.
+possible. In your Python console execute the following to run the first tutorial.
 
 ```python
 >>> from agentMET4FOF_tutorials.tutorial_1_generator_agent import demonstrate_generator_agent_use
