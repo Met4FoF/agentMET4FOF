@@ -90,7 +90,7 @@ to a framework that is specialized in representing heterogeneous sensor networks
 </p>
 <p align="justify">
 A special emphasize is put on supporting metrological treatment of sensor streaming
-data. This includes the consideration of measurement uncertainties during data analyses
+data. This includes the consideration of measurement uncertainties during data analysis
 and processing as well as propagating metadata alongside the data itself.
 </p>
 <p align="justify">
