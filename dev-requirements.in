@@ -1,3 +1,5 @@
+-c requirements.txt
+
 pytest
 pytest-cov
 pytest-timeout

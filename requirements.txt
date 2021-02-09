@@ -85,7 +85,7 @@ networkx==2.5
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
-numpy==1.20.0
+numpy==1.20.1
     # via
     #   agentMET4FOF (setup.py)
     #   matplotlib
@@ -95,7 +95,7 @@ numpy==1.20.0
     #   time-series-buffer
 osbrain==0.6.5
     # via agentMET4FOF (setup.py)
-pandas==1.2.1
+pandas==1.2.2
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
@@ -105,6 +105,8 @@ plotly==4.14.3
     #   dash
 poyo==0.5.0
     # via cookiecutter
+psutil==5.8.0
+    # via agentMET4FOF (setup.py)
 pyparsing==2.4.7
     # via matplotlib
 pyro4==4.80
