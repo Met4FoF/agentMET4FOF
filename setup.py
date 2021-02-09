@@ -79,7 +79,7 @@ setup(
         "psutil",
     ],
     extras_require={"tutorials": ["notebook", "PyDynamic"]},
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
