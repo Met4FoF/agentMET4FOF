@@ -78,8 +78,7 @@ commands:
         name: Run tests
         command: |
           source venv/bin/activate
-          pytest -v --junitxml=test-reports/pytest.xml --cov=. . | tee \
-              test-reports/agentMET4FOF.log
+          tox | tee --append test-reports/agentMET4FOF.log
 
     # Upload coverage report if the according parameter is set to `true`.
     - when:
@@ -160,7 +159,7 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            pytest -v --junitxml=test-reports/junit.xml . | tee test-reports/pytest.log
+            tox | tee --append test-reports/agentMET4FOF.log
 
       - store_test_artifacts_and_results
 
