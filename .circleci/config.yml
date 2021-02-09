@@ -211,7 +211,7 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v4-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
             - v4-venv-dependencies-
 
@@ -227,7 +227,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v4-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
       - run_venv_tests
