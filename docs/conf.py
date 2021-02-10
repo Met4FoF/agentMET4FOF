@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.intersphinx",
     "nbsphinx",
     "recommonmark",
 ]
@@ -46,7 +47,20 @@ extensions = [
 # https://sphinx-rtd-theme.readthedocs.io/en/latest/configuring.html
 html_theme_options = {
     # True hides the + signs to expand the menu entries in the sidebar.
-    'collapse_navigation': False,
+    "collapse_navigation": False,
+}
+
+# This should make SciPy documentation available inside our docs.
+intersphinx_mapping = {
+    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": (
+        "https://pydynamic.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-metadata": (
+        "https://time-series-metadata.readthedocs.io/en/latest/",
+        None,
+    ),
 }
 
 nbsphinx_allow_errors = True
@@ -73,20 +87,15 @@ def make_path_dict(source: str, destination: str) -> dict:
 
 
 # Set up all paths for source and destination folders.
-examples_source = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "examples")
-)
 tutorials_source = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "agentMET4FOF_tutorials")
 )
-examples_dest = os.path.abspath(os.path.join(os.path.dirname(__file__), "examples"))
 tutorials_dest = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "agentMET4FOF_tutorials")
 )
 
 # Assemble the list of dicts of all source and destination folders to copy.
 path_dicts = [
-    make_path_dict(examples_source, examples_dest),
     make_path_dict(tutorials_source, tutorials_dest),
 ]
 
@@ -124,8 +133,14 @@ master_doc = "index"
 
 # General information about the project.
 project = "agentMET4FOF"
-copyright = "2019, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Haris Lulic (" "PTB)"
-author = "Bang Xiang Yong, Björn Ludwig, Haris Lulic"
+copyright = (
+    "2021, Bang Xiang Yong (UCAM), Björn Ludwig (PTB), Anupam Prasad Vedurmudi (PTB), "
+    "Maximilian Gruber (PTB), Haris Lulic (IMBIH)"
+)
+author = (
+    "Bang Xiang Yong, Björn Ludwig, Anupam Prasad Vedurmudi, Maximilian Gruber, "
+    "Haris Lulic"
+)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

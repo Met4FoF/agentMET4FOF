@@ -78,8 +78,7 @@ commands:
         name: Run tests
         command: |
           source venv/bin/activate
-          pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
-              test-reports/agentMET4FOF.log
+          tox | tee --append test-reports/agentMET4FOF.log
 
     # Upload coverage report if the according parameter is set to `true`.
     - when:
@@ -135,7 +134,7 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v1-conda-dependencies-
 
-      # Create environment.
+      # Create environment and install extra_requires dependencies manually.
       - run:
           name: Create or update environment
           command: |
@@ -144,6 +143,8 @@ jobs:
             else
                 conda env create -f environment.yml
             fi
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
 
       - save_cache:
           paths:
@@ -157,13 +158,13 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            pytest -v --junitxml=test-reports/junit.xml . > test-reports/pytest.log
+            tox | tee --append test-reports/agentMET4FOF.log
 
       - store_test_artifacts_and_results
 
 
   # Define one 'test' job to run their test suites against the
-  # installed dependencies from the environment.yml.
+  # installed dependencies from the setup.py.
   test_against_setup:
 
     executor: tester
@@ -175,9 +176,9 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v1-setup-dependencies-
+            - v2-setup-dependencies-
 
       # Install dependencies.
       - run:
@@ -185,14 +186,13 @@ jobs:
           command: |
             python3 -m venv venv
             source venv/bin/activate
-            pip install --upgrade pip wheel
-            pip install . -r dev-requirements.txt
+            pip install --upgrade tox
 
       - save_cache:
           paths:
             - ./venv
           key: >-
-            v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner and request to send coverage report.
       - run_venv_tests:
@@ -211,24 +211,23 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v3-venv-dependencies-
+            - v4-venv-dependencies-
 
-      # Install dependencies.
+      # Install dependencies and extra_requires dependencies manually.
       - run:
           name: Install dependencies
           command: |
             python3 -m venv venv
             source venv/bin/activate
-            pip install --upgrade pip pip-tools
-            pip-sync dev-requirements.txt requirements.txt
+            pip install --upgrade pip tox
 
       - save_cache:
           paths:
             - ./venv
           key: >-
-            v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
       - run_venv_tests

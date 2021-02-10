@@ -11,8 +11,8 @@ from dash.exceptions import PreventUpdate
 from . import LayoutHelper
 from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
     create_nodes_cytoscape, get_param_dash_component, extract_param_dropdown
-
 from .Dashboard_layout_base import Dashboard_Layout_Base
+
 
 class Dashboard_agt_net(Dashboard_Layout_Base):
     def set_layout_name(self, id="agt-net", title="Agent Network"):

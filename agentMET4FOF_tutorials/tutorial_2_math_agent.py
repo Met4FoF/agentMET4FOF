@@ -1,6 +1,4 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
-
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, SineGeneratorAgent
 
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
@@ -35,20 +33,6 @@ class MultiMathAgent(AgentMET4FOF):
     @staticmethod
     def plus(summand_1: float, summand_2: float) -> float:
         return summand_1 + summand_2
-
-
-class SineGeneratorAgent(AgentMET4FOF):
-
-    _stream: SineGenerator
-
-    def init_parameters(self):
-        self._stream = SineGenerator()
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            sine_data = self._stream.next_sample()  # dictionary
-            self.send_output(sine_data["quantities"])
-
 
 def main():
     # start agent network server
