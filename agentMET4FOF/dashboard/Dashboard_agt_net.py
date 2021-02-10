@@ -5,13 +5,9 @@ import dash_core_components as dcc
 import dash_cytoscape as cyto
 import dash_html_components as html
 import networkx as nx
-import visdcc
-
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
-
-import agentMET4FOF_ml_extension.agentMET4FOF_ml_extension.ML_Experiment as ml_exp_class
 from . import LayoutHelper
 from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
     create_nodes_cytoscape, get_param_dash_component, extract_param_dropdown
@@ -191,7 +187,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         html.P(id="disconnect_placeholder", className="black-text", children=" "),
                         html.P(id="monitor_placeholder", className="black-text", children=" "),
                         html.P(id="mpld3_placeholder", className="black-text", children=" "),
-                        visdcc.Run_js(id='toast-js-script')
+                        # visdcc.Run_js(id='toast-js-script')
                     ])
 
                 ])
@@ -212,14 +208,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 interval=update_interval_seconds * 1000,  # in milliseconds
                 n_intervals=0
             ),
-            dcc.Interval(
-                id='interval-update-toast',
-                interval=1 * 1000,  # in milliseconds
-                n_intervals=0
-            )
+
         ])
 
     def prepare_callbacks(self, app):
+
+
         # Update network graph per interval
         @app.callback([dash.dependencies.Output('agents-network', 'elements'),
                        dash.dependencies.Output('connect-modules-dropdown', 'options')],
@@ -304,7 +298,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def start_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.set_running_state()
-                raise_toast("Set agents state : %s !" % "Running")
+                app.raise_toast("Set agents state : %s !" % "Running")
             raise PreventUpdate
 
         # Stop button click
@@ -314,7 +308,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def stop_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.set_stop_state()
-                raise_toast("Set agents state : %s !" % "Stop")
+                app.raise_toast("Set agents state : %s !" % "Stop")
             raise PreventUpdate
 
         # Handle click of the reset button.
@@ -325,7 +319,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         def reset_button_click(n_clicks):
             if n_clicks is not None:
                 app.dashboard_ctrl.agentNetwork.reset_agents()
-                raise_toast("Reset agent states !")
+                app.raise_toast("Reset agent states !")
             raise PreventUpdate
 
 
@@ -365,7 +359,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 agentTypes = app.dashboard_ctrl.get_agentTypes()
                 init_params_kwargs = extract_param_dropdown(init_params_div)
                 new_agent = app.dashboard_ctrl.agentNetwork.add_agent(name=init_name_input, agentType=agentTypes[add_dropdown_val], **init_params_kwargs)
-                raise_toast("Spawned new agent : %s !" % init_name_input)
+                app.raise_toast("Spawned new agent : %s !" % init_name_input)
             raise PreventUpdate
 
         # Add agent button click
@@ -377,7 +371,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # for add agent button click
             if n_clicks is not None and current_agent_id != "Not selected":
                 app.dashboard_ctrl.agentNetwork.remove_agent(current_agent_id)
-                raise_toast("Removed agent : %s !" % current_agent_id)
+                app.raise_toast("Removed agent : %s !" % current_agent_id)
             raise PreventUpdate
 
         # Add coalition button click
@@ -387,23 +381,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                        ]
                       )
         def add_coalition_button_click(n_clicks, coalition_name):
-            # for add agent button click
-            # def add_ml_experiment(self, name="MLEXP_1", agents=[]):
-            #     """
-            #     Instantiates a coalition of agents.
-            #     """
-            #     new_ml_exp = ml_exp_class.ML_Experiment(name, agents)
-            #     self._get_controller().add_coalition(new_ml_exp)
-            #     return new_ml_exp
-
             agentNetwork = app.dashboard_ctrl.agentNetwork
-            # agentNetwork.add_ml_experiment = add_ml_experiment
 
             if n_clicks is not None:
                 if coalition_name != "":
-                    # new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
-                    new_coalition = agentNetwork.add_ml_experiment(name=coalition_name)
-                    raise_toast("Created new coalition : %s !" % coalition_name)
+                    new_coalition = app.dashboard_ctrl.agentNetwork.add_coalition(name=coalition_name)
+                    app.raise_toast("Created new coalition : %s !" % coalition_name)
             return [""]
 
 
@@ -422,12 +405,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     if current_agent_id != dropdown_value:
                         agentNetwork.bind_agents(agentNetwork.get_agent(current_agent_id),
                                                  target_agent)
-                        raise_toast("Connected %s to %s !" % (current_agent_id, target_agent.name))
+                        app.raise_toast("Connected %s to %s !" % (current_agent_id, target_agent.name))
                 # otherwise, selected is a coalition
                 # add it into coalition
                 else:
                     agentNetwork.add_coalition_agent(name=current_agent_id, agents=[target_agent])
-                    raise_toast("%s joined %s coalition !" % (target_agent.name, current_agent_id))
+                    app.raise_toast("%s joined %s coalition !" % (target_agent.name, current_agent_id))
 
             raise PreventUpdate
 
@@ -447,12 +430,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     if current_agent_id != dropdown_value:
                         agentNetwork.unbind_agents(agentNetwork.get_agent(current_agent_id),
                                                  target_agent)
-                        raise_toast("Disconnected %s from %s !" % (current_agent_id, target_agent.name))
+                        app.raise_toast("Disconnected %s from %s !" % (current_agent_id, target_agent.name))
                 # otherwise, selected is a coalition
                 # remove it from coalition
                 else:
                     agentNetwork.remove_coalition_agent(coalition_name=current_agent_id, agent_name=target_agent.name)
-                    raise_toast("%s removed from %s coalition !" % (target_agent.name, current_agent_id))
+                    app.raise_toast("%s removed from %s coalition !" % (target_agent.name, current_agent_id))
             raise PreventUpdate
 
         @app.callback([dash.dependencies.Output('selected-node', 'children'),
@@ -702,17 +685,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # set dimensions of each monitor agent's graph
             return [all_graphs]
 
-        @app.callback(
-            dash.dependencies.Output('toast-js-script', 'run'),
-            [dash.dependencies.Input('interval-update-toast', 'n_intervals')])
-        def myfun(n_intervals):
-            # if there are messages in toast contents to be displayed
-            if hasattr(app, "toast_contents") and len(app.toast_contents) > 0:
-                # pop toast contents
-                return "M.toast({html: '%s'})" % app.toast_contents.pop(0)
 
-            else:
-                return ""
 
         app.clientside_callback(
             ClientsideFunction(
@@ -723,9 +696,5 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             [dash.dependencies.Input('matplotlib-division', 'children')]
         )
 
-        app.toast_contents = []
-
-        def raise_toast(message, app=app):
-            app.toast_contents.append(message)
 
         return app

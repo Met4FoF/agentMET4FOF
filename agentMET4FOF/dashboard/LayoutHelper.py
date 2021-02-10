@@ -129,3 +129,7 @@ def extract_param_dropdown(params_div):
             if 'value' in div['props'].keys():
                 init_params.update({div['props']['placeholder']:div['props']['value']})
     return init_params
+
+
+def raise_toast(message, app):
+    app.toast_contents.append(message)

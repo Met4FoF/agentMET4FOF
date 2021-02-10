@@ -3,8 +3,10 @@ import socket
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+import visdcc
 
 from .Dashboard_Control import _Dashboard_Control
+from .LayoutHelper import raise_toast
 
 
 class AgentDashboard:
@@ -93,8 +95,14 @@ class AgentDashboard:
                     html.Div([
                         html.A("Distributed Quality Analytics Testbed", className="brand-logo center"),
                         html.Ul([
-                        ], className="right hide-on-med-and-down")
+                        ], className="right hide-on-med-and-down"),
+                        visdcc.Run_js(id='toast-js-script'),
+                        dcc.Interval(id='interval-update-toast',
+                                     interval=1 * 1000,  # in milliseconds
+                                     n_intervals=0
+                                     )
                     ], className="nav-wrapper container")
+
                 ], className="light-blue lighten-1"),
                 dcc.Tabs(id="main-tabs", value="agt-net", children=[
                     dashboard_layout.dcc_tab for dashboard_layout in self.dashboard_layouts
@@ -102,7 +110,25 @@ class AgentDashboard:
                 html.Div(id="page-div",children=[
                 dashboard_layout.get_layout() for dashboard_layout in self.dashboard_layouts
                 ]),
+
         ])
+
+        app.toast_contents = []
+        def raise_toast_(message, app=app):
+            raise_toast(message,app=app)
+        app.raise_toast = raise_toast_
+
+        @app.callback(
+            dash.dependencies.Output('toast-js-script', 'run'),
+            [dash.dependencies.Input('interval-update-toast', 'n_intervals')])
+        def myfun(n_intervals):
+            # if there are messages in toast contents to be displayed
+            if hasattr(app, "toast_contents") and len(app.toast_contents) > 0:
+                # pop toast contents
+                return "M.toast({html: '%s'})" % app.toast_contents.pop(0)
+
+            else:
+                return ""
 
         for dashboard_layout in self.dashboard_layouts:
             dashboard_layout.prepare_callbacks(app)
