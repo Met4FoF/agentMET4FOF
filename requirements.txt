@@ -4,6 +4,7 @@
 #
 #    pip-compile
 #
+pathos == 0.2.7
 arrow==0.17.0
     # via jinja2-time
 binaryornot==0.4.4
