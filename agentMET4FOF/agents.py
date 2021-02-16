@@ -21,7 +21,7 @@ from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
-
+from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF, SineGenerator
 
@@ -1078,9 +1078,12 @@ class _AgentController(AgentMET4FOF):
         edges = []
         for agent_name in agent_names:
             temp_agent = self.get_agent(agent_name)
-            temp_output_connections = list(temp_agent.get_attr('Outputs').keys())
-            for output_connection in temp_output_connections:
-                edges += [(agent_name, output_connection)]
+            output_agent_channels = temp_agent.get_attr('Outputs_agent_channels')
+            temp_output_agents = list(output_agent_channels.keys())
+            temp_output_channels = list(output_agent_channels.values())
+
+            for output_agent_name, output_agent_channel in zip(temp_output_agents,temp_output_channels):
+                edges += [(agent_name, output_agent_name, {"channel":str(output_agent_channel)})]
         return edges
 
     def _get_logger(self):
@@ -1138,7 +1141,7 @@ class AgentNetwork:
 
     def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv",
                  dashboard_modules=True, dashboard_extensions=[], dashboard_update_interval=3,
-                 dashboard_max_monitors=10, dashboard_port=8050, backend="osbrain", mesa_update_interval=0.1):
+                 dashboard_max_monitors=10, dashboard_port=8050, backend="osbrain", mesa_update_interval=0.1, network_stylesheet = default_agent_network_stylesheet, **dashboard_kwargs):
         """
         Parameters
         ----------
@@ -1161,6 +1164,8 @@ class AgentNetwork:
             Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the each Monitor Agent will occupy one of these figures.
         dashboard_port: int
             Port of the dashboard to be hosted on. By default is port 8050.
+        **dashboard_kwargs
+            Additional key words to be passed in initialising the dashboard
         """
 
 
@@ -1211,7 +1216,10 @@ class AgentNetwork:
                 "ip_addr": ip_addr,
                 "port": dashboard_port,
                 "agentNetwork": self,
+                "network_stylesheet":network_stylesheet
             }
+            dashboard_params.update(dashboard_kwargs)
+
             # Initialize dashboard process/thread.
             if self.backend == "osbrain":
                 from .dashboard.Dashboard import AgentDashboardProcess
@@ -1332,7 +1340,7 @@ class AgentNetwork:
 
     def get_nodes_edges(self):
         G = self.get_networkx()
-        return G.nodes, G.edges
+        return G.nodes, G.edges(data=True)
 
     def get_nodes(self):
         G = self.get_networkx()

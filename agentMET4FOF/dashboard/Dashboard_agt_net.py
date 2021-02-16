@@ -27,7 +27,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         return [dcc.Graph(id='monitors-graph-' + str(i), figure={}, style={'height': '90vh'}) for i in
                 range(num_monitors)]
 
-    def get_layout(self, update_interval_seconds=3, num_monitors=10):
+    def get_layout(self):
         # body
         return html.Div(className="row", children=[
 
@@ -57,57 +57,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                             layout={'name': 'breadthfirst'},
                             style={'width': '100%', 'height': '600px'},
                             elements=[],
-                            stylesheet=[
-                                {'selector': 'node', 'style':
-                                    {'label': 'data(id)',
-                                     'shape': 'rectangle'}
-                                 },
-                                {'selector': 'edge',
-                                 'style': {'curve-style': 'bezier', 'mid-target-arrow-shape':
-                                     'triangle', 'arrow-scale': 2, 'line-color': '#4287f5',
-                                           'mid-target-arrow-color': '#4287f5'},
-                                 },
-                                {
-                                    'selector': '.rectangle',
-                                    'style': {
-                                        'shape': 'rectangle'
-                                    }
-                                },
-                                {
-                                    'selector': '.triangle',
-                                    'style': {
-                                        'shape': 'triangle'
-                                    }
-                                },
-                                {
-                                    'selector': '.octagon',
-                                    'style': {
-                                        'shape': 'octagon'
-                                    }
-                                },
-                                {
-                                    'selector': '.ellipse',
-                                    'style': {
-                                        'shape': 'ellipse'
-                                    }
-                                },
-                                {
-                                    'selector': '.bluebackground',
-                                    'style': {
-                                        'background-color': '#c4fdff'
-                                    }
-                                },
-                                {
-                                    'selector': '.blue',
-                                    'style': {
-                                        'background-color': '#006db5'
-                                    }
-                                },
-                                {
-                                    'selector': '.coalition',
-                                    'style': {'line-style': 'dashed'}
-                                },
-                            ]
+                            stylesheet=self.app.network_stylesheet
 
                         )
 
@@ -116,7 +66,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 ]),
                 html.H5(className="card", id="matplotlib-division", children=" "),
                 html.Div(className="card", id="monitors-temp-division",
-                         children=self.get_multiple_graphs(num_monitors)),
+                         children=self.get_multiple_graphs(self.app.num_monitors)),
 
             ]),
 
@@ -175,7 +125,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             ]),
             dcc.Interval(
                 id='interval-component-network-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
+                interval=self.app.update_interval_seconds * 1000,  # in milliseconds
                 n_intervals=0
             ),
             dcc.Interval(
@@ -185,7 +135,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             ),
             dcc.Interval(
                 id='interval-update-monitor-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
+                interval=self.app.update_interval_seconds * 1000,  # in milliseconds
                 n_intervals=0
             )
         ])
@@ -216,7 +166,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 new_G.add_edges_from(edges)
 
                 nodes_elements = create_nodes_cytoscape(new_G)
-                edges_elements = create_edges_cytoscape(edges)
+                edges_elements = create_edges_cytoscape(edges, app.hide_default_edge)
                 # print(edges_elements)
                 # draw coalition nodes, and assign child nodes to coalition nodes
                 if len(agentNetwork.coalitions) > 0:
