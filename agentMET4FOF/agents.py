@@ -129,6 +129,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         self.Inputs = {}
         self.Outputs = {}
+        self.Outputs_agent_channels = {} #keep track of agent subscription channels
         self.AgentType = type(self).__name__
         self.log_mode = log_mode
         self.log_info("INITIALIZED")
@@ -370,10 +371,18 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         packed_data = self.pack_data(data, channel=channel)
 
         if self.backend == "osbrain":
-            self.send(self.PubAddr, packed_data, topic='data')
+            self.send(self.PubAddr, packed_data, topic=channel)
+
         elif self.backend == "mesa":
             for key, value in self.Outputs.items():
-                value.mesa_message_queue.append(packed_data)
+                # if output agent has subscribed to a list of channels,
+                # we check whether `channel` is subscribed in that list
+                # if it is, then we append to that agent's message queue
+                if isinstance(self.Outputs_agent_channels[key], list):
+                    if channel in self.Outputs_agent_channels[key]:
+                        value.mesa_message_queue.append(packed_data)
+                elif channel == self.Outputs_agent_channels[key]:
+                    value.mesa_message_queue.append(packed_data)
         duration_time_pack = round(time.time() - start_time_pack, 6)
 
         # LOGGING
@@ -449,7 +458,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         end_time_pack = time.time()
         self.log_info("Tproc: " + str(round(end_time_pack - start_time_pack, 6)))
 
-    def bind_output(self, output_agent):
+    def bind_output(self, output_agent, channel="default"):
         """
         Forms Output connection with another agent. Any call on send_output will reach this newly binded agent
 
@@ -460,40 +469,58 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         output_agent : AgentMET4FOF or list
             Agent(s) to be binded to this agent's output channel
 
+        channel : str or list of str
+            Specific name of the channel(s) to be subscribed to. (Default = "data")
+
         """
         if isinstance(output_agent, list):
             for agent in output_agent:
-                self._bind_output(agent)
+                self._bind_output(output_agent=agent, channel=channel)
         else:
-            self._bind_output(output_agent)
+            self._bind_output(output_agent=output_agent, channel=channel)
 
-    def _bind_output(self, output_agent):
+    def _bind_output(self, output_agent, channel="default"):
         """
         Internal method which implements the logic for connecting this agent, to the `output_agent`.
         """
         if type(output_agent) == str:
-            output_module_id = output_agent
+            output_agent_id = output_agent
         else:
-            output_module_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr('name')
 
-        if output_module_id not in self.Outputs and output_module_id != self.name:
+        # if output_agent_id not in self.Outputs and output_agent_id != self.name:
+        if output_agent_id not in self.Outputs and output_agent_id != self.name:
             # update self.Outputs list and Inputs list of output_module
             self.Outputs.update({output_agent.get_attr('name'): output_agent})
             temp_updated_inputs = output_agent.get_attr('Inputs')
             temp_updated_inputs.update({self.name: self})
             output_agent.set_attr(Inputs=temp_updated_inputs)
 
+            # connect socket for osbrain
             if self.backend == "osbrain":
+                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
                 # bind to the address
                 if output_agent.has_socket(self.PubAddr_alias):
-                    output_agent.subscribe(self.PubAddr_alias, handler={'data': AgentMET4FOF.handle_process_data})
+                    if isinstance(channel, list):
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                    else:
+                        output_agent.subscribe(self.PubAddr_alias, handler={channel: AgentMET4FOF.handle_process_data})
                 else:
-                    output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
-                                         handler={'data': AgentMET4FOF.handle_process_data})
+                    if isinstance(channel, list):
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                    else:
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel: AgentMET4FOF.handle_process_data})
+
+            # update channels subscription information for mesa
+            else:
+                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
 
             # LOGGING
             if self.log_mode:
-                self.log_info("Connected output module: " + output_module_id)
+                self.log_info("Connected output module: " + output_agent_id)
 
     def unbind_output(self, output_agent):
         """
@@ -506,22 +533,24 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         """
         if type(output_agent) == str:
-            module_id = output_agent
+            output_agent_id = output_agent
         else:
-            module_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr('name')
 
-        if module_id in self.Outputs and module_id != self.name:
-            self.Outputs.pop(module_id, None)
+        if output_agent_id in self.Outputs and output_agent_id != self.name:
+            self.Outputs.pop(output_agent_id, None)
+
             new_inputs = output_agent.get_attr('Inputs')
             new_inputs.pop(self.name, None)
             output_agent.set_attr(Inputs=new_inputs)
 
             if self.backend == "osbrain":
-                output_agent.unsubscribe(self.PubAddr_alias, 'data')
+                output_agent.unsubscribe(self.PubAddr_alias, topic=self.Outputs_agent_channels[output_agent_id])
 
+            self.Outputs_agent_channels.pop(output_agent_id, None)
             # LOGGING
             if self.log_mode:
-                self.log_info("Disconnected output module: " + module_id)
+                self.log_info("Disconnected output module: " + output_agent_id)
 
     def _convert_to_plotly(self, matplotlib_fig: matplotlib.figure.Figure):
         """
@@ -1378,7 +1407,7 @@ class AgentNetwork:
 
         agent_proxy.shutdown()
 
-    def bind_agents(self, source, target):
+    def bind_agents(self, source, target, channel="default"):
         """
         Binds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
 
@@ -1393,7 +1422,7 @@ class AgentNetwork:
             Target agent whose Input channel will be binded to `source`
         """
 
-        source.bind_output(target)
+        source.bind_output(target, channel=channel)
 
         return 0
 
