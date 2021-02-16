@@ -451,7 +451,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
 
                 # Check if any metadata is present that can be used to generate axis
                 # labels or otherwise use default labels.
-                if (
+                if (len(memory_data) > 0 and
                     isinstance(memory_data[sender_agent], dict)
                     and "metadata" in memory_data[sender_agent].keys()
                 ):
