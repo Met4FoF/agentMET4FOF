@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import socket
-from multiprocessing import Process
 from threading import Thread
 from time import sleep
 from wsgiref.simple_server import make_server
@@ -11,6 +10,7 @@ import dash_html_components as html
 import psutil
 
 from .Dashboard_Control import _Dashboard_Control
+import pathos
 
 
 class AgentDashboard:
@@ -163,7 +163,8 @@ class AgentDashboard:
             return True
 
 
-class AgentDashboardProcess(AgentDashboard, Process):
+
+class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
     """Represents an agent dashboard for the osBrain backend"""
 
 
