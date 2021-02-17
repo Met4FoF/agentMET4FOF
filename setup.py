@@ -77,7 +77,8 @@ setup(
         "mpld3",
         "mesa",
         "psutil",
-        "pathos"
+        "pathos",
+        "visdcc",
     ],
     extras_require={"tutorials": ["notebook", "PyDynamic"]},
     python_requires=">=3.8",
