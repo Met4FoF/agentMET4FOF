@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import socket
-from multiprocessing import Process
 from threading import Thread
 from time import sleep
 from wsgiref.simple_server import make_server
@@ -11,6 +10,7 @@ import dash_html_components as html
 import psutil
 
 from .Dashboard_Control import _Dashboard_Control
+import pathos
 
 
 class AgentDashboard:
@@ -77,7 +77,17 @@ class AgentDashboard:
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
-        self._server.serve_forever()
+        if hasattr(self, "_server"):
+            print(
+                f"\n--------------------------------------------------------------\n"
+                f"|                                                            |\n"
+                f"| Your agent network is starting up. Open your browser and   |\n"
+                f"| visit the agentMET4FOF dashboard on "
+                f"http://{self.ip_addr}:{self.port}/ |\n"
+                f"|                                                            |\n"
+                f"--------------------------------------------------------------\n"
+            )
+            self._server.serve_forever()
 
     def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
         """
@@ -153,7 +163,8 @@ class AgentDashboard:
             return True
 
 
-class AgentDashboardProcess(AgentDashboard, Process):
+
+class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
     """Represents an agent dashboard for the osBrain backend"""
 
 

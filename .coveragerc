@@ -9,6 +9,7 @@ exclude_lines =
 ignore_errors = True
 omit =
     *venv/*
+    .tox/*
     tests/*
     docs/*
     setup.py
