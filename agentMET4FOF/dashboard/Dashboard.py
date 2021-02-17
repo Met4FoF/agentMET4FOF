@@ -7,10 +7,9 @@ from wsgiref.simple_server import make_server
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import psutil
+import pathos
 
 from .Dashboard_Control import _Dashboard_Control
-import pathos
 
 
 class AgentDashboard:
@@ -154,11 +153,6 @@ class AgentDashboard:
             if sock.connect_ex((ip_addr, _port)) == 0:
                 sock.shutdown(socket.SHUT_RDWR)
                 return False
-            # So no dashboard seems to running. Here we check, if anything else is
-            # running on that port.
-            for connection in psutil.net_connections():
-                if connection.laddr.port == _port and connection.laddr.ip == ip_addr:
-                    return False
             # Seems as if, we can actually start our dashboard server.
             return True
 
