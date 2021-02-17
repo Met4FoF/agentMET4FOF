@@ -156,9 +156,9 @@ class AgentDashboard:
                 return False
             # So no dashboard seems to running. Here we check, if anything else is
             # running on that port.
-            for connection in psutil.net_connections():
-                if connection.laddr.port == _port and connection.laddr.ip == ip_addr:
-                    return False
+            # for connection in psutil.net_connections():
+            #     if connection.laddr.port == _port and connection.laddr.ip == ip_addr:
+            #         return False
             # Seems as if, we can actually start our dashboard server.
             return True
 
