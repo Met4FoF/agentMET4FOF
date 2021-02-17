@@ -124,9 +124,7 @@ pluggy==0.13.1
 prompt-toolkit==3.0.14
     # via ipython
 psutil==5.8.0
-    # via
-    #   -c requirements.txt
-    #   -r dev-requirements.in
+    # via -r dev-requirements.in
 ptyprocess==0.7.0
     # via pexpect
 py==1.10.0
