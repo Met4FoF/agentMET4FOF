@@ -55,9 +55,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         cyto.Cytoscape(
                             id='agents-network',
                             layout={'name': 'breadthfirst'},
-                            style={'width': '100%', 'height': '600px'},
+                            style={'width': '100%', 'height': '800px'},
                             elements=[],
-                            stylesheet=self.app.network_stylesheet
+                            stylesheet=self.app.network_stylesheet,
 
                         )
 
@@ -171,7 +171,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 # draw coalition nodes, and assign child nodes to coalition nodes
                 if len(agentNetwork.coalitions) > 0:
                     parent_elements = [{"data": {'id': coalition.name, 'label': coalition.name},
-                                        'classes': 'bluebackground'} for coalition in agentNetwork.coalitions]
+                                        'classes': 'coalition'} for coalition in agentNetwork.coalitions]
                     for coalition in coalitions:
                         # check if agent is in the coalition, set its parents
                         for agent_node in nodes_elements:
@@ -182,7 +182,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         for edges in edges_elements:
                             if edges["data"]["source"] in coalition.agent_names() and edges["data"][
                                 "target"] in coalition.agent_names():
-                                edges.update({'classes': "coalition"})
+                                edges.update({'classes': "coalition-edge"})
                 else:
                     parent_elements = []
 

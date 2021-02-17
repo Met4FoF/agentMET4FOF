@@ -65,6 +65,14 @@ default_agent_network_stylesheet = [
                                 },
                                 {
                                     'selector': '.coalition',
+                                    'style': {
+                                        'background-color': '#c4fdff',
+                                        "text-valign": "top",
+                                        "text-halign": "center",
+                                              }
+                                },
+                                {
+                                    'selector': '.coalition-edge',
                                     'style': {'line-style': 'dashed'}
                                 },
                                 {
