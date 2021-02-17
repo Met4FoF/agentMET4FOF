@@ -1845,8 +1845,8 @@ class SineGeneratorAgent(AgentMET4FOF):
     def init_parameters(self, sfreq=500, sine_freq=5):
         """Initialize the input data
 
-        Initialize the input data stream as an instance of the
-        :py:mod:`SineGenerator` class
+        Initialize the input data stream as an instance of the :class:`SineGenerator`
+        class.
 
         Parameters
         ----------
@@ -1861,7 +1861,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         """Model the agent's behaviour
 
         On state *Running* the agent will extract sample by sample the input data
-        streams content and push it via invoking :py:method:`AgentMET4FOF.send_output`.
+        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
