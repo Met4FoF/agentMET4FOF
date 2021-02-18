@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 from pandas import DataFrame
 from time_series_metadata.scheme import MetaData
-
+import warnings
 
 class DataStreamMET4FOF():
     """
@@ -200,6 +200,10 @@ class DataStreamMET4FOF():
 
         #resort to default wave generator if one is not supplied
         if generator_function is None:
+            warnings.warn(
+                "No uncertainty generator function specified. Setting to default ("
+                "sine wave)."
+            )
             self.F = 50
             self._generator_function = self._default_generator_function
         else:
