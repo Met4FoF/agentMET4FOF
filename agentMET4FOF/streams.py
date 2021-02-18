@@ -1,5 +1,6 @@
 import numpy as np
 from time_series_metadata.scheme import MetaData
+import warnings
 from scipy import signal
 
 class DataStreamMET4FOF():
@@ -108,6 +109,10 @@ class DataStreamMET4FOF():
 
         #resort to default wave generator if one is not supplied
         if generator_function is None:
+            warnings.warn(
+                "No generator function specified. Setting to default ("
+                "sine wave)."
+            )
             self.F = 50
             self.generator_function = self.default_generator_function
         else:
