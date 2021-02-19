@@ -1685,7 +1685,7 @@ class MonitorAgent(AgentMET4FOF):
             the :attr:`custom_plot_function`
         """
         self.plots = {}
-        self.plot_filter = [] if plot_filter is None else plot_filter
+        self.plot_filter = plot_filter
         self.custom_plot_function = custom_plot_function
         self.custom_plot_parameters = kwargs
 
@@ -1702,7 +1702,7 @@ class MonitorAgent(AgentMET4FOF):
             Acceptable channel values are 'default' or 'plot'
         """
         if message['channel'] == 'default':
-            if self.plot_filter != []:
+            if self.plot_filter:
                 message['data'] = {key: message['data'][key] for key in self.plot_filter}
             self.buffer_store(agent_from=message["from"], data=message["data"])
         elif message['channel'] == 'plot':
