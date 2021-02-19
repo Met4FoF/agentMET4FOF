@@ -1663,9 +1663,7 @@ class MonitorAgent(AgentMET4FOF):
     def init_parameters(
         self,
         plot_filter: List[str] = None,
-        custom_plot_function: Callable[
-            [Union[List, np.ndarray, pd.DataFrame], str, Any, ...], Scatter
-        ] = None,
+        custom_plot_function: Callable[..., Scatter] = None,
         *args,
         **kwargs
     ):
