@@ -502,16 +502,16 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_names = agentNetwork.agents()  # get all agent names
-            agent_type = "Monitor"  # all agents with Monitor in its name will be selected
+            agent_type = "Monitor"
+            agent_names = agentNetwork.agents(filter_agent=agent_type)  # get all agent names
+              # all agents with Monitor in its name will be selected
             plots_data = {}  # storage for all monitor agent's memory
 
             # load data from all Monitor agent's memory
             for agent_name in agent_names:
-                if agent_type in agent_name:
-                    monitor_agent = agentNetwork.get_agent(agent_name)
-                    plots = monitor_agent.get_attr('plots')
-                    plots_data.update({agent_name: plots})
+                monitor_agent = agentNetwork.get_agent(agent_name)
+                plots = monitor_agent.get_attr('plots')
+                plots_data.update({agent_name: plots})
 
             # now monitors_data = {'monitor_agent1_name':agent1_memory, 'monitor_agent2_name':agent2_memory }
             # now create a plot for each monitor agent
