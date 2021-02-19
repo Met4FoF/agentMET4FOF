@@ -155,7 +155,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Method to reset the agent's states and parameters. User can override this method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
-        self.memory = {}
+        self.buffer.clear()
 
     def init_parameters(self):
         """
