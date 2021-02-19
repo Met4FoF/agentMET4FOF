@@ -49,6 +49,25 @@ html_theme_options = {
     'collapse_navigation': False,
 }
 
+# This should make SciPy documentation available inside our docs.
+intersphinx_mapping = {
+    "NumPy": ("https://numpy.org/doc/stable/", None),
+    "Pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
+    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": (
+        "https://pydynamic.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-metadata": (
+        "https://time-series-metadata.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-buffer": (
+        "https://time-series-buffer.readthedocs.io/en/latest/",
+        None,
+    ),
+}
+
 nbsphinx_allow_errors = True
 
 ################################################################################
