@@ -1639,7 +1639,7 @@ class MonitorAgent(AgentMET4FOF):
     """
     Unique Agent for storing plots and data from messages received from input agents.
 
-    The dashboard searches for Monitor Agents' `memory` and `plots` to draw the graphs
+    The dashboard searches for Monitor Agents' `buffer` and `plots` to draw the graphs
     "plot" channel is used to receive base64 images from agents to plot on dashboard
 
     Attributes
@@ -1662,29 +1662,27 @@ class MonitorAgent(AgentMET4FOF):
 
     def init_parameters(
         self,
-        plot_filter: List[str] = None,
-        custom_plot_function: Callable[..., Scatter] = None,
-        *args,
+        plot_filter: Optional[List[str]] = None,
+        custom_plot_function: Optional[Callable[..., Scatter]] = None,
         **kwargs
     ):
         """Initialize the monitor agent's parameters
 
         Parameters
         ----------
-        plots : dict
-            Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
-        plot_filter : list of str
-            List of keys to filter the 'data' upon receiving message to be saved into memory
-            Used to specifically select only a few keys to be plotted
-        custom_plot_function : callable
+        plot_filter : list of str, optional
+            List of keys to filter the 'data' upon receiving message to be saved into
+            memory. Used to specifically select only a few keys to be plotted
+        custom_plot_function : callable, optional
             a custom plot function that can be provided to handle the data in the
             monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
-            gets provided with the content (value) of the buffer and with the string of the
-            sender agent's name as stored in the buffer's keys. Additionally any other
-            parameters can be provided as a dict in custom_plot_parameters.
-        custom_plot_parameters : dict
-            a custom dictionary of parameters that shall be provided to each call of the
-            custom_plot_function
+            gets provided with the content (value) of the buffer and with the string of
+            the sender agent's name as stored in the buffer's keys. Additionally any
+            other parameters can be provided as a dict in custom_plot_parameters. By
+            default the data gets plotted as shown in the various tutorials.
+        kwargs : Any
+            custom key word parameters that shall be provided to each call of
+            the :attr:`custom_plot_function`
         """
         self.plots = {}
         self.plot_filter = [] if plot_filter is None else plot_filter
