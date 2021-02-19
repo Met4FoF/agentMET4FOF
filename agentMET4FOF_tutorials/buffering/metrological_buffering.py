@@ -1,5 +1,9 @@
 from agentMET4FOF.agents import AgentNetwork
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent, MetrologicalAgentBuffer
+from agentMET4FOF.metrological_agents import (
+    MetrologicalAgent,
+    MetrologicalAgentBuffer,
+    MetrologicalMonitorAgent,
+)
 from agentMET4FOF.metrological_streams import (
     MetrologicalDataStreamMET4FOF,
     MetrologicalSineGenerator,
@@ -34,8 +38,9 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
 
     def init_buffer(self, buffer_size):
         """
-        A method to initialise the buffer. By overriding this method, user can provide a custom buffer, instead of the regular AgentBuffer.
-        This can be used, for example, to provide a MetrologicalAgentBuffer in the metrological agents.
+        A method to initialise the buffer. By overriding this method, user can provide
+        a custom buffer, instead of the regular AgentBuffer. This can be used,
+        for example, to provide a MetrologicalAgentBuffer in the metrological agents.
         """
         buffer = MetrologicalAgentBuffer(buffer_size)
         return buffer
@@ -49,23 +54,27 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         if self.current_state == "Running":
             metrological_sine_data = self._stream.next_sample()
 
-            self.buffer.store(agent_from=self.name, data=[metrological_sine_data]) #equivalent to self.buffer_store but without logging.
+            # Equivalent to self.buffer_store but without logging.
+            self.buffer.store(agent_from=self.name, data=[metrological_sine_data])
 
             # The actual dictionary is stored in self.buffer.buffer
             self.log_info(str((self.buffer.buffer)))
 
-            #check if buffer is filled up, then send out computed mean on the buffer
+            # Check if buffer is filled up, then send out computed mean on the buffer
             if self.buffer.buffer_filled(self.name):
 
-                #access buffer content by accessing its key, it works like a dictionary
-                time_series_buffer = self.buffer[self.name] # this is a TimeSeriesBuffer object
-                buffer_content = time_series_buffer.pop(self.buffer_size) # np.array of dims (self.buffer_size,4)
+                # Access buffer content by accessing its key, it works like a
+                # dictionary. This is a TimeSeriesBuffer object.
+                time_series_buffer = self.buffer[self.name]
+
+                # np.ndarray of shape (self.buffer_size, 4)
+                buffer_content = time_series_buffer.pop(self.buffer_size)
 
                 # send out metrological data
                 self.set_output_data(channel="default", data=buffer_content)
                 super().agent_loop()
 
-                #clear buffer
+                # clear buffer
                 self.buffer.clear(self.name)
 
 
