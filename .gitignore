@@ -22,3 +22,7 @@ docs/agentMET4FOF_tutorials
 # Build clutter #
 #################
 *.egg-info/
+
+# Test clutter #
+################
+test-reports/
