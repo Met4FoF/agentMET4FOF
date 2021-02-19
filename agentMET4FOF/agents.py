@@ -267,7 +267,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         return self.buffer.buffer_filled(agent_name)
 
-    def buffer_clear(self, agent_name: str = None):
+    def buffer_clear(self, agent_name: Optional[str] = None):
         """
         Empties buffer which is a dict indexed by the `agent_name`.
 
