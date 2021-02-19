@@ -917,7 +917,7 @@ class _AgentController(AgentMET4FOF):
     Provides global control to all agents in network.
     """
 
-    def init_parameters(self, ns=None, backend='osbrain', mesa_model=""):
+    def init_parameters(self, ns=None, backend='osbrain', mesa_model="", log_mode=True):
         self.backend = backend
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = "Idle"
@@ -925,6 +925,7 @@ class _AgentController(AgentMET4FOF):
         self.G = nx.DiGraph()
         self._logger = None
         self.coalitions = []
+        self.log_mode = log_mode
 
         if backend == "mesa":
             self.mesa_model = mesa_model
