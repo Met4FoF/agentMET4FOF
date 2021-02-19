@@ -171,6 +171,7 @@ This software is developed as a joint effort of several project partners namely:
 - [Institute for Manufacturing of the University of Cambridge (IfM)](https://www.ifm.eng.cam.ac.uk/)
 - [Physikalisch-Technische Bundesanstalt (PTB)](https://www.ptb.de/)
 - [Van Swinden Laboratory (VSL)](https://www.vsl.nl/en/)
+- [National Physics Laboratory (NPL)](https://www.npl.co.uk/)
 
 under the lead of IfM. The software is made available "as is" free of cost. The 
 authors and their institutions assume no responsibility whatsoever for its use by 
