@@ -361,7 +361,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and agentNetwork.get_mode() != "Reset" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_names = agentNetwork.agents('MonitorAgent')  # get all agent names
+            agent_names = agentNetwork.agents(filter_agent='Monitor')  # get all agent names
             app.num_monitor = len(agent_names)
             monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
             style_graphs = [{'opacity': 0, 'width': 10, 'height': 10} for i in range(app.num_monitors)]
