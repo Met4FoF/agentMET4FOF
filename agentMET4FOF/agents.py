@@ -616,8 +616,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def get_all_attr(self):
         _all_attr = self.__dict__
-        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias", "PubAddr", "states", "log_mode", "get_all_attr",
-                    "plots", "name", "agent_loop"]
+        excludes = [
+            "Inputs",
+            "Outputs",
+            "buffer",
+            "PubAddr_alias",
+            "PubAddr",
+            "states",
+            "log_mode",
+            "get_all_attr",
+            "plots",
+            "name",
+            "agent_loop"
+        ]
         filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
         filtered_attr = {key: val for key, val in filtered_attr.items() if
                          key not in excludes and type(val).__name__ != 'function'}
@@ -1643,8 +1654,34 @@ class MonitorAgent(AgentMET4FOF):
         Used to specifically select only a few keys to be plotted
     """
 
-    def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
-        self.memory = {}
+    def init_parameters(
+        self,
+        plot_filter: List[str] = None,
+        custom_plot_function: Callable[
+            [Union[List, np.ndarray, pd.DataFrame], str, Any, ...], Scatter
+        ] = None,
+        *args,
+        **kwargs
+    ):
+        """Initialize the monitor agent's parameters
+
+        Parameters
+        ----------
+        plots : dict
+            Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
+        plot_filter : list of str
+            List of keys to filter the 'data' upon receiving message to be saved into memory
+            Used to specifically select only a few keys to be plotted
+        custom_plot_function : callable
+            a custom plot function that can be provided to handle the data in the
+            monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+            gets provided with the content (value) of the buffer and with the string of the
+            sender agent's name as stored in the buffer's keys. Additionally any other
+            parameters can be provided as a dict in custom_plot_parameters.
+        custom_plot_parameters : dict
+            a custom dictionary of parameters that shall be provided to each call of the
+            custom_plot_function
+        """
         self.plots = {}
         self.plot_filter = plot_filter
         self.custom_plot_function = custom_plot_function
