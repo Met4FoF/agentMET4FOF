@@ -9,7 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from threading import Timer
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -21,6 +21,7 @@ from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
+from plotly.graph_objs import Scatter
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF, SineGenerator
@@ -266,15 +267,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         return self.buffer.buffer_filled(agent_name)
 
-    def buffer_clear(self, agent_name=None):
+    def buffer_clear(self, agent_name: str = None):
         """
         Empties buffer which is a dict indexed by the `agent_name`.
 
         Parameters
         ----------
-        agent_name : str
-            Key of the memory dict, which can be the name of input agent, or self.name. If one is not supplied, we assume to clear the entire memory.
-
+        agent_name : str, optional
+            Key of the memory dict, which can be the name of input agent, or self.name.
+            If not supplied (default), we assume to clear the entire memory.
         """
         self.buffer.clear(agent_name)
 
@@ -1643,15 +1644,20 @@ class MonitorAgent(AgentMET4FOF):
 
     Attributes
     ----------
-    memory : dict
-        Dictionary of format `{agent1_name : agent1_data, agent2_name : agent2_data}`
-
     plots : dict
         Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
-
     plot_filter : list of str
         List of keys to filter the 'data' upon receiving message to be saved into memory
         Used to specifically select only a few keys to be plotted
+    custom_plot_function : callable
+        a custom plot function that can be provided to handle the data in the
+        monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+        gets provided with the content (value) of the buffer and with the string of the
+        sender agent's name as stored in the buffer's keys. Additionally any other
+        parameters can be provided as a dict in custom_plot_parameters.
+    custom_plot_parameters : dict
+        a custom dictionary of parameters that shall be provided to each call of the
+        custom_plot_function
     """
 
     def init_parameters(
@@ -1691,7 +1697,8 @@ class MonitorAgent(AgentMET4FOF):
         """
         Handles incoming data from 'default' and 'plot' channels.
 
-        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+        Stores 'default' data into :attr:``self.buffer`` and 'plot' data into
+        :attr:``self.plots``
 
         Parameters
         ----------
@@ -1706,7 +1713,7 @@ class MonitorAgent(AgentMET4FOF):
             self.update_plot_memory(message)
         return 0
 
-    def update_plot_memory(self, message):
+    def update_plot_memory(self, message: Dict[str, Any]):
         """
         Updates plot figures stored in `self.plots` with the received message
 
