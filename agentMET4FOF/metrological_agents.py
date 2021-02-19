@@ -1,10 +1,11 @@
-from typing import Dict, Union
+from typing import Dict, List, Tuple, Union
 
+import numpy as np
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
-import numpy as np
-from agentMET4FOF.agents import AgentMET4FOF, AgentBuffer
+
+from agentMET4FOF.agents import AgentBuffer, AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
@@ -193,21 +194,73 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
             trace = go.Scatter()
         return trace
 
-class MetrologicalAgentBuffer(AgentBuffer):
-    def __init__(self, buffer_size=1000):
-        super(MetrologicalAgentBuffer, self).__init__(buffer_size)
-        self.supported_datatype.append(TimeSeriesBuffer)
 
-    def convert_single_to_tsbuffer(self, single_data):
+class MetrologicalAgentBuffer(AgentBuffer):
+    """Buffer class which is instantiated in every metrological agent to store data
+
+    This buffer is necessary to handle multiple inputs coming from agents.
+
+    We can access the buffer like a dict with exposed functions such as .values(),
+    .keys() and .items(). The actual dict object is stored in the attribute
+    :attr:`buffer <agentMET4FOF.agents.AgentBuffer.buffer>`. The list in
+    :attr:`supported_datatypes <agentMET4FOF.agents.AgentBuffer.supported_datatypes>`
+    contains one more element
+    for metrological agents, namely :class:`TimeSeriesBuffer
+    <time-series-buffer:time_series_buffer.buffer.TimeSeriesBuffer>`.
+    """
+    def __init__(self, buffer_size: int = 1000):
+        """Initialise a new agent buffer object
+
+        Parameters
+        ----------
+        buffer_size: int
+            Length of buffer allowed.
+        """
+        super(MetrologicalAgentBuffer, self).__init__(buffer_size)
+        self.supported_datatypes.append(TimeSeriesBuffer)
+
+    def convert_single_to_tsbuffer(self, single_data: Union[List, Tuple, np.ndarray]):
+        """Convert common data in agentMET4FOF to :class:`TimeSeriesBuffer
+        <time-series-buffer:time_series_buffer.buffer.TimeSeriesBuffer>`
+
+        Parameters
+        ----------
+        single_data : iterable of iterables (list, tuple, np.ndarrray) with shape (N, M)
+
+            * M==2 (pairs): assumed to be like (time, value)
+            * M==3 (triple): assumed to be like (time, value, value_unc)
+            * M==4 (4-tuple): assumed to be like (time, time_unc, value, value_unc)
+
+        Returns
+        -------
+        TimeSeriesBuffer
+            the new :class:`TimeSeriesBuffer
+            <time-series-buffer:time_series_buffer.buffer.TimeSeriesBuffer>` object
+
+        """
         ts = TimeSeriesBuffer(maxlen=self.buffer_size)
         ts.add(single_data)
         return ts
 
-    def update(self, agent_from: str, data):
-        """
-        Overrides data in the buffer dict keyed by `agent_from` with value `data`
+    def update(
+            self,
+            agent_from: str,
+            data: Union[Dict, List, Tuple, np.ndarray],
+    ) -> TimeSeriesBuffer:
+        """Overrides data in the buffer dict keyed by `agent_from` with value `data`
 
-        If `data` is a single value, this converts it into a list first before storing in the buffer dict.
+        Parameters
+        ----------
+        agent_from : str
+            Name of agent sender
+        data : dict or iterable of iterables (list, tuple, np.ndarray) with shape (N, M
+            the data to be stored in the metrological buffer
+
+        Returns
+        -------
+        TimeSeriesBuffer
+            the updated :class:`TimeSeriesBuffer
+            <time-series-buffer:time_series_buffer.buffer.TimeSeriesBuffer>` object
         """
         # handle if data type nested in dict
         if isinstance(data, dict):
@@ -239,7 +292,19 @@ class MetrologicalAgentBuffer(AgentBuffer):
         else:
             self._concatenate(iterable=self.buffer[message_from],data=message_data, concat_axis=concat_axis)
 
-    def _concatenate(self, iterable, data, concat_axis=0):
+    def _concatenate(self, iterable: TimeSeriesBuffer, data, concat_axis=0):
+        """Concatenate the given ``iterable`` with ``data``
+
+        Handles the concatenation function depending on the datatype, and truncates it
+        if the buffer is filled to `buffer_size`.
+
+        Parameters
+        ----------
+        iterable : any in supported_datatype
+            The current buffer to be concatenated with.
+
+        data : np.ndarray, DataFrame, list
+            New incoming data
+        """
         iterable.add(data)
         return iterable
-
