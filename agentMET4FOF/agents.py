@@ -1689,7 +1689,7 @@ class MonitorAgent(AgentMET4FOF):
             custom_plot_function
         """
         self.plots = {}
-        self.plot_filter = plot_filter
+        self.plot_filter = [] if plot_filter is None else plot_filter
         self.custom_plot_function = custom_plot_function
         self.custom_plot_parameters = kwargs
 
