@@ -38,7 +38,7 @@ in the section <a href="#about">About</a>.
 - [💨 Coming soon](#coming-soon)
 - [💎 Acknowledgement](#acknowledgement)
 - [⚠ Disclaimer](#disclaimer)
-- [©️ License](#license)
+- [© License](#license)
 
 ## 💫Quickstart
 
@@ -180,7 +180,7 @@ reliability, safety, suitability or any other characteristic. In no event will t
 authors be liable for any direct, indirect or consequential damage arising in 
 connection with the use of this software.
 
-## ©️License
+## ©License
 
 agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
 
