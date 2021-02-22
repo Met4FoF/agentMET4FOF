@@ -117,8 +117,8 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         Tuple[float, float]
             constant (zero) time and amplitude uncertainties
         """
-        value_unc = 0
-        time_unc = 0
+        value_unc = np.zeros(_.shape)
+        time_unc = np.zeros(_.shape)
         return time_unc, value_unc
 
     def _next_sample_generator(
@@ -129,16 +129,15 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         Overrides :meth:`.DataStreamMET4FOF._next_sample_generator`. Adds
         time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
         """
-        timeelement: np.ndarray = (
-                np.arange(self._sample_idx, self._sample_idx + batch_size, 1) / self.sfreq
+        _time: np.ndarray = (
+                np.arange(self._sample_idx, self._sample_idx + batch_size, 1).reshape(-1, 1) / self.sfreq
         )
-        _time: float = timeelement.item()
         self._sample_idx += batch_size
 
         _time_unc, _value_unc = self._generator_function_unc(_time)
-        amplitude: float = self._generator_function(_time, **self._generator_parameters)
+        amplitude: np.ndarray = self._generator_function(_time, **self._generator_parameters)
 
-        return np.array((_time, _time_unc, amplitude.item(), _value_unc))
+        return np.concatenate((_time, _time_unc, amplitude, _value_unc), axis=1)
 
 
 class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
@@ -209,5 +208,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         return amplitude
 
     def _uncertainty_generator(self, _):
-        """A simple uncertainty generator"""
-        return self.time_unc ** 2, self.value_unc ** 2
+        """A simple uncertainty generator returns vectors with
+        the shape of the current time-batch with constant time and amplitude
+        uncertainty. """
+        _value_unc = np.ones(_.shape) * self.value_unc ** 2
+        _time_unc = np.ones(_.shape) * self.time_unc ** 2
+        return _time_unc, _value_unc
