@@ -1,5 +1,4 @@
 import warnings
-from random import gauss
 from typing import Any, Callable, Dict, Iterable, Optional, Tuple, Union
 
 import numpy as np
@@ -181,7 +180,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
         quantity_units: Union[str, Tuple[str, ...]] = "V",
         misc: Optional[Any] = "Simple sine wave generator",
-        value_unc: Union[float, Iterable[float]] = 0.5,
+        value_unc: Union[float, Iterable[float]] = 0.1,
         time_unc: Union[float, Iterable[float]] = 0,
     ):
         super().__init__()
@@ -204,13 +203,13 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     def _sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * sine_freq * time) + gauss(0, self.value_unc ** 2)
+        amplitude = np.sin(2 * np.pi * sine_freq * time) + np.random.normal(0, self.value_unc, time.shape)
         return amplitude
 
     def _uncertainty_generator(self, _):
         """A simple uncertainty generator returns vectors with
         the shape of the current time-batch with constant time and amplitude
         uncertainty. """
-        _value_unc = np.ones(_.shape) * self.value_unc ** 2
-        _time_unc = np.ones(_.shape) * self.time_unc ** 2
+        _value_unc = np.ones(_.shape) * self.value_unc
+        _time_unc = np.ones(_.shape) * self.time_unc
         return _time_unc, _value_unc
