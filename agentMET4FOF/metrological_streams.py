@@ -1,7 +1,8 @@
 import warnings
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 
 from agentMET4FOF.streams import DataStreamMET4FOF
 
@@ -45,11 +46,25 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         :attr:`**_uncertainty_parameters`.
     """
 
-    def __init__(self):
-        """Initialize a MetrologicalDataStreamMET4FOF object"""
+    def __init__(
+        self,
+        value_unc: Union[float, Iterable[float]] = 0.0,
+        time_unc: Union[float, Iterable[float]] = 0.0,
+    ):
+        """Initialize a MetrologicalDataStreamMET4FOF object
+
+        Parameters
+        ----------
+        value_unc : iterable of floats or float, optional (defaults to 0)
+            uncertainties associated with values
+        time_unc : iterable of floats or float, optional (defaults to 0)
+            uncertainties associated with timestamps
+        """
         super().__init__()
-        self._uncertainty_parameters: Dict = None
-        self._generator_function_unc: Callable = lambda x: (0, 0)
+        self._uncertainty_parameters: Dict
+        self._generator_function_unc: Callable
+        self._value_unc: Union[float, Iterable[float]] = value_unc
+        self._time_unc: Union[float, Iterable[float]] = time_unc
 
     def set_generator_function(
         self,
@@ -57,7 +72,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         uncertainty_generator: Callable = None,
         sfreq: int = None,
         **kwargs: Optional[Any]
-    ):
+    ) -> Callable:
         """
         Set value and uncertainty generators based on user-defined functions. By
         default, this function resorts to a sine wave generator function and a
@@ -83,6 +98,11 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             Both the calls of the value generator function and of
             the uncertainty generator function will be supplied with the
             ``**uncertainty_parameters``.
+
+        Returns
+        -------
+        Callable
+            The uncertainty generator function
         """
         # Call the set_generator_function from the parent class to set the generator
         # function.
@@ -98,45 +118,71 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
                 "No uncertainty generator function specified. Setting to default ("
                 "zero)."
             )
-            self._generator_function_unc = self.default_uncertainty_generator
+            self._generator_function_unc = self._default_uncertainty_generator
         else:
             self._generator_function_unc = uncertainty_generator
         return self._generator_function_unc
 
-    def default_uncertainty_generator(self, _):
+    def _default_uncertainty_generator(
+        self,
+        time: Union[List, pd.DataFrame, np.ndarray],
+        values: Union[List, pd.DataFrame, np.ndarray],
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Default uncertainty generator function
 
         Parameters
         ----------
-        _ : Any
-            unused parameters in place of the normally required time parameter
-        
+        time : Union[List, DataFrame, np.ndarray]
+            timestamps
+        values : Union[List, DataFrame, np.ndarray]
+            values corresponding to timestamps
+
         Returns
         -------
         Tuple[np.ndarray, np.ndarray]
-            constant (zero) time and amplitude uncertainties
+            constant (zero) time and value uncertainties each of the same shape
+            as ``time``
         """
-        value_unc = np.zeros(_.shape)
-        time_unc = np.zeros(_.shape)
-        return time_unc, value_unc
+        _time_unc = np.full_like(time, fill_value=self.time_unc)
+        _value_unc = np.full_like(values, fill_value=self.value_unc)
+        return _time_unc, _value_unc
 
-    def _next_sample_generator(
-            self, batch_size: int = 1
-    ) -> np.ndarray:
+    def _next_sample_generator(self, batch_size: int = 1) -> np.ndarray:
         """
         Internal method for generating a batch of samples from the generator function.
         Overrides :meth:`.DataStreamMET4FOF._next_sample_generator`. Adds
         time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
         """
         _time: np.ndarray = (
-                np.arange(self._sample_idx, self._sample_idx + batch_size, 1).reshape(-1, 1) / self.sfreq
+            np.arange(self._sample_idx, self._sample_idx + batch_size, 1).reshape(-1, 1)
+            / self.sfreq
         )
         self._sample_idx += batch_size
 
-        _time_unc, _value_unc = self._generator_function_unc(_time)
-        amplitude: np.ndarray = self._generator_function(_time, **self._generator_parameters)
+        _amplitude: np.ndarray = self._generator_function(
+            _time, **self._generator_parameters
+        )
+        _time_unc, _value_unc = self._generator_function_unc(_time, _amplitude)
 
-        return np.concatenate((_time, _time_unc, amplitude, _value_unc), axis=1)
+        return np.concatenate((_time, _time_unc, _amplitude, _value_unc), axis=1)
+
+    @property
+    def value_unc(self) -> Union[float, Iterable[float]]:
+        """Union[float, Iterable[float]]: uncertainties associated with the values"""
+        return self._value_unc
+
+    @value_unc.setter
+    def value_unc(self, value: Union[float, Iterable[float]]):
+        self._value_unc = value
+
+    @property
+    def time_unc(self) -> Union[float, Iterable[float]]:
+        """Union[float, Iterable[float]]: uncertainties associated with timestamps"""
+        return self._time_unc
+
+    @time_unc.setter
+    def time_unc(self, value: Union[float, Iterable[float]]):
+        self._time_unc = value
 
 
 class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
@@ -172,8 +218,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     def __init__(
         self,
-        sfreq: int=500,
-        sine_freq: float=50,
+        sfreq: int = 500,
+        sine_freq: float = 50,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
@@ -183,7 +229,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         value_unc: Union[float, Iterable[float]] = 0.1,
         time_unc: Union[float, Iterable[float]] = 0,
     ):
-        super().__init__()
+        super(MetrologicalSineGenerator, self).__init__(
+            value_unc=value_unc, time_unc=time_unc
+        )
         self.set_metadata(
             device_id=device_id,
             time_name=time_name,
@@ -196,7 +244,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         self.time_unc = time_unc
         self.set_generator_function(
             generator_function=self._sine_wave_function,
-            uncertainty_generator=self._uncertainty_generator,
+            uncertainty_generator=self._default_uncertainty_generator,
             sfreq=sfreq,
             sine_freq=sine_freq,
         )
@@ -206,11 +254,3 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         amplitude = np.sin(2 * np.pi * sine_freq * time)
         amplitude += np.random.normal(0, self.value_unc, amplitude.shape)
         return amplitude
-
-    def _uncertainty_generator(self, _):
-        """A simple uncertainty generator returns vectors with
-        the shape of the current time-batch with constant time and amplitude
-        uncertainty. """
-        _value_unc = np.ones(_.shape) * self.value_unc
-        _time_unc = np.ones(_.shape) * self.time_unc
-        return _time_unc, _value_unc
