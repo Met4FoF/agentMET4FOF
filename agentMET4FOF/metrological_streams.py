@@ -113,7 +113,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         
         Returns
         -------
-        Tuple[float, float]
+        Tuple[np.ndarray, np.ndarray]
             constant (zero) time and amplitude uncertainties
         """
         value_unc = np.zeros(_.shape)
@@ -203,7 +203,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     def _sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * sine_freq * time) + np.random.normal(0, self.value_unc, time.shape)
+        amplitude = np.sin(2 * np.pi * sine_freq * time)
+        amplitude += np.random.normal(0, self.value_unc, amplitude.shape)
         return amplitude
 
     def _uncertainty_generator(self, _):
