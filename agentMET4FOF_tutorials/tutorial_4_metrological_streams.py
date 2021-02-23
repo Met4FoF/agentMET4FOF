@@ -39,7 +39,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
         datastream's content and push it into its output buffer.
         """
         if self.current_state == "Running":
-            self.set_output_data(channel="default", data=[self._stream.next_sample()])
+            self.set_output_data(channel="default", data=self._stream.next_sample())
             super().agent_loop()
 
 
