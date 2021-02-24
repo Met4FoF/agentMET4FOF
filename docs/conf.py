@@ -64,6 +64,10 @@ intersphinx_mapping = {
         "https://time-series-metadata.readthedocs.io/en/latest/",
         None,
     ),
+    "np": (
+        "http://docs.scipy.org/doc/numpy/",
+        None,
+    ),
 }
 # We keep the objects.inv files in our docs folder to get hints on how to specify the
 # cross-references. More on the topic can be found here:
