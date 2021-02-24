@@ -39,7 +39,7 @@ in the section <a href="#about">About</a>.
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
 - [💨 Coming soon](#coming-soon)
-- [✒️ Citation](#citation)
+- [🖋 Citation](#citation)
 - [💎 Acknowledgement](#acknowledgement)
 - [⚠ Disclaimer](#disclaimer)
 - [© License](#license)
@@ -161,7 +161,7 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
 
-## ✒️Citation
+## 🖋Citation
 
 If you publish results obtained with the help of agentMET4FOF, please cite the linked
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)](https://doi.org/10.5281/zenodo.4560344).
