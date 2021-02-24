@@ -154,8 +154,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
         """
         _time: np.ndarray = (
-            np.arange(self._sample_idx, self._sample_idx + batch_size, 1).reshape(-1, 1)
-            / self.sfreq
+            np.arange(self._sample_idx, self._sample_idx + batch_size, 1.0 / self.sfreq).reshape(-1, 1)
         )
         self._sample_idx += batch_size
 
@@ -251,6 +250,6 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     def _sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * sine_freq * time)
+        amplitude = np.sin(np.multiply(2 * np.pi * sine_freq, time))
         amplitude += np.random.normal(0, self.value_unc, amplitude.shape)
         return amplitude
