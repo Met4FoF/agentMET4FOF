@@ -78,7 +78,7 @@ commands:
         name: Run tests
         command: |
           source venv/bin/activate
-          tox | tee --append test-reports/agentMET4FOF.log
+          tox | tee --append test-results/agentMET4FOF.log
 
     # Upload coverage report if the according parameter is set to `true`.
     - when:
@@ -97,11 +97,11 @@ commands:
     steps:
     # Store test results.
     - store_artifacts:
-        path: test-reports
-        destination: test-reports
+        path: test-results
+        destination: test-results
 
     - store_test_results:
-        path: test-reports
+        path: test-results
 
   install_deps:
     description: "Install dependencies."
@@ -167,7 +167,7 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            tox | tee --append test-reports/agentMET4FOF.log
+            tox | tee --append test-results/agentMET4FOF.log
 
       - store_test_artifacts_and_results
 
