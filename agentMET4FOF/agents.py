@@ -1693,7 +1693,7 @@ class MonitorAgent(AgentMET4FOF):
         """
         Handles incoming data from 'default' and 'plot' channels.
 
-        Stores 'default' data into :attr:``self.buffer`` and 'plot' data into
+        Stores 'default' data into :attr:`buffer` and 'plot' data into
         :attr:``self.plots``
 
         Parameters
