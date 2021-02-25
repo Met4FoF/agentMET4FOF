@@ -17,6 +17,9 @@
   <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
     <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
   </a>
+  <!-- Zenodo DOI -->
+  <a href="https://doi.org/10.5281/zenodo.4560344">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg" alt="DOI"></a>
 </p>
 
 <h1 align="center">Multi-Agent System for IIoT</h1>
@@ -36,6 +39,7 @@ in the section <a href="#about">About</a>.
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
 - [💨 Coming soon](#coming-soon)
+- [🖋 Citation](#citation)
 - [💎 Acknowledgement](#acknowledgement)
 - [⚠ Disclaimer](#disclaimer)
 - [© License](#license)
@@ -156,6 +160,11 @@ For a comprehensive overview of current development activities and upcoming task
 take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/projects/1),
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
+
+## 🖋Citation
+
+If you publish results obtained with the help of agentMET4FOF, please cite the linked
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)](https://doi.org/10.5281/zenodo.4560344).
 
 ## 💎Acknowledgement
 

@@ -11,3 +11,4 @@ recommonmark
 sphinx_rtd_theme
 ipython
 tox
+python-semantic-release
