@@ -56,9 +56,9 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         Parameters
         ----------
         value_unc : iterable of floats or float, optional (defaults to 0)
-            uncertainties associated with values
+            standard uncertainties associated with values
         time_unc : iterable of floats or float, optional (defaults to 0)
-            uncertainties associated with timestamps
+            standard uncertainties associated with timestamps
         """
         super().__init__()
         self._uncertainty_parameters: Dict
@@ -128,7 +128,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         time: Union[List, pd.DataFrame, np.ndarray],
         values: Union[List, pd.DataFrame, np.ndarray],
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """Default uncertainty generator function
+        """Default (standard) uncertainty generator function
 
         Parameters
         ----------
@@ -140,7 +140,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         Returns
         -------
         Tuple[np.ndarray, np.ndarray]
-            constant (zero) time and value uncertainties each of the same shape
+            constant time and value uncertainties each of the same shape
             as ``time``
         """
         _time_unc = np.full_like(time, fill_value=self.time_unc)
