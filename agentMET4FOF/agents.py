@@ -9,7 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from threading import Timer
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -21,6 +21,7 @@ from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from plotly import tools as tls
+from plotly.graph_objs import Scatter
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF, SineGenerator
@@ -155,7 +156,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Method to reset the agent's states and parameters. User can override this method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
-        self.memory = {}
+        self.buffer.clear()
 
     def init_parameters(self):
         """
@@ -266,15 +267,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         return self.buffer.buffer_filled(agent_name)
 
-    def buffer_clear(self, agent_name=None):
+    def buffer_clear(self, agent_name: Optional[str] = None):
         """
         Empties buffer which is a dict indexed by the `agent_name`.
 
         Parameters
         ----------
-        agent_name : str
-            Key of the memory dict, which can be the name of input agent, or self.name. If one is not supplied, we assume to clear the entire memory.
-
+        agent_name : str, optional
+            Key of the memory dict, which can be the name of input agent, or self.name.
+            If not supplied (default), we assume to clear the entire memory.
         """
         self.buffer.clear(agent_name)
 
@@ -616,8 +617,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def get_all_attr(self):
         _all_attr = self.__dict__
-        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias", "PubAddr", "states", "log_mode", "get_all_attr",
-                    "plots", "name", "agent_loop"]
+        excludes = [
+            "Inputs",
+            "Outputs",
+            "buffer",
+            "PubAddr_alias",
+            "PubAddr",
+            "states",
+            "log_mode",
+            "get_all_attr",
+            "plots",
+            "name",
+            "agent_loop"
+        ]
         filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
         filtered_attr = {key: val for key, val in filtered_attr.items() if
                          key not in excludes and type(val).__name__ != 'function'}
@@ -1627,24 +1639,51 @@ class MonitorAgent(AgentMET4FOF):
     """
     Unique Agent for storing plots and data from messages received from input agents.
 
-    The dashboard searches for Monitor Agents' `memory` and `plots` to draw the graphs
+    The dashboard searches for Monitor Agents' `buffer` and `plots` to draw the graphs
     "plot" channel is used to receive base64 images from agents to plot on dashboard
 
     Attributes
     ----------
-    memory : dict
-        Dictionary of format `{agent1_name : agent1_data, agent2_name : agent2_data}`
-
     plots : dict
         Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
-
     plot_filter : list of str
         List of keys to filter the 'data' upon receiving message to be saved into memory
         Used to specifically select only a few keys to be plotted
+    custom_plot_function : callable
+        a custom plot function that can be provided to handle the data in the
+        monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+        gets provided with the content (value) of the buffer and with the string of the
+        sender agent's name as stored in the buffer's keys. Additionally any other
+        parameters can be provided as a dict in custom_plot_parameters.
+    custom_plot_parameters : dict
+        a custom dictionary of parameters that shall be provided to each call of the
+        custom_plot_function
     """
 
-    def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
-        self.memory = {}
+    def init_parameters(
+        self,
+        plot_filter: Optional[List[str]] = None,
+        custom_plot_function: Optional[Callable[..., Scatter]] = None,
+        **kwargs
+    ):
+        """Initialize the monitor agent's parameters
+
+        Parameters
+        ----------
+        plot_filter : list of str, optional
+            List of keys to filter the 'data' upon receiving message to be saved into
+            memory. Used to specifically select only a few keys to be plotted
+        custom_plot_function : callable, optional
+            a custom plot function that can be provided to handle the data in the
+            monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+            gets provided with the content (value) of the buffer and with the string of
+            the sender agent's name as stored in the buffer's keys. Additionally any
+            other parameters can be provided as a dict in custom_plot_parameters. By
+            default the data gets plotted as shown in the various tutorials.
+        kwargs : Any
+            custom key word parameters that shall be provided to each call of
+            the :attr:`custom_plot_function`
+        """
         self.plots = {}
         self.plot_filter = plot_filter
         self.custom_plot_function = custom_plot_function
@@ -1654,7 +1693,8 @@ class MonitorAgent(AgentMET4FOF):
         """
         Handles incoming data from 'default' and 'plot' channels.
 
-        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+        Stores 'default' data into :attr:`buffer` and 'plot' data into
+        :attr:`plots`
 
         Parameters
         ----------
@@ -1662,14 +1702,14 @@ class MonitorAgent(AgentMET4FOF):
             Acceptable channel values are 'default' or 'plot'
         """
         if message['channel'] == 'default':
-            if self.plot_filter != []:
+            if self.plot_filter:
                 message['data'] = {key: message['data'][key] for key in self.plot_filter}
             self.buffer_store(agent_from=message["from"], data=message["data"])
         elif message['channel'] == 'plot':
             self.update_plot_memory(message)
         return 0
 
-    def update_plot_memory(self, message):
+    def update_plot_memory(self, message: Dict[str, Any]):
         """
         Updates plot figures stored in `self.plots` with the received message
 
