@@ -154,7 +154,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
         """
         _time: np.ndarray = (
-            np.arange(self._sample_idx, self._sample_idx + batch_size, 1.0 / self.sfreq).reshape(-1, 1)
+            np.arange(self._sample_idx, self._sample_idx + batch_size, 1.0).reshape(-1, 1) / self.sfreq
         )
         self._sample_idx += batch_size
 
