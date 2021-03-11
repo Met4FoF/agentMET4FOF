@@ -48,9 +48,9 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
     """
 
     def __init__(
-            self,
-            value_unc: Union[float, Iterable[float]] = 0.0,
-            time_unc: Union[float, Iterable[float]] = 0.0,
+        self,
+        value_unc: Union[float, Iterable[float]] = 0.0,
+        time_unc: Union[float, Iterable[float]] = 0.0,
     ):
         """Initialize a MetrologicalDataStreamMET4FOF object
 
@@ -68,11 +68,11 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         self._time_unc: Union[float, Iterable[float]] = time_unc
 
     def set_generator_function(
-            self,
-            generator_function: Callable = None,
-            uncertainty_generator: Callable = None,
-            sfreq: int = None,
-            **kwargs: Optional[Any]
+        self,
+        generator_function: Callable = None,
+        uncertainty_generator: Callable = None,
+        sfreq: int = None,
+        **kwargs: Optional[Any]
     ) -> Callable:
         """
         Set value and uncertainty generators based on user-defined functions. By
@@ -125,9 +125,9 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         return self._generator_function_unc
 
     def _default_uncertainty_generator(
-            self,
-            time: Union[List, pd.DataFrame, np.ndarray],
-            values: Union[List, pd.DataFrame, np.ndarray],
+        self,
+        time: Union[List, pd.DataFrame, np.ndarray],
+        values: Union[List, pd.DataFrame, np.ndarray],
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Default (standard) uncertainty generator function
 
@@ -155,10 +155,10 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
         """
         _time: np.ndarray = (
-                np.arange(self._sample_idx, self._sample_idx + batch_size, 1.0).reshape(
-                    -1, 1
-                )
-                / self.sfreq
+            np.arange(self._sample_idx, self._sample_idx + batch_size, 1.0).reshape(
+                -1, 1
+            )
+            / self.sfreq
         )
         self._sample_idx += batch_size
 
@@ -220,17 +220,17 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     """
 
     def __init__(
-            self,
-            sfreq: int = 500,
-            sine_freq: float = 50,
-            device_id: str = "SineGenerator",
-            time_name: str = "time",
-            time_unit: str = "s",
-            quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
-            quantity_units: Union[str, Tuple[str, ...]] = "V",
-            misc: Optional[Any] = "Simple sine wave generator",
-            value_unc: Union[float, Iterable[float]] = 0.1,
-            time_unc: Union[float, Iterable[float]] = 0,
+        self,
+        sfreq: int = 500,
+        sine_freq: float = 50,
+        device_id: str = "SineGenerator",
+        time_name: str = "time",
+        time_unit: str = "s",
+        quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
+        quantity_units: Union[str, Tuple[str, ...]] = "V",
+        misc: Optional[Any] = "Simple sine wave generator",
+        value_unc: Union[float, Iterable[float]] = 0.1,
+        time_unc: Union[float, Iterable[float]] = 0,
     ):
         super(MetrologicalSineGenerator, self).__init__(
             value_unc=value_unc, time_unc=time_unc
