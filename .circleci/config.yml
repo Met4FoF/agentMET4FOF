@@ -247,6 +247,12 @@ jobs:
       name: publisher
 
     steps:
+      # Set the SSH key which has write access to GitHub repo for including our
+      # CHANGELOG.
+      - add_ssh_keys:
+          fingerprints:
+            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
+
       - checkout
       - install_all_deps
 
