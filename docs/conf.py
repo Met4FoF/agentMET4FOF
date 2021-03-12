@@ -53,7 +53,7 @@ html_theme_options = {
 # This should make Python built-in, Pandas, SciPy, PyDynamic and time-series-metadata
 # documentation available inside our docs.
 intersphinx_mapping = {
-    "Python": ("http://docs.python.org/", None),
+    "Python": ("https://docs.python.org/3", None),
     "pd": ("http://pandas.pydata.org/pandas-docs/dev", None),
     "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "PyDynamic": (
@@ -65,7 +65,7 @@ intersphinx_mapping = {
         None,
     ),
     "np": (
-        "http://docs.scipy.org/doc/numpy/",
+        "https://numpy.org/doc/stable/",
         None,
     ),
 }
@@ -91,6 +91,11 @@ nbsphinx_allow_errors = True
 shutil.copyfile(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "README.md")),
     os.path.join(os.path.dirname(__file__), "README.md"),
+)
+# Copy over CHANGELOG from root folder.
+shutil.copyfile(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG")),
+    os.path.join(os.path.dirname(__file__), "CHANGELOG.md"),
 )
 
 # Copy over all other specified folders from repository tree.
