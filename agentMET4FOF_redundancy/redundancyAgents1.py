@@ -52,7 +52,7 @@ class MetrologicalMultiWaveGeneratorAgent(MetrologicalAgent):
         streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            self.set_output_data(channel="default", data=self._data_stream._next_sample_generator())
+            self.set_output_data(channel="default", data=self._data_stream._next_sample_generator(batch_size=10))
             super().agent_loop()
 
     @property
@@ -185,7 +185,7 @@ class RedundancyAgent(MetrologicalAgent):
                     print('Not enough data for redundancy agent evaluation.')
                     return 0
 
-            buff = self.buffer.popleft(self.n_pr) # take n_pr entries out from the buffer
+            buff = self.buffer.popleft(self.n_pr)  # take n_pr entries out from the buffer
 
             t_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             ut_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
@@ -246,7 +246,6 @@ class RedundancyAgent(MetrologicalAgent):
                     data = np.array([t_data_arr2d[-1, 0], ut_data_arr2d[-1, 0], ybest[0], uybest[0]])
 
             # Send the data
-            # data = np.array([1,2,3,4])
             if len(data.shape) == 1:
                 data = data.reshape((1, len(data)))
 
