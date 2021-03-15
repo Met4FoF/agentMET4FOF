@@ -3,24 +3,14 @@ from typing import Dict, Union
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
-import numpy as np
 from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
-    # dict like {
-    #     <from>: {
-    #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata": MetaData(**kwargs).metadata,
-    #     }
+
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
     _input_data_maxlen: int
 
-    # dict like {
-    #     <channel> : {
-    #         "buffer" : TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata" : MetaData(**kwargs)
-    #     }
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
     _output_data_maxlen: int
 
