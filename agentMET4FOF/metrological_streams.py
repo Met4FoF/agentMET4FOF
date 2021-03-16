@@ -117,7 +117,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         if uncertainty_generator is None:
             warnings.warn(
                 "No uncertainty generator function specified. Setting to default ("
-                "constant)."
+                "value_unc = constant, time_unc = 0)."
             )
             self._generator_function_unc = self._default_uncertainty_generator
         else:

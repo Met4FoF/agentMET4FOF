@@ -29,21 +29,22 @@ def demonstrate_redundancy_agent_four_signals():
     problim = 0.95
 
     # start agent network server
-    agent_network = AgentNetwork(dashboard_modules=True)
+    agent_network: AgentNetwork = AgentNetwork(dashboard_modules=True)
 
     # Initialize signal generating class outside of agent framework.
     signal_arr = [MetrologicalMultiWaveGenerator(sfreq=fsam, freq_arr=np.array([freq]), intercept=intercept,
-                                             ampl_arr=np.array([ampl]), phase_ini_arr=np.array([phi]),
-                                             value_unc=exp_unc_abs) for freq, phi, ampl in zip(freqs, phases, ampls)]
+                                                 ampl_arr=np.array([ampl]), phase_ini_arr=np.array([phi]),
+                                                 value_unc=exp_unc_abs) for freq, phi, ampl in
+                  zip(freqs, phases, ampls)]
 
     # Data source agents.
     source_agents = []
     sensor_key_list = []
     for count, signal in enumerate(signal_arr):
-        sensor_key_list += ["Sensor" + str(count+1)]
-        source_agents += [agent_network.add_agent(name=sensor_key_list[count], agentType=MetrologicalMultiWaveGeneratorAgent)]
-        source_agents[count].init_parameters(signal=signal, batch_size=batch_size)
-
+        sensor_key_list += ["Sensor" + str(count + 1)]
+        source_agents += [
+            agent_network.add_agent(name=sensor_key_list[-1], agentType=MetrologicalMultiWaveGeneratorAgent)]
+        source_agents[-1].init_parameters(signal=signal, batch_size=batch_size)
 
     # Redundant data processing agent
     redundancy_name1 = "RedundancyAgent1"  # Name cannot contain spaces!!
@@ -51,7 +52,8 @@ def demonstrate_redundancy_agent_four_signals():
     redundancy_agent1.init_parameters1(sensor_key_list=sensor_key_list, calc_type="lcs", n_pr=n_pr, problim=problim)
 
     # Initialize metrologically enabled plotting agent.
-    monitor_agent1 = agent_network.add_agent(name="MonitorAgent_SensorValues", agentType=MetrologicalMonitorAgent) # Name cannot contain spaces!!
+    monitor_agent1 = agent_network.add_agent(name="MonitorAgent_SensorValues",
+                                             agentType=MetrologicalMonitorAgent)  # Name cannot contain spaces!!
     monitor_agent2 = agent_network.add_agent(name="MonitorAgent_RedundantEstimate", agentType=MetrologicalMonitorAgent)
 
     # Bind agents.
