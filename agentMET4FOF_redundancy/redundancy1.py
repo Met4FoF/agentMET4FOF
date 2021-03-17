@@ -178,7 +178,7 @@ def calc_best_estimate(y_arr, vy_arr2d, problim):
     chi2obs:    float
                 observed value of chi-squared, used for consistency evaluation
     """
-    # print('y_arr.shape = ', y_arr.shape)
+
     print(f'cbe y_arr = {y_arr}')
     n_estims = len(y_arr)
 

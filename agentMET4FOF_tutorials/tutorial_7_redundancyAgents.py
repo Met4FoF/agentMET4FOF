@@ -29,7 +29,7 @@ def demonstrate_redundancy_agent_four_signals():
     problim = 0.95
 
     # start agent network server
-    agent_network: AgentNetwork = AgentNetwork(dashboard_modules=True)
+    agent_network: AgentNetwork = AgentNetwork(dashboard_modules=True, backend='mesa')
 
     # Initialize signal generating class outside of agent framework.
     signal_arr = [MetrologicalMultiWaveGenerator(sfreq=fsam, freq_arr=np.array([freq]), intercept=intercept,
@@ -42,18 +42,17 @@ def demonstrate_redundancy_agent_four_signals():
     sensor_key_list = []
     for count, signal in enumerate(signal_arr):
         sensor_key_list += ["Sensor" + str(count + 1)]
-        source_agents += [
-            agent_network.add_agent(name=sensor_key_list[-1], agentType=MetrologicalMultiWaveGeneratorAgent)]
+        source_agents += [agent_network.add_agent(name=sensor_key_list[-1], agentType=MetrologicalMultiWaveGeneratorAgent)]
         source_agents[-1].init_parameters(signal=signal, batch_size=batch_size)
 
     # Redundant data processing agent
-    redundancy_name1 = "RedundancyAgent1"  # Name cannot contain spaces!!
+    redundancy_name1 = "RedundancyAgent1"
     redundancy_agent1 = agent_network.add_agent(name=redundancy_name1, agentType=RedundancyAgent)
-    redundancy_agent1.init_parameters1(sensor_key_list=sensor_key_list, calc_type="lcs", n_pr=n_pr, problim=problim)
+    redundancy_agent1.init_parameters(sensor_key_list=sensor_key_list, n_pr=n_pr, problim=problim,  calc_type="lcs")
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent1 = agent_network.add_agent(name="MonitorAgent_SensorValues",
-                                             agentType=MetrologicalMonitorAgent)  # Name cannot contain spaces!!
+                                             agentType=MetrologicalMonitorAgent)
     monitor_agent2 = agent_network.add_agent(name="MonitorAgent_RedundantEstimate", agentType=MetrologicalMonitorAgent)
 
     # Bind agents.

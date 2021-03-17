@@ -19,7 +19,7 @@ def demonstrate_redundancy_agent_onesignal():
     is started. The network and the calculated results can be monitored in a browser at the address http://127.0.0.1:8050/.
     """
     # parameters
-    batch_size = 10
+    batch_size = 20
     n_pr = 20
     fsam = 40
     f1 = 6
@@ -32,7 +32,7 @@ def demonstrate_redundancy_agent_onesignal():
     problim = 0.95
 
     # start agent network server
-    agent_network = AgentNetwork(dashboard_modules=True)
+    agent_network = AgentNetwork(dashboard_modules=True, backend='mesa')
 
     # Initialize signal generating class outside of agent framework.
     signal1 = MetrologicalMultiWaveGenerator(sfreq=fsam, freq_arr=np.array([f1, f2]), ampl_arr=np.array([ampl1, ampl2]),
@@ -47,7 +47,7 @@ def demonstrate_redundancy_agent_onesignal():
     sensor_key_list = [source_name1]
     redundancy_name1 = "RedundancyAgent1"
     redundancy_agent1 = agent_network.add_agent(name=redundancy_name1, agentType=RedundancyAgent)
-    redundancy_agent1.init_parameters1(sensor_key_list=sensor_key_list, calc_type="lcss", n_pr=n_pr, problim=problim)
+    redundancy_agent1.init_parameters(sensor_key_list=sensor_key_list, calc_type="lcss", n_pr=n_pr, problim=problim)
 
     # prior knowledge needed for redundant evaluation of the data
     redundancy_agent1.init_parameters2(fsam=fsam, f1=f1, f2=f2, ampl_ratio=ampl1/ampl2, phi1=phi1, phi2=phi2)

@@ -52,7 +52,7 @@ class MetrologicalMultiWaveGeneratorAgent(MetrologicalAgent):
         streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            self.set_output_data(channel="default", data=self._data_stream._next_sample_generator(batch_size=10))
+            self.set_output_data(channel="default", data=self._data_stream.next_sample(batch_size=10))
             super().agent_loop()
 
     @property
@@ -73,32 +73,26 @@ class RedundancyAgent(MetrologicalAgent):
     a_arr: np.ndarray
     a_arr2d: np.ndarray
 
-    def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
+    def init_parameters(
+        self,
+        input_data_maxlen: int = 25,
+        output_data_maxlen: int = 25,
+        sensor_key_list: list = None,
+        n_pr: int = 1,
+        problim: float = .9,
+        calc_type: str = 'lcs'
+    ):
         """
         Initialize the redundancy agent as an instance of the :py:mod:`MetrologicalAgent` class.
 
-        Parameters
+        Parent class parameters
         ----------
         input_data_maxlen: int
 
         output_data_maxlen: int
-        """
-        self.metadata = MetaData(
-            device_id="RedAgent01",
-            time_name="time",
-            time_unit="s",
-            quantity_names="m",
-            quantity_units="kg",
-            misc="nothing")
 
-        super().init_parameters(input_data_maxlen=25, output_data_maxlen=25)
-        self.set_output_data(channel="default", metadata=self.metadata)
 
-    def init_parameters1(self, calc_type, sensor_key_list, n_pr, problim):
-        """
         Parameters used for both methods :func:`lcs` and :func:`lcss`.
-
-        Parameters
         ----------
         calc_type: str
                    calculation type: 'lcs' or 'lcss'
@@ -107,12 +101,26 @@ class RedundancyAgent(MetrologicalAgent):
         n_pr:   integer
                 size of the batch of data that is handled at once by the Redundancy Agent
         problim: float
-                 limit probability used for conistency evaluation
+                 limit probability used for consistency evaluation
         """
+
+        if sensor_key_list is None:
+            sensor_key_list = []
+        super().init_parameters(input_data_maxlen=25, output_data_maxlen=25)
+        self.metadata = MetaData(
+            device_id="RedAgent01",
+            time_name="time",
+            time_unit="s",
+            quantity_names="m",
+            quantity_units="kg",
+            misc="nothing")
+
         self.calc_type = calc_type
         self.sensor_key_list = sensor_key_list
         self.n_pr = n_pr
         self.problim = problim
+
+        self.set_output_data(channel="default", metadata=self.metadata)
 
     def init_parameters2(self, fsam, f1, f2, ampl_ratio, phi1, phi2):
         """
@@ -136,18 +144,19 @@ class RedundancyAgent(MetrologicalAgent):
                 initial phase of second frequency component
         """
         # set-up vector a_arr and matrix a_arr2d for redundancy method
-        a = np.identity(self.n_pr)
+        id_mat = np.identity(self.n_pr)
+        id_fft = np.fft.fft(id_mat)
+
         n_pr2 = int(self.n_pr / 2)
-        afft = np.fft.fft(a)
-        bfft = np.real(afft[:n_pr2, :]) / n_pr2
-        cfft = -np.imag(afft[:n_pr2, :]) / n_pr2
+        bfft = id_fft[:n_pr2, :].real / n_pr2
+        cfft = -id_fft[:n_pr2, :].imag / n_pr2
+
         c1 = 1 / np.cos(phi1)
         c2 = 1 / np.sin(-phi1)
         c3 = ampl_ratio / np.cos(phi2)
         c4 = ampl_ratio / np.sin(-phi2)
 
-        t_max = self.n_pr / fsam
-        df = 1 / t_max
+        df = fsam / self.n_pr
 
         ind_freq1 = int(f1/df)
         ind_freq2 = int(f2/df)
@@ -161,6 +170,7 @@ class RedundancyAgent(MetrologicalAgent):
         a_row2 = a_row2.reshape((1, len(a_row2)))
         a_row3 = a_row3.reshape((1, len(a_row3)))
         a_row4 = a_row4.reshape((1, len(a_row4)))
+
         self.a_arr2d = np.concatenate((a_row1, a_row2, a_row3, a_row4), axis=0)
         self.a_arr = np.zeros(shape=(4, 1))
 
@@ -191,7 +201,6 @@ class RedundancyAgent(MetrologicalAgent):
             ut_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             x_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             ux_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
-            # print('buff = ', buff)
             i_sensor = 0
             # for key in buff.keys(): # arbitrary order
 
@@ -203,9 +212,7 @@ class RedundancyAgent(MetrologicalAgent):
                 ux_data_arr2d[:, i_sensor] = data_arr[:, 3]
                 i_sensor = i_sensor + 1
 
-            #print('calc_type: ', self.calc_type)
             if self.calc_type == "lcs":
-                #print('case lcs')
                 data = np.full(shape=(self.n_pr, 4), fill_value=np.nan)
                 for i_pnt in range(self.n_pr):
                     y_arr = np.array(x_data_arr2d[i_pnt, :])
@@ -213,7 +220,7 @@ class RedundancyAgent(MetrologicalAgent):
                     vy_arr2d = np.zeros(shape=(n_sensors, n_sensors))
                     for i_sensor in range(n_sensors):
                         vy_arr2d[i_sensor, i_sensor] = np.square(ux_data_arr2d[i_pnt, i_sensor])
-                    #data = np.array([1, 2, 3, 4])
+
                     n_sols, ybest, uybest, chi2obs, indkeep = calc_lcs(y_arr, vy_arr2d, self.problim)
                     if n_sols == 1:  # time stamp is value of first sensor
                         if isinstance(ybest, np.ndarray):
@@ -249,7 +256,6 @@ class RedundancyAgent(MetrologicalAgent):
             if len(data.shape) == 1:
                 data = data.reshape((1, len(data)))
 
-            # print('data = ', data)
             self.set_output_data(channel="default", data=data)
             super().agent_loop()
 
