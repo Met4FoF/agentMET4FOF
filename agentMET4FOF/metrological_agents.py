@@ -272,26 +272,6 @@ class MetrologicalAgentBuffer(AgentBuffer):
             self.buffer.update({agent_from: data})
         return self.buffer
 
-    def store(self, agent_from, data=None, concat_axis=0):
-        # if first argument is the agentMET4FOF dict message
-        if isinstance(agent_from, dict):
-            message = agent_from
-        # otherwise, we expect the name of agent_sender and the data to be passed
-        else:
-            message = {"from": agent_from, "data": data}
-
-        # store into a separate variables, it will be used frequently later for the type checks
-        message_from = message["from"]
-        message_data = message["data"]
-
-        # check if sender agent has sent any message before:
-        # if it did,then append, otherwise create new entry for the input agent
-        if message_from not in self.buffer:
-            self.update(message_from, message_data)
-            return 0
-        else:
-            self._concatenate(iterable=self.buffer[message_from],data=message_data, concat_axis=concat_axis)
-
     def _concatenate(self, iterable: TimeSeriesBuffer, data, concat_axis=0):
         """Concatenate the given ``iterable`` with ``data``
 
