@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
@@ -272,19 +273,28 @@ class MetrologicalAgentBuffer(AgentBuffer):
             self.buffer.update({agent_from: data})
         return self.buffer
 
-    def _concatenate(self, iterable: TimeSeriesBuffer, data, concat_axis=0):
-        """Concatenate the given ``iterable`` with ``data``
+    def _concatenate(
+        self,
+        iterable: TimeSeriesBuffer,
+        data: Union[np.ndarray, list, pd.DataFrame],
+        concat_axis: int = 0
+    ) -> TimeSeriesBuffer:
+        """Concatenate the given ``TimeSeriesBuffer`` with ``data``
 
-        Handles the concatenation function depending on the datatype, and truncates it
-        if the buffer is filled to `buffer_size`.
+        Add ``data`` to the :class:`TimeSeriesBuffer
+        <time-series-buffer:time_series_buffer.buffer.TimeSeriesBuffer>` object.
 
         Parameters
         ----------
-        iterable : any in supported_datatype
+        iterable : TimeSeriesBuffer
             The current buffer to be concatenated with.
-
         data : np.ndarray, DataFrame, list
             New incoming data
+
+        Returns
+        -------
+        TimeSeriesBuffer
+            the original buffer with the data appended
         """
         iterable.add(data)
         return iterable
