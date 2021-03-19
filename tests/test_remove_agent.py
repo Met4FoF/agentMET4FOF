@@ -14,6 +14,8 @@ def test_remove_agent(agent_network):
     dummy_agent3 = agent_network.add_agent(agentType=AgentMET4FOF)
     dummy_agent4 = agent_network.add_agent(agentType=AgentMET4FOF)
 
+    assert len(agent_network.agents()) != 0
+
     agent_network.bind_agents(dummy_agent1, dummy_agent2)
     agent_network.bind_agents(dummy_agent1, dummy_agent3)
     agent_network.bind_agents(dummy_agent1, dummy_agent4)
