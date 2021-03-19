@@ -9,11 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from threading import Timer
-from typing import Any, Callable, Dict, List, Optional, Union
-
-from multiprocessing.context import Process
-from threading import Thread, Timer
-from typing import Dict, Iterable, Optional, Sized, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sized, Tuple, Union
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -24,11 +20,9 @@ import pandas as pd
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
-from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from pandas import DataFrame
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
-
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF, SineGenerator
