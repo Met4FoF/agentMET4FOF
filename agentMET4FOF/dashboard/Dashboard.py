@@ -161,6 +161,11 @@ class AgentDashboard:
 class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
     """Represents an agent dashboard for the osBrain backend"""
 
+    def terminate(self):
+        """This is shutting down the application server serving the web interface"""
+        super(AgentDashboardProcess, self).terminate()
+        self._server.server_close()
+
 
 class AgentDashboardThread(AgentDashboard, Thread):
     """Represents an agent dashboard for the Mesa backend"""
@@ -206,6 +211,7 @@ class AgentDashboardThread(AgentDashboard, Thread):
         """This is shutting down the application server serving the web interface"""
         try:
             self._server.shutdown()
+            self._server.server_close()
         except AttributeError:
             # In this case the dashboard has in fact already been shutdown earlier.
             pass
