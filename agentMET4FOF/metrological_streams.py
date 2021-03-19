@@ -49,8 +49,10 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
     def __init__(
         self,
-        value_unc: Union[float, Iterable[float]] = 0.0,
-        time_unc: Union[float, Iterable[float]] = 0.0,
+        value_unc: float = 0.0,
+        time_unc: float = 0.0,
+        exp_unc: float = None,
+        cov_factor: int = 1,
     ):
         """Initialize a MetrologicalDataStreamMET4FOF object
 
@@ -60,12 +62,18 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             standard uncertainties associated with values
         time_unc : iterable of floats or float, optional (defaults to 0)
             standard uncertainties associated with timestamps
+        exp_unc : iterable of floats or float, optional (defaults to None)
+            expanded uncertainties associated with values
+        cov_factor : iterable of integers or integer, optional (defaults to 1)
+            coverage factor associated with the expanded uncertainty
         """
         super().__init__()
         self._uncertainty_parameters: Dict
         self._generator_function_unc: Callable
-        self._value_unc: Union[float, Iterable[float]] = value_unc
-        self._time_unc: Union[float, Iterable[float]] = time_unc
+        self._value_unc: float = value_unc
+        self._time_unc: float = time_unc
+        self.exp_unc: float = exp_unc
+        self.cov_factor: int = cov_factor
 
     def set_generator_function(
         self,
@@ -144,8 +152,12 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             constant time and value uncertainties each of the same shape
             as ``time``
         """
+        if not self.exp_unc:
+            self.value_unc = self.exp_unc / self.cov_factor
+
         _time_unc = np.full_like(time, fill_value=self.time_unc)
         _value_unc = np.full_like(values, fill_value=self.value_unc)
+
         return _time_unc, _value_unc
 
     def _next_sample_generator(self, batch_size: int = 1) -> np.ndarray:
@@ -229,8 +241,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
         quantity_units: Union[str, Tuple[str, ...]] = "V",
         misc: Optional[Any] = "Simple sine wave generator",
-        value_unc: Union[float, Iterable[float]] = 0.1,
-        time_unc: Union[float, Iterable[float]] = 0,
+        value_unc: float = 0.1,
+        time_unc: float = 0,
     ):
         super(MetrologicalSineGenerator, self).__init__(
             value_unc=value_unc, time_unc=time_unc
