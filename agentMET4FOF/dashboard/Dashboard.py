@@ -7,7 +7,7 @@ from wsgiref.simple_server import make_server
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pathos
+from multiprocess.context import Process
 
 from .Dashboard_Control import _Dashboard_Control
 
@@ -157,8 +157,7 @@ class AgentDashboard:
             return True
 
 
-
-class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
+class AgentDashboardProcess(AgentDashboard, Process):
     """Represents an agent dashboard for the osBrain backend"""
 
     def terminate(self):
