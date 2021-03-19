@@ -1,0 +1,14 @@
+# Changelog
+
+<!--next-version-placeholder-->
+
+## v0.6.1 (2021-03-12)
+### Fix
+* **metrological_streams:** Fixed computational error for batches of size more than one ([`686bad5`](https://github.com/Met4FoF/agentMET4FOF/commit/686bad58ee02b216ffb3c663c9492d7dd7aaf6df))
+* **agents:** Fixed `buffer.clear` method, which did not work anymore after moving from `memory` to `buffer`
+
+### Documentation
+* **README:** Include the Zenodo DOI banner and add the Citation section ([`4a57dd8`](https://github.com/Met4FoF/agentMET4FOF/commit/4a57dd8402590b9439ecf3bc47fbf950c6d44c7d))
+* **docstrings:** Seriously improve docstrings and type hinting in `agents.py` and `dashboard/LayoutHelper.py`
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/0.6.0...v0.6.1)**

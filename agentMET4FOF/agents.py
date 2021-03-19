@@ -8,6 +8,9 @@ import sys
 import time
 from collections import deque
 from io import BytesIO
+from threading import Timer
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from multiprocessing.context import Process
 from threading import Thread, Timer
 from typing import Dict, Iterable, Optional, Sized, Tuple, Union
@@ -21,11 +24,14 @@ import pandas as pd
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
+from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from pandas import DataFrame
 from plotly import tools as tls
+from plotly.graph_objs import Scatter
+
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
-from .streams import DataStreamMET4FOF
+from .streams import DataStreamMET4FOF, SineGenerator
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
@@ -73,9 +79,16 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.agent_loop()
 
     def _remove_methods(self, cls):
+        """Remove methods from the other backends base class from the current agent"""
         for name in list(vars(cls)):
             if not name.startswith("__"):
-                delattr(cls, name)
+                try:
+                    delattr(self, name)
+                except AttributeError:
+                    # This situation only occurs when we start and stop agent
+                    # networks of differing backends in one sequence. Normally
+                    # ignoring these errors should be no problem.
+                    pass
 
     def set_attr(self, **kwargs):
         for key, val in kwargs.items():
@@ -158,7 +171,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Method to reset the agent's states and parameters. User can override this method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
-        self.memory = {}
+        self.buffer.clear()
 
     def init_parameters(self):
         """
@@ -269,15 +282,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         return self.buffer.buffer_filled(agent_name)
 
-    def buffer_clear(self, agent_name=None):
+    def buffer_clear(self, agent_name: Optional[str] = None):
         """
         Empties buffer which is a dict indexed by the `agent_name`.
 
         Parameters
         ----------
-        agent_name : str
-            Key of the memory dict, which can be the name of input agent, or self.name. If one is not supplied, we assume to clear the entire memory.
-
+        agent_name : str, optional
+            Key of the memory dict, which can be the name of input agent, or self.name.
+            If not supplied (default), we assume to clear the entire memory.
         """
         self.buffer.clear(agent_name)
 
@@ -619,8 +632,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def get_all_attr(self):
         _all_attr = self.__dict__
-        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias", "PubAddr", "states", "log_mode", "get_all_attr",
-                    "plots", "name", "agent_loop"]
+        excludes = [
+            "Inputs",
+            "Outputs",
+            "buffer",
+            "PubAddr_alias",
+            "PubAddr",
+            "states",
+            "log_mode",
+            "get_all_attr",
+            "plots",
+            "name",
+            "agent_loop"
+        ]
         filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
         filtered_attr = {key: val for key, val in filtered_attr.items() if
                          key not in excludes and type(val).__name__ != 'function'}
@@ -1169,6 +1193,12 @@ class MesaModel(Model):
     def agents(self):
         return [agent.name for agent in self.schedule.agents]
 
+    def shutdown(self):
+        """Shutdown entire MESA model with all agents and schedulers"""
+        for agent in self.agents():
+            agent_obj = self.get_agent(agent)
+            agent_obj.shutdown()
+
 
 class AgentNetwork:
     """
@@ -1244,15 +1274,26 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
-            from .dashboard.Dashboard import AgentDashboard
+            # Initialize common dashboard parameters for both types of dashboards
+            # corresponding to different backends.
+            dashboard_params = {
+                "dashboard_modules": dashboard_modules,
+                "dashboard_layouts": [Dashboard_agt_net] + dashboard_extensions,
+                "dashboard_update_interval": dashboard_update_interval,
+                "max_monitors": dashboard_max_monitors,
+                "ip_addr": ip_addr,
+                "port": dashboard_port,
+                "agentNetwork": self,
+            }
+            # Initialize dashboard process/thread.
             if self.backend == "osbrain":
-                self.dashboard_proc = Process(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardProcess
+
+                self.dashboard_proc = AgentDashboardProcess(**dashboard_params)
             elif self.backend == "mesa":
-                self.dashboard_proc = Thread(target=AgentDashboard, args=(
-                    dashboard_modules, [Dashboard_agt_net] + dashboard_extensions, dashboard_update_interval,
-                    dashboard_max_monitors, ip_addr, dashboard_port, self))
+                from .dashboard.Dashboard import AgentDashboardThread
+
+                self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             self.dashboard_proc.start()
         else:
             self.dashboard_proc = None
@@ -1575,13 +1616,21 @@ class AgentNetwork:
         # processes are ended.
         if self.backend == "osbrain":
             self._get_controller().get_attr('ns').shutdown()
+        elif self.backend == "mesa":
+            self._get_controller().stop_mesa_timer()
+            self.mesa_model.shutdown()
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
-            # First shutdown the child process.
+            # This calls either the provided method Process.terminate() which
+            # abruptly stops the running multiprocess.Process in case of the osBrain
+            # backend or the self-written method in the class AgentDashboardThread
+            # ensuring the proper termination of the dash.Dash app.
             self.dashboard_proc.terminate()
-            # Then clean up the dangling process list entry.
-            self.dashboard_proc.join()
+            # Then wait for the termination of the actual thread or at least finish the
+            # execution of the join method in case of the "Mesa" backend. See #163
+            # for the search for a proper solution to this issue.
+            self.dashboard_proc.join(timeout=10)
         return 0
 
     def start_mesa_timer(self, update_interval):
@@ -1680,24 +1729,51 @@ class MonitorAgent(AgentMET4FOF):
     """
     Unique Agent for storing plots and data from messages received from input agents.
 
-    The dashboard searches for Monitor Agents' `memory` and `plots` to draw the graphs
+    The dashboard searches for Monitor Agents' `buffer` and `plots` to draw the graphs
     "plot" channel is used to receive base64 images from agents to plot on dashboard
 
     Attributes
     ----------
-    memory : dict
-        Dictionary of format `{agent1_name : agent1_data, agent2_name : agent2_data}`
-
     plots : dict
         Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
-
     plot_filter : list of str
         List of keys to filter the 'data' upon receiving message to be saved into memory
         Used to specifically select only a few keys to be plotted
+    custom_plot_function : callable
+        a custom plot function that can be provided to handle the data in the
+        monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+        gets provided with the content (value) of the buffer and with the string of the
+        sender agent's name as stored in the buffer's keys. Additionally any other
+        parameters can be provided as a dict in custom_plot_parameters.
+    custom_plot_parameters : dict
+        a custom dictionary of parameters that shall be provided to each call of the
+        custom_plot_function
     """
 
-    def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
-        self.memory = {}
+    def init_parameters(
+        self,
+        plot_filter: Optional[List[str]] = None,
+        custom_plot_function: Optional[Callable[..., Scatter]] = None,
+        **kwargs
+    ):
+        """Initialize the monitor agent's parameters
+
+        Parameters
+        ----------
+        plot_filter : list of str, optional
+            List of keys to filter the 'data' upon receiving message to be saved into
+            memory. Used to specifically select only a few keys to be plotted
+        custom_plot_function : callable, optional
+            a custom plot function that can be provided to handle the data in the
+            monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+            gets provided with the content (value) of the buffer and with the string of
+            the sender agent's name as stored in the buffer's keys. Additionally any
+            other parameters can be provided as a dict in custom_plot_parameters. By
+            default the data gets plotted as shown in the various tutorials.
+        kwargs : Any
+            custom key word parameters that shall be provided to each call of
+            the :attr:`custom_plot_function`
+        """
         self.plots = {}
         self.plot_filter = plot_filter
         self.custom_plot_function = custom_plot_function
@@ -1707,7 +1783,8 @@ class MonitorAgent(AgentMET4FOF):
         """
         Handles incoming data from 'default' and 'plot' channels.
 
-        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+        Stores 'default' data into :attr:`buffer` and 'plot' data into
+        :attr:`plots`
 
         Parameters
         ----------
@@ -1715,14 +1792,14 @@ class MonitorAgent(AgentMET4FOF):
             Acceptable channel values are 'default' or 'plot'
         """
         if message['channel'] == 'default':
-            if self.plot_filter != []:
+            if self.plot_filter:
                 message['data'] = {key: message['data'][key] for key in self.plot_filter}
             self.buffer_store(agent_from=message["from"], data=message["data"])
         elif message['channel'] == 'plot':
             self.update_plot_memory(message)
         return 0
 
-    def update_plot_memory(self, message):
+    def update_plot_memory(self, message: Dict[str, Any]):
         """
         Updates plot figures stored in `self.plots` with the received message
 
@@ -1817,3 +1894,36 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles += 1
             except:
                 raise Exception
+
+
+class SineGeneratorAgent(AgentMET4FOF):
+    """An agent streaming a sine signal
+
+    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
+    to connected agents via its output channel.
+    """
+
+    def init_parameters(self, sfreq=500, sine_freq=5):
+        """Initialize the input data
+
+        Initialize the input data stream as an instance of the :class:`SineGenerator`
+        class.
+
+        Parameters
+        ----------
+        sfreq : int
+            sampling frequency for the underlying signal
+        sine_freq : float
+            frequency of the generated sine wave
+        """
+        self._sine_stream = SineGenerator(sfreq=sfreq, sine_freq=sine_freq)
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input data
+        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
+        """
+        if self.current_state == "Running":
+            sine_data = self._sine_stream.next_sample()  # dictionary
+            self.send_output(sine_data["quantities"])

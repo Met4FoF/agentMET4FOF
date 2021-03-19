@@ -1,6 +1,4 @@
-import sys
 import warnings
-from collections import Iterable
 
 import dash
 import dash_core_components as dcc
@@ -9,14 +7,15 @@ import dash_html_components as html
 import networkx as nx
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
-from time_series_metadata.scheme import MetaData
 
 from . import LayoutHelper
-from .LayoutHelper import create_edges_cytoscape, create_monitor_graph, \
-    create_nodes_cytoscape
-from .. import agents as agentmet4fof_module
-
 from .Dashboard_layout_base import Dashboard_Layout_Base
+from .LayoutHelper import (
+    create_edges_cytoscape,
+    create_monitor_graph,
+    create_nodes_cytoscape,
+)
+from .. import agents as agentmet4fof_module
 
 
 class Dashboard_agt_net(Dashboard_Layout_Base):
@@ -418,20 +417,20 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             style_graphs = [{'opacity': 0, 'width': 10, 'height': 10} for i in range(app.num_monitors)]
 
             for monitor_id, monitor_agent in enumerate(agent_names):
-                memory_data = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
+                monitor_buffer = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
                 custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
                 data = []
-                for sender_agent in memory_data.keys():
+                for sender_agent, buffered_data in monitor_buffer.items():
                     # if custom plot function is not provided, resolve to default plotting
-                    if type(custom_plot_function).__name__ == "int":
-                        traces = create_monitor_graph(memory_data[sender_agent], sender_agent)
+                    if custom_plot_function is None:
+                        traces = create_monitor_graph(buffered_data, sender_agent)
                     # otherwise call custom plot function and load up custom plot parameters
                     else:
                         custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr(
                             'custom_plot_parameters')
                         # Handle iterable of traces.
                         traces = custom_plot_function(
-                            memory_data[sender_agent],
+                            buffered_data,
                             sender_agent,
                             **custom_plot_parameters
                         )
@@ -453,12 +452,13 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 # Check if any metadata is present that can be used to generate axis
                 # labels or otherwise use default labels.
                 if (
-                    isinstance(memory_data[sender_agent], dict)
-                    and "metadata" in memory_data[sender_agent].keys()
+                    len(monitor_buffer) > 0
+                    and isinstance(buffered_data, dict)
+                    and "metadata" in buffered_data.keys()
                 ):
                     # The metadata currently is always a list in the
                     # beginning containing at least one element.
-                    desc = memory_data[sender_agent]["metadata"][0]
+                    desc = buffered_data["metadata"][0]
 
                     # We now expect metadata to be of type
                     # time-series-metadata.scheme.MetaData. We try to access the
