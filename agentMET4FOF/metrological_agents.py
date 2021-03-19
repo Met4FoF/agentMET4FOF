@@ -9,6 +9,14 @@ from agentMET4FOF.agents import AgentMET4FOF
 class MetrologicalAgent(AgentMET4FOF):
 
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
+    """Input dictionary of all incoming data including metadata
+    
+    dict like {
+        <from>: {
+            "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+            "metadata": MetaData(**kwargs).metadata,
+        }
+    """
     _input_data_maxlen: int
 
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
