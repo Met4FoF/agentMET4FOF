@@ -260,22 +260,22 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
 
 class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
-    """
-    Class to generate data as a sum of cosine wave and additional Gaussian noise.
+    """Class to generate data as a sum of cosine wave and additional Gaussian noise.
+    
     Values with associated uncertainty are returned.
 
     Parameters
     ----------
-    sfreq:     float
-                sampling frequency which determines the time step when next_sample is called.
-    intercept: float
-                constant intercept of the signal
-    freq_arr:  np.ndarray of float
-              array with frequencies of components included in the signal
-    ampl_arr:  np.ndarray of float
-              array with amplitudes of components included in the signal
-    phase_ini_arr:  np.ndarray of float
-              array with initial phases of components included in the signal
+    sfreq : float
+        sampling frequency which determines the time step when next_sample is called.
+    intercept : float
+        constant intercept of the signal
+    freq_arr : np.ndarray of float
+        array with frequencies of components included in the signal
+    ampl_arr : np.ndarray of float
+        array with amplitudes of components included in the signal
+    phase_ini_arr : np.ndarray of float
+        array with initial phases of components included in the signal
     """
 
     def __init__(
