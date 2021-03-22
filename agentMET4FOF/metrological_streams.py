@@ -49,10 +49,10 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
     def __init__(
         self,
-        value_unc: float = 0.0,
-        time_unc: float = 0.0,
-        exp_unc: float = None,
-        cov_factor: int = 1,
+        value_unc: Optional[float] = 0.0,
+        time_unc: Optional[float] = 0.0,
+        exp_unc: Optional[float] = None,
+        cov_factor: Optional[int] = 1,
     ):
         """Initialize a MetrologicalDataStreamMET4FOF object
 
