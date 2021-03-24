@@ -52,28 +52,34 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         value_unc: Optional[float] = 0.0,
         time_unc: Optional[float] = 0.0,
         exp_unc: Optional[float] = None,
-        cov_factor: Optional[int] = 1,
+        cov_factor: Optional[float] = 1.0,
     ):
         """Initialize a MetrologicalDataStreamMET4FOF object
 
         Parameters
         ----------
-        value_unc : iterable of floats or float, optional (defaults to 0)
+        value_unc : float, optional (defaults to 0)
             standard uncertainties associated with values
-        time_unc : iterable of floats or float, optional (defaults to 0)
+        time_unc : float, optional (defaults to 0)
             standard uncertainties associated with timestamps
-        exp_unc : iterable of floats or float, optional (defaults to None)
+        exp_unc : float, optional (defaults to None)
             expanded uncertainties associated with values
-        cov_factor : iterable of integers or integer, optional (defaults to 1)
+        cov_factor : float, optional (defaults to 1)
             coverage factor associated with the expanded uncertainty
+
+        If exp_unc and cov_factor are given explicit values, they override value_unc
+        according to value_unc = exp_unc / cov_factor
         """
         super().__init__()
         self._uncertainty_parameters: Dict
         self._generator_function_unc: Callable
-        self._value_unc: float = value_unc
         self._time_unc: float = time_unc
         self.exp_unc: float = exp_unc
-        self.cov_factor: int = cov_factor
+        self.cov_factor: float = cov_factor
+        if self.exp_unc is not None:
+            self.value_unc: float = self.exp_unc / self.cov_factor
+        else:
+            self._value_unc: float = value_unc
 
     def set_generator_function(
         self,
@@ -152,9 +158,6 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
             constant time and value uncertainties each of the same shape
             as ``time``
         """
-        if not self.exp_unc:
-            self.value_unc = self.exp_unc / self.cov_factor
-
         _time_unc = np.full_like(time, fill_value=self.time_unc)
         _value_unc = np.full_like(values, fill_value=self.value_unc)
 
@@ -288,6 +291,9 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
         array with amplitudes of components included in the signal
     phase_ini_arr : np.ndarray of float
         array with initial phases of components included in the signal
+    noisy : bool
+        boolean to determine whether the generated signal should be noisy or "clean"
+        defaults to True
     """
 
     def __init__(
