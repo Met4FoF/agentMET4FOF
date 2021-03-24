@@ -81,6 +81,9 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         else:
             self._value_unc: float = value_unc
 
+        self._generator_function_unc = None
+        self._uncertainty_parameters = None
+
     def set_generator_function(
         self,
         generator_function: Callable = None,
