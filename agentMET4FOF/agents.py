@@ -1227,9 +1227,8 @@ class AgentNetwork:
                 print("Unable to connect to existing NameServer...")
             self.ns = 0
 
-    def start_server_osbrain(self, ip_addr="127.0.0.1", port=3333):
-        """
-        Only for osbrain backend. Starts a new AgentNetwork.
+    def start_server_osbrain(self, ip_addr: str = "127.0.0.1", port: int = 3333):
+        """Starts a new AgentNetwork for osBrain and initializes :attr:`_controller`
 
         Parameters
         ----------
@@ -1245,16 +1244,25 @@ class AgentNetwork:
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
             self.ns = run_nameserver(addr=ip_addr + ':' + str(port))
-        self.controller = run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True),
-                                    nsaddr=self.ns.addr(), addr=ip_addr)
-        self.logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
-        self.controller.init_parameters(ns=self.ns, backend=self.backend)
-        self.logger.init_parameters(log_filename=self.log_filename, save_logfile=self.save_logfile)
+        self._controller = run_agent(
+            "AgentController",
+            base=_AgentController,
+            attributes=dict(log_mode=True),
+            nsaddr=self.ns.addr(),
+            addr=ip_addr,
+        )
+        self._logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
+        self._controller.init_parameters(ns=self.ns, backend=self.backend)
+        self._logger.init_parameters(
+            log_filename=self.log_filename, save_logfile=self.save_logfile
+        )
 
     def start_server_mesa(self):
-        """
-        Handles the initialisation for backend == "mesa".
-        Involves spawning two nested objects : MesaModel and AgentController
+        """Starts a new AgentNetwork for Mesa and initializes :attr:`_controller`
+
+        Handles the initialisation for :attr:`backend` ``== "mesa"``. Involves
+        spawning two nested objects :attr:`mesa_model` and :attr:`_controller` and
+        calls :meth:`start_mesa_timer`.
         """
         self.mesa_model = MesaModel()
         self._controller = _AgentController(name="AgentController", backend=self.backend)
@@ -1428,23 +1436,11 @@ class AgentNetwork:
         return 0
 
     def _get_controller(self):
-        """
-        Internal method to access the AgentController relative to the nameserver
-
-        """
-        if self.backend == "osbrain":
-            if self._controller is None:
-                self._controller = self.ns.proxy('AgentController')
-
+        """Internal method to access the AgentController relative to the nameserver"""
         return self._controller
 
     def _get_logger(self):
-        """
-        Internal method to access the Logger relative to the nameserver
-
-        """
-        if self._logger is None:
-            self._logger = self.ns.proxy('Logger')
+        """Internal method to access the Logger relative to the nameserver"""
         return self._logger
 
     def get_agent(self, agent_name):

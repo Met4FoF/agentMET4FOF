@@ -7,7 +7,7 @@ from wsgiref.simple_server import make_server
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pathos
+from multiprocess.context import Process
 
 from .Dashboard_Control import _Dashboard_Control
 
@@ -157,9 +157,13 @@ class AgentDashboard:
             return True
 
 
-
-class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
+class AgentDashboardProcess(AgentDashboard, Process):
     """Represents an agent dashboard for the osBrain backend"""
+
+    def terminate(self):
+        """This is shutting down the application server serving the web interface"""
+        super(AgentDashboardProcess, self).terminate()
+        self._server.server_close()
 
 
 class AgentDashboardThread(AgentDashboard, Thread):
@@ -206,6 +210,7 @@ class AgentDashboardThread(AgentDashboard, Thread):
         """This is shutting down the application server serving the web interface"""
         try:
             self._server.shutdown()
+            self._server.server_close()
         except AttributeError:
             # In this case the dashboard has in fact already been shutdown earlier.
             pass

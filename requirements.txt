@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-arrow==0.17.0
+arrow==1.0.3
     # via jinja2-time
 binaryornot==0.4.4
     # via cookiecutter
@@ -47,7 +47,6 @@ dill==0.3.3
     # via
     #   multiprocess
     #   osbrain
-    #   pathos
 flask-compress==1.9.0
     # via dash
 flask==1.1.2
@@ -85,7 +84,7 @@ mesa==0.8.8.1
 mpld3==0.5.2
     # via agentMET4FOF (setup.py)
 multiprocess==0.70.11.1
-    # via pathos
+    # via agentMET4FOF (setup.py)
 networkx==2.5
     # via
     #   agentMET4FOF (setup.py)
@@ -100,22 +99,16 @@ numpy==1.20.1
     #   time-series-buffer
 osbrain==0.6.5
     # via agentMET4FOF (setup.py)
-pandas==1.2.2
+pandas==1.2.3
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
-pathos==0.2.7
-    # via agentMET4FOF (setup.py)
 plotly==4.14.3
     # via
     #   agentMET4FOF (setup.py)
     #   dash
-pox==0.2.9
-    # via pathos
 poyo==0.5.0
     # via cookiecutter
-ppft==1.6.6.3
-    # via pathos
 pyparsing==2.4.7
     # via matplotlib
 pyro4==4.80
@@ -144,7 +137,6 @@ six==1.15.0
     #   cookiecutter
     #   cycler
     #   plotly
-    #   ppft
     #   python-dateutil
     #   retrying
 text-unidecode==1.3
@@ -155,7 +147,7 @@ time-series-metadata==0.1.0
     # via agentMET4FOF (setup.py)
 tornado==6.1
     # via mesa
-tqdm==4.57.0
+tqdm==4.59.0
     # via mesa
 uncertainties==3.1.5
     # via time-series-buffer
