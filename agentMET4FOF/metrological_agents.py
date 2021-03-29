@@ -4,6 +4,10 @@ import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
 from agentMET4FOF.agents import AgentMET4FOF
+from .metrological_streams import (
+    MetrologicalDataStreamMET4FOF,
+    MetrologicalSineGenerator,
+)
 
 
 class MetrologicalAgent(AgentMET4FOF):
@@ -120,7 +124,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         self.plots = {}
         self.custom_plot_parameters = {}
 
-
     def on_received_message(self, message):
         """
         Handles incoming data from 'default' and 'plot' channels.
@@ -198,3 +201,49 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         else:
             trace = go.Scatter()
         return trace
+
+class MetrologicalSineGeneratorAgent(MetrologicalAgent):
+    """An agent streaming a sine signal
+
+    Takes samples from an instance of :py:class:`MetrologicalSineGenerator` with sampling frequency `sfreq` and
+    signal frequency `sine_freq` and pushes them sample by sample to connected agents via its output channel.
+    """
+
+    # The datatype of the stream will be MetrologicalSineGenerator.
+    _stream: MetrologicalDataStreamMET4FOF
+
+    def init_parameters(
+        self,
+        signal: MetrologicalDataStreamMET4FOF = MetrologicalSineGenerator(),
+        **kwargs
+    ):
+        """Initialize the input data stream
+
+        Parameters
+        ----------
+        sine_freq : float
+            the frequency of the
+        sfreq : int
+            the sampling frequency of the generated signal
+        value_unc : iterable of floats or float, optional
+            standard uncertainty(ies) of the quantity values. Defaults to 0.1.
+        time_unc : iterable of floats or float, optional
+            standard uncertainty of the time stamps. Defaults to 0.
+        """
+        self._stream = signal
+        super().init_parameters()
+        self.set_output_data(channel="default", metadata=self._stream.metadata)
+
+    @property
+    def device_id(self):
+        return self._stream.metadata.metadata["device_id"]
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input
+        datastream's content and push it into its output buffer.
+        """
+        if self.current_state == "Running":
+            self.set_output_data(channel="default", data=self._stream.next_sample())
+            super().agent_loop()
