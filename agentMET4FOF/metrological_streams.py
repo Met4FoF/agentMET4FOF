@@ -306,7 +306,7 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
                  ampl_arr: np.array = np.array([1]),
                  phase_ini_arr: np.array = np.array([0]),
                  intercept: float = 0,
-                 device_id: str = "DataGenerator",
+                 device_id: str = "MultiWaveDataGenerator",
                  time_name: str = "time",
                  time_unit: str = "s",
                  quantity_names: Union[str, Tuple[str, ...]] = ("Length", "Mass"),

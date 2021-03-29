@@ -202,7 +202,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
             trace = go.Scatter()
         return trace
 
-class MetrologicalSineGeneratorAgent(MetrologicalAgent):
+class MetrologicalGeneratorAgent(MetrologicalAgent):
     """An agent streaming a sine signal
 
     Takes samples from an instance of :py:class:`MetrologicalSineGenerator` with sampling frequency `sfreq` and
@@ -221,14 +221,8 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        sine_freq : float
-            the frequency of the
-        sfreq : int
-            the sampling frequency of the generated signal
-        value_unc : iterable of floats or float, optional
-            standard uncertainty(ies) of the quantity values. Defaults to 0.1.
-        time_unc : iterable of floats or float, optional
-            standard uncertainty of the time stamps. Defaults to 0.
+        signal : MetrologicalDataStreamMET4FOF
+            the underlying signal for the generator
         """
         self._stream = signal
         super().init_parameters()
