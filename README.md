@@ -93,7 +93,7 @@ industry-oriented use cases with the aim of impacting on IIoT applications. This
 to a framework that is specialized in representing heterogeneous sensor networks.
 </p>
 <p align="justify">
-A special emphasize is put on supporting metrological treatment of sensor streaming
+A special emphasis is put on supporting metrological treatment of sensor streaming
 data. This includes the consideration of measurement uncertainties during data analysis
 and processing as well as propagating metadata alongside the data itself.
 </p>
