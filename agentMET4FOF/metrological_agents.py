@@ -14,6 +14,14 @@ class MetrologicalAgent(AgentMET4FOF):
     #         "metadata": MetaData(**kwargs).metadata,
     #     }
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
+    """Input dictionary of all incoming data including metadata::
+
+        dict like {
+            <from>: {
+                "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+                "metadata": MetaData(**kwargs).metadata,
+            }
+    """
     _input_data_maxlen: int
 
     # dict like {
@@ -22,6 +30,14 @@ class MetrologicalAgent(AgentMET4FOF):
     #         "metadata" : MetaData(**kwargs)
     #     }
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
+    """Output dictionary of all outgoing data including metadata::
+
+        dict like {
+            <from>: {
+                "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+                "metadata": MetaData(**kwargs).metadata,
+            }
+    """
     _output_data_maxlen: int
 
     def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
