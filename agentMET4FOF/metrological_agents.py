@@ -205,8 +205,9 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
 class MetrologicalGeneratorAgent(MetrologicalAgent):
     """An agent streaming a specified signal
 
-    Takes samples from an instance of :py:class:`MetrologicalSineGenerator` with sampling frequency `sfreq` and
-    signal frequency `sine_freq` and pushes them sample by sample to connected agents via its output channel.
+    Takes samples from an instance of :py:class:`MetrologicalDataStreamMET4FOF
+    <agentMET4FOF.metrological_streams.MetrologicalDataStreamMET4FOF>` and pushes them
+    sample by sample to connected agents via its output channel.
     """
 
     # The datatype of the stream will be MetrologicalSineGenerator.
