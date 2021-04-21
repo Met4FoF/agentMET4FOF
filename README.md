@@ -89,11 +89,11 @@ corresponding data analysis. An excellent way to represent such networks is a
 multi-agent system (MAS), where independent software modules (agents) encapsulate
 properties and functionalities. agentMET4FOF is an interactive and flexible open-source
 implementation of such a MAS. The software engineering process is driven by several
-industry-oriented use cases with the aim of impacting on IIoT applications. This leads
+industry-oriented use cases with the aim of enabling IIoT applications. This leads
 to a framework that is specialized in representing heterogeneous sensor networks.
 </p>
 <p align="justify">
-A special emphasize is put on supporting metrological treatment of sensor streaming
+A special emphasis is put on supporting metrological treatment of sensor streaming
 data. This includes the consideration of measurement uncertainties during data analysis
 and processing as well as propagating metadata alongside the data itself.
 </p>
