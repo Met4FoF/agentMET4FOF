@@ -210,7 +210,6 @@ class MetrologicalGeneratorAgent(MetrologicalAgent):
     sample by sample to connected agents via its output channel.
     """
 
-    # The datatype of the stream will be MetrologicalSineGenerator.
     _stream: MetrologicalDataStreamMET4FOF
 
     def init_parameters(
