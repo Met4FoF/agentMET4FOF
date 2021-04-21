@@ -221,8 +221,10 @@ class MetrologicalGeneratorAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        signal : MetrologicalDataStreamMET4FOF
-            the underlying signal for the generator
+        signal : MetrologicalDataStreamMET4FOF, optional
+            the underlying signal for the generator, defaults to
+            :py:class:`MetrologicalSineGenerator 
+            <agentMET4FOF.metrological_streams.MetrologicalSineGenerator>`
         """
         self._stream = signal
         super().init_parameters()
