@@ -229,7 +229,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         the corresponding attribute of the created :class:`Metadata` object. Defaults to
         'Simple sine wave generator'.
     value_unc : iterable of floats or float, optional
-        standard uncertainty(ies) of the quantity values. Defaults to 0.5.
+        standard uncertainty(ies) of the quantity values. Defaults to 0.1.
     time_unc : iterable of floats or float, optional
         standard uncertainty of the time stamps. Defaults to 0.
     """
@@ -303,7 +303,7 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
                  ampl_arr: np.array = np.array([1]),
                  phase_ini_arr: np.array = np.array([0]),
                  intercept: float = 0,
-                 device_id: str = "DataGenerator",
+                 device_id: str = "MultiWaveDataGenerator",
                  time_name: str = "time",
                  time_unit: str = "s",
                  quantity_names: Union[str, Tuple[str, ...]] = ("Length", "Mass"),
