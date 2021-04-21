@@ -343,7 +343,7 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
         if noisy:
             value_arr += self.value_unc / 2 * norm.rvs(size=time.shape)
 
-        for ampl, freq, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
+        for freq, ampl, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
             value_arr += ampl * np.cos(2 * np.pi * freq * time + phase_ini)
 
         return value_arr
