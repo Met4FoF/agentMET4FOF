@@ -203,7 +203,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         return trace
 
 class MetrologicalGeneratorAgent(MetrologicalAgent):
-    """An agent streaming a sine signal
+    """An agent streaming a specified signal
 
     Takes samples from an instance of :py:class:`MetrologicalSineGenerator` with sampling frequency `sfreq` and
     signal frequency `sine_freq` and pushes them sample by sample to connected agents via its output channel.
