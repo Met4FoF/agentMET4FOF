@@ -53,9 +53,9 @@ class SineGeneratorAgent(AgentMET4FOF):
             sine_data = self._sine_stream.next_sample()  # dictionary
 
             if self.nested_output:
-                self.send_output({"Sensor1":sine_data["x"]*self.scaler,"Sensor2":sine_data["x"]*self.scaler+1.1})
+                self.send_output({"Sensor1":sine_data["quantities"]*self.scaler,"Sensor2":sine_data["quantities"]*self.scaler+1.1})
             else:
-                self.send_output(sine_data["x"]*self.scaler)
+                self.send_output(sine_data["quantities"]*self.scaler)
 
 
 
