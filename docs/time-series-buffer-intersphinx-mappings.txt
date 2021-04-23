@@ -1,0 +1,16 @@
+py:class
+	time_series_buffer.buffer.TimeSeriesBuffer time_series_buffer.buffer.html#time_series_buffer.buffer.TimeSeriesBuffer
+py:method
+	time_series_buffer.buffer.TimeSeriesBuffer.add time_series_buffer.buffer.html#time_series_buffer.buffer.TimeSeriesBuffer.add
+	time_series_buffer.buffer.TimeSeriesBuffer.pop time_series_buffer.buffer.html#time_series_buffer.buffer.TimeSeriesBuffer.pop
+	time_series_buffer.buffer.TimeSeriesBuffer.show time_series_buffer.buffer.html#time_series_buffer.buffer.TimeSeriesBuffer.show
+py:module
+	time_series_buffer.buffer                time_series_buffer.buffer.html#module-time_series_buffer.buffer
+std:doc
+	README                                   time-series-buffer - a metrological time-series buffer: README.html
+	index                                    time-series-buffer - a buffer for time-series with associated measurement uncertainties: index.html
+	time_series_buffer.buffer                TimeSeriesBuffer - the reference        : time_series_buffer.buffer.html
+std:label
+	genindex                                 Index                                   : genindex.html
+	modindex                                 Module Index                            : py-modindex.html
+	search                                   Search Page                             : search.html

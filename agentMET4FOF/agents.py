@@ -9,7 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from threading import Timer
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sized, Tuple, Union
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -20,6 +20,7 @@ import pandas as pd
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
+from pandas import DataFrame
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
 
@@ -125,7 +126,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
 
         buffer_size : int
-            The total number of elements to be stored in the agent `buffer`
+            The total number of elements to be stored in the agent :attr:`buffer`
             When total elements exceeds this number, the latest elements will be replaced with the incoming data elements
         """
         self.Inputs = {}
@@ -142,11 +143,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
-        self.buffer = AgentBuffer(self.buffer_size)
+        self.buffer = self.init_buffer(self.buffer_size)
 
         if self.backend == 'osbrain':
             self.PubAddr_alias = self.name + "_PUB"
             self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias, transport='tcp')
+
+    def init_buffer(self, buffer_size):
+        """
+        A method to initialise the buffer. By overriding this method, user can provide a custom buffer, instead of the regular AgentBuffer.
+        This can be used, for example, to provide a MetrologicalAgentBuffer in the metrological agents.
+        """
+        buffer = AgentBuffer(buffer_size)
+        return buffer
 
     def reset(self):
         """
@@ -646,55 +655,77 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             del self
 
 
-class AgentBuffer():
-    """
-    Buffer class which is instantiated in every agent to store data incrementally.
+class AgentBuffer:
+    """Buffer class which is instantiated in every agent to store data incrementally
+
     This buffer is necessary to handle multiple inputs coming from agents.
-    The buffer can be a dict of iterables, or a dict of dict of iterables for nested named data.
-    The keys are the names of agents.
 
-    We can access the buffer like a dict with exposed functions such as .values(), .keys() and .items(),
-    The actual dict object is stored in the variable `self.buffer`
+    We can access the buffer like a dict with exposed functions such as .values(),
+    .keys() and .items(). The actual dict object is stored in the variable
+    :attr:`buffer`.
+
+    Attributes
+    ----------
+    buffer : dict of iterables or dict of dicts of iterables
+        The buffer can be a dict of iterables, or a dict of dict of iterables for nested
+        named data. The keys are the names of agents.
+    buffer_size :
+        The total number of elements to be stored in the agent :attr:`buffer`
+    supported_datatypes : list of types
+        List of all types supported and thus properly handled by the buffer. Defaults to
+        :class:`np.ndarray <NumPy:numpy.ndarray>`, list and Pandas
+        :class:`DataFrame <Pandas:pandas.DataFrame>`
     """
 
-    def __init__(self, buffer_size=1000):
-        """
+    def __init__(self, buffer_size: int = 1000):
+        """Initialise a new agent buffer object
+
         Parameters
         ----------
-
         buffer_size: int
             Length of buffer allowed.
         """
         self.buffer = {}
         self.buffer_size = buffer_size
-        self.supported_datatype = (list, pd.DataFrame, np.ndarray)
+        self.supported_datatypes = [list, pd.DataFrame, np.ndarray]
 
     def __getitem__(self, key):
         return self.buffer[key]
 
-    def check_supported_datatype(self, value):
-        """
-        Checks whether `value` is one of the supported data types.
+    def check_supported_datatype(self, obj: object) -> bool:
+        """Checks whether `value` is an object of one of the supported data types
 
         Parameters
         ----------
-        value : iterable
-            Value to be checked.
+        obj : object
+            Value to be checked
 
         Returns
         ------
         result : boolean
+            True if value is an object of one of the supported data types, False if not
         """
-        for supported_datatype in self.supported_datatype:
-            if isinstance(value, supported_datatype):
+        for supported_datatype in self.supported_datatypes:
+            if isinstance(obj, supported_datatype):
                 return True
         return False
 
-    def update(self, agent_from: str, data):
-        """
-        Overrides data in the buffer dict keyed by `agent_from` with value `data`
+    def update(
+            self,
+            agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
+            data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
+    ):
+        """Overrides data in the buffer dict keyed by ``agent_from`` with value ``data``
 
-        If `data` is a single value, this converts it into a list first before storing in the buffer dict.
+        If ``data`` is a single value, this converts it into a list first before storing
+        in the buffer dict.
+
+        Parameters
+        ----------
+        agent_from : str
+            Name of agent sender
+        data : np.ndarray, DataFrame, list, float or int
+            New incoming data
         """
         # handle if data type nested in dict
         if isinstance(data, dict):
@@ -708,18 +739,28 @@ class AgentBuffer():
         self.buffer.update({agent_from: data})
         return self.buffer
 
-    def _concatenate(self, iterable, data, concat_axis=0):
-        """
-        Concatenate the given `iterable`, with `data`.
-        Handles the concatenation function depending on the datatype, and truncates it if the buffer is filled to `buffer_size`.
+    def _concatenate(
+            self,
+            iterable: Union[np.ndarray, list, pd.DataFrame],
+            data: Union[np.ndarray, list, DataFrame],
+            concat_axis: int = 0
+    ) -> Iterable:
+        """Concatenate the given ``iterable`` with ``data``
+
+        Handles the concatenation function depending on the datatype, and truncates it
+        if the buffer is filled to `buffer_size`.
 
         Parameters
         ----------
         iterable : any in supported_datatype
             The current buffer to be concatenated with.
 
-        data : any in supported_datatype
+        data : np.ndarray, DataFrame, list
             New incoming data
+
+        Returns
+        any in supported_datatype
+            the original buffer with the data appended
         """
         # handle list
         if isinstance(iterable, list):
@@ -744,51 +785,98 @@ class AgentBuffer():
                 iterable = iterable.truncate(before=truncated_element_index)
         return iterable
 
-    def buffer_filled(self, agent_from=None):
-        """
-        Checks whether buffer is filled, by comparing against the `buffer_size`.
+    def buffer_filled(self, agent_from: Optional[str] = None) -> bool:
+        """Checks whether buffer is filled, by comparing against the :attr:`buffer_size`
+
+        For nested dict, this returns True if any of the iterables is beyond the
+        :attr:`buffer_size`. For any of the dict values , which is not one of
+        :attr:`supported_datatypes` this returns None.
 
         Parameters
         ----------
-        agent_from : str
-            Name of input agent in the buffer dict to be looked up for.
-            If `agent_from` is not provided, we check for all iterables in the buffer.
-            For nested dict, this returns true for any iterable which is beyond the `buffer_size`.
+        agent_from : str, optional
+            Name of input agent in the buffer dict to be looked up. If ``agent_from``
+            is not provided, we check for all iterables in the buffer (default).
+
+        Returns
+        -------
+        bool or None
+            True if either the or any of the iterables has reached
+            :attr:`buffer_size` or None in case none of the values is of one of the
+            supported datatypes. False if all present iterable can take at least
+            one more element according to :attr:`buffer_size`.
         """
         if agent_from is None:
-            return any([self._iterable_filled(iterable) for iterable in self.buffer.values()])
-        elif isinstance(self.buffer[agent_from], dict):
-            return any([self._iterable_filled(iterable) for iterable in self.buffer[agent_from].values()])
+            return any([self._iterable_filled(iterable) for iterable in self.values()])
+        elif isinstance(self[agent_from], dict):
+            return any([self._iterable_filled(iterable) for iterable in self[agent_from].values()])
         else:
-            return self._iterable_filled(self.buffer[agent_from])
+            return self._iterable_filled(self[agent_from])
 
-    def _iterable_filled(self, iterable):
-        """
-        Internal method for checking on length of iterable.
+    def _iterable_filled(self, iterable: Sized) -> Union[bool, None]:
+        """Internal method for checking on length of iterables of supported types
+
+        Parameters
+        ----------
+        iterable : Any
+            Expected to be an iterable of one of the supported datatypes but could be
+            any.
+
+        Returns
+        -------
+        bool or None
+            True if the iterable is of one of the supported datatypes and has reached
+            :attr:`buffer_size` in length or False if not or None in case it is not of
+            one of the supported datatypes.
         """
         if self.check_supported_datatype(iterable):
             if len(iterable) >= self.buffer_size:
                 return True
-            else:
-                return False
+            return False
 
-    def popleft(self, n=1):
-        """
-        Pops the first n entries in the buffer.
+    def popleft(self, n: Optional[int] = 1) -> Union[Dict, np.ndarray, list, DataFrame]:
+        """Pops the first n entries in the buffer
+
+        Parameters
+        ---------
+        n : int
+            Number of elements to retrieve from buffer
+
+        Returns
+        -------
+        dict, :class:`np.ndarray <NumPy:numpy.ndarray>`, list or Pandas
+        :class:`DataFrame <Pandas:pandas.DataFrame>`
+            The retrieved elements
         """
         popped_buffer = copy.copy(self.buffer)
         remaining_buffer = copy.copy(self.buffer)
         if isinstance(popped_buffer, dict):
-            for key in popped_buffer.keys():
-                popped_buffer[key], remaining_buffer[key] = self._popleft(popped_buffer[key], n)
+            for key, value in popped_buffer.items():
+                value, remaining_buffer[key] = self._popleft(value, n)
         else:
             popped_buffer, remaining_buffer = self._popleft(popped_buffer, n)
         self.buffer = remaining_buffer
         return popped_buffer
 
-    def _popleft(self, iterable, n=1):
-        """
-        Internal method to handle the actual popping mechanism based on the type of iterable.
+    def _popleft(
+            self,
+            iterable: Union[np.ndarray, list, DataFrame],
+            n: Optional[int] = 1
+    ) -> Tuple[Union[np.ndarray, list, DataFrame], Union[np.ndarray, list, DataFrame]]:
+        """Internal handler of the actual popping mechanism based on type of iterable
+
+        Parameters
+        ---------
+        n : int
+            Number of elements to retrieve from buffer.
+        iterable : any in :attr:`supported_datatypes`
+            The current buffer to retrieve from.
+
+        Returns
+        -------
+        2-tuple of each either one of :class:`np.ndarray <NumPy:numpy.ndarray>`,
+        list or Pandas :class:`DataFrame <Pandas:pandas.DataFrame>`
+            The retrieved elements and the residual items in the buffer
         """
         popped_item = 0
         if isinstance(iterable, list):
@@ -802,51 +890,53 @@ class AgentBuffer():
             iterable = iterable.iloc[n:]
         return popped_item, iterable
 
-    def clear(self, agent_from=None):
-        """
-        Clears the data in the buffer. if `agent_from` is not given, the entire buffer is removed.
+    def clear(self, agent_from: Optional[str] = None):
+        """Clears the data in the buffer
 
-        agent_from : str
-            Name of agent
+        Parameters
+        ----------
+        agent_from : str, optional
+            Name of agent, if ``agent_from`` is not given, the entire buffer is
+            flushed. (default)
         """
         if agent_from is None:
-            del self.buffer
             self.buffer = {}
-        else:
+        elif agent_from in self.buffer:
             del self.buffer[agent_from]
 
-    def store(self, agent_from, data=None, concat_axis=0):
-        """
-        Stores data into `self.buffer` with the received message
+    def store(
+        self,
+        agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
+        data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
+        concat_axis: Optional[int] = 0,
+    ):
+        """Stores data into :attr:`buffer` with the received message
 
-        Checks if sender agent has sent any message before
-        If it did, then append, otherwise create new entry for it
+        Checks if sender agent has sent any message before. If it did, then append,
+        otherwise create new entry for it.
 
         Parameters
         ----------
         agent_from : dict | str
             if type is dict, we expect it to be the agentMET4FOF dict message to be
-            compliant with older code otherwise, we expect it to be name of agent
-            sender and `data` will need to be passed as parameter
-        data
-            optional if agent_from is a dict. Otherwise this parameter is compulsory.
-            Any supported data which can be stored in dict as buffering.
-
-        concat_axis : int
-            optional axis to concatenate on with the buffering for numpy arrays.
+            compliant with older code (keys ``from`` and ``data`` present'), otherwise
+            we expect it to be name of agent sender and ``data`` will need to be passed
+            as parameter
+        data : np.ndarray, DataFrame, list, float or int
+            Not used if ``agent_from`` is a dict. Otherwise ``data`` is compulsory.
+        concat_axis : int, optional
+            axis to concatenate on with the buffering for numpy arrays.
             Default is 0.
-
         """
-        # if first argument is the agentMET4FOF dict message
+        # Store into a separate variables, it will be used frequently later for the
+        # type checks. If first argument is the agentMET4FOF dict message in old format
         if isinstance(agent_from, dict):
-            message = agent_from
-        # otherwise, we expect the name of agent_sender and the data to be passed
+            message_from = agent_from["from"]
+            message_data = agent_from["data"]
+        # ... otherwise, we expect the name of agent_sender and the data to be passed.
         else:
-            message = {"from": agent_from, "data": data}
-
-        # store into a separate variables, it will be used frequently later for the type checks
-        message_from = message["from"]
-        message_data = message["data"]
+            message_from = agent_from
+            message_data = data
 
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for the input agent
@@ -876,21 +966,15 @@ class AgentBuffer():
             self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
 
     def values(self):
-        """
-        Interface to access the internal dict's values()
-        """
+        """Interface to access the internal dict's values()"""
         return self.buffer.values()
 
     def items(self):
-        """
-        Interface to access the internal dict's items()
-        """
+        """Interface to access the internal dict's items()"""
         return self.buffer.items()
 
     def keys(self):
-        """
-        Interface to access the internal dict's keys()
-        """
+        """Interface to access the internal dict's keys()"""
         return self.buffer.keys()
 
 class _AgentController(AgentMET4FOF):
