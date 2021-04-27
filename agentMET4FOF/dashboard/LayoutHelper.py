@@ -23,10 +23,13 @@ def create_nodes_cytoscape(agent_graph):
 
     return new_elements
 
-def create_edges_cytoscape(edges):
+def create_edges_cytoscape(edges, hide_default_edge=True):
     new_elements =[]
     for edge in edges:
-        new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        if hide_default_edge and isinstance(edge[2]['channel'], str) and edge[2]['channel'] == "default":
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        else:
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1], 'channel': edge[2]['channel']}}]
     return new_elements
 
 def create_monitor_graph(data,sender_agent = 'Monitor Agent'):

@@ -30,7 +30,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         return [dcc.Graph(id='monitors-graph-' + str(i), figure={}, style={'height': '90vh'}) for i in
                 range(num_monitors)]
 
-    def get_layout(self, update_interval_seconds=3, num_monitors=10):
+    def get_layout(self):
         # body
         return html.Div(className="row", children=[
 
@@ -58,59 +58,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         cyto.Cytoscape(
                             id='agents-network',
                             layout={'name': 'breadthfirst'},
-                            style={'width': '100%', 'height': '600px'},
+                            style={'width': '100%', 'height': '800px'},
                             elements=[],
-                            stylesheet=[
-                                {'selector': 'node', 'style':
-                                    {'label': 'data(id)',
-                                     'shape': 'rectangle'}
-                                 },
-                                {'selector': 'edge',
-                                 'style': {'curve-style': 'bezier', 'mid-target-arrow-shape':
-                                     'triangle', 'arrow-scale': 2, 'line-color': '#4287f5',
-                                           'mid-target-arrow-color': '#4287f5'},
-                                 },
-                                {
-                                    'selector': '.rectangle',
-                                    'style': {
-                                        'shape': 'rectangle'
-                                    }
-                                },
-                                {
-                                    'selector': '.triangle',
-                                    'style': {
-                                        'shape': 'triangle'
-                                    }
-                                },
-                                {
-                                    'selector': '.octagon',
-                                    'style': {
-                                        'shape': 'octagon'
-                                    }
-                                },
-                                {
-                                    'selector': '.ellipse',
-                                    'style': {
-                                        'shape': 'ellipse'
-                                    }
-                                },
-                                {
-                                    'selector': '.bluebackground',
-                                    'style': {
-                                        'background-color': '#c4fdff'
-                                    }
-                                },
-                                {
-                                    'selector': '.blue',
-                                    'style': {
-                                        'background-color': '#006db5'
-                                    }
-                                },
-                                {
-                                    'selector': '.coalition',
-                                    'style': {'line-style': 'dashed'}
-                                },
-                            ]
+                            stylesheet=self.app.network_stylesheet,
 
                         )
 
@@ -119,7 +69,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 ]),
                 html.H5(className="card", id="matplotlib-division", children=" "),
                 html.Div(className="card", id="monitors-temp-division",
-                         children=self.get_multiple_graphs(num_monitors)),
+                         children=self.get_multiple_graphs(self.app.num_monitors)),
 
             ]),
 
@@ -202,7 +152,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             ]),
             dcc.Interval(
                 id='interval-component-network-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
+                interval=self.app.update_interval_seconds * 1000,  # in milliseconds
                 n_intervals=0
             ),
             dcc.Interval(
@@ -212,7 +162,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             ),
             dcc.Interval(
                 id='interval-update-monitor-graph',
-                interval=update_interval_seconds * 1000,  # in milliseconds
+                interval=self.app.update_interval_seconds * 1000,  # in milliseconds
                 n_intervals=0
             ),
             dcc.Interval(
@@ -254,12 +204,12 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                 new_G.add_edges_from(edges)
 
                 nodes_elements = create_nodes_cytoscape(new_G)
-                edges_elements = create_edges_cytoscape(edges)
+                edges_elements = create_edges_cytoscape(edges, app.hide_default_edge)
                 # print(edges_elements)
                 # draw coalition nodes, and assign child nodes to coalition nodes
                 if len(agentNetwork.coalitions) > 0:
                     parent_elements = [{"data": {'id': coalition.name, 'label': coalition.name},
-                                        'classes': 'bluebackground'} for coalition in agentNetwork.coalitions]
+                                        'classes': 'coalition'} for coalition in agentNetwork.coalitions]
                     for coalition in coalitions:
                         # check if agent is in the coalition, set its parents
                         for agent_node in nodes_elements:
@@ -270,7 +220,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         for edges in edges_elements:
                             if edges["data"]["source"] in coalition.agent_names() and edges["data"][
                                 "target"] in coalition.agent_names():
-                                edges.update({'classes': "coalition"})
+                                edges.update({'classes': "coalition-edge"})
                 else:
                     parent_elements = []
 
@@ -505,7 +455,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and agentNetwork.get_mode() != "Reset" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_names = agentNetwork.agents('MonitorAgent')  # get all agent names
+            agent_names = agentNetwork.agents(filter_agent='Monitor')  # get all agent names
             app.num_monitor = len(agent_names)
             monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
             style_graphs = [{'opacity': 0, 'width': 10, 'height': 10} for i in range(app.num_monitors)]
@@ -648,16 +598,16 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_names = agentNetwork.agents()  # get all agent names
-            agent_type = "Monitor"  # all agents with Monitor in its name will be selected
+            agent_type = "Monitor"
+            agent_names = agentNetwork.agents(filter_agent=agent_type)  # get all agent names
+              # all agents with Monitor in its name will be selected
             plots_data = {}  # storage for all monitor agent's memory
 
             # load data from all Monitor agent's memory
             for agent_name in agent_names:
-                if agent_type in agent_name:
-                    monitor_agent = agentNetwork.get_agent(agent_name)
-                    plots = monitor_agent.get_attr('plots')
-                    plots_data.update({agent_name: plots})
+                monitor_agent = agentNetwork.get_agent(agent_name)
+                plots = monitor_agent.get_attr('plots')
+                plots_data.update({agent_name: plots})
 
             # now monitors_data = {'monitor_agent1_name':agent1_memory, 'monitor_agent2_name':agent2_memory }
             # now create a plot for each monitor agent
