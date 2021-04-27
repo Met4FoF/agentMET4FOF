@@ -6,6 +6,7 @@
 #
 arrow==1.0.3
     # via jinja2-time
+visdcc==0.0.40
 binaryornot==0.4.4
     # via cookiecutter
 brotli==1.0.9
