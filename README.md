@@ -2,7 +2,7 @@
   <!-- CircleCI Tests -->
   <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield"></a>
   <!-- ReadTheDocs Documentation -->
-  <a href="https://riverml.xyz">
+  <a href="https://agentmet4fof.readthedocs.io/">
     <img src="https://readthedocs.org/projects/agentmet4fof/badge/?version=latest" alt="ReadTheDocs badge">
   </a>
   <!-- CodeCov(erage) -->
@@ -17,6 +17,9 @@
   <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
     <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
   </a>
+  <!-- Zenodo DOI -->
+  <a href="https://doi.org/10.5281/zenodo.4560343">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4560343.svg" alt="DOI"></a>
 </p>
 
 <h1 align="center">Multi-Agent System for IIoT</h1>
@@ -36,9 +39,10 @@ in the section <a href="#about">About</a>.
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
 - [💨 Coming soon](#coming-soon)
+- [🖋 Citation](#citation)
 - [💎 Acknowledgement](#acknowledgement)
 - [⚠ Disclaimer](#disclaimer)
-- [©️ License](#license)
+- [© License](#license)
 
 ## 💫Quickstart
 
@@ -85,11 +89,11 @@ corresponding data analysis. An excellent way to represent such networks is a
 multi-agent system (MAS), where independent software modules (agents) encapsulate
 properties and functionalities. agentMET4FOF is an interactive and flexible open-source
 implementation of such a MAS. The software engineering process is driven by several
-industry-oriented use cases with the aim of impacting on IIoT applications. This leads
+industry-oriented use cases with the aim of enabling IIoT applications. This leads
 to a framework that is specialized in representing heterogeneous sensor networks.
 </p>
 <p align="justify">
-A special emphasize is put on supporting metrological treatment of sensor streaming
+A special emphasis is put on supporting metrological treatment of sensor streaming
 data. This includes the consideration of measurement uncertainties during data analysis
 and processing as well as propagating metadata alongside the data itself.
 </p>
@@ -157,6 +161,11 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
 
+## 🖋Citation
+
+If you publish results obtained with the help of agentMET4FOF, please cite the linked
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)](https://doi.org/10.5281/zenodo.4560344).
+
 ## 💎Acknowledgement
 
 This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://www.ptb.de/empir2018/met4fof/home/)
@@ -171,6 +180,7 @@ This software is developed as a joint effort of several project partners namely:
 - [Institute for Manufacturing of the University of Cambridge (IfM)](https://www.ifm.eng.cam.ac.uk/)
 - [Physikalisch-Technische Bundesanstalt (PTB)](https://www.ptb.de/)
 - [Van Swinden Laboratory (VSL)](https://www.vsl.nl/en/)
+- [National Physics Laboratory (NPL)](https://www.npl.co.uk/)
 
 under the lead of IfM. The software is made available "as is" free of cost. The 
 authors and their institutions assume no responsibility whatsoever for its use by 
@@ -179,7 +189,7 @@ reliability, safety, suitability or any other characteristic. In no event will t
 authors be liable for any direct, indirect or consequential damage arising in 
 connection with the use of this software.
 
-## ©️License
+## ©License
 
 agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
 

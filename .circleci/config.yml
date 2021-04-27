@@ -19,35 +19,37 @@ workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      - test_against_venv:
-          filters:
-            tags:
-              # Include tag filter to trigger as well on tag pushes.
-              only: /.*/
-      - test_against_conda:
-          filters:
-            tags:
-              # Include tag filter to trigger as well on tag pushes.
-              only: /.*/
-      - test_against_setup:
-          filters:
-            tags:
-              # Include tag filter to trigger as well on tag pushes.
-              only: /.*/
-      - deploy:
-          # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
-          # pushes, which successfully run 'test' job and are tagged with version.
+      - test_against_venv
+      - test_against_conda
+      - test_against_setup
+      - preview_release:
+          # Test the 'release' job to avoid trouble when Pull Requests get merged and
+          # to preview publishing actions and the new changelog.
           requires:
-              - test_against_venv
-              - test_against_conda
-              - test_against_setup
+            - test_against_venv
+            - test_against_conda
+            - test_against_setup
+      - confirm_previewed_release_actions:
+          # This job allows for checking that the release we will create in the
+          # next step actually is the desired release, by observing the result of
+          # preview_release.
+          type: approval
+          requires:
+            - preview_release
           filters:
-              tags:
-                # Specify the tags which trigger the job as regular expression.
-                only: /[0-9]*+(\.[0-9]+)*+(\.(dev)[0-9]+|((a|b)|rc)[0-9]+)?/
-              branches:
-                # This assures the job only being triggered by tag pushes.
-                ignore: /.*/
+            branches:
+              # This assures the job only being triggered on branch master.
+              only: /develop/
+      - release:
+          # Job to potentially create a release based on python-semantic-release's
+          # decision and publish it on GitHub, Zenodo and PyPI.org. This requires manual
+          # approval in the previous step, which is only triggered on branch master,
+          # thus this job here is triggered only on master as well.
+          context:
+            - pypi.org publishing for agentMET4FOF
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+          requires:
+            - confirm_previewed_release_actions
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -58,7 +60,7 @@ commands:
     - run:
         name: Create test result folder
         command: |
-          mkdir -p test-reports
+          mkdir -p test-results
 
   run_venv_tests:
     description: "Run and store test results."
@@ -78,7 +80,7 @@ commands:
         name: Run tests
         command: |
           source venv/bin/activate
-          tox | tee --append test-reports/agentMET4FOF.log
+          tox | tee --append test-results/agentMET4FOF.log
 
     # Upload coverage report if the according parameter is set to `true`.
     - when:
@@ -97,11 +99,21 @@ commands:
     steps:
     # Store test results.
     - store_artifacts:
-        path: test-reports
-        destination: test-reports
+        path: test-results
+        destination: test-results
 
     - store_test_results:
-        path: test-reports
+        path: test-results
+
+  install_all_deps:
+    description: "Install dependencies."
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt -r dev-requirements.txt
 
 jobs:
   # Define one 'test' job to run their test suites against the
@@ -158,7 +170,7 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            tox | tee --append test-reports/agentMET4FOF.log
+            tox | tee --append test-results/agentMET4FOF.log
 
       - store_test_artifacts_and_results
 
@@ -232,65 +244,55 @@ jobs:
       # Run tests! We use pytest's test-runner.
       - run_venv_tests
 
-  deploy:
-    executor: publisher
+  release:
+    executor:
+      name: publisher
 
     steps:
-      # Checkout code.
+      # Set the SSH key which has write access to GitHub repo for including our
+      # CHANGELOG.
+      - add_ssh_keys:
+          fingerprints:
+            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
+
       - checkout
+      - install_all_deps
 
-      # Download and cache dependencies.
-      - restore_cache:
-          keys:
-            # Specify the unique identifier for the cache.
-            - v1-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
-            - v1-dependencies-deploy-
-
-      # Install dependencies if necessary.
+      # Publish it, if there is anything to publish!
       - run:
-         name: Install dependencies
-         command: |
-           python3 -m venv agent_venv
-           source agent_venv/bin/activate
-           pip install --upgrade -r requirements.txt
-           pip install --upgrade setuptools wheel twine
-
-      - save_cache:
-          paths:
-            - ./agent_venv
-          key: v1-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
-
-      # Verify Git tag to version to ensure, only wanted versions are uploaded.
-      - run:
-          name: Verify Git tag vs. version
+          name: Run semantic-release publish
           command: |
-            source agent_venv/bin/activate
-            python setup.py verify
+            source venv/bin/activate
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            semantic-release publish
 
-      # Create a package.
+  preview_release:
+    executor:
+      name: publisher
+
+    steps:
+      - checkout
+      - install_all_deps
+
+      # Fake publish, just to make sure everything works after merging a PR and
+      # before actual release jos run.
       - run:
-          name: Create package
+          name: Preview python-semantic-release actions
           command: |
-            source agent_venv/bin/activate
-            python3 setup.py sdist bdist_wheel
+            unset CIRCLE_PULL_REQUEST CIRCLE_PULL_REQUESTS CI_PULL_REQUEST \
+              CI_PULL_REQUESTS
+            export CIRCLE_BRANCH=develop
+            source venv/bin/activate
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            echo "
+            The changelog of the next release will contain:
+            "
+            semantic-release --unreleased changelog
+            echo "
+            -----------------------------------------------------------
 
-      # Store test results as artifacts.
-      - store_artifacts:
-         path: dist
-         destination: dist
-
-      # We create a .pypirc to provide the username and password.
-      - run:
-          name: Create .pypirc
-          command: |
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username: __token__" >> ~/.pypirc
-            echo -e "password: $PYPI_PASSWORD" >> ~/.pypirc
-
-      # Upload the created packages to test.pypi.org.
-      - run:
-          name: Upload to PyPI.org
-          command: |
-            source agent_venv/bin/activate
-            twine upload dist/*
+            python-semantic-release would perform the following actions:
+            "
+            semantic-release --noop publish

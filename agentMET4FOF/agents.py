@@ -9,7 +9,7 @@ import time
 from collections import deque
 from io import BytesIO
 from threading import Timer
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sized, Tuple, Union
 
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -20,8 +20,11 @@ import pandas as pd
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
+from pandas import DataFrame
 from plotly import tools as tls
 from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
+from plotly.graph_objs import Scatter
+
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 from .streams import DataStreamMET4FOF, SineGenerator
 
@@ -124,7 +127,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
 
         buffer_size : int
-            The total number of elements to be stored in the agent `buffer`
+            The total number of elements to be stored in the agent :attr:`buffer`
             When total elements exceeds this number, the latest elements will be replaced with the incoming data elements
         """
         self.Inputs = {}
@@ -144,11 +147,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
-        self.buffer = AgentBuffer(self.buffer_size)
+        self.buffer = self.init_buffer(self.buffer_size)
 
         if self.backend == 'osbrain':
             self.PubAddr_alias = self.name + "_PUB"
             self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias, transport='tcp')
+
+    def init_buffer(self, buffer_size):
+        """
+        A method to initialise the buffer. By overriding this method, user can provide a custom buffer, instead of the regular AgentBuffer.
+        This can be used, for example, to provide a MetrologicalAgentBuffer in the metrological agents.
+        """
+        buffer = AgentBuffer(buffer_size)
+        return buffer
 
     def reset(self):
         """
@@ -158,7 +169,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Method to reset the agent's states and parameters. User can override this method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
-        self.memory = {}
+        self.buffer.clear()
 
     def init_parameters(self):
         """
@@ -269,15 +280,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         return self.buffer.buffer_filled(agent_name)
 
-    def buffer_clear(self, agent_name=None):
+    def buffer_clear(self, agent_name: Optional[str] = None):
         """
         Empties buffer which is a dict indexed by the `agent_name`.
 
         Parameters
         ----------
-        agent_name : str
-            Key of the memory dict, which can be the name of input agent, or self.name. If one is not supplied, we assume to clear the entire memory.
-
+        agent_name : str, optional
+            Key of the memory dict, which can be the name of input agent, or self.name.
+            If not supplied (default), we assume to clear the entire memory.
         """
         self.buffer.clear(agent_name)
 
@@ -648,8 +659,19 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def get_all_attr(self):
         _all_attr = self.__dict__
-        excludes = ["Inputs", "Outputs", "memory", "PubAddr_alias", "PubAddr", "states", "log_mode", "get_all_attr",
-                    "plots", "name", "agent_loop"]
+        excludes = [
+            "Inputs",
+            "Outputs",
+            "buffer",
+            "PubAddr_alias",
+            "PubAddr",
+            "states",
+            "log_mode",
+            "get_all_attr",
+            "plots",
+            "name",
+            "agent_loop"
+        ]
         filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
         filtered_attr = {key: val for key, val in filtered_attr.items() if
                          key not in excludes and type(val).__name__ != 'function'}
@@ -666,55 +688,77 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             del self
 
 
-class AgentBuffer():
-    """
-    Buffer class which is instantiated in every agent to store data incrementally.
+class AgentBuffer:
+    """Buffer class which is instantiated in every agent to store data incrementally
+
     This buffer is necessary to handle multiple inputs coming from agents.
-    The buffer can be a dict of iterables, or a dict of dict of iterables for nested named data.
-    The keys are the names of agents.
 
-    We can access the buffer like a dict with exposed functions such as .values(), .keys() and .items(),
-    The actual dict object is stored in the variable `self.buffer`
+    We can access the buffer like a dict with exposed functions such as .values(),
+    .keys() and .items(). The actual dict object is stored in the variable
+    :attr:`buffer`.
+
+    Attributes
+    ----------
+    buffer : dict of iterables or dict of dicts of iterables
+        The buffer can be a dict of iterables, or a dict of dict of iterables for nested
+        named data. The keys are the names of agents.
+    buffer_size :
+        The total number of elements to be stored in the agent :attr:`buffer`
+    supported_datatypes : list of types
+        List of all types supported and thus properly handled by the buffer. Defaults to
+        :class:`np.ndarray <NumPy:numpy.ndarray>`, list and Pandas
+        :class:`DataFrame <Pandas:pandas.DataFrame>`
     """
 
-    def __init__(self, buffer_size=1000):
-        """
+    def __init__(self, buffer_size: int = 1000):
+        """Initialise a new agent buffer object
+
         Parameters
         ----------
-
         buffer_size: int
             Length of buffer allowed.
         """
         self.buffer = {}
         self.buffer_size = buffer_size
-        self.supported_datatype = (list, pd.DataFrame, np.ndarray)
+        self.supported_datatypes = [list, pd.DataFrame, np.ndarray]
 
     def __getitem__(self, key):
         return self.buffer[key]
 
-    def check_supported_datatype(self, value):
-        """
-        Checks whether `value` is one of the supported data types.
+    def check_supported_datatype(self, obj: object) -> bool:
+        """Checks whether `value` is an object of one of the supported data types
 
         Parameters
         ----------
-        value : iterable
-            Value to be checked.
+        obj : object
+            Value to be checked
 
         Returns
         ------
         result : boolean
+            True if value is an object of one of the supported data types, False if not
         """
-        for supported_datatype in self.supported_datatype:
-            if isinstance(value, supported_datatype):
+        for supported_datatype in self.supported_datatypes:
+            if isinstance(obj, supported_datatype):
                 return True
         return False
 
-    def update(self, agent_from: str, data):
-        """
-        Overrides data in the buffer dict keyed by `agent_from` with value `data`
+    def update(
+            self,
+            agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
+            data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
+    ):
+        """Overrides data in the buffer dict keyed by ``agent_from`` with value ``data``
 
-        If `data` is a single value, this converts it into a list first before storing in the buffer dict.
+        If ``data`` is a single value, this converts it into a list first before storing
+        in the buffer dict.
+
+        Parameters
+        ----------
+        agent_from : str
+            Name of agent sender
+        data : np.ndarray, DataFrame, list, float or int
+            New incoming data
         """
         # handle if data type nested in dict
         if isinstance(data, dict):
@@ -728,18 +772,28 @@ class AgentBuffer():
         self.buffer.update({agent_from: data})
         return self.buffer
 
-    def _concatenate(self, iterable, data, concat_axis=0):
-        """
-        Concatenate the given `iterable`, with `data`.
-        Handles the concatenation function depending on the datatype, and truncates it if the buffer is filled to `buffer_size`.
+    def _concatenate(
+            self,
+            iterable: Union[np.ndarray, list, pd.DataFrame],
+            data: Union[np.ndarray, list, DataFrame],
+            concat_axis: int = 0
+    ) -> Iterable:
+        """Concatenate the given ``iterable`` with ``data``
+
+        Handles the concatenation function depending on the datatype, and truncates it
+        if the buffer is filled to `buffer_size`.
 
         Parameters
         ----------
         iterable : any in supported_datatype
             The current buffer to be concatenated with.
 
-        data : any in supported_datatype
+        data : np.ndarray, DataFrame, list
             New incoming data
+
+        Returns
+        any in supported_datatype
+            the original buffer with the data appended
         """
         # handle list
         if isinstance(iterable, list):
@@ -764,51 +818,98 @@ class AgentBuffer():
                 iterable = iterable.truncate(before=truncated_element_index)
         return iterable
 
-    def buffer_filled(self, agent_from=None):
-        """
-        Checks whether buffer is filled, by comparing against the `buffer_size`.
+    def buffer_filled(self, agent_from: Optional[str] = None) -> bool:
+        """Checks whether buffer is filled, by comparing against the :attr:`buffer_size`
+
+        For nested dict, this returns True if any of the iterables is beyond the
+        :attr:`buffer_size`. For any of the dict values , which is not one of
+        :attr:`supported_datatypes` this returns None.
 
         Parameters
         ----------
-        agent_from : str
-            Name of input agent in the buffer dict to be looked up for.
-            If `agent_from` is not provided, we check for all iterables in the buffer.
-            For nested dict, this returns true for any iterable which is beyond the `buffer_size`.
+        agent_from : str, optional
+            Name of input agent in the buffer dict to be looked up. If ``agent_from``
+            is not provided, we check for all iterables in the buffer (default).
+
+        Returns
+        -------
+        bool or None
+            True if either the or any of the iterables has reached
+            :attr:`buffer_size` or None in case none of the values is of one of the
+            supported datatypes. False if all present iterable can take at least
+            one more element according to :attr:`buffer_size`.
         """
         if agent_from is None:
-            return any([self._iterable_filled(iterable) for iterable in self.buffer.values()])
-        elif isinstance(self.buffer[agent_from], dict):
-            return any([self._iterable_filled(iterable) for iterable in self.buffer[agent_from].values()])
+            return any([self._iterable_filled(iterable) for iterable in self.values()])
+        elif isinstance(self[agent_from], dict):
+            return any([self._iterable_filled(iterable) for iterable in self[agent_from].values()])
         else:
-            return self._iterable_filled(self.buffer[agent_from])
+            return self._iterable_filled(self[agent_from])
 
-    def _iterable_filled(self, iterable):
-        """
-        Internal method for checking on length of iterable.
+    def _iterable_filled(self, iterable: Sized) -> Union[bool, None]:
+        """Internal method for checking on length of iterables of supported types
+
+        Parameters
+        ----------
+        iterable : Any
+            Expected to be an iterable of one of the supported datatypes but could be
+            any.
+
+        Returns
+        -------
+        bool or None
+            True if the iterable is of one of the supported datatypes and has reached
+            :attr:`buffer_size` in length or False if not or None in case it is not of
+            one of the supported datatypes.
         """
         if self.check_supported_datatype(iterable):
             if len(iterable) >= self.buffer_size:
                 return True
-            else:
-                return False
+            return False
 
-    def popleft(self, n=1):
-        """
-        Pops the first n entries in the buffer.
+    def popleft(self, n: Optional[int] = 1) -> Union[Dict, np.ndarray, list, DataFrame]:
+        """Pops the first n entries in the buffer
+
+        Parameters
+        ---------
+        n : int
+            Number of elements to retrieve from buffer
+
+        Returns
+        -------
+        dict, :class:`np.ndarray <NumPy:numpy.ndarray>`, list or Pandas
+        :class:`DataFrame <Pandas:pandas.DataFrame>`
+            The retrieved elements
         """
         popped_buffer = copy.copy(self.buffer)
         remaining_buffer = copy.copy(self.buffer)
         if isinstance(popped_buffer, dict):
-            for key in popped_buffer.keys():
-                popped_buffer[key], remaining_buffer[key] = self._popleft(popped_buffer[key], n)
+            for key, value in popped_buffer.items():
+                value, remaining_buffer[key] = self._popleft(value, n)
         else:
             popped_buffer, remaining_buffer = self._popleft(popped_buffer, n)
         self.buffer = remaining_buffer
         return popped_buffer
 
-    def _popleft(self, iterable, n=1):
-        """
-        Internal method to handle the actual popping mechanism based on the type of iterable.
+    def _popleft(
+            self,
+            iterable: Union[np.ndarray, list, DataFrame],
+            n: Optional[int] = 1
+    ) -> Tuple[Union[np.ndarray, list, DataFrame], Union[np.ndarray, list, DataFrame]]:
+        """Internal handler of the actual popping mechanism based on type of iterable
+
+        Parameters
+        ---------
+        n : int
+            Number of elements to retrieve from buffer.
+        iterable : any in :attr:`supported_datatypes`
+            The current buffer to retrieve from.
+
+        Returns
+        -------
+        2-tuple of each either one of :class:`np.ndarray <NumPy:numpy.ndarray>`,
+        list or Pandas :class:`DataFrame <Pandas:pandas.DataFrame>`
+            The retrieved elements and the residual items in the buffer
         """
         popped_item = 0
         if isinstance(iterable, list):
@@ -822,51 +923,53 @@ class AgentBuffer():
             iterable = iterable.iloc[n:]
         return popped_item, iterable
 
-    def clear(self, agent_from=None):
-        """
-        Clears the data in the buffer. if `agent_from` is not given, the entire buffer is removed.
+    def clear(self, agent_from: Optional[str] = None):
+        """Clears the data in the buffer
 
-        agent_from : str
-            Name of agent
+        Parameters
+        ----------
+        agent_from : str, optional
+            Name of agent, if ``agent_from`` is not given, the entire buffer is
+            flushed. (default)
         """
         if agent_from is None:
-            del self.buffer
             self.buffer = {}
-        else:
+        elif agent_from in self.buffer:
             del self.buffer[agent_from]
 
-    def store(self, agent_from, data=None, concat_axis=0):
-        """
-        Stores data into `self.buffer` with the received message
+    def store(
+        self,
+        agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
+        data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
+        concat_axis: Optional[int] = 0,
+    ):
+        """Stores data into :attr:`buffer` with the received message
 
-        Checks if sender agent has sent any message before
-        If it did, then append, otherwise create new entry for it
+        Checks if sender agent has sent any message before. If it did, then append,
+        otherwise create new entry for it.
 
         Parameters
         ----------
         agent_from : dict | str
             if type is dict, we expect it to be the agentMET4FOF dict message to be
-            compliant with older code otherwise, we expect it to be name of agent
-            sender and `data` will need to be passed as parameter
-        data
-            optional if agent_from is a dict. Otherwise this parameter is compulsory.
-            Any supported data which can be stored in dict as buffering.
-
-        concat_axis : int
-            optional axis to concatenate on with the buffering for numpy arrays.
+            compliant with older code (keys ``from`` and ``data`` present'), otherwise
+            we expect it to be name of agent sender and ``data`` will need to be passed
+            as parameter
+        data : np.ndarray, DataFrame, list, float or int
+            Not used if ``agent_from`` is a dict. Otherwise ``data`` is compulsory.
+        concat_axis : int, optional
+            axis to concatenate on with the buffering for numpy arrays.
             Default is 0.
-
         """
-        # if first argument is the agentMET4FOF dict message
+        # Store into a separate variables, it will be used frequently later for the
+        # type checks. If first argument is the agentMET4FOF dict message in old format
         if isinstance(agent_from, dict):
-            message = agent_from
-        # otherwise, we expect the name of agent_sender and the data to be passed
+            message_from = agent_from["from"]
+            message_data = agent_from["data"]
+        # ... otherwise, we expect the name of agent_sender and the data to be passed.
         else:
-            message = {"from": agent_from, "data": data}
-
-        # store into a separate variables, it will be used frequently later for the type checks
-        message_from = message["from"]
-        message_data = message["data"]
+            message_from = agent_from
+            message_data = data
 
         # check if sender agent has sent any message before:
         # if it did,then append, otherwise create new entry for the input agent
@@ -896,21 +999,15 @@ class AgentBuffer():
             self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
 
     def values(self):
-        """
-        Interface to access the internal dict's values()
-        """
+        """Interface to access the internal dict's values()"""
         return self.buffer.values()
 
     def items(self):
-        """
-        Interface to access the internal dict's items()
-        """
+        """Interface to access the internal dict's items()"""
         return self.buffer.items()
 
     def keys(self):
-        """
-        Interface to access the internal dict's keys()
-        """
+        """Interface to access the internal dict's keys()"""
         return self.buffer.keys()
 
 class _AgentController(AgentMET4FOF):
@@ -1289,9 +1386,8 @@ class AgentNetwork:
                 print("Unable to connect to existing NameServer...")
             self.ns = 0
 
-    def start_server_osbrain(self, ip_addr="127.0.0.1", port=3333):
-        """
-        Only for osbrain backend. Starts a new AgentNetwork.
+    def start_server_osbrain(self, ip_addr: str = "127.0.0.1", port: int = 3333):
+        """Starts a new AgentNetwork for osBrain and initializes :attr:`_controller`
 
         Parameters
         ----------
@@ -1307,16 +1403,25 @@ class AgentNetwork:
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
             self.ns = run_nameserver(addr=ip_addr + ':' + str(port))
-        self.controller = run_agent("AgentController", base=_AgentController, attributes=dict(log_mode=True),
-                                    nsaddr=self.ns.addr(), addr=ip_addr)
-        self.logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
-        self.controller.init_parameters(ns=self.ns, backend=self.backend)
-        self.logger.init_parameters(log_filename=self.log_filename, save_logfile=self.save_logfile)
+        self._controller = run_agent(
+            "AgentController",
+            base=_AgentController,
+            attributes=dict(log_mode=True),
+            nsaddr=self.ns.addr(),
+            addr=ip_addr,
+        )
+        self._logger = run_agent("Logger", base=_Logger, nsaddr=self.ns.addr())
+        self._controller.init_parameters(ns=self.ns, backend=self.backend)
+        self._logger.init_parameters(
+            log_filename=self.log_filename, save_logfile=self.save_logfile
+        )
 
     def start_server_mesa(self):
-        """
-        Handles the initialisation for backend == "mesa".
-        Involves spawning two nested objects : MesaModel and AgentController
+        """Starts a new AgentNetwork for Mesa and initializes :attr:`_controller`
+
+        Handles the initialisation for :attr:`backend` ``== "mesa"``. Involves
+        spawning two nested objects :attr:`mesa_model` and :attr:`_controller` and
+        calls :meth:`start_mesa_timer`.
         """
         self.mesa_model = MesaModel()
         self._controller = _AgentController(name="AgentController", backend=self.backend)
@@ -1490,23 +1595,11 @@ class AgentNetwork:
         return 0
 
     def _get_controller(self):
-        """
-        Internal method to access the AgentController relative to the nameserver
-
-        """
-        if self.backend == "osbrain":
-            if self._controller is None:
-                self._controller = self.ns.proxy('AgentController')
-
+        """Internal method to access the AgentController relative to the nameserver"""
         return self._controller
 
     def _get_logger(self):
-        """
-        Internal method to access the Logger relative to the nameserver
-
-        """
-        if self._logger is None:
-            self._logger = self.ns.proxy('Logger')
+        """Internal method to access the Logger relative to the nameserver"""
         return self._logger
 
     def get_agent(self, agent_name):
@@ -1736,24 +1829,51 @@ class MonitorAgent(AgentMET4FOF):
     """
     Unique Agent for storing plots and data from messages received from input agents.
 
-    The dashboard searches for Monitor Agents' `memory` and `plots` to draw the graphs
+    The dashboard searches for Monitor Agents' `buffer` and `plots` to draw the graphs
     "plot" channel is used to receive base64 images from agents to plot on dashboard
 
     Attributes
     ----------
-    memory : dict
-        Dictionary of format `{agent1_name : agent1_data, agent2_name : agent2_data}`
-
     plots : dict
         Dictionary of format `{agent1_name : agent1_plot, agent2_name : agent2_plot}`
-
     plot_filter : list of str
         List of keys to filter the 'data' upon receiving message to be saved into memory
         Used to specifically select only a few keys to be plotted
+    custom_plot_function : callable
+        a custom plot function that can be provided to handle the data in the
+        monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+        gets provided with the content (value) of the buffer and with the string of the
+        sender agent's name as stored in the buffer's keys. Additionally any other
+        parameters can be provided as a dict in custom_plot_parameters.
+    custom_plot_parameters : dict
+        a custom dictionary of parameters that shall be provided to each call of the
+        custom_plot_function
     """
 
-    def init_parameters(self, plot_filter=[], custom_plot_function=-1, *args, **kwargs):
-        self.memory = {}
+    def init_parameters(
+        self,
+        plot_filter: Optional[List[str]] = None,
+        custom_plot_function: Optional[Callable[..., Scatter]] = None,
+        **kwargs
+    ):
+        """Initialize the monitor agent's parameters
+
+        Parameters
+        ----------
+        plot_filter : list of str, optional
+            List of keys to filter the 'data' upon receiving message to be saved into
+            memory. Used to specifically select only a few keys to be plotted
+        custom_plot_function : callable, optional
+            a custom plot function that can be provided to handle the data in the
+            monitor agents buffer (see :class:`AgentMET4FOF` for details). The function
+            gets provided with the content (value) of the buffer and with the string of
+            the sender agent's name as stored in the buffer's keys. Additionally any
+            other parameters can be provided as a dict in custom_plot_parameters. By
+            default the data gets plotted as shown in the various tutorials.
+        kwargs : Any
+            custom key word parameters that shall be provided to each call of
+            the :attr:`custom_plot_function`
+        """
         self.plots = {}
         self.plot_filter = plot_filter
         self.custom_plot_function = custom_plot_function
@@ -1763,7 +1883,8 @@ class MonitorAgent(AgentMET4FOF):
         """
         Handles incoming data from 'default' and 'plot' channels.
 
-        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+        Stores 'default' data into :attr:`buffer` and 'plot' data into
+        :attr:`plots`
 
         Parameters
         ----------
@@ -1771,14 +1892,14 @@ class MonitorAgent(AgentMET4FOF):
             Acceptable channel values are 'default' or 'plot'
         """
         if message['channel'] == 'default':
-            if self.plot_filter != []:
+            if self.plot_filter:
                 message['data'] = {key: message['data'][key] for key in self.plot_filter}
             self.buffer_store(agent_from=message["from"], data=message["data"])
         elif message['channel'] == 'plot':
             self.update_plot_memory(message)
         return 0
 
-    def update_plot_memory(self, message):
+    def update_plot_memory(self, message: Dict[str, Any]):
         """
         Updates plot figures stored in `self.plots` with the received message
 

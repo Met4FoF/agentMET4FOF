@@ -18,3 +18,12 @@ results/
 docs/_build
 docs/README.md
 docs/agentMET4FOF_tutorials
+docs/CHANGELOG.md
+
+# Build clutter #
+#################
+*.egg-info/
+
+# Test clutter #
+################
+test-reports/

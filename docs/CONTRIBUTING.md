@@ -7,6 +7,17 @@ established workflows. This guide should work on all platforms and provide every
 needed to start developing for agentMET4FOF. Please open an issue or ideally contribute
 to this guide as a start, if problems or questions arise.
 
+## Guiding principles
+
+The agentMET4FOF development process is based on the following guiding principles: 
+
+- actively maintain, ensuring security vulnerabilities or other issues
+  are resolved in a timely manner 
+- employ state-of-the-art development practices and tools, specifically
+  - follow [semantic versioning](https://semver.org/)
+  - use [conventional commit messages](https://www.conventionalcommits.org/en/v1.0.0/)
+  - consider the PEP8 style guide, wherever feasible
+
 ### Get the code on GitHub and locally
 
 For collaboration, we recommend forking the repository as described [here](https://help.github.com/en/articles/fork-a-repo).
@@ -37,6 +48,7 @@ you have everything at your hands:
 - [_pytest_](https://pypi.org/project/pytest/) as testing framework backed by
   [_hypothesis_](https://pypi.org/project/hypothesis/) and
   [_coverage_](https://pypi.org/project/coverage/).
+- [_python-semantic-release_](https://github.com/relekang/python-semantic-release) in
 - [our pipeline on _CircleCI_](https://app.circleci.com/pipelines/github/Met4FoF/agentMET4FOF)
 . All requirements for contributions are derived from this. 
 
@@ -52,7 +64,40 @@ such that it is automatically applied.
 
 ### Commit messages
 
-agentMET4FOF commit messages follow some conventions to be easily readable.
+agentMET4FOF commit messages follow some conventions to be easily human and
+machine-readable.
+
+#### Commit message structure
+
+[Conventional commit messages](https://www.conventionalcommits.org/en/v1.0.0/#summary)
+are required for the following:
+
+- Releasing automatically according to [semantic versioning](https://semver.org/)
+- [Generating  a changelog automatically](https://github.com/Met4FoF/agentMET4FOF/releases/)
+
+Parts of the commit messages and links appear in the changelogs of subsequent
+releases as a result. We use the following types:
+
+- _feat_: for commits that introduce new features (this correlates with MINOR in
+  semantic versioning)
+- _docs_: for commits that contribute significantly to documentation
+- _fix_: commits in which bugs are fixed (this correlates with PATCH in semantic
+  versioning)
+- _test_: Commits that apply significant changes to tests
+- _chore_: Commits that affect other non-PyDynamic components (e.g. ReadTheDocs, Git
+, ... )
+- _revert_: commits, which undo previous commits using `git revert`
+- _wip_: Commits which are not recognizable as one of the above-mentioned types until
+  later, usually during a PR merge.  The merge commit is then marked as the
+  corresponding type.
+
+Of the types mentioned above, the following appear in separate sections of the
+changelog:
+
+- _Feature_: _feat_
+- _Documentation_: _docs_
+- _Fix_: _fix_
+- _Test_: _test_
 
 #### Commit message styling
 
@@ -64,7 +109,14 @@ complete the following sentence:
 More comprehensive messages should contain an empty line after that and everything else
 needed starting from the third line. Each line should not exceed 100 characters.
 
-#### Examples
+#### BREAKING CHANGEs
+
+Since agentMET4FOF is not yet considered stable, we do not mark BREAKING CHANGES. As a
+consequence, at any time commits may changes parts of agentMET4FOF's public interface so
+that previously written code may no longer be executable. If this occurs we try though,
+to mention migration strategies in the corresponding release descriptions.
+
+#### Commit message examples
 
 For examples please checkout the
 [Git Log](https://github.com/Met4FoF/agentMET4FOF/commits/master).

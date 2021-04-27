@@ -7,9 +7,9 @@ from wsgiref.simple_server import make_server
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import psutil
+from multiprocess.context import Process
+
 from .Dashboard_Control import _Dashboard_Control
-import pathos
 
 
 class AgentDashboard:
@@ -160,18 +160,17 @@ class AgentDashboard:
             if sock.connect_ex((ip_addr, _port)) == 0:
                 sock.shutdown(socket.SHUT_RDWR)
                 return False
-            # So no dashboard seems to running. Here we check, if anything else is
-            # running on that port.
-            for connection in psutil.net_connections():
-                if connection.laddr.port == _port and connection.laddr.ip == ip_addr:
-                    return False
             # Seems as if, we can actually start our dashboard server.
             return True
 
 
-
-class AgentDashboardProcess(AgentDashboard, pathos.helpers.mp.Process):
+class AgentDashboardProcess(AgentDashboard, Process):
     """Represents an agent dashboard for the osBrain backend"""
+
+    def terminate(self):
+        """This is shutting down the application server serving the web interface"""
+        super(AgentDashboardProcess, self).terminate()
+        self._server.server_close()
 
 
 class AgentDashboardThread(AgentDashboard, Thread):
@@ -220,6 +219,7 @@ class AgentDashboardThread(AgentDashboard, Thread):
         """This is shutting down the application server serving the web interface"""
         try:
             self._server.shutdown()
+            self._server.server_close()
         except AttributeError:
             # In this case the dashboard has in fact already been shutdown earlier.
             pass
