@@ -455,9 +455,91 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         # process the received data here
         start_time_pack = time.time()
-        self.on_received_message(message)
+        if message["channel"] == "request-attr":
+            self.respond_request_attr_(message["data"])
+        if message["channel"] == "request-method":
+            self.respond_request_method_(message["data"])
+        elif (message["channel"] == "reply-attr" or message["channel"] =="set-attr") and message["data"] != "NULL":
+            self.respond_reply_attr_(message["data"])
+        else:
+            self.on_received_message(message)
         end_time_pack = time.time()
         self.log_info("Tproc: " + str(round(end_time_pack - start_time_pack, 6)))
+
+    def send_request_attribute(self, attribute : str):
+        """
+        Send a `request` of `attribute` to output agents.
+
+        Output agents will reply with the requested `attribute` if they have.
+        """
+        self.send_output(data=attribute,channel="request-attr")
+
+    def send_request_method(self, method : str, **method_params):
+        """
+        Send a `request` of executing methods to output agents.
+
+        Output agents will respond by calling the method.
+        """
+        message = {"name":method}
+        message.update(method_params)
+        self.send_output(data=message,channel="request-method")
+
+    def send_set_attr(self, attr :str, value):
+        """
+        Sends a message to set the `attr` of another agent to that of `value`.
+
+        Parameters
+        ----------
+        attr : str
+            The variable name of the output agent to be set.
+
+        value
+            The value of the variable to be set
+        """
+        self.send_output(data={attr: value}, channel="set-attr")
+
+    def respond_reply_attr_(self, message_data):
+        """
+        Response to a `reply` of setting attribute
+        """
+        if isinstance(message_data, str) and message_data == "NULL":
+            return 0
+        else:
+            key = next(iter(message_data))
+            setattr(self, key, message_data[key])
+
+
+    def respond_request_attr_(self, attribute: str):
+        """
+        Response to a `request` of `attribute` from input agents.
+
+        This agent reply with the requested `attribute` if it has it.
+        """
+        if hasattr(self, attribute):
+            self.send_output(data={attribute:self.get_attr(attribute)}, channel="reply-attr")
+        else:
+            self.log_info("'"+attribute+"' not available for reply.")
+            self.send_output(data="NULL", channel="reply-attr")
+
+    def respond_request_method_(self, message_data:dict):
+        """
+        Response to a `request` of executing `method` from input agents.
+
+        This agent will execute the method with the provided parameters of the method.
+        """
+        method_name = message_data["name"]
+        data_params = {key:val for key,val in message_data.items() if key != "name"}
+        if hasattr(self, method_name):
+            self.get_attr(method_name)(**data_params)
+
+        """
+        This user provided method is called whenever an agent is connected to its output.
+
+        This can be for example, to send `metadata` or `ping` to the output agent.
+        """
+
+        return NotImplemented
+
 
     def bind_output(self, output_agent, channel="default"):
         """
