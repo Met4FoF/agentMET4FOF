@@ -1292,6 +1292,8 @@ class _AgentController(AgentMET4FOF):
         self.coalitions.append(new_coalition)
         return new_coalition
 
+    def del_coalition(self):
+        self.coalitions = []
     def add_coalition_agent(self, name, agents=[]):
         """
         Add agents into the coalition
