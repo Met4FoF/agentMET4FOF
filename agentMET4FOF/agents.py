@@ -1103,6 +1103,8 @@ class _AgentController(AgentMET4FOF):
         self.coalitions.append(new_coalition)
         return new_coalition
 
+    def del_coalition(self):
+        self.coalitions = []
 
 class MesaModel(Model):
     """A MESA Model"""
@@ -1537,6 +1539,9 @@ class AgentNetwork:
         new_coalition = Coalition(name, agents)
         self._get_controller().add_coalition(new_coalition)
         return new_coalition
+
+    def del_coalition(self):
+        self._get_controller().del_coalition()
 
     @property
     def coalitions(self):
