@@ -532,6 +532,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         if hasattr(self, method_name):
             self.get_attr(method_name)(**data_params)
 
+    def on_connect_output(self, output_agent):
         """
         This user provided method is called whenever an agent is connected to its output.
 
@@ -600,6 +601,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             # update channels subscription information for mesa
             else:
                 self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
+
+            # calls on connect output method
+            self.on_connect_output(output_agent)
 
             # LOGGING
             if self.log_mode:
