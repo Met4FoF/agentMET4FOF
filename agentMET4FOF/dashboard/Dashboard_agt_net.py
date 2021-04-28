@@ -48,6 +48,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                             html.Div(className="col", children=[
                                 LayoutHelper.html_button(icon="restore", text="Reset", id="reset-button")
                             ]),
+                            html.Div(className="col", children=[
+                                LayoutHelper.html_button(icon="restore", text="Export JPG", id="cyto-button-export")
+                            ]),
                         ])
 
                     ]),
@@ -141,6 +144,17 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         ])
 
     def prepare_callbacks(self, app):
+
+        @app.callback([dash.dependencies.Output('agents-network', 'generateImage')],
+                       [dash.dependencies.Input('cyto-button-export', 'n_clicks')],
+                      )
+        def export_image(n_clicks):
+            if (n_clicks is not None):
+                return [{
+                    'type': "png",
+                    'action': "download"
+                }]
+
         # Update network graph per interval
         @app.callback([dash.dependencies.Output('agents-network', 'elements'),
                        dash.dependencies.Output('connect-modules-dropdown', 'options')],
