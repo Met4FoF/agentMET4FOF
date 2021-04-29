@@ -1775,6 +1775,9 @@ class AgentNetwork:
         """
         return self._get_controller().get_coalition(name)
 
+    def del_coalition(self):
+        self._get_controller().del_coalition()
+
     @property
     def coalitions(self):
         return self._get_controller().get_attr("coalitions")
