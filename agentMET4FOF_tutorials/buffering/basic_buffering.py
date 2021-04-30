@@ -73,10 +73,12 @@ def demonstrate_generator_agent_use():
     # Initialize agents by adding them to the agent network.
     # The buffer size is set during initialisation
     gen_agent = agent_network.add_agent(agentType=BufferSineGeneratorAgent, buffer_size=5)
-    monitor_agent = agent_network.add_agent(agentType=MonitorAgent)
+    monitor_agent_1 = agent_network.add_agent(agentType=MonitorAgent, buffer_size=10)
+    monitor_agent_2 = agent_network.add_agent(agentType=MonitorAgent, buffer_size=20)
 
     #bind agents
-    agent_network.bind_agents(gen_agent, monitor_agent)
+    agent_network.bind_agents(gen_agent, monitor_agent_1)
+    agent_network.bind_agents(gen_agent, monitor_agent_2)
 
     # Set all agents' states to "Running".
     agent_network.set_running_state()
