@@ -385,12 +385,12 @@ class SineGenerator(DataStreamMET4FOF):
     sine_freq : float
         frequency of wave function
     """
-    def __init__(self, sfreq = 500, sine_freq=5):
+    def __init__(self, sfreq=500, sine_freq=50):
         super().__init__()
         self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, sine_freq=sine_freq)
 
-    def sine_wave_function(self, time, sine_freq=50):
+    def sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
         amplitude = np.sin(2 * np.pi * sine_freq * time)
         return amplitude
