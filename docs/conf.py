@@ -78,6 +78,25 @@ intersphinx_mapping = {
 # writing this).
 
 
+# This should make SciPy documentation available inside our docs.
+intersphinx_mapping = {
+    "NumPy": ("https://numpy.org/doc/stable/", None),
+    "Pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
+    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": (
+        "https://pydynamic.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-metadata": (
+        "https://time-series-metadata.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-buffer": (
+        "https://time-series-buffer.readthedocs.io/en/latest/",
+        None,
+    ),
+}
+
 nbsphinx_allow_errors = True
 
 ################################################################################
@@ -167,7 +186,7 @@ author = (
 # built documents.
 #
 # The short X.Y version.
-version = '0.6.2'
+version = '0.6.3'
 # The full version, including alpha/beta/rc tags.
 # release = '0.0.1'
 
