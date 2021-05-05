@@ -5,17 +5,18 @@ import pandas as pd
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
+from agentMET4FOF.agents import AgentMET4FOF, AgentBuffer
+from .metrological_streams import (
+    MetrologicalDataStreamMET4FOF,
+    MetrologicalSineGenerator,
+)
 
-from agentMET4FOF.agents import AgentBuffer, AgentMET4FOF
 
 
 class MetrologicalAgent(AgentMET4FOF):
-    # dict like {
-    #     <from>: {
-    #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata": MetaData(**kwargs).metadata,
-    #     }
+
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
+
     """Input dictionary of all incoming data including metadata::
 
         dict like {
@@ -26,12 +27,8 @@ class MetrologicalAgent(AgentMET4FOF):
     """
     _input_data_maxlen: int
 
-    # dict like {
-    #     <channel> : {
-    #         "buffer" : TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata" : MetaData(**kwargs)
-    #     }
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
+
     """Output dictionary of all outgoing data including metadata::
 
         dict like {
@@ -132,7 +129,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         self.plots = {}
         self.custom_plot_parameters = {}
 
-
     def on_received_message(self, message):
         """
         Handles incoming data from 'default' and 'plot' channels.
@@ -211,6 +207,47 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
             trace = go.Scatter()
         return trace
 
+class MetrologicalGeneratorAgent(MetrologicalAgent):
+    """An agent streaming a specified signal
+
+    Takes samples from an instance of :py:class:`MetrologicalDataStreamMET4FOF
+    <agentMET4FOF.metrological_streams.MetrologicalDataStreamMET4FOF>` and pushes them
+    sample by sample to connected agents via its output channel.
+    """
+
+    _stream: MetrologicalDataStreamMET4FOF
+
+    def init_parameters(
+        self,
+        signal: MetrologicalDataStreamMET4FOF = MetrologicalSineGenerator(),
+        **kwargs
+    ):
+        """Initialize the input data stream
+
+        Parameters
+        ----------
+        signal : MetrologicalDataStreamMET4FOF, optional
+            the underlying signal for the generator, defaults to
+            :py:class:`MetrologicalSineGenerator 
+            <agentMET4FOF.metrological_streams.MetrologicalSineGenerator>`
+        """
+        self._stream = signal
+        super().init_parameters()
+        self.set_output_data(channel="default", metadata=self._stream.metadata)
+
+    @property
+    def device_id(self):
+        return self._stream.metadata.metadata["device_id"]
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input
+        datastream's content and push it into its output buffer.
+        """
+        if self.current_state == "Running":
+            self.set_output_data(channel="default", data=self._stream.next_sample())
+            super().agent_loop()
 
 class MetrologicalAgentBuffer(AgentBuffer):
     """Buffer class which is instantiated in every metrological agent to store data
