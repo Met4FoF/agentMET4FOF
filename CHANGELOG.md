@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.4 (2021-05-06)
+### Fix
+* **streams:** Remove unnecessary instantiation of sine_freq in method sine_wave_function ([`192a6c9`](https://github.com/Met4FoF/agentMET4FOF/commit/192a6c9f662b014bf5ef21ec07ed8ba5638697c6))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.6.3...v0.6.4)**
+
 ## v0.6.3 (2021-04-28)
 ### Fix
 * **time_series_buffer:** Resolve storing nan values ([`bbc1ae9`](https://github.com/Met4FoF/agentMET4FOF/commit/bbc1ae925d221fdd79715a46e48c91059b2d4cd6))
