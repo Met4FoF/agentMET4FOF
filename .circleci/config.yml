@@ -200,7 +200,7 @@ jobs:
             # Fallback to using the latest cache if no exact match is found.
             - v2-setup-dependencies-
 
-      # Install dependencies.
+      # Install dependencies. visdcc should be taken out as soon as possible again.
       - run:
           name: Install dependencies
           command: |
@@ -231,9 +231,9 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
+            - v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v4-venv-dependencies-
+            - v5-venv-dependencies-
 
       # Install dependencies and extra_requires dependencies manually.
       - run:
@@ -242,12 +242,13 @@ jobs:
             python3 -m venv venv
             source venv/bin/activate
             pip install --upgrade pip tox
+            pip install -r requirements.txt
 
       - save_cache:
           paths:
             - ./venv
           key: >-
-            v4-venv-dependencies-{{ checksum "dev-requirements.txt" }}
+            v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
       - run_venv_tests

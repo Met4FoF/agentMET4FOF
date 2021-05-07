@@ -44,7 +44,7 @@ def test_send_plot():
     gen_agent = agentNetwork.add_agent(agentType=GeneratorAgent)
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
 
-    agentNetwork.bind_agents(gen_agent, monitor_agent)
+    agentNetwork.bind_agents(gen_agent, monitor_agent, channel="plot")
 
     gen_agent.dummy_send_graph(mode="image")
     time.sleep(3)

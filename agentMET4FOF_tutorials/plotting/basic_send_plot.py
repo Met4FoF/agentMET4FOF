@@ -9,6 +9,9 @@
 #"plotly" mode will not work for all types of plot although it provides most interactivity
 #"mpld3" mode works for most plots, with medium interactivity
 
+#Update: To use `send_plot`, make sure you have connected the MonitorAgent to the "plot" channel of the
+#`input`/`source` agent
+
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 import matplotlib.pyplot as plt
 import numpy as np
@@ -65,9 +68,9 @@ def main():
     agentNetwork.bind_agents(gen_agent, plotting_image_agent)
     agentNetwork.bind_agents(gen_agent, plotting_plotly_agent)
     agentNetwork.bind_agents(gen_agent, plotting_mpld3_agent)
-    agentNetwork.bind_agents(plotting_image_agent, monitor_agent)
-    agentNetwork.bind_agents(plotting_plotly_agent, monitor_agent)
-    agentNetwork.bind_agents(plotting_mpld3_agent, monitor_agent)
+    agentNetwork.bind_agents(plotting_image_agent, monitor_agent, channel="plot")
+    agentNetwork.bind_agents(plotting_plotly_agent, monitor_agent, channel="plot")
+    agentNetwork.bind_agents(plotting_mpld3_agent, monitor_agent, channel="plot")
 
     # set all agents states to "Running"
     agentNetwork.set_running_state()
