@@ -1,6 +1,7 @@
 -c requirements.txt
 
 pytest
+nbval
 pytest-cov
 pytest-timeout
 requests
@@ -12,3 +13,4 @@ sphinx_rtd_theme
 ipython
 tox
 python-semantic-release
+notebook
