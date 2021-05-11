@@ -178,9 +178,9 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v1-setup-dependencies-
+            - v2-setup-dependencies-
 
       # Install dependencies.
       - run:
@@ -195,7 +195,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v1-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner and request to send coverage report.
       - run_venv_tests:
@@ -214,9 +214,9 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v4-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v3-venv-dependencies-
+            - v4-venv-dependencies-
 
       # Install dependencies and extra_requires dependencies manually.
       - run:
@@ -232,7 +232,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v3-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v4-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
 
       # Run tests! We use pytest's test-runner.
       - run_venv_tests
@@ -248,9 +248,9 @@ jobs:
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
-            - v1-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+            - v2-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
             # Fallback to using the latest cache if no exact match is found.
-            - v1-dependencies-deploy-
+            - v2-dependencies-deploy-
 
       # Install dependencies if necessary.
       - run:
@@ -264,7 +264,7 @@ jobs:
       - save_cache:
           paths:
             - ./agent_venv
-          key: v1-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+          key: v2-dependencies-deploy-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
 
       # Verify Git tag to version to ensure, only wanted versions are uploaded.
       - run:
