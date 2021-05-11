@@ -37,6 +37,8 @@ workflows:
       - deploy:
           # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
           # pushes, which successfully run 'test' job and are tagged with version.
+          context:
+            - pypi.org publishing for agentMET4FOF
           requires:
               - test_against_venv
               - test_against_conda
@@ -286,7 +288,7 @@ jobs:
           command: |
             echo -e "[pypi]" >> ~/.pypirc
             echo -e "username: __token__" >> ~/.pypirc
-            echo -e "password: $PYPI_PASSWORD" >> ~/.pypirc
+            echo -e "password: $PYPI_TOKEN" >> ~/.pypirc
 
       # Upload the created packages to test.pypi.org.
       - run:
