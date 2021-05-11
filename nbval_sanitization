@@ -1,0 +1,7 @@
+[regex1]
+regex: \[\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2}.\d{6}\]
+replace: TIME_STAMP
+
+[regex2]
+regex: (?<=SET STATE:   Running\n)(.*\n)*
+replace: RUNNING
