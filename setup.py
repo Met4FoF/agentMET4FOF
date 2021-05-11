@@ -76,6 +76,7 @@ setup(
         "time-series-metadata",
         "mpld3",
         "mesa",
+        "psutil",
     ],
     extras_require={"tutorials": ["notebook", "PyDynamic"]},
     python_requires=">=3.6",
