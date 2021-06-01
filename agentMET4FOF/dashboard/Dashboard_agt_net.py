@@ -661,7 +661,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
         @app.callback(
             dash.dependencies.Output('toast-js-script', 'run'),
             [dash.dependencies.Input('interval-update-toast', 'n_intervals')])
-        def myfun(n_intervals):
+        def generate_toast_msg(n_intervals):
             # if there are messages in toast contents to be displayed
             if hasattr(app, "toast_contents") and len(app.toast_contents) > 0:
                 # pop toast contents
