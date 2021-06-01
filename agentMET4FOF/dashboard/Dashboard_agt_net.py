@@ -612,8 +612,8 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_type = "Monitor"
-            agent_names = agentNetwork.agents(filter_agent=agent_type)  # get all agent names
+            agent_name_filter = "Monitor"
+            agent_names = agentNetwork.agents(filter_agent=agent_name_filter)  # get all agent names
               # all agents with Monitor in its name will be selected
             plots_data = {}  # storage for all monitor agent's memory
 
