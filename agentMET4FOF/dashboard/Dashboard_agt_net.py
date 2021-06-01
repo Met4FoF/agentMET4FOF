@@ -186,6 +186,8 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     'type': "png",
                     'action': "download"
                 }]
+            else:
+                raise PreventUpdate
 
         # Update network graph per interval
         @app.callback([dash.dependencies.Output('agents-network', 'elements'),
