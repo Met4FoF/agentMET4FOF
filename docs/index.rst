@@ -11,6 +11,7 @@ agentMET4FOF - Metrological Agent-based system
    INSTALL
    UMLs
    CONTRIBUTING
+   CHANGELOG
 
 .. toctree::
    :maxdepth: 1

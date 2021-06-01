@@ -53,7 +53,7 @@ html_theme_options = {
 # This should make Python built-in, Pandas, SciPy, PyDynamic and time-series-metadata
 # documentation available inside our docs.
 intersphinx_mapping = {
-    "Python": ("http://docs.python.org/", None),
+    "Python": ("https://docs.python.org/3", None),
     "pd": ("http://pandas.pydata.org/pandas-docs/dev", None),
     "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "PyDynamic": (
@@ -65,7 +65,7 @@ intersphinx_mapping = {
         None,
     ),
     "np": (
-        "http://docs.scipy.org/doc/numpy/",
+        "https://numpy.org/doc/stable/",
         None,
     ),
 }
@@ -77,6 +77,25 @@ intersphinx_mapping = {
 # which we took from the linked page (almost at the very bottom at the time of
 # writing this).
 
+
+# This should make SciPy documentation available inside our docs.
+intersphinx_mapping = {
+    "NumPy": ("https://numpy.org/doc/stable/", None),
+    "Pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
+    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "PyDynamic": (
+        "https://pydynamic.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-metadata": (
+        "https://time-series-metadata.readthedocs.io/en/latest/",
+        None,
+    ),
+    "time-series-buffer": (
+        "https://time-series-buffer.readthedocs.io/en/latest/",
+        None,
+    ),
+}
 
 nbsphinx_allow_errors = True
 
@@ -91,6 +110,11 @@ nbsphinx_allow_errors = True
 shutil.copyfile(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "README.md")),
     os.path.join(os.path.dirname(__file__), "README.md"),
+)
+# Copy over CHANGELOG from root folder.
+shutil.copyfile(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG")),
+    os.path.join(os.path.dirname(__file__), "CHANGELOG.md"),
 )
 
 # Copy over all other specified folders from repository tree.
@@ -162,7 +186,7 @@ author = (
 # built documents.
 #
 # The short X.Y version.
-version = '0.6.1'
+version = '0.6.3'
 # The full version, including alpha/beta/rc tags.
 # release = '0.0.1'
 

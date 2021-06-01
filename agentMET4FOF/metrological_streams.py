@@ -49,23 +49,40 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
     def __init__(
         self,
-        value_unc: Union[float, Iterable[float]] = 0.0,
-        time_unc: Union[float, Iterable[float]] = 0.0,
+        value_unc: Optional[float] = 0.0,
+        time_unc: Optional[float] = 0.0,
+        exp_unc: Optional[float] = None,
+        cov_factor: Optional[float] = 1.0,
     ):
         """Initialize a MetrologicalDataStreamMET4FOF object
 
         Parameters
         ----------
-        value_unc : iterable of floats or float, optional (defaults to 0)
+        value_unc : float, optional (defaults to 0)
             standard uncertainties associated with values
-        time_unc : iterable of floats or float, optional (defaults to 0)
+        time_unc : float, optional (defaults to 0)
             standard uncertainties associated with timestamps
+        exp_unc : float, optional (defaults to None)
+            expanded uncertainties associated with values
+        cov_factor : float, optional (defaults to 1)
+            coverage factor associated with the expanded uncertainty
+
+        If exp_unc and cov_factor are given explicit values, they override value_unc
+        according to value_unc = exp_unc / cov_factor
         """
         super().__init__()
         self._uncertainty_parameters: Dict
         self._generator_function_unc: Callable
-        self._value_unc: Union[float, Iterable[float]] = value_unc
-        self._time_unc: Union[float, Iterable[float]] = time_unc
+        self._time_unc: float = time_unc
+        self.exp_unc: float = exp_unc
+        self.cov_factor: float = cov_factor
+        if self.exp_unc is not None:
+            self.value_unc: float = self.exp_unc / self.cov_factor
+        else:
+            self._value_unc: float = value_unc
+
+        self._generator_function_unc = None
+        self._uncertainty_parameters = None
 
     def set_generator_function(
         self,
@@ -146,6 +163,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         """
         _time_unc = np.full_like(time, fill_value=self.time_unc)
         _value_unc = np.full_like(values, fill_value=self.value_unc)
+
         return _time_unc, _value_unc
 
     def _next_sample_generator(self, batch_size: int = 1) -> np.ndarray:
@@ -214,7 +232,7 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         the corresponding attribute of the created :class:`Metadata` object. Defaults to
         'Simple sine wave generator'.
     value_unc : iterable of floats or float, optional
-        standard uncertainty(ies) of the quantity values. Defaults to 0.5.
+        standard uncertainty(ies) of the quantity values. Defaults to 0.1.
     time_unc : iterable of floats or float, optional
         standard uncertainty of the time stamps. Defaults to 0.
     """
@@ -229,8 +247,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
         quantity_units: Union[str, Tuple[str, ...]] = "V",
         misc: Optional[Any] = "Simple sine wave generator",
-        value_unc: Union[float, Iterable[float]] = 0.1,
-        time_unc: Union[float, Iterable[float]] = 0,
+        value_unc: float = 0.1,
+        time_unc: float = 0,
     ):
         super(MetrologicalSineGenerator, self).__init__(
             value_unc=value_unc, time_unc=time_unc
@@ -266,16 +284,19 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
 
     Parameters
     ----------
-    sfreq:     float
-                sampling frequency which determines the time step when next_sample is called.
-    intercept: float
-                constant intercept of the signal
-    freq_arr:  np.ndarray of float
-              array with frequencies of components included in the signal
-    ampl_arr:  np.ndarray of float
-              array with amplitudes of components included in the signal
-    phase_ini_arr:  np.ndarray of float
-              array with initial phases of components included in the signal
+    sfreq : float
+        sampling frequency which determines the time step when next_sample is called.
+    intercept : float
+        constant intercept of the signal
+    freq_arr : np.ndarray of float
+        array with frequencies of components included in the signal
+    ampl_arr : np.ndarray of float
+        array with amplitudes of components included in the signal
+    phase_ini_arr : np.ndarray of float
+        array with initial phases of components included in the signal
+    noisy : bool
+        boolean to determine whether the generated signal should be noisy or "clean"
+        defaults to True
     """
 
     def __init__(
@@ -285,7 +306,7 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
                  ampl_arr: np.array = np.array([1]),
                  phase_ini_arr: np.array = np.array([0]),
                  intercept: float = 0,
-                 device_id: str = "DataGenerator",
+                 device_id: str = "MultiWaveDataGenerator",
                  time_name: str = "time",
                  time_unit: str = "s",
                  quantity_names: Union[str, Tuple[str, ...]] = ("Length", "Mass"),
@@ -325,7 +346,7 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
         if noisy:
             value_arr += self.value_unc / 2 * norm.rvs(size=time.shape)
 
-        for ampl, freq, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
-            value_arr = value_arr + ampl * np.cos(2 * np.pi * freq * time + phase_ini)
+        for freq, ampl, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
+            value_arr += ampl * np.cos(2 * np.pi * freq * time + phase_ini)
 
         return value_arr
