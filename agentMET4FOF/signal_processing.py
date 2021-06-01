@@ -44,4 +44,6 @@ class FFT_Agent(AgentMET4FOF):
         N = len(amplitudes)
         fig = plt.figure()
         plt.plot(sample_freq[1:N//2], amplitudes[1:N//2])
+        plt.xlabel("Frequency (Hz)")
+        plt.ylabel("Power Amplitude")
         return fig
