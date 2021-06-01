@@ -26,6 +26,18 @@ def create_nodes_cytoscape(agent_graph):
     return new_elements
 
 def create_edges_cytoscape(edges, hide_default_edge=True):
+    """
+    Converts data of network edges into a form accepted by cytoscape network generation in the dashboard.
+
+    Parameters
+    ----------
+    edges : list
+        List of edges where index 0 and 1 are names of sources and targets respectively. Index 2 is a dictionary with key of 'channel'.
+
+    hide_default_edge : boolean
+        Set to hide 'default' channel display or not.
+    """
+
     new_elements =[]
     for edge in edges:
         if hide_default_edge and isinstance(edge[2]['channel'], str) and edge[2]['channel'] == "default":
