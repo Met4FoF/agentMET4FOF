@@ -151,7 +151,7 @@ tqdm==4.60.0
     # via mesa
 uncertainties==3.1.5
     # via time-series-buffer
-urllib3==1.26.4
+urllib3==1.26.5
     # via requests
 visdcc==0.0.40
     # via agentMET4FOF (setup.py)
