@@ -1703,19 +1703,29 @@ class AgentNetwork:
 
         return self._get_controller().get_agent(agent_name)
 
-    def agents(self, filter_agent=None):
-        """
-        Returns all agent names connected to Agent Network.
+    def agents(self, filter_agent: Optional[str] = None) -> List[str]:
+        """Returns all or subset of agents' names connected to agent network
+
+        Parameters
+        ----------
+        filter_agent : str, optional
+            if present, only those names are returned which contain
+            ``filter_agent``'s value
 
         Returns
         -------
-        list : names of all agents
-
+        list[str]
+            requested names of agents
         """
-        agent_names = self._get_controller().agents()
+        all_agent_names = self._get_controller().agents()
         if filter_agent is not None:
-            agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
-        return agent_names
+            filtered_agent_names = [
+                agent_name
+                for agent_name in all_agent_names
+                if filter_agent in agent_name
+            ]
+            return filtered_agent_names
+        return all_agent_names
 
     def generate_module_name_byType(self,agentType):
         return (self._get_controller().generate_module_name_byType(agentType))
