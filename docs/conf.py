@@ -97,7 +97,7 @@ shutil.copyfile(
 )
 # Copy over CHANGELOG from root folder.
 shutil.copyfile(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG.md")),
     os.path.join(os.path.dirname(__file__), "CHANGELOG.md"),
 )
 
@@ -170,7 +170,7 @@ author = (
 # built documents.
 #
 # The short X.Y version.
-version = '0.8.1'
+version = "0.8.1"
 # The full version, including alpha/beta/rc tags.
 # release = '0.0.1'
 
