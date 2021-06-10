@@ -164,8 +164,8 @@ class DataStreamMET4FOF():
         ----------
         time : Union[List, DataFrame, np.ndarray]
         """
-        amplitude = np.sin(2*np.pi*self.F*time)
-        return amplitude
+        value = np.sin(2*np.pi*self.F*time)
+        return value
 
     def set_generator_function(
             self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
@@ -218,11 +218,11 @@ class DataStreamMET4FOF():
                                      1)/self.sfreq
         self._sample_idx += batch_size
 
-        amplitude: np.ndarray = self._generator_function(
+        value: np.ndarray = self._generator_function(
             time, **self._generator_parameters
         )
 
-        return {'quantities': amplitude, 'time': time}
+        return {'quantities': value, 'time': time}
 
     def set_data_source(
             self,
@@ -392,8 +392,8 @@ class SineGenerator(DataStreamMET4FOF):
 
     def sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * sine_freq * time)
-        return amplitude
+        value = np.sin(2 * np.pi * sine_freq * time)
+        return value
 
 
 class CosineGenerator(DataStreamMET4FOF):
@@ -420,8 +420,8 @@ class CosineGenerator(DataStreamMET4FOF):
 
     def cosine_wave_function(self, time, cosine_freq=50):
         """A simple cosine wave generator"""
-        amplitude = np.cos(2 * np.pi * cosine_freq * time)
-        return amplitude
+        value = np.cos(2 * np.pi * cosine_freq * time)
+        return value
 
 
 def extract_x_y(message):
