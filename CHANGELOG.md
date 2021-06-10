@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.8.1 (2021-06-10)
+
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.8.0...v0.8.1)**
+
 ## v0.8.0 (2021-06-10)
 ### Feature
 * **MetrologicalGeneratorAgent:** Rewrote to default metrological generator agent for both streams ([`52606d7`](https://github.com/Met4FoF/agentMET4FOF/commit/52606d7583166c397594bc12585635825352dd1f))
