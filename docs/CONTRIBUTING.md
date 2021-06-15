@@ -119,7 +119,7 @@ to mention migration strategies in the corresponding release descriptions.
 #### Commit message examples
 
 For examples please checkout the
-[Git Log](https://github.com/Met4FoF/agentMET4FOF/commits/master).
+[Git Log](https://github.com/Met4FoF/agentMET4FOF/commits/develop).
 
 ###  Testing
 
