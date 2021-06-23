@@ -6,11 +6,12 @@ import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
 
-from agentMET4FOF.agents import AgentBuffer, AgentMET4FOF
+from .agents import AgentBuffer, AgentMET4FOF
 from .metrological_streams import (
     MetrologicalDataStreamMET4FOF,
     MetrologicalSineGenerator,
 )
+
 
 class MetrologicalAgent(AgentMET4FOF):
     # dict like {
