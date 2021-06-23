@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from agentMET4FOF.streams import DataStreamMET4FOF
+from .streams import DataStreamMET4FOF
 
 
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
