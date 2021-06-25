@@ -180,12 +180,12 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         )
         self._sample_idx += batch_size
 
-        _amplitude: np.ndarray = self._generator_function(
+        _value: np.ndarray = self._generator_function(
             _time, **self._generator_parameters
         )
-        _time_unc, _value_unc = self._generator_function_unc(_time, _amplitude)
+        _time_unc, _value_unc = self._generator_function_unc(_time, _value)
 
-        return np.concatenate((_time, _time_unc, _amplitude, _value_unc), axis=1)
+        return np.concatenate((_time, _time_unc, _value, _value_unc), axis=1)
 
     @property
     def value_unc(self) -> Union[float, Iterable[float]]:
@@ -272,9 +272,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
 
     def _sine_wave_function(self, time, sine_freq):
         """A simple sine wave generator"""
-        amplitude = np.sin(np.multiply(2 * np.pi * sine_freq, time))
-        amplitude += np.random.normal(0, self.value_unc, amplitude.shape)
-        return amplitude
+        value = np.sin(np.multiply(2 * np.pi * sine_freq, time))
+        value += np.random.normal(0, self.value_unc, value.shape)
+        return value
 
 
 class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):

@@ -32,7 +32,7 @@ class _Dashboard_Control():
         agentTypes = {}
         for module_ in self.modules:
             agentTypes.update(dict([(name, cls) for name, cls in module_.__dict__.items() if
-                                    isinstance(cls, type) and cls.__bases__[-1] == agentmet4fof_module.AgentMET4FOF]))
+                                    isinstance(cls, type) and issubclass(cls, agentmet4fof_module.AgentMET4FOF)]))
         agentTypes.pop("_AgentController", None)
         agentTypes.pop("_Logger", None)
         agentTypes.pop("DataStreamAgent", None)

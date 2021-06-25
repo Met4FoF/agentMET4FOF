@@ -68,6 +68,10 @@ intersphinx_mapping = {
         "https://numpy.org/doc/stable/",
         None,
     ),
+    "time-series-buffer": (
+        "https://time-series-buffer.readthedocs.io/en/latest/",
+        None,
+    ),
 }
 # We keep the objects.inv files in our docs folder to get hints on how to specify the
 # cross-references. More on the topic can be found here:
@@ -76,26 +80,6 @@ intersphinx_mapping = {
 # $ python -msphinx.ext.intersphinx https://docs.python.org/3/objects.inv
 # which we took from the linked page (almost at the very bottom at the time of
 # writing this).
-
-
-# This should make SciPy documentation available inside our docs.
-intersphinx_mapping = {
-    "NumPy": ("https://numpy.org/doc/stable/", None),
-    "Pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
-    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "PyDynamic": (
-        "https://pydynamic.readthedocs.io/en/latest/",
-        None,
-    ),
-    "time-series-metadata": (
-        "https://time-series-metadata.readthedocs.io/en/latest/",
-        None,
-    ),
-    "time-series-buffer": (
-        "https://time-series-buffer.readthedocs.io/en/latest/",
-        None,
-    ),
-}
 
 nbsphinx_allow_errors = True
 
@@ -113,7 +97,7 @@ shutil.copyfile(
 )
 # Copy over CHANGELOG from root folder.
 shutil.copyfile(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG.md")),
     os.path.join(os.path.dirname(__file__), "CHANGELOG.md"),
 )
 
@@ -186,7 +170,7 @@ author = (
 # built documents.
 #
 # The short X.Y version.
-version = '0.6.3'
+version = "0.8.1"
 # The full version, including alpha/beta/rc tags.
 # release = '0.0.1'
 

@@ -12,11 +12,9 @@ from agentMET4FOF_tutorials.tutorial_5_coalition import (
 from agentMET4FOF_tutorials.tutorial_6_mesa_backend import (
     demonstrate_mesa_backend as tut6,
 )
-
-
-def test_tutorial_6():
-    """Test executability of tutorial_6_mesa_backend.py."""
-    tut6().shutdown()
+from agentMET4FOF_tutorials.tutorial_7_generic_metrological_agent import (
+    demonstrate_metrological_stream as tut7,
+)
 
 
 def test_tutorial_1():
@@ -42,3 +40,13 @@ def test_tutorial_4():
 def test_tutorial_5():
     """Test executability of tutorial_5_coalition.py."""
     tut5().shutdown()
+
+
+def test_tutorial_6():
+    """Test executability of tutorial_6_mesa_backend.py."""
+    tut6().shutdown()
+
+
+def test_tutorial_7():
+    """Test executability of tutorial_7_generic_metrological_agent.py."""
+    tut7().shutdown()

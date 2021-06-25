@@ -10,11 +10,13 @@ from agentMET4FOF.metrological_streams import (
 
 
 def demonstrate_metrological_stream():
-    """
-    Demonstrate an agent network with two metrologically enabled agents defined as objects of the
-    :class:`MetrologicalGeneratorAgent` class whose outputs are bound to a single monitor agent.
+    """Demonstrate an agent network with two metrologically enabled agents
 
-    The metrological agents generate signals from a sine wave and a multiwave generator source.
+    The agents are defined as objects of the :class:`MetrologicalGeneratorAgent`
+    class whose outputs are bound to a single monitor agent.
+
+    The metrological agents generate signals from a sine wave and a multiwave generator
+    source.
 
     Returns
     -------
@@ -24,17 +26,19 @@ def demonstrate_metrological_stream():
     # start agent network server
     agent_network = AgentNetwork(dashboard_modules=True)
 
-    # Initialize metrologically enabled agent with a multiwave (sum of cosines) generator as signal source.
-    # taking name from signal source metadata.
-    signal_multiwave = MetrologicalMultiWaveGenerator(quantity_names="Voltage", quantity_units="V")
+    # Initialize metrologically enabled agent with a multiwave (sum of cosines)
+    # generator as signal source taking name from signal source metadata.
+    signal_multiwave = MetrologicalMultiWaveGenerator(
+        quantity_names="Voltage", quantity_units="V"
+    )
     source_name_multiwave = signal_multiwave.metadata.metadata["device_id"]
     source_agent_multiwave = agent_network.add_agent(
         name=source_name_multiwave, agentType=MetrologicalGeneratorAgent
     )
     source_agent_multiwave.init_parameters(signal=signal_multiwave)
 
-    # Initialize second metrologically enabled agent with a sine generator as signal source
-    # taking name from signal source metadata.
+    # Initialize second metrologically enabled agent with a sine generator as signal
+    # source taking name from signal source metadata.
     signal_sine = MetrologicalSineGenerator()
     source_name_sine = signal_sine.metadata.metadata["device_id"]
     source_agent_sine = agent_network.add_agent(
@@ -44,7 +48,9 @@ def demonstrate_metrological_stream():
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
-        "MonitorAgent", agentType=MetrologicalMonitorAgent, buffer_size=50,
+        "MonitorAgent",
+        agentType=MetrologicalMonitorAgent,
+        buffer_size=50,
     )
 
     # Bind agents.

@@ -22,6 +22,7 @@ from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from pandas import DataFrame
 from plotly import tools as tls
+from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
 from plotly.graph_objs import Scatter
 
 from .dashboard.Dashboard_agt_net import Dashboard_agt_net
@@ -131,6 +132,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         self.Inputs = {}
         self.Outputs = {}
+        self.Outputs_agent_channels = {} #keep track of agent subscription channels
         self.AgentType = type(self).__name__
         self.log_mode = log_mode
         self.log_info("INITIALIZED")
@@ -139,7 +141,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop", 4: "Reset"}
         self.current_state = self.states[0]
         self.loop_wait = None
-        self.stylesheet = ""
+        if not hasattr(self, "stylesheet"):
+            self.stylesheet = ""
+
         self.output_channels_info = {}
 
         self.buffer_size = buffer_size
@@ -380,10 +384,18 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         packed_data = self.pack_data(data, channel=channel)
 
         if self.backend == "osbrain":
-            self.send(self.PubAddr, packed_data, topic='data')
+            self.send(self.PubAddr, packed_data, topic=channel)
+
         elif self.backend == "mesa":
             for key, value in self.Outputs.items():
-                value.mesa_message_queue.append(packed_data)
+                # if output agent has subscribed to a list of channels,
+                # we check whether `channel` is subscribed in that list
+                # if it is, then we append to that agent's message queue
+                if isinstance(self.Outputs_agent_channels[key], list):
+                    if channel in self.Outputs_agent_channels[key]:
+                        value.mesa_message_queue.append(packed_data)
+                elif channel == self.Outputs_agent_channels[key]:
+                    value.mesa_message_queue.append(packed_data)
         duration_time_pack = round(time.time() - start_time_pack, 6)
 
         # LOGGING
@@ -418,7 +430,8 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         if channel not in self.output_channels_info.keys():
             if type(data) == dict:
-                nested_metadata = {key: self._get_metadata(data[key]) for key in data.keys()}
+                nested_metadata = {key: {nested_dict_key:self._get_metadata(nested_dict_val) for nested_dict_key,nested_dict_val in data[key].items()}
+                if isinstance(data[key],dict) else self._get_metadata(data[key]) for key in data.keys()}
                 self.output_channels_info.update({channel: nested_metadata})
             else:
                 self.output_channels_info.update({channel: self._get_metadata(data)})
@@ -455,11 +468,94 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         # process the received data here
         start_time_pack = time.time()
-        self.on_received_message(message)
+        if message["channel"] == "request-attr":
+            self.respond_request_attr_(message["data"])
+        if message["channel"] == "request-method":
+            self.respond_request_method_(message["data"])
+        elif (message["channel"] == "reply-attr" or message["channel"] =="set-attr") and message["data"] != "NULL":
+            self.respond_reply_attr_(message["data"])
+        else:
+            self.on_received_message(message)
         end_time_pack = time.time()
         self.log_info("Tproc: " + str(round(end_time_pack - start_time_pack, 6)))
 
-    def bind_output(self, output_agent):
+    def send_request_attribute(self, attribute : str):
+        """
+        Send a `request` of `attribute` to output agents.
+
+        Output agents will reply with the requested `attribute` if they have.
+        """
+        self.send_output(data=attribute,channel="request-attr")
+
+    def send_request_method(self, method : str, **method_params):
+        """
+        Send a `request` of executing methods to output agents.
+
+        Output agents will respond by calling the method.
+        """
+        message = {"name":method}
+        message.update(method_params)
+        self.send_output(data=message,channel="request-method")
+
+    def send_set_attr(self, attr :str, value):
+        """
+        Sends a message to set the `attr` of another agent to that of `value`.
+
+        Parameters
+        ----------
+        attr : str
+            The variable name of the output agent to be set.
+
+        value
+            The value of the variable to be set
+        """
+        self.send_output(data={attr: value}, channel="set-attr")
+
+    def respond_reply_attr_(self, message_data):
+        """
+        Response to a `reply` of setting attribute
+        """
+        if isinstance(message_data, str) and message_data == "NULL":
+            return 0
+        else:
+            key = next(iter(message_data))
+            setattr(self, key, message_data[key])
+
+
+    def respond_request_attr_(self, attribute: str):
+        """
+        Response to a `request` of `attribute` from input agents.
+
+        This agent reply with the requested `attribute` if it has it.
+        """
+        if hasattr(self, attribute):
+            self.send_output(data={attribute:self.get_attr(attribute)}, channel="reply-attr")
+        else:
+            self.log_info("'"+attribute+"' not available for reply.")
+            self.send_output(data="NULL", channel="reply-attr")
+
+    def respond_request_method_(self, message_data:dict):
+        """
+        Response to a `request` of executing `method` from input agents.
+
+        This agent will execute the method with the provided parameters of the method.
+        """
+        method_name = message_data["name"]
+        data_params = {key:val for key,val in message_data.items() if key != "name"}
+        if hasattr(self, method_name):
+            self.get_attr(method_name)(**data_params)
+
+    def on_connect_output(self, output_agent):
+        """
+        This user provided method is called whenever an agent is connected to its output.
+
+        This can be for example, to send `metadata` or `ping` to the output agent.
+        """
+
+        return NotImplemented
+
+
+    def bind_output(self, output_agent, channel="default"):
         """
         Forms Output connection with another agent. Any call on send_output will reach this newly binded agent
 
@@ -470,40 +566,61 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         output_agent : AgentMET4FOF or list
             Agent(s) to be binded to this agent's output channel
 
+        channel : str or list of str
+            Specific name of the channel(s) to be subscribed to. (Default = "data")
+
         """
         if isinstance(output_agent, list):
             for agent in output_agent:
-                self._bind_output(agent)
+                self._bind_output(output_agent=agent, channel=channel)
         else:
-            self._bind_output(output_agent)
+            self._bind_output(output_agent=output_agent, channel=channel)
 
-    def _bind_output(self, output_agent):
+    def _bind_output(self, output_agent, channel="default"):
         """
         Internal method which implements the logic for connecting this agent, to the `output_agent`.
         """
         if type(output_agent) == str:
-            output_module_id = output_agent
+            output_agent_id = output_agent
         else:
-            output_module_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr('name')
 
-        if output_module_id not in self.Outputs and output_module_id != self.name:
+        # if output_agent_id not in self.Outputs and output_agent_id != self.name:
+        if output_agent_id not in self.Outputs and output_agent_id != self.name:
             # update self.Outputs list and Inputs list of output_module
             self.Outputs.update({output_agent.get_attr('name'): output_agent})
             temp_updated_inputs = output_agent.get_attr('Inputs')
             temp_updated_inputs.update({self.name: self})
             output_agent.set_attr(Inputs=temp_updated_inputs)
 
+            # connect socket for osbrain
             if self.backend == "osbrain":
+                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
                 # bind to the address
                 if output_agent.has_socket(self.PubAddr_alias):
-                    output_agent.subscribe(self.PubAddr_alias, handler={'data': AgentMET4FOF.handle_process_data})
+                    if isinstance(channel, list):
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                    else:
+                        output_agent.subscribe(self.PubAddr_alias, handler={channel: AgentMET4FOF.handle_process_data})
                 else:
-                    output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
-                                         handler={'data': AgentMET4FOF.handle_process_data})
+                    if isinstance(channel, list):
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                    else:
+                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
+                                             handler={channel: AgentMET4FOF.handle_process_data})
+
+            # update channels subscription information for mesa
+            else:
+                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
+
+            # calls on connect output method
+            self.on_connect_output(output_agent)
 
             # LOGGING
             if self.log_mode:
-                self.log_info("Connected output module: " + output_module_id)
+                self.log_info("Connected output module: " + output_agent_id)
 
     def unbind_output(self, output_agent):
         """
@@ -516,22 +633,24 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         """
         if type(output_agent) == str:
-            module_id = output_agent
+            output_agent_id = output_agent
         else:
-            module_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr('name')
 
-        if module_id in self.Outputs and module_id != self.name:
-            self.Outputs.pop(module_id, None)
+        if output_agent_id in self.Outputs and output_agent_id != self.name:
+            self.Outputs.pop(output_agent_id, None)
+
             new_inputs = output_agent.get_attr('Inputs')
             new_inputs.pop(self.name, None)
             output_agent.set_attr(Inputs=new_inputs)
 
             if self.backend == "osbrain":
-                output_agent.unsubscribe(self.PubAddr_alias, 'data')
+                output_agent.unsubscribe(self.PubAddr_alias, topic=self.Outputs_agent_channels[output_agent_id])
 
+            self.Outputs_agent_channels.pop(output_agent_id, None)
             # LOGGING
             if self.log_mode:
-                self.log_info("Disconnected output module: " + module_id)
+                self.log_info("Disconnected output module: " + output_agent_id)
 
     def _convert_to_plotly(self, matplotlib_fig: matplotlib.figure.Figure):
         """
@@ -984,7 +1103,7 @@ class _AgentController(AgentMET4FOF):
     Provides global control to all agents in network.
     """
 
-    def init_parameters(self, ns=None, backend='osbrain', mesa_model=""):
+    def init_parameters(self, ns=None, backend='osbrain', mesa_model="", log_mode=True):
         self.backend = backend
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = "Idle"
@@ -992,6 +1111,7 @@ class _AgentController(AgentMET4FOF):
         self.G = nx.DiGraph()
         self._logger = None
         self.coalitions = []
+        self.log_mode = log_mode
 
         if backend == "mesa":
             self.mesa_model = mesa_model
@@ -1056,7 +1176,11 @@ class _AgentController(AgentMET4FOF):
         return num_count
 
     def generate_module_name_byType(self, agentType):
-        name = agentType.__name__
+        # handle agent type
+        if isinstance(agentType, str):
+            name = agentType
+        else:
+            name = agentType.__name__
         name += "_" + str(self.get_agentType_count(agentType))
         return name
 
@@ -1145,9 +1269,12 @@ class _AgentController(AgentMET4FOF):
         edges = []
         for agent_name in agent_names:
             temp_agent = self.get_agent(agent_name)
-            temp_output_connections = list(temp_agent.get_attr('Outputs').keys())
-            for output_connection in temp_output_connections:
-                edges += [(agent_name, output_connection)]
+            output_agent_channels = temp_agent.get_attr('Outputs_agent_channels')
+            temp_output_agents = list(output_agent_channels.keys())
+            temp_output_channels = list(output_agent_channels.values())
+
+            for output_agent_name, output_agent_channel in zip(temp_output_agents,temp_output_channels):
+                edges += [(agent_name, output_agent_name, {"channel":str(output_agent_channel)})]
         return edges
 
     def _get_logger(self):
@@ -1164,6 +1291,36 @@ class _AgentController(AgentMET4FOF):
         """
         self.coalitions.append(new_coalition)
         return new_coalition
+
+    def del_coalition(self):
+        self.coalitions = []
+    def add_coalition_agent(self, name, agents=[]):
+        """
+        Add agents into the coalition
+        """
+        # update coalition
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == name:
+                for agent in agents:
+                    self.coalitions[coalition_i].add_agent(agent)
+
+    def remove_coalition_agent(self, coalition_name, agent_name=""):
+        """
+        Remove agent from coalition
+        """
+        # update coalition
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == coalition_name:
+                self.coalitions[coalition_i].remove_agent(agent_name)
+
+    def get_coalition(self, name):
+        """
+        Gets the coalition based on provided name
+        """
+        for coalition_i, coalition in enumerate(self.coalitions):
+            if coalition.name == name:
+                return coalition
+        return -1
 
 
 class MesaModel(Model):
@@ -1205,7 +1362,7 @@ class AgentNetwork:
 
     def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv",
                  dashboard_modules=True, dashboard_extensions=[], dashboard_update_interval=3,
-                 dashboard_max_monitors=10, dashboard_port=8050, backend="osbrain", mesa_update_interval=0.1):
+                 dashboard_max_monitors=10, dashboard_port=8050, backend="osbrain", mesa_update_interval=0.1, network_stylesheet = default_agent_network_stylesheet, **dashboard_kwargs):
         """
         Parameters
         ----------
@@ -1228,6 +1385,8 @@ class AgentNetwork:
             Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the each Monitor Agent will occupy one of these figures.
         dashboard_port: int
             Port of the dashboard to be hosted on. By default is port 8050.
+        **dashboard_kwargs
+            Additional key words to be passed in initialising the dashboard
         """
 
 
@@ -1268,6 +1427,7 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
+            from .dashboard.Dashboard_agt_net import Dashboard_agt_net
             # Initialize common dashboard parameters for both types of dashboards
             # corresponding to different backends.
             dashboard_params = {
@@ -1278,12 +1438,15 @@ class AgentNetwork:
                 "ip_addr": ip_addr,
                 "port": dashboard_port,
                 "agentNetwork": self,
+                "network_stylesheet":network_stylesheet
             }
+            dashboard_params.update(dashboard_kwargs)
+
             # Initialize dashboard process/thread.
             if self.backend == "osbrain":
-                from .dashboard.Dashboard import AgentDashboardProcess
+                from .dashboard.Dashboard import AgentDashboardThread
 
-                self.dashboard_proc = AgentDashboardProcess(**dashboard_params)
+                self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             elif self.backend == "mesa":
                 from .dashboard.Dashboard import AgentDashboardThread
 
@@ -1407,7 +1570,7 @@ class AgentNetwork:
 
     def get_nodes_edges(self):
         G = self.get_networkx()
-        return G.nodes, G.edges
+        return G.nodes, G.edges(data=True)
 
     def get_nodes(self):
         G = self.get_networkx()
@@ -1482,7 +1645,7 @@ class AgentNetwork:
 
         agent_proxy.shutdown()
 
-    def bind_agents(self, source, target):
+    def bind_agents(self, source, target, channel="default"):
         """
         Binds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
 
@@ -1497,7 +1660,7 @@ class AgentNetwork:
             Target agent whose Input channel will be binded to `source`
         """
 
-        source.bind_output(target)
+        source.bind_output(target, channel=channel)
 
         return 0
 
@@ -1540,19 +1703,32 @@ class AgentNetwork:
 
         return self._get_controller().get_agent(agent_name)
 
-    def agents(self, filter_agent=None):
-        """
-        Returns all agent names connected to Agent Network.
+    def agents(self, filter_agent: Optional[str] = None) -> List[str]:
+        """Returns all or subset of agents' names connected to agent network
+
+        Parameters
+        ----------
+        filter_agent : str, optional
+            if present, only those names are returned which contain
+            ``filter_agent``'s value
 
         Returns
         -------
-        list : names of all agents
-
+        list[str]
+            requested names of agents
         """
-        agent_names = self._get_controller().agents()
+        all_agent_names = self._get_controller().agents()
         if filter_agent is not None:
-            agent_names = [agent_name for agent_name in agent_names if filter_agent in agent_name]
-        return agent_names
+            filtered_agent_names = [
+                agent_name
+                for agent_name in all_agent_names
+                if filter_agent in agent_name
+            ]
+            return filtered_agent_names
+        return all_agent_names
+
+    def generate_module_name_byType(self,agentType):
+        return (self._get_controller().generate_module_name_byType(agentType))
 
     def add_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, loop_wait=None,
                   **kwargs):
@@ -1590,6 +1766,27 @@ class AgentNetwork:
         new_coalition = Coalition(name, agents)
         self._get_controller().add_coalition(new_coalition)
         return new_coalition
+
+    def add_coalition_agent(self, name="Coalition_1", agents=[]):
+        """
+        Add agents into the coalition
+        """
+        self._get_controller().add_coalition_agent(name, agents)
+
+    def remove_coalition_agent(self, coalition_name, agent_name=""):
+        """
+        Remove agent from coalition
+        """
+        self._get_controller().remove_coalition_agent(coalition_name, agent_name)
+
+    def get_coalition(self, name):
+        """
+        Returns the coalition with the provided name
+        """
+        return self._get_controller().get_coalition(name)
+
+    def del_coalition(self):
+        self._get_controller().del_coalition()
 
     @property
     def coalitions(self):
@@ -1634,6 +1831,12 @@ class AgentNetwork:
 
 
 class Coalition():
+    """
+    A special class for grouping agents.
+
+    It is rendered as a parent group on the dashboard, along with its member agents.
+
+    """
     def __init__(self, name="Coalition", agents=[]):
         self.agents = agents
         self.name = name
@@ -1641,6 +1844,14 @@ class Coalition():
     def agent_names(self):
         return [agent.get_attr("name") for agent in self.agents]
 
+    def add_agent(self, agent):
+        self.agents.append(agent)
+
+    def remove_agent(self, agent):
+        if isinstance(agent, str):
+            self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent]
+        elif isinstance(agent, AgentMET4FOF):
+            self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent.name]
 
 class DataStreamAgent(AgentMET4FOF):
     """
