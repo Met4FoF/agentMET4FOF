@@ -27,7 +27,7 @@ from ..dashboard.default_network_stylesheet import default_agent_network_stylesh
 from ..streams import DataStreamMET4FOF
 
 
-__all__ = ["AgentMET4FOF", "MonitorAgent", "AgentNetwork"]
+__all__ = ["AgentMET4FOF", "MonitorAgent", "AgentNetwork", "AgentBuffer"]
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
