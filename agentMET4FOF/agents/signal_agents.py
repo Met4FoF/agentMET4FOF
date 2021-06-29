@@ -1,6 +1,8 @@
 from .base_agents import AgentMET4FOF
 from ..streams import SineGenerator
 
+__all__ = ["SineGeneratorAgent"]
+
 
 class SineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal
