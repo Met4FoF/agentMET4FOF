@@ -1,5 +1,5 @@
-from agentMET4FOF.agents.base_agents import AgentMET4FOF
-from agentMET4FOF.streams import SineGenerator
+from .base_agents import AgentMET4FOF
+from ..streams import SineGenerator
 
 
 class SineGeneratorAgent(AgentMET4FOF):
