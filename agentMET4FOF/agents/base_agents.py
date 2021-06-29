@@ -23,8 +23,7 @@ from pandas import DataFrame
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
 
-from ..dashboard.default_network_stylesheet import \
-    default_agent_network_stylesheet
+from ..dashboard.default_network_stylesheet import default_agent_network_stylesheet
 from ..streams import DataStreamMET4FOF
 
 
@@ -32,18 +31,33 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
     """
     Base class for all agents with specific functions to be overridden/supplied by user.
 
-    Behavioral functions for users to provide are init_parameters, agent_loop and on_received_message.
-    Communicative functions are bind_output, unbind_output and send_output.
+    Behavioral functions for users to provide are init_parameters, agent_loop and
+    on_received_message. Communicative functions are bind_output, unbind_output and
+    send_output.
     """
 
-    def __init__(self, name='', host=None, serializer=None, transport=None, attributes=None, backend="osbrain",
-                 mesa_model=None):
+    def __init__(
+        self,
+        name="",
+        host=None,
+        serializer=None,
+        transport=None,
+        attributes=None,
+        backend="osbrain",
+        mesa_model=None,
+    ):
         self.backend = backend.lower()
 
         if self.backend == "osbrain":
             self._remove_methods(MesaAgent)
-            osBrainAgent.__init__(self, name=name, host=host, serializer=serializer, transport=transport,
-                                  attributes=attributes)
+            osBrainAgent.__init__(
+                self,
+                name=name,
+                host=host,
+                serializer=serializer,
+                transport=transport,
+                attributes=attributes,
+            )
 
         elif self.backend == "mesa":
             MesaAgent.__init__(self, name, mesa_model)
@@ -53,7 +67,10 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             self.name = name
             self.mesa_model = mesa_model
         else:
-            raise NotImplementedError("Backend has not been implemented. Valid choices are 'osbrain' and 'mesa'.")
+            raise NotImplementedError(
+                "Backend has not been implemented. Valid choices are 'osbrain' and "
+                "'mesa'."
+            )
 
     def init_mesa(self, name):
         # MESA Specific parameters
@@ -93,20 +110,22 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def init_agent(self, buffer_size=1000, log_mode=True):
         """
-        Internal initialization to setup the agent: mainly on setting the dictionary of Inputs, Outputs, PubAddr.
-
-        Calls user-defined `init_parameters()` upon finishing.
+        Internal initialization to setup the agent: mainly on setting the dictionary
+        of Inputs, Outputs, PubAddr. Calls user-defined `init_parameters()` upon
+        finishing.
 
         Attributes
         ----------
 
         Inputs : dict
-            Dictionary of Agents connected to its input channels. Messages will arrive from agents in this dictionary.
-            Automatically updated when `bind_output()` function is called
+            Dictionary of Agents connected to its input channels. Messages will
+            arrive from agents in this dictionary. Automatically updated when
+            `bind_output()` function is called
 
         Outputs : dict
-            Dictionary of Agents connected to its output channels. Messages will be sent to agents in this dictionary.
-            Automatically updated when `bind_output()` function is called
+            Dictionary of Agents connected to its output channels. Messages will be
+            sent to agents in this dictionary. Automatically updated when
+            `bind_output()` function is called
 
         PubAddr_alias : str
             Name of Publish address socket
@@ -118,20 +137,24 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             Name of class
 
         current_state : str
-            Current state of agent. Can be used to define different states of operation such as "Running", "Idle, "Stop", etc..
-            Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+            Current state of agent. Can be used to define different states of
+            operation such as "Running", "Idle, "Stop", etc.. Users will need to
+            define their own flow of handling each type of `self.current_state` in
+            the `agent_loop`
 
         loop_wait : int
             The interval to wait between loop.
-            Call `init_agent_loop` to restart the timer or set the value of loop_wait in `init_parameters` when necessary.
+            Call `init_agent_loop` to restart the timer or set the value of loop_wait
+            in `init_parameters` when necessary.
 
         buffer_size : int
             The total number of elements to be stored in the agent :attr:`buffer`
-            When total elements exceeds this number, the latest elements will be replaced with the incoming data elements
+            When total elements exceeds this number, the latest elements will be
+            replaced with the incoming data elements
         """
         self.Inputs = {}
         self.Outputs = {}
-        self.Outputs_agent_channels = {} #keep track of agent subscription channels
+        self.Outputs_agent_channels = {}  # keep track of agent subscription channels
         self.AgentType = type(self).__name__
         self.log_mode = log_mode
         self.log_info("INITIALIZED")
@@ -148,24 +171,28 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.buffer_size = buffer_size
         self.buffer = self.init_buffer(self.buffer_size)
 
-        if self.backend == 'osbrain':
+        if self.backend == "osbrain":
             self.PubAddr_alias = self.name + "_PUB"
-            self.PubAddr = self.bind('PUB', alias=self.PubAddr_alias, transport='tcp')
+            self.PubAddr = self.bind("PUB", alias=self.PubAddr_alias, transport="tcp")
 
     def init_buffer(self, buffer_size):
         """
-        A method to initialise the buffer. By overriding this method, user can provide a custom buffer, instead of the regular AgentBuffer.
-        This can be used, for example, to provide a MetrologicalAgentBuffer in the metrological agents.
+        A method to initialise the buffer. By overriding this method, user can
+        provide a custom buffer, instead of the regular AgentBuffer. This can be
+        used, for example, to provide a MetrologicalAgentBuffer in the metrological
+        agents.
         """
         buffer = AgentBuffer(buffer_size)
         return buffer
 
     def reset(self):
         """
-        This method will be called on all agents when the global `reset_agents` is called by the AgentNetwork and when the
-        Reset button is clicked on the dashboard.
+        This method will be called on all agents when the global `reset_agents` is
+        called by the AgentNetwork and when the Reset button is clicked on the
+        dashboard.
 
-        Method to reset the agent's states and parameters. User can override this method to reset the specific parameters.
+        Method to reset the agent's states and parameters. User can override this
+        method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
         self.buffer.clear()
@@ -194,7 +221,11 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
                 if self.backend == "osbrain":
                     super().log_info(message)
                 elif self.backend == "mesa":
-                    message = '[%s] (%s): %s' % (datetime.datetime.utcnow(), self.name, message)
+                    message = "[%s] (%s): %s" % (
+                        datetime.datetime.utcnow(),
+                        self.name,
+                        message,
+                    )
                     print(message)
 
         except Exception as e:
@@ -213,7 +244,8 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             The wait between each iteration of the loop
         """
 
-        # most default: loop wait has not been set in init_parameters() not init_agent_loop()
+        # most default: loop wait has not been set in init_parameters() not
+        # init_agent_loop()
         if self.loop_wait is None and loop_wait is None:
             set_loop_wait = 1.0
         # init_agent_loop overrides loop_wait parameter
@@ -236,18 +268,21 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         return 0
 
     def stop_agent_loop(self):
-        """
-        Stops agent_loop from running. Note that the agent will still be responding to messages
+        """Stops agent_loop from running
 
+        Note that the agent will still be responding to messages.
         """
         self.stop_all_timers()
 
     def agent_loop(self):
         """
-        User defined method for the agent to execute for `loop_wait` seconds specified either in `self.loop_wait` or explicitly via`init_agent_loop(loop_wait)`
+        User defined method for the agent to execute for `loop_wait` seconds
+        specified either in `self.loop_wait` or explicitly via `init_agent_loop(
+        loop_wait)`
 
-        To start a new loop, call `init_agent_loop(loop_wait)` on the agent
-        Example of usage is to check the `current_state` of the agent and send data periodically
+        To start a new loop, call `init_agent_loop(loop_wait)` on the agent. Example
+        of usage is to check the `current_state` of the agent and send data
+        periodically.
         """
         return 0
 
@@ -258,15 +293,17 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Parameters
         ----------
         message : Dictionary
-            The message received is in form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}
-            agent_name is the name of the Input agent which sent the message
-            data is the actual content of the message
+            The message received is in form {'from':agent_name, 'data': data,
+            'senderType': agent_class, 'channel':channel_name}. agent_name is the
+            name of the Input agent which sent the message data is the actual content
+            of the message.
         """
         return message
 
     def buffer_filled(self, agent_name=None):
         """
-        Checks whether the internal buffer has been filled to the maximum allowed specified by self.buffer_size
+        Checks whether the internal buffer has been filled to the maximum allowed
+        specified by self.buffer_size
 
         Parameters
         ----------
@@ -303,19 +340,22 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         agent_from : str
             Name of agent sender
         data
-            Any supported data which can be stored in dict as buffer. See AgentBuffer for more information.
+            Any supported data which can be stored in dict as buffer. See AgentBuffer
+            for more information.
 
         """
 
         self.buffer.store(agent_from=agent_from, data=data, concat_axis=concat_axis)
         self.log_info("Buffer: " + str(self.buffer.buffer))
 
-    def pack_data(self, data, channel='default'):
+    def pack_data(self, data, channel="default"):
         """
         Internal method to pack the data content into a dictionary before sending out.
 
-        Special case : if the `data` is already a `message`, then the `from` and `senderType` will be altered to this agent,
-        without altering the `data` and `channel` within the message this is used for more succinct data processing and passing.
+        Special case : if the `data` is already a `message`, then the `from` and
+        `senderType` will be altered to this agent, without altering the `data` and
+        `channel` within the message this is used for more succinct data processing
+        and passing.
 
         Parameters
         ----------
@@ -327,17 +367,23 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         Returns
         -------
-        Packed message data : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
+        Packed message data : dict of the form {'from':agent_name, 'data': data,
+        'senderType': agent_class, 'channel':channel_name}.
         """
 
         # if is a message type, override the `from` and `senderType` fields only
         if self._is_type_message(data):
             new_data = data
-            new_data['from'] = self.name
-            new_data['senderType'] = type(self).__name__
+            new_data["from"] = self.name
+            new_data["senderType"] = type(self).__name__
             return new_data
 
-        return {'from': self.name, 'data': data, 'senderType': type(self).__name__, 'channel': channel}
+        return {
+            "from": self.name,
+            "data": data,
+            "senderType": type(self).__name__,
+            "channel": channel,
+        }
 
     def _is_type_message(self, data):
         """
@@ -354,11 +400,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         if type(data) == dict:
             dict_keys = data.keys()
-            if 'from' in dict_keys and 'data' in dict_keys and 'senderType' in dict_keys:
+            if (
+                "from" in dict_keys
+                and "data" in dict_keys
+                and "senderType" in dict_keys
+            ):
                 return True
         return False
 
-    def send_output(self, data, channel='default'):
+    def send_output(self, data, channel="default"):
         """
         Sends message data to all connected agents in self.Outputs.
 
@@ -376,7 +426,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         Returns
         -------
-        message : dict of the form {'from':agent_name, 'data': data, 'senderType': agent_class, 'channel':channel_name}.
+        message : dict
+            {'from':agent_name, 'data': data, 'senderType': agent_class,
+            'channel':channel_name}.
 
         """
         start_time_pack = time.time()
@@ -406,18 +458,18 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             print(e)
 
         # Add info of channel
-        self._update_output_channels_info(packed_data['data'], packed_data['channel'])
+        self._update_output_channels_info(packed_data["data"], packed_data["channel"])
 
         return packed_data
 
     def _update_output_channels_info(self, data, channel):
         """
-        Internal method to update the dict of output_channels_info. This is used in conjunction with send_output().
+        Internal method to update the dict of output_channels_info. This is used in
+        conjunction with send_output().
 
         Checks and records data type & dimension and channel name
-        If the data is nested within dict, then it will search deeper and subsequently record the info of each
-        inner hierarchy
-
+        If the data is nested within dict, then it will search deeper and
+        subsequently record the info of each inner hierarchy
 
         Parameters
         ----------
@@ -429,8 +481,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         if channel not in self.output_channels_info.keys():
             if type(data) == dict:
-                nested_metadata = {key: {nested_dict_key:self._get_metadata(nested_dict_val) for nested_dict_key,nested_dict_val in data[key].items()}
-                if isinstance(data[key],dict) else self._get_metadata(data[key]) for key in data.keys()}
+                nested_metadata = {
+                    key: {
+                        nested_dict_key: self._get_metadata(nested_dict_val)
+                        for nested_dict_key, nested_dict_val in data[key].items()
+                    }
+                    if isinstance(data[key], dict)
+                    else self._get_metadata(data[key])
+                    for key in data.keys()
+                }
                 self.output_channels_info.update({channel: nested_metadata})
             else:
                 self.output_channels_info.update({channel: self._get_metadata(data)})
@@ -442,18 +501,18 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         data_info = {}
         if type(data) == np.ndarray or type(data).__name__ == "DataFrame":
-            data_info.update({'type': type(data).__name__, 'shape': data.shape})
+            data_info.update({"type": type(data).__name__, "shape": data.shape})
         elif type(data) == list:
-            data_info.update({'type': type(data).__name__, 'len': len(data)})
+            data_info.update({"type": type(data).__name__, "len": len(data)})
         else:
-            data_info.update({'type': type(data).__name__})
+            data_info.update({"type": type(data).__name__})
         return data_info
 
     def handle_process_data(self, message):
-        """
-        Internal method to handle incoming message before calling user-defined on_received_message method.
+        """Internal method to handle incoming message before calling on_received_message
 
-        If current_state is either Stop or Reset, it will terminate early before entering on_received_message
+        If current_state is either Stop or Reset, it will terminate early before
+        entering on_received_message.
         """
 
         if self.current_state == "Stop" or self.current_state == "Reset":
@@ -471,32 +530,34 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             self.respond_request_attr_(message["data"])
         if message["channel"] == "request-method":
             self.respond_request_method_(message["data"])
-        elif (message["channel"] == "reply-attr" or message["channel"] =="set-attr") and message["data"] != "NULL":
+        elif (
+            message["channel"] == "reply-attr" or message["channel"] == "set-attr"
+        ) and message["data"] != "NULL":
             self.respond_reply_attr_(message["data"])
         else:
             self.on_received_message(message)
         end_time_pack = time.time()
         self.log_info("Tproc: " + str(round(end_time_pack - start_time_pack, 6)))
 
-    def send_request_attribute(self, attribute : str):
+    def send_request_attribute(self, attribute: str):
         """
         Send a `request` of `attribute` to output agents.
 
         Output agents will reply with the requested `attribute` if they have.
         """
-        self.send_output(data=attribute,channel="request-attr")
+        self.send_output(data=attribute, channel="request-attr")
 
-    def send_request_method(self, method : str, **method_params):
+    def send_request_method(self, method: str, **method_params):
         """
         Send a `request` of executing methods to output agents.
 
         Output agents will respond by calling the method.
         """
-        message = {"name":method}
+        message = {"name": method}
         message.update(method_params)
-        self.send_output(data=message,channel="request-method")
+        self.send_output(data=message, channel="request-method")
 
-    def send_set_attr(self, attr :str, value):
+    def send_set_attr(self, attr: str, value):
         """
         Sends a message to set the `attr` of another agent to that of `value`.
 
@@ -520,7 +581,6 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             key = next(iter(message_data))
             setattr(self, key, message_data[key])
 
-
     def respond_request_attr_(self, attribute: str):
         """
         Response to a `request` of `attribute` from input agents.
@@ -528,37 +588,37 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         This agent reply with the requested `attribute` if it has it.
         """
         if hasattr(self, attribute):
-            self.send_output(data={attribute:self.get_attr(attribute)}, channel="reply-attr")
+            self.send_output(
+                data={attribute: self.get_attr(attribute)}, channel="reply-attr"
+            )
         else:
-            self.log_info("'"+attribute+"' not available for reply.")
+            self.log_info("'" + attribute + "' not available for reply.")
             self.send_output(data="NULL", channel="reply-attr")
 
-    def respond_request_method_(self, message_data:dict):
+    def respond_request_method_(self, message_data: dict):
         """
         Response to a `request` of executing `method` from input agents.
 
         This agent will execute the method with the provided parameters of the method.
         """
         method_name = message_data["name"]
-        data_params = {key:val for key,val in message_data.items() if key != "name"}
+        data_params = {key: val for key, val in message_data.items() if key != "name"}
         if hasattr(self, method_name):
             self.get_attr(method_name)(**data_params)
 
     def on_connect_output(self, output_agent):
-        """
-        This user provided method is called whenever an agent is connected to its output.
+        """This method is called whenever an agent is connected to its output
 
         This can be for example, to send `metadata` or `ping` to the output agent.
         """
 
         return NotImplemented
 
-
     def bind_output(self, output_agent, channel="default"):
-        """
-        Forms Output connection with another agent. Any call on send_output will reach this newly binded agent
+        """Forms Output connection with another agent
 
-        Adds the agent to its list of Outputs.
+        Any call on send_output will reach this newly binded agent. Adds the agent to
+        its list of Outputs.
 
         Parameters
         ----------
@@ -577,42 +637,65 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def _bind_output(self, output_agent, channel="default"):
         """
-        Internal method which implements the logic for connecting this agent, to the `output_agent`.
+        Internal method which implements the logic for connecting this agent,
+        to the `output_agent`.
         """
         if type(output_agent) == str:
             output_agent_id = output_agent
         else:
-            output_agent_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr("name")
 
         # if output_agent_id not in self.Outputs and output_agent_id != self.name:
         if output_agent_id not in self.Outputs and output_agent_id != self.name:
             # update self.Outputs list and Inputs list of output_module
-            self.Outputs.update({output_agent.get_attr('name'): output_agent})
-            temp_updated_inputs = output_agent.get_attr('Inputs')
+            self.Outputs.update({output_agent.get_attr("name"): output_agent})
+            temp_updated_inputs = output_agent.get_attr("Inputs")
             temp_updated_inputs.update({self.name: self})
             output_agent.set_attr(Inputs=temp_updated_inputs)
 
             # connect socket for osbrain
             if self.backend == "osbrain":
-                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
+                self.Outputs_agent_channels.update(
+                    {output_agent.get_attr("name"): channel}
+                )
                 # bind to the address
                 if output_agent.has_socket(self.PubAddr_alias):
                     if isinstance(channel, list):
-                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
-                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                        output_agent.connect(
+                            self.PubAddr,
+                            alias=self.PubAddr_alias,
+                            handler={
+                                channel_name: AgentMET4FOF.handle_process_data
+                                for channel_name in channel
+                            },
+                        )
                     else:
-                        output_agent.subscribe(self.PubAddr_alias, handler={channel: AgentMET4FOF.handle_process_data})
+                        output_agent.subscribe(
+                            self.PubAddr_alias,
+                            handler={channel: AgentMET4FOF.handle_process_data},
+                        )
                 else:
                     if isinstance(channel, list):
-                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
-                                             handler={channel_name: AgentMET4FOF.handle_process_data for channel_name in channel})
+                        output_agent.connect(
+                            self.PubAddr,
+                            alias=self.PubAddr_alias,
+                            handler={
+                                channel_name: AgentMET4FOF.handle_process_data
+                                for channel_name in channel
+                            },
+                        )
                     else:
-                        output_agent.connect(self.PubAddr, alias=self.PubAddr_alias,
-                                             handler={channel: AgentMET4FOF.handle_process_data})
+                        output_agent.connect(
+                            self.PubAddr,
+                            alias=self.PubAddr_alias,
+                            handler={channel: AgentMET4FOF.handle_process_data},
+                        )
 
             # update channels subscription information for mesa
             else:
-                self.Outputs_agent_channels.update({output_agent.get_attr('name'): channel})
+                self.Outputs_agent_channels.update(
+                    {output_agent.get_attr("name"): channel}
+                )
 
             # calls on connect output method
             self.on_connect_output(output_agent)
@@ -622,8 +705,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
                 self.log_info("Connected output module: " + output_agent_id)
 
     def unbind_output(self, output_agent):
-        """
-        Remove existing output connection with another agent. This reverses the bind_output method
+        """Remove existing output connection with another agent
+
+        This reverses the bind_output method.
 
         Parameters
         ----------
@@ -634,17 +718,20 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         if type(output_agent) == str:
             output_agent_id = output_agent
         else:
-            output_agent_id = output_agent.get_attr('name')
+            output_agent_id = output_agent.get_attr("name")
 
         if output_agent_id in self.Outputs and output_agent_id != self.name:
             self.Outputs.pop(output_agent_id, None)
 
-            new_inputs = output_agent.get_attr('Inputs')
+            new_inputs = output_agent.get_attr("Inputs")
             new_inputs.pop(self.name, None)
             output_agent.set_attr(Inputs=new_inputs)
 
             if self.backend == "osbrain":
-                output_agent.unsubscribe(self.PubAddr_alias, topic=self.Outputs_agent_channels[output_agent_id])
+                output_agent.unsubscribe(
+                    self.PubAddr_alias,
+                    topic=self.Outputs_agent_channels[output_agent_id],
+                )
 
             self.Outputs_agent_channels.pop(output_agent_id, None)
             # LOGGING
@@ -664,7 +751,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         # convert to plotly format
         matplotlib_fig.tight_layout()
         plotly_fig = tls.mpl_to_plotly(matplotlib_fig)
-        plotly_fig['layout']['showlegend'] = True
+        plotly_fig["layout"]["showlegend"] = True
         return plotly_fig
 
     def _fig_to_uri(self, matplotlib_fig: matplotlib.figure.Figure):
@@ -678,17 +765,17 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
         """
         out_img = BytesIO()
-        matplotlib_fig.savefig(out_img, format='png')
+        matplotlib_fig.savefig(out_img, format="png")
         matplotlib_fig.clf()
         plt.close(matplotlib_fig)
         out_img.seek(0)  # rewind file
         encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
         return "data:image/png;base64,{}".format(encoded)
 
-    def _convert_matplotlib_fig(self, fig: matplotlib.figure.Figure, mode: str = "image"):
-        """
-        Internal method to convert matplotlib figure which can be rendered by the dashboard.
-        """
+    def _convert_matplotlib_fig(
+        self, fig: matplotlib.figure.Figure, mode: str = "image"
+    ):
+        """Convert matplotlib figure to be rendered by the dashboard"""
 
         error_msg = "Conversion mode " + mode + " is not implemented."
         if mode == "plotly":
@@ -701,21 +788,28 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             raise NotImplementedError(error_msg)
         return fig
 
-    def send_plot(self, fig: Union[matplotlib.figure.Figure, Dict[str, matplotlib.figure.Figure]], mode: str = "image"):
+    def send_plot(
+        self,
+        fig: Union[matplotlib.figure.Figure, Dict[str, matplotlib.figure.Figure]],
+        mode: str = "image",
+    ):
         """
         Sends plot to agents connected to this agent's Output channel.
 
         This method is different from send_output which will be sent to through the
         'plot' channel to be handled.
 
-        Tradeoffs between "image" and "plotly" modes are that "image" are more stable and "plotly" are interactive.
-        Note not all (complicated) matplotlib figures can be converted into a plotly figure.
+        Tradeoffs between "image" and "plotly" modes are that "image" are more stable
+        and "plotly" are interactive. Note not all (complicated) matplotlib figures
+        can be converted into a plotly figure.
 
         Parameters
         ----------
 
         fig : matplotlib.figure.Figure or dict of matplotlib.figure.Figure
-            Alternatively, multiple figures can be nested in a dict (with any preferred keys) e.g {"Temperature":matplotlib.Figure, "Acceleration":matplotlib.Figure}
+            Alternatively, multiple figures can be nested in a dict (with any
+            preferred keys) e.g {"Temperature":matplotlib.Figure,
+            "Acceleration":matplotlib.Figure}
 
         mode : str
             "image" - converts into image via encoding at base64 string.
@@ -736,7 +830,10 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
                 fig[key] = self._convert_matplotlib_fig(fig[key], mode)
             graph = {"mode": mode, "fig": list(fig.values())}
         elif isinstance(fig, list):
-            graph = {"mode": mode, "fig": [self._convert_matplotlib_fig(fig_, mode) for fig_ in fig]}
+            graph = {
+                "mode": mode,
+                "fig": [self._convert_matplotlib_fig(fig_, mode) for fig_ in fig],
+            }
         else:
             graph = {"mode": mode, "fig": fig}
         self.send_output(graph, channel="plot")
@@ -755,14 +852,30 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             "get_all_attr",
             "plots",
             "name",
-            "agent_loop"
+            "agent_loop",
         ]
-        filtered_attr = {key: val for key, val in _all_attr.items() if key.startswith('_') is False}
-        filtered_attr = {key: val for key, val in filtered_attr.items() if
-                         key not in excludes and type(val).__name__ != 'function'}
-        filtered_attr = {key: val if (type(val) == float or type(val) == int or type(
-            val) == str or key == 'output_channels_info') else str(val) for key, val in filtered_attr.items()}
-        filtered_attr = {key: val for key, val in filtered_attr.items() if "object" not in str(val)}
+        filtered_attr = {
+            key: val for key, val in _all_attr.items() if key.startswith("_") is False
+        }
+        filtered_attr = {
+            key: val
+            for key, val in filtered_attr.items()
+            if key not in excludes and type(val).__name__ != "function"
+        }
+        filtered_attr = {
+            key: val
+            if (
+                type(val) == float
+                or type(val) == int
+                or type(val) == str
+                or key == "output_channels_info"
+            )
+            else str(val)
+            for key, val in filtered_attr.items()
+        }
+        filtered_attr = {
+            key: val for key, val in filtered_attr.items() if "object" not in str(val)
+        }
         return filtered_attr
 
     def shutdown(self):
@@ -829,9 +942,9 @@ class AgentBuffer:
         return False
 
     def update(
-            self,
-            agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
-            data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
+        self,
+        agent_from: Union[Dict[str, Union[np.ndarray, list, pd.DataFrame]], str],
+        data: Union[np.ndarray, list, pd.DataFrame, float, int] = None,
     ):
         """Overrides data in the buffer dict keyed by ``agent_from`` with value ``data``
 
@@ -849,7 +962,8 @@ class AgentBuffer:
         if isinstance(data, dict):
             # check for each value datatype
             for key, value in data.items():
-                # if the value is not list types, turn it into a list of single value i.e [value]
+                # if the value is not list types, turn it into a list of single value
+                # i.e [value]
                 if not self.check_supported_datatype(value):
                     data[key] = [value]
         elif not self.check_supported_datatype(data):
@@ -858,10 +972,10 @@ class AgentBuffer:
         return self.buffer
 
     def _concatenate(
-            self,
-            iterable: Union[np.ndarray, list, pd.DataFrame],
-            data: Union[np.ndarray, list, DataFrame],
-            concat_axis: int = 0
+        self,
+        iterable: Union[np.ndarray, list, pd.DataFrame],
+        data: Union[np.ndarray, list, DataFrame],
+        concat_axis: int = 0,
     ) -> Iterable:
         """Concatenate the given ``iterable`` with ``data``
 
@@ -883,21 +997,22 @@ class AgentBuffer:
         # handle list
         if isinstance(iterable, list):
             iterable += data
-            # check if exceed memory buffer size, remove the first n elements which exceeded the size
+            # check if exceed memory buffer size, remove the first n elements which
+            # exceeded the size
             if len(iterable) > self.buffer_size:
                 truncated_element_index = len(iterable) - self.buffer_size
                 iterable = iterable[truncated_element_index:]
 
         # handle if data type is np.ndarray
         elif isinstance(iterable, np.ndarray):
-            iterable = np.concatenate((iterable, data),axis=concat_axis)
+            iterable = np.concatenate((iterable, data), axis=concat_axis)
             if len(iterable) > self.buffer_size:
                 truncated_element_index = len(iterable) - self.buffer_size
                 iterable = iterable[truncated_element_index:]
 
         # handle if data type is pd.DataFrame
         elif isinstance(iterable, pd.DataFrame):
-            iterable = pd.concat([iterable,data], ignore_index=True, axis=concat_axis)
+            iterable = pd.concat([iterable, data], ignore_index=True, axis=concat_axis)
             if len(iterable) > self.buffer_size:
                 truncated_element_index = len(iterable) - self.buffer_size
                 iterable = iterable.truncate(before=truncated_element_index)
@@ -927,7 +1042,12 @@ class AgentBuffer:
         if agent_from is None:
             return any([self._iterable_filled(iterable) for iterable in self.values()])
         elif isinstance(self[agent_from], dict):
-            return any([self._iterable_filled(iterable) for iterable in self[agent_from].values()])
+            return any(
+                [
+                    self._iterable_filled(iterable)
+                    for iterable in self[agent_from].values()
+                ]
+            )
         else:
             return self._iterable_filled(self[agent_from])
 
@@ -977,9 +1097,7 @@ class AgentBuffer:
         return popped_buffer
 
     def _popleft(
-            self,
-            iterable: Union[np.ndarray, list, DataFrame],
-            n: Optional[int] = 1
+        self, iterable: Union[np.ndarray, list, DataFrame], n: Optional[int] = 1
     ) -> Tuple[Union[np.ndarray, list, DataFrame], Union[np.ndarray, list, DataFrame]]:
         """Internal handler of the actual popping mechanism based on type of iterable
 
@@ -1074,14 +1192,18 @@ class AgentBuffer:
                 # check if the key exist
                 # if it does, then append
                 if key in self.buffer[agent_from].keys():
-                    self.buffer[agent_from][key] = self._concatenate(self.buffer[agent_from][key], value,concat_axis)
+                    self.buffer[agent_from][key] = self._concatenate(
+                        self.buffer[agent_from][key], value, concat_axis
+                    )
                 # otherwise, create new entry
                 else:
                     self.buffer[agent_from].update({key: value})
         else:
             if not self.check_supported_datatype(message_data):
                 message_data = [message_data]
-            self.buffer[agent_from] = self._concatenate(self.buffer[agent_from], message_data,concat_axis)
+            self.buffer[agent_from] = self._concatenate(
+                self.buffer[agent_from], message_data, concat_axis
+            )
 
     def values(self):
         """Interface to access the internal dict's values()"""
@@ -1095,14 +1217,15 @@ class AgentBuffer:
         """Interface to access the internal dict's keys()"""
         return self.buffer.keys()
 
+
 class _AgentController(AgentMET4FOF):
-    """
-    Unique internal agent to provide control to other agents. Automatically instantiated when starting server.
+    """Unique internal agent to provide control to other agents
 
-    Provides global control to all agents in network.
+    Automatically instantiated when starting server. Provides global control to all
+    agents in network.
     """
 
-    def init_parameters(self, ns=None, backend='osbrain', mesa_model="", log_mode=True):
+    def init_parameters(self, ns=None, backend="osbrain", mesa_model="", log_mode=True):
         self.backend = backend
         self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
         self.current_state = "Idle"
@@ -1116,7 +1239,7 @@ class _AgentController(AgentMET4FOF):
             self.mesa_model = mesa_model
 
     def start_mesa_timer(self, mesa_update_interval):
-        class RepeatTimer():
+        class RepeatTimer:
             def __init__(self, t, repeat_function):
                 self.t = t
                 self.repeat_function = repeat_function
@@ -1134,7 +1257,9 @@ class _AgentController(AgentMET4FOF):
                 self.thread.cancel()
 
         self.mesa_update_interval = mesa_update_interval
-        self.mesa_timer = RepeatTimer(t=mesa_update_interval, repeat_function=self.mesa_model.step)
+        self.mesa_timer = RepeatTimer(
+            t=mesa_update_interval, repeat_function=self.mesa_model.step
+        )
         self.mesa_timer.start()
 
     def stop_mesa_timer(self):
@@ -1160,7 +1285,7 @@ class _AgentController(AgentMET4FOF):
         agent_names = self.agents()
         if len(agent_names) != 0:
             for agentName in agent_names:
-                current_agent_type = self.get_agent(agentName).get_attr('AgentType')
+                current_agent_type = self.get_agent(agentName).get_attr("AgentType")
                 if current_agent_type == agentType_name:
                     num_count += 1
         return num_count
@@ -1185,16 +1310,26 @@ class _AgentController(AgentMET4FOF):
 
     def generate_module_name_byUnique(self, agent_name):
         name = agent_name
-        agent_copy_count = self.get_agent_name_count(agent_name)  # number of agents with same name
+        agent_copy_count = self.get_agent_name_count(
+            agent_name
+        )  # number of agents with same name
         if agent_copy_count > 1:
             name += "(" + str(self.get_agent_name_count(agent_name)) + ")"
         return name
 
-    def add_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, loop_wait=None,
-                  **kwargs):
+    def add_agent(
+        self,
+        name=" ",
+        agentType=AgentMET4FOF,
+        log_mode=True,
+        buffer_size=1000,
+        ip_addr=None,
+        loop_wait=None,
+        **kwargs
+    ):
         try:
             if ip_addr is None:
-                ip_addr = 'localhost'
+                ip_addr = "localhost"
 
             if name == " ":
                 new_name = self.generate_module_name_byType(agentType)
@@ -1203,21 +1338,45 @@ class _AgentController(AgentMET4FOF):
 
             # actual instantiation of agent, depending on backend
             if self.backend == "osbrain":
-                new_agent = self._add_osbrain_agent(name=new_name, agentType=agentType, log_mode=log_mode,
-                                                    buffer_size=buffer_size, ip_addr=ip_addr, loop_wait=loop_wait,
-                                                    **kwargs)
+                new_agent = self._add_osbrain_agent(
+                    name=new_name,
+                    agentType=agentType,
+                    log_mode=log_mode,
+                    buffer_size=buffer_size,
+                    ip_addr=ip_addr,
+                    loop_wait=loop_wait,
+                    **kwargs
+                )
             elif self.backend == "mesa":
                 # handle osbrain and mesa here
-                new_agent = self._add_mesa_agent(name=new_name, agentType=agentType, buffer_size=buffer_size,
-                                                 log_mode=log_mode, **kwargs)
+                new_agent = self._add_mesa_agent(
+                    name=new_name,
+                    agentType=agentType,
+                    buffer_size=buffer_size,
+                    log_mode=log_mode,
+                    **kwargs
+                )
             return new_agent
         except Exception as e:
             self.log_info("ERROR:" + str(e))
 
-    def _add_osbrain_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None,
-                           loop_wait=None, **kwargs):
-        new_agent = run_agent(name, base=agentType, attributes=dict(log_mode=log_mode, buffer_size=buffer_size),
-                              nsaddr=self.ns.addr(), addr=ip_addr)
+    def _add_osbrain_agent(
+        self,
+        name=" ",
+        agentType=AgentMET4FOF,
+        log_mode=True,
+        buffer_size=1000,
+        ip_addr=None,
+        loop_wait=None,
+        **kwargs
+    ):
+        new_agent = run_agent(
+            name,
+            base=agentType,
+            attributes=dict(log_mode=log_mode, buffer_size=buffer_size),
+            nsaddr=self.ns.addr(),
+            addr=ip_addr,
+        )
         new_agent.init_parameters(**kwargs)
         new_agent.init_agent(buffer_size=buffer_size, log_mode=log_mode)
         new_agent.init_agent_loop(loop_wait)
@@ -1225,8 +1384,17 @@ class _AgentController(AgentMET4FOF):
             new_agent.set_logger(self._get_logger())
         return new_agent
 
-    def _add_mesa_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, **kwargs):
-        new_agent = agentType(name=name, backend=self.backend, mesa_model=self.mesa_model)
+    def _add_mesa_agent(
+        self,
+        name=" ",
+        agentType=AgentMET4FOF,
+        log_mode=True,
+        buffer_size=1000,
+        **kwargs
+    ):
+        new_agent = agentType(
+            name=name, backend=self.backend, mesa_model=self.mesa_model
+        )
         new_agent.init_parameters(**kwargs)
         new_agent.init_agent(buffer_size=buffer_size, log_mode=log_mode)
         new_agent = self.mesa_model.add_agent(new_agent)
@@ -1245,7 +1413,9 @@ class _AgentController(AgentMET4FOF):
 
     def agents(self, exclude_names=["AgentController", "Logger"]):
         if self.backend == "osbrain":
-            agent_names = [name for name in self.ns.agents() if name not in exclude_names]
+            agent_names = [
+                name for name in self.ns.agents() if name not in exclude_names
+            ]
         else:
             agent_names = self.mesa_model.agents()
         return agent_names
@@ -1254,7 +1424,10 @@ class _AgentController(AgentMET4FOF):
         agent_names = self.agents()
         edges = self.get_latest_edges(agent_names)
 
-        if len(agent_names) != self.G.number_of_nodes() or len(edges) != self.G.number_of_edges():
+        if (
+            len(agent_names) != self.G.number_of_nodes()
+            or len(edges) != self.G.number_of_edges()
+        ):
             agent_stylesheets = self.get_agents_stylesheets(agent_names)
             new_G = nx.DiGraph()
             new_G.add_nodes_from(list(zip(agent_names, agent_stylesheets)))
@@ -1262,18 +1435,26 @@ class _AgentController(AgentMET4FOF):
             self.G = new_G
 
     def get_networkx(self):
-        return (self.G)
+        return self.G
 
     def get_latest_edges(self, agent_names):
         edges = []
         for agent_name in agent_names:
             temp_agent = self.get_agent(agent_name)
-            output_agent_channels = temp_agent.get_attr('Outputs_agent_channels')
+            output_agent_channels = temp_agent.get_attr("Outputs_agent_channels")
             temp_output_agents = list(output_agent_channels.keys())
             temp_output_channels = list(output_agent_channels.values())
 
-            for output_agent_name, output_agent_channel in zip(temp_output_agents,temp_output_channels):
-                edges += [(agent_name, output_agent_name, {"channel":str(output_agent_channel)})]
+            for output_agent_name, output_agent_channel in zip(
+                temp_output_agents, temp_output_channels
+            ):
+                edges += [
+                    (
+                        agent_name,
+                        output_agent_name,
+                        {"channel": str(output_agent_channel)},
+                    )
+                ]
         return edges
 
     def _get_logger(self):
@@ -1281,7 +1462,7 @@ class _AgentController(AgentMET4FOF):
         Internal method to access the Logger relative to the nameserver
         """
         if self._logger is None:
-            self._logger = self.ns.proxy('Logger')
+            self._logger = self.ns.proxy("Logger")
         return self._logger
 
     def add_coalition(self, new_coalition):
@@ -1293,6 +1474,7 @@ class _AgentController(AgentMET4FOF):
 
     def del_coalition(self):
         self.coalitions = []
+
     def add_coalition_agent(self, name, agents=[]):
         """
         Add agents into the coalition
@@ -1337,7 +1519,7 @@ class MesaModel(Model):
         return agent
 
     def step(self):
-        '''Advance the model by one step.'''
+        """Advance the model by one step."""
         self.schedule.step()
 
     def agents(self):
@@ -1351,17 +1533,29 @@ class MesaModel(Model):
 
 
 class AgentNetwork:
+    """Object for starting a new Agent Network or connect to an existing Agent Network
+
+    An existing Agent Network can be specified by ip & port. Provides function to
+    add agents, (un)bind agents, query agent network state, set global agent states
+    Interfaces with an internal _AgentController which is hidden from user.
     """
-    Object for starting a new Agent Network or connect to an existing Agent Network specified by ip & port
 
-    Provides function to add agents, (un)bind agents, query agent network state, set global agent states
-    Interfaces with an internal _AgentController which is hidden from user
-
-    """
-
-    def __init__(self, ip_addr="127.0.0.1", port=3333, connect=False, log_filename="log_file.csv",
-                 dashboard_modules=True, dashboard_extensions=[], dashboard_update_interval=3,
-                 dashboard_max_monitors=10, dashboard_port=8050, backend="osbrain", mesa_update_interval=0.1, network_stylesheet = default_agent_network_stylesheet, **dashboard_kwargs):
+    def __init__(
+        self,
+        ip_addr="127.0.0.1",
+        port=3333,
+        connect=False,
+        log_filename="log_file.csv",
+        dashboard_modules=True,
+        dashboard_extensions=[],
+        dashboard_update_interval=3,
+        dashboard_max_monitors=10,
+        dashboard_port=8050,
+        backend="osbrain",
+        mesa_update_interval=0.1,
+        network_stylesheet=default_agent_network_stylesheet,
+        **dashboard_kwargs
+    ):
         """
         Parameters
         ----------
@@ -1370,24 +1564,30 @@ class AgentNetwork:
         port: int
             Port of server to connect/start
         connect: bool
-            False sets Agent network to connect mode and will connect to specified address
-            True (Default) sets Agent network to initially try to connect and if it cant find one, it will start a new server at specified address
+            False sets Agent network to connect mode and will connect to specified
+            address, True (Default) sets Agent network to initially try to connect
+            and if it cant find one, it will start a new server at specified address
         log_filename: str
-            Name of log file, acceptable csv format. It will be saved locally, in the same folder as the python script in which this AgentNetwork is instantiated on.
-            If set to None or False, then will not save in a file. Note that the overhead of updating the log file can be huge, especially for high number of agents and large data transmission.
+            Name of log file, acceptable csv format. It will be saved locally,
+            in the same folder as the python script in which this AgentNetwork is
+            instantiated on. If set to None or False, then will not save in a file.
+            Note that the overhead of updating the log file can be huge, especially
+            for high number of agents and large data transmission.
         dashboard_modules : list of modules , modules or bool
-            Accepts list of modules which contains the AgentMET4FOF and DataStreamMET4FOF derived classes
-            If set to True, will initiate the dashboard with default agents in AgentMET4FOF
+            Accepts list of modules which contains the AgentMET4FOF and
+            DataStreamMET4FOF derived classes. If set to True, will initiate the
+            dashboard with default agents in AgentMET4FOF
         dashboard_update_interval : int
             Regular interval (seconds) to update the dashboard graphs
         dashboard_max_monitors : int
-            Due to complexity in managing and instantiating dynamic figures, a maximum number of monitors is specified first and only the each Monitor Agent will occupy one of these figures.
+            Due to complexity in managing and instantiating dynamic figures,
+            a maximum number of monitors is specified first and only the each
+            Monitor Agent will occupy one of these figures.
         dashboard_port: int
             Port of the dashboard to be hosted on. By default is port 8050.
         **dashboard_kwargs
             Additional key words to be passed in initialising the dashboard
         """
-
 
         self.backend = backend
         self.ip_addr = ip_addr
@@ -1402,7 +1602,7 @@ class AgentNetwork:
         else:
             self.is_parent_mesa = True
 
-        if type(self.log_filename) == str and '.csv' in self.log_filename:
+        if type(self.log_filename) == str and ".csv" in self.log_filename:
             self.save_logfile = True
         else:
             self.save_logfile = False
@@ -1418,7 +1618,10 @@ class AgentNetwork:
         elif self.backend == "mesa":
             self.start_server_mesa()
         else:
-            raise NotImplementedError("Backend has not been implemented. Valid choices are 'osbrain' and 'mesa'.")
+            raise NotImplementedError(
+                "Backend has not been implemented. Valid choices are 'osbrain' and "
+                "'mesa'."
+            )
 
         if isinstance(dashboard_extensions, list) == False:
             dashboard_extensions = [dashboard_extensions]
@@ -1426,7 +1629,8 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
-            from .dashboard.Dashboard_agt_net import Dashboard_agt_net
+            from ..dashboard.Dashboard_agt_net import Dashboard_agt_net
+
             # Initialize common dashboard parameters for both types of dashboards
             # corresponding to different backends.
             dashboard_params = {
@@ -1437,7 +1641,7 @@ class AgentNetwork:
                 "ip_addr": ip_addr,
                 "port": dashboard_port,
                 "agentNetwork": self,
-                "network_stylesheet":network_stylesheet
+                "network_stylesheet": network_stylesheet,
             }
             dashboard_params.update(dashboard_kwargs)
 
@@ -1467,7 +1671,7 @@ class AgentNetwork:
             Port of server to connect to
         """
         try:
-            self.ns = NSProxy(nsaddr=ip_addr + ':' + str(port))
+            self.ns = NSProxy(nsaddr=ip_addr + ":" + str(port))
         except:
             if verbose:
                 print("Unable to connect to existing NameServer...")
@@ -1486,10 +1690,10 @@ class AgentNetwork:
         """
 
         print("Starting NameServer...")
-        self.ns = run_nameserver(addr=ip_addr + ':' + str(port))
+        self.ns = run_nameserver(addr=ip_addr + ":" + str(port))
         if len(self.ns.agents()) != 0:
             self.ns.shutdown()
-            self.ns = run_nameserver(addr=ip_addr + ':' + str(port))
+            self.ns = run_nameserver(addr=ip_addr + ":" + str(port))
         self._controller = run_agent(
             "AgentController",
             base=_AgentController,
@@ -1511,8 +1715,12 @@ class AgentNetwork:
         calls :meth:`start_mesa_timer`.
         """
         self.mesa_model = MesaModel()
-        self._controller = _AgentController(name="AgentController", backend=self.backend)
-        self._controller.init_parameters(backend=self.backend, mesa_model=self.mesa_model)
+        self._controller = _AgentController(
+            name="AgentController", backend=self.backend
+        )
+        self._controller.init_parameters(
+            backend=self.backend, mesa_model=self.mesa_model
+        )
         self.start_mesa_timer(self.mesa_update_interval)
 
     def _set_mode(self, state):
@@ -1534,7 +1742,7 @@ class AgentNetwork:
             State of Agent Network
         """
 
-        return self._get_controller().get_attr('current_state')
+        return self._get_controller().get_attr("current_state")
 
     def get_mode(self):
         """
@@ -1544,13 +1752,13 @@ class AgentNetwork:
             State of Agent Network
         """
 
-        return self._get_controller().get_attr('current_state')
+        return self._get_controller().get_attr("current_state")
 
     def set_running_state(self, filter_agent=None):
-        """
-        Blanket operation on all agents to set their `current_state` attribute to "Running"
+        """Blanket operation on all agents to set their `current_state` to "Running"
 
-        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+        Users will need to define their own flow of handling each type of
+        `self.current_state` in the `agent_loop`.
 
         Parameters
         ----------
@@ -1565,7 +1773,7 @@ class AgentNetwork:
         self._get_controller().update_networkx()
 
     def get_networkx(self):
-        return self._get_controller().get_attr('G')
+        return self._get_controller().get_attr("G")
 
     def get_nodes_edges(self):
         G = self.get_networkx()
@@ -1583,7 +1791,8 @@ class AgentNetwork:
         """
         Blanket operation on all agents to set their `current_state` attribute to "Stop"
 
-        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+        Users will need to define their own flow of handling each type of
+        `self.current_state` in the `agent_loop`.
 
         Parameters
         ----------
@@ -1595,11 +1804,11 @@ class AgentNetwork:
         self.set_agents_state(filter_agent=filter_agent, state="Stop")
 
     def set_agents_state(self, filter_agent=None, state="Idle"):
-        """
-        Blanket operation on all agents to set their `current_state` attribute to given state
+        """Blanket operation on all agents to set their `current_state` to given state
 
-        Can be used to define different states of operation such as "Running", "Idle, "Stop", etc..
-        Users will need to define their own flow of handling each type of `self.current_state` in the `agent_loop`
+        Can be used to define different states of operation such as "Running",
+        "Idle, "Stop", etc.. Users will need to define their own flow of handling
+        each type of `self.current_state` in the `agent_loop`.
 
         Parameters
         ----------
@@ -1613,7 +1822,9 @@ class AgentNetwork:
 
         self._set_mode(state)
         for agent_name in self.agents():
-            if (filter_agent is not None and filter_agent in agent_name) or (filter_agent is None):
+            if (filter_agent is not None and filter_agent in agent_name) or (
+                filter_agent is None
+            ):
                 agent = self.get_agent(agent_name)
                 try:
                     agent.set_attr(current_state=state)
@@ -1645,10 +1856,10 @@ class AgentNetwork:
         agent_proxy.shutdown()
 
     def bind_agents(self, source, target, channel="default"):
-        """
-        Binds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
+        """Binds two agents' communication channel in a unidirectional manner
 
-        Any subsequent calls of `source.send_output()` will reach `target` Agent's message queue.
+        Any subsequent calls of `source.send_output()` will reach `target` agent's
+        message queue.
 
         Parameters
         ----------
@@ -1664,8 +1875,7 @@ class AgentNetwork:
         return 0
 
     def unbind_agents(self, source, target):
-        """
-        Unbinds two agents communication channel in a unidirectional manner from `source` Agent to `target` Agent
+        """Unbinds two agents communication channel in a unidirectional manner
 
         This is the reverse of `bind_agents()`
 
@@ -1726,11 +1936,19 @@ class AgentNetwork:
             return filtered_agent_names
         return all_agent_names
 
-    def generate_module_name_byType(self,agentType):
-        return (self._get_controller().generate_module_name_byType(agentType))
+    def generate_module_name_byType(self, agentType):
+        return self._get_controller().generate_module_name_byType(agentType)
 
-    def add_agent(self, name=" ", agentType=AgentMET4FOF, log_mode=True, buffer_size=1000, ip_addr=None, loop_wait=None,
-                  **kwargs):
+    def add_agent(
+        self,
+        name=" ",
+        agentType=AgentMET4FOF,
+        log_mode=True,
+        buffer_size=1000,
+        ip_addr=None,
+        loop_wait=None,
+        **kwargs
+    ):
         """
         Instantiates a new agent in the network.
 
@@ -1752,9 +1970,15 @@ class AgentNetwork:
         if ip_addr is None:
             ip_addr = self.ip_addr
 
-        agent = self._get_controller().add_agent(name=name, agentType=agentType, log_mode=log_mode,
-                                                 buffer_size=buffer_size, ip_addr=ip_addr, loop_wait=loop_wait,
-                                                 **kwargs)
+        agent = self._get_controller().add_agent(
+            name=name,
+            agentType=agentType,
+            log_mode=log_mode,
+            buffer_size=buffer_size,
+            ip_addr=ip_addr,
+            loop_wait=loop_wait,
+            **kwargs
+        )
 
         return agent
 
@@ -1801,7 +2025,7 @@ class AgentNetwork:
         # This leaves some process clutter in the process list, but the actual
         # processes are ended.
         if self.backend == "osbrain":
-            self._get_controller().get_attr('ns').shutdown()
+            self._get_controller().get_attr("ns").shutdown()
         elif self.backend == "mesa":
             self._get_controller().stop_mesa_timer()
             self.mesa_model.shutdown()
@@ -1829,13 +2053,14 @@ class AgentNetwork:
         self._get_controller().step_mesa_model()
 
 
-class Coalition():
+class Coalition:
     """
     A special class for grouping agents.
 
     It is rendered as a parent group on the dashboard, along with its member agents.
 
     """
+
     def __init__(self, name="Coalition", agents=[]):
         self.agents = agents
         self.name = name
@@ -1850,19 +2075,28 @@ class Coalition():
         if isinstance(agent, str):
             self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent]
         elif isinstance(agent, AgentMET4FOF):
-            self.agents = [agent_i for agent_i in self.agents if agent_i.name != agent.name]
+            self.agents = [
+                agent_i for agent_i in self.agents if agent_i.name != agent.name
+            ]
+
 
 class DataStreamAgent(AgentMET4FOF):
-    """
-    Able to simulate generation of datastream by loading a given DataStreamMET4FOF object.
+    """Able to simulate generation of datastream by loading a given DataStreamMET4FOF
 
-    Can be used in incremental training or batch training mode.
-    To simulate batch training mode, set `pretrain_size=-1` , otherwise, set pretrain_size and batch_size for the respective
-    See `DataStreamMET4FOF` on loading your own data set as a data stream.
+    Can be used in incremental training or batch training mode. To simulate batch
+    training mode, set `pretrain_size=-1` , otherwise, set pretrain_size and
+    batch_size for the respective. See `DataStreamMET4FOF` on loading your own data
+    set as a data stream.
     """
 
-    def init_parameters(self, stream=DataStreamMET4FOF(), pretrain_size=None, batch_size=1, loop_wait=1,
-                        randomize=False):
+    def init_parameters(
+        self,
+        stream=DataStreamMET4FOF(),
+        pretrain_size=None,
+        batch_size=1,
+        loop_wait=1,
+        randomize=False,
+    ):
         """
         Parameters
         ----------
@@ -1871,13 +2105,15 @@ class DataStreamAgent(AgentMET4FOF):
             A DataStreamMET4FOF object which provides the sample data
 
         pretrain_size : int
-            The number of sample data to send through in the first loop cycle, and subsequently, the batch_size will be used
+            The number of sample data to send through in the first loop cycle,
+            and subsequently, the batch_size will be used
 
         batch_size : int
             The number of sample data to send in every loop cycle
 
         loop_wait : int
-            The duration to wait (seconds) at the end of each loop cycle before going into the next cycle
+            The duration to wait (seconds) at the end of each loop cycle before
+            going into the next cycle
 
         randomize : bool
             Determines if the dataset should be shuffled before streaming
@@ -1991,11 +2227,13 @@ class MonitorAgent(AgentMET4FOF):
         message : dict
             Acceptable channel values are 'default' or 'plot'
         """
-        if message['channel'] == 'default':
+        if message["channel"] == "default":
             if self.plot_filter:
-                message['data'] = {key: message['data'][key] for key in self.plot_filter}
+                message["data"] = {
+                    key: message["data"][key] for key in self.plot_filter
+                }
             self.buffer_store(agent_from=message["from"], data=message["data"])
-        elif message['channel'] == 'plot':
+        elif message["channel"] == "plot":
             self.update_plot_memory(message)
         return 0
 
@@ -2007,15 +2245,16 @@ class MonitorAgent(AgentMET4FOF):
         ----------
         message : dict
             Standard message format specified by AgentMET4FOF class
-            Message['data'] needs to be base64 image string and can be nested in dictionary for multiple plots
-            Only the latest plot will be shown kept and does not keep a history of the plots.
+            Message['data'] needs to be base64 image string and can be nested in
+            dictionary for multiple plots. Only the latest plot will be shown kept
+            and does not keep a history of the plots.
         """
 
-        if type(message['data']) != dict or message['from'] not in self.plots.keys():
-            self.plots[message['from']] = message['data']
-        elif type(message['data']) == dict:
-            for key in message['data'].keys():
-                self.plots[message['from']].update({key: message['data'][key]})
+        if type(message["data"]) != dict or message["from"] not in self.plots.keys():
+            self.plots[message["from"]] = message["data"]
+        elif type(message["data"]) == dict:
+            for key in message["data"].keys():
+                self.plots[message["from"]].update({key: message["data"][key]})
         self.log_info("PLOTS: " + str(self.plots))
 
     def reset(self):
@@ -2025,27 +2264,30 @@ class MonitorAgent(AgentMET4FOF):
 
 
 class _Logger(AgentMET4FOF):
-    """
-    An internal logger agent which are instantiated immediately with each AgentNetwork.
-    It collects all the logs which are sent to it, and print them and optionally save them into a csv log file.
-    Since the user is not expected to directly access the logger agent, its initialisation option and interface are provided via the AgentNetwork object.
+    """An internal logger agent which is instantiated with each AgentNetwork
 
-    When log_info of any agent is called, the agent will send the data to the logger agent.
+    It collects all the logs which are sent to it, and print them and optionally
+    save them into a csv log file. Since the user is not expected to directly access
+    the logger agent, its initialisation option and interface are provided via the
+    AgentNetwork object.
+
+    When log_info of any agent is called, the agent will send the data to the logger
+    agent.
     """
 
     def init_parameters(self, log_filename="log_file.csv", save_logfile=True):
         self.current_log_handlers = {"INFO": self.log_handler}
-        self.bind('SUB', 'sub', {"INFO": self.log_handler})
+        self.bind("SUB", "sub", {"INFO": self.log_handler})
         self.log_filename = log_filename
         self.save_logfile = save_logfile
         if self.save_logfile:
             try:
                 # writes a new file
-                self.writeFile = open(self.log_filename, 'w', newline='')
+                self.writeFile = open(self.log_filename, "w", newline="")
                 writer = csv.writer(self.writeFile)
-                writer.writerow(['Time', 'Name', 'Topic', 'Data'])
+                writer.writerow(["Time", "Name", "Topic", "Data"])
                 # set to append mode
-                self.writeFile = open(self.log_filename, 'a', newline='')
+                self.writeFile = open(self.log_filename, "a", newline="")
             except:
                 raise Exception
         self.save_cycles = 0
@@ -2056,25 +2298,25 @@ class _Logger(AgentMET4FOF):
 
     def bind_log_handler(self, log_handler_functions):
         for topic in self.subscribed_topics:
-            self.unsubscribe('sub', topic)
+            self.unsubscribe("sub", topic)
         self.current_log_handlers.update(log_handler_functions)
-        self.subscribe('sub', self.current_log_handlers)
+        self.subscribe("sub", self.current_log_handlers)
 
     def log_handler(self, message, topic):
-        sys.stdout.write(message + '\n')
+        sys.stdout.write(message + "\n")
         sys.stdout.flush()
         self.save_log_info(str(message))
 
     def save_log_info(self, log_msg):
-        re_sq = r'\[(.*?)\]'
-        re_rd = r'\((.*?)\)'
+        re_sq = r"\[(.*?)\]"
+        re_rd = r"\((.*?)\)"
 
         date = re.findall(re_sq, log_msg)[0]
         date = "[" + date + "]"
 
         agent_name = re.findall(re_rd, log_msg)[0]
 
-        contents = log_msg.split(':')
+        contents = log_msg.split(":")
         if len(contents) > 4:
             topic = contents[3]
             data = str(contents[4:])
@@ -2090,7 +2332,7 @@ class _Logger(AgentMET4FOF):
 
                 if self.save_cycles % 15 == 0:
                     self.writeFile.close()
-                    self.writeFile = open(self.log_filename, 'a', newline='')
+                    self.writeFile = open(self.log_filename, "a", newline="")
                 self.save_cycles += 1
             except:
                 raise Exception
