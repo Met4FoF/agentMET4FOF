@@ -24,7 +24,7 @@ from plotly import tools as tls
 from plotly.graph_objs import Scatter
 
 from ..dashboard.default_network_stylesheet import default_agent_network_stylesheet
-from ..streams import DataStreamMET4FOF
+from ..streams.base_streams import DataStreamMET4FOF
 
 
 __all__ = ["AgentMET4FOF", "MonitorAgent", "AgentNetwork", "AgentBuffer"]

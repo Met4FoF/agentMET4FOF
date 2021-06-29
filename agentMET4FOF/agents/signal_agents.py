@@ -1,5 +1,5 @@
 from .base_agents import AgentMET4FOF
-from ..streams import SineGenerator
+from ..streams.signal_streams import SineGenerator
 
 __all__ = ["SineGeneratorAgent"]
 
