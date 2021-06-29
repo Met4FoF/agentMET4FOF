@@ -1,4 +1,3 @@
-# Agent dependencies
 import base64
 import copy
 import csv
@@ -22,11 +21,11 @@ from mesa.time import BaseScheduler
 from osbrain import Agent as osBrainAgent, NSProxy, run_agent, run_nameserver
 from pandas import DataFrame
 from plotly import tools as tls
-from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
 from plotly.graph_objs import Scatter
 
-from .dashboard.Dashboard_agt_net import Dashboard_agt_net
-from .streams import DataStreamMET4FOF, SineGenerator
+from ..dashboard.default_network_stylesheet import \
+    default_agent_network_stylesheet
+from ..streams import DataStreamMET4FOF
 
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
@@ -1444,11 +1443,11 @@ class AgentNetwork:
 
             # Initialize dashboard process/thread.
             if self.backend == "osbrain":
-                from .dashboard.Dashboard import AgentDashboardThread
+                from ..dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             elif self.backend == "mesa":
-                from .dashboard.Dashboard import AgentDashboardThread
+                from ..dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             self.dashboard_proc.start()
@@ -2095,36 +2094,3 @@ class _Logger(AgentMET4FOF):
                 self.save_cycles += 1
             except:
                 raise Exception
-
-
-class SineGeneratorAgent(AgentMET4FOF):
-    """An agent streaming a sine signal
-
-    Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
-    to connected agents via its output channel.
-    """
-
-    def init_parameters(self, sfreq=500, sine_freq=5):
-        """Initialize the input data
-
-        Initialize the input data stream as an instance of the :class:`SineGenerator`
-        class.
-
-        Parameters
-        ----------
-        sfreq : int
-            sampling frequency for the underlying signal
-        sine_freq : float
-            frequency of the generated sine wave
-        """
-        self._sine_stream = SineGenerator(sfreq=sfreq, sine_freq=sine_freq)
-
-    def agent_loop(self):
-        """Model the agent's behaviour
-
-        On state *Running* the agent will extract sample by sample the input data
-        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
-        """
-        if self.current_state == "Running":
-            sine_data = self._sine_stream.next_sample()  # dictionary
-            self.send_output(sine_data["quantities"])
