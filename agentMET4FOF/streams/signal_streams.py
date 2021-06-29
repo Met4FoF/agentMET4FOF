@@ -3,6 +3,9 @@ import numpy as np
 from .base_streams import DataStreamMET4FOF
 
 
+__all__ = ["SineGenerator", "CosineGenerator"]
+
+
 class SineGenerator(DataStreamMET4FOF):
     """
     Built-in class of sine wave generator which inherits all
