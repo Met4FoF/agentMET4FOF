@@ -2104,7 +2104,7 @@ class SineGeneratorAgent(AgentMET4FOF):
     to connected agents via its output channel.
     """
 
-    def init_parameters(self, sfreq=500, sine_freq=5):
+    def init_parameters(self, sfreq=500, sine_freq=5, ampl=1, phase_ini=0):
         """Initialize the input data
 
         Initialize the input data stream as an instance of the :class:`SineGenerator`
@@ -2117,7 +2117,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         sine_freq : float
             frequency of the generated sine wave
         """
-        self._sine_stream = SineGenerator(sfreq=sfreq, sine_freq=sine_freq)
+        self._sine_stream = SineGenerator(sfreq=sfreq, sine_freq=sine_freq, ampl=ampl, phase_ini=phase_ini)
 
     def agent_loop(self):
         """Model the agent's behaviour
