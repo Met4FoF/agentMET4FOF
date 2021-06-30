@@ -9,5 +9,11 @@ from ..agents.base_agents import (
     MetrologicalAgentBuffer,
     MetrologicalMonitorAgent,
 )
+from ..agents.signal_agents import MetrologicalGeneratorAgent
 
-__all__ = ["MetrologicalAgent", "MetrologicalAgentBuffer", "MetrologicalMonitorAgent"]
+__all__ = [
+    "MetrologicalAgent",
+    "MetrologicalAgentBuffer",
+    "MetrologicalGeneratorAgent",
+    "MetrologicalMonitorAgent",
+]
