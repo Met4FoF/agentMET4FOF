@@ -3,12 +3,12 @@
 import numpy as np
 import pytest
 
-from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.agents.base_agents import AgentNetwork
 
 # Set time to wait for before agents should have done their jobs in networks.
 test_timeout = 20
 
-# Set random seed to achieve reproducibility
+# Set random seed to achieve rep(roducibility
 np.random.seed(123)
 
 

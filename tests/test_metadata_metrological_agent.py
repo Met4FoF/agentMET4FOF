@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from time_series_metadata.scheme import MetaData
 
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
+from agentMET4FOF.agents.base_agents import MetrologicalAgent, MetrologicalMonitorAgent
 from tests.conftest import test_timeout
 
 
