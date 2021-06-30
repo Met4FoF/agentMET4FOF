@@ -1,4 +1,39 @@
-from agentMET4FOF import agents, streams
+from agentMET4FOF import agents, streams, metrological_agents, metrological_streams
+from agentMET4FOF.agents import (
+    AgentBuffer,
+    AgentMET4FOF,
+    AgentNetwork,
+    MonitorAgent,
+    SineGeneratorAgent,
+    MetrologicalGeneratorAgent,
+)
+from agentMET4FOF.streams import DataStreamMET4FOF, SineGenerator, CosineGenerator
+from agentMET4FOF.agents.base_agents import (
+    AgentBuffer,
+    AgentMET4FOF,
+    AgentNetwork,
+    Coalition,
+    DataStreamAgent,
+    MesaModel,
+    MetrologicalAgent,
+    MetrologicalAgentBuffer,
+    MetrologicalMonitorAgent,
+    MonitorAgent,
+)
+from agentMET4FOF.agents.signal_agents import (
+    MetrologicalGeneratorAgent,
+    SineGeneratorAgent,
+)
+from agentMET4FOF.metrological_agents import (
+    MetrologicalAgent,
+    MetrologicalAgentBuffer,
+    MetrologicalMonitorAgent,
+)
+from agentMET4FOF.metrological_streams import (
+    MetrologicalDataStreamMET4FOF,
+    MetrologicalMultiWaveGenerator,
+    MetrologicalSineGenerator,
+)
 from agentMET4FOF.dashboard import (
     Dashboard,
     Dashboard_agt_net,
@@ -10,6 +45,8 @@ from agentMET4FOF_tutorials import (
     tutorial_3_multi_channel,
     tutorial_4_metrological_streams,
     tutorial_5_coalition,
+    tutorial_6_mesa_backend,
+    tutorial_7_generic_metrological_agent,
 )
 
 # During a pytest execution this file gets interpreted once and all imports at the
