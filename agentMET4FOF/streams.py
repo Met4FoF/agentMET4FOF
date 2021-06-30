@@ -384,15 +384,25 @@ class SineGenerator(DataStreamMET4FOF):
         is called
     sine_freq : float
         frequency of wave function
+    ampl : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    phase_ini : float, optional
+        Initial phase of the wave function. Defaults to 0.
     """
-    def __init__(self, sfreq=500, sine_freq=50):
+    def __init__(self, sfreq=500, sine_freq=50, ampl: float = 1, phase_ini: float = 0):
         super().__init__()
         self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, sine_freq=sine_freq)
+        self.set_generator_function(
+            generator_function=self.sine_wave_function,
+            sfreq=sfreq,
+            sine_freq=sine_freq,
+            ampl=ampl,
+            phase_ini=phase_ini
+        )
 
-    def sine_wave_function(self, time, sine_freq):
+    def sine_wave_function(self, time, sine_freq, ampl, phase_ini):
         """A simple sine wave generator"""
-        value = np.sin(2 * np.pi * sine_freq * time)
+        value = ampl * np.sin(2 * np.pi * sine_freq * time + phase_ini)
         return value
 
 
@@ -412,15 +422,25 @@ class CosineGenerator(DataStreamMET4FOF):
         is called
     F : int
         frequency of wave function
+    ampl : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    phase_ini : float, optional
+        Initial phase of the wave function. Defaults to 0.
     """
-    def __init__(self, sfreq = 500, cosine_freq=5):
+    def __init__(self, sfreq = 500, cosine_freq=50, ampl: float = 1, phase_ini: float = 0):
         super().__init__()
         self.set_metadata("CosineGenerator","time","s",("Voltage"),("V"),"Simple cosine wave generator")
-        self.set_generator_function(generator_function=self.cosine_wave_function, sfreq=sfreq, cosine_freq=cosine_freq)
+        self.set_generator_function(
+            generator_function=self.cosine_wave_function,
+            sfreq=sfreq,
+            cosine_freq=cosine_freq,
+            ampl=ampl,
+            phase_ini = phase_ini
+        )
 
-    def cosine_wave_function(self, time, cosine_freq=50):
+    def cosine_wave_function(self, time, cosine_freq, ampl, phase_ini):
         """A simple cosine wave generator"""
-        value = np.cos(2 * np.pi * cosine_freq * time)
+        value = ampl * np.cos(2 * np.pi * cosine_freq * time + phase_ini)
         return value
 
 
