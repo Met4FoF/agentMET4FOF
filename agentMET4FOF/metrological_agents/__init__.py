@@ -6,12 +6,12 @@ statements.
 """
 import warnings
 
-from ..agents.utils import MetrologicalAgentBuffer
 from ..agents.metrological_base_agents import (
     MetrologicalAgent,
     MetrologicalMonitorAgent,
 )
 from ..agents.metrological_signal_agents import MetrologicalGeneratorAgent
+from ..agents.utils import MetrologicalAgentBuffer
 
 __all__ = [
     "MetrologicalAgent",

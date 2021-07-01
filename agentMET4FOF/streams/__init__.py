@@ -8,7 +8,21 @@ import warnings
 
 from .base_streams import DataStreamMET4FOF
 from .metrological_base_streams import MetrologicalDataStreamMET4FOF
+from .metrological_signal_streams import (
+    MetrologicalMultiWaveGenerator,
+    MetrologicalSineGenerator,
+)
 from .signal_streams import CosineGenerator, SineGenerator
+
+__all__ = [
+    "CosineGenerator",
+    "DataStreamMET4FOF",
+    "MetrologicalDataStreamMET4FOF",
+    "MetrologicalMultiWaveGenerator",
+    "MetrologicalSineGenerator",
+    "SineGenerator",
+]
+
 
 warnings.warn(
     "The package metrological_agents is deprecated and might be removed any "

@@ -403,5 +403,3 @@ def extract_x_y(message):
     else:
         return 1
     return x, y
-
-

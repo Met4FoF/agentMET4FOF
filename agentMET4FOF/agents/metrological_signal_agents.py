@@ -1,7 +1,6 @@
 from .metrological_base_agents import MetrologicalAgent
 from ..streams.metrological_base_streams import MetrologicalDataStreamMET4FOF
-from ..streams.signal_streams import MetrologicalSineGenerator
-
+from ..streams.metrological_signal_streams import MetrologicalSineGenerator
 
 __all__ = ["MetrologicalGeneratorAgent"]
 
