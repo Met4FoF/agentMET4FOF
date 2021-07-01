@@ -4,16 +4,27 @@ Up until version 0.8.1 we had several modules instead of the packages `agents` a
 `streams`. We have included this package to not break the previously needed import
 statements.
 """
-from ..agents.base_agents import (
+import warnings
+
+from ..agents.utils import MetrologicalAgentBuffer
+from ..agents.metrological_base_agents import (
     MetrologicalAgent,
-    MetrologicalAgentBuffer,
     MetrologicalMonitorAgent,
 )
-from ..agents.signal_agents import MetrologicalGeneratorAgent
+from ..agents.metrological_signal_agents import MetrologicalGeneratorAgent
 
 __all__ = [
     "MetrologicalAgent",
+    "MetrologicalMonitorAgent",
     "MetrologicalAgentBuffer",
     "MetrologicalGeneratorAgent",
-    "MetrologicalMonitorAgent",
 ]
+
+warnings.warn(
+    "The package metrological_agents is deprecated and might be removed any "
+    "time. The content is moved into the package agents, such that instead "
+    "for instance 'from agentMET4FOF.metrological_agents import "
+    "MetrologicalAgent' the current import should be 'from "
+    "agentMET4FOF.agents.metrological_agents import MetrologicalAgent'.",
+    DeprecationWarning,
+)

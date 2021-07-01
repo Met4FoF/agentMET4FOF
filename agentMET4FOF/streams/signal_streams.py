@@ -3,7 +3,8 @@ from typing import Any, Iterable, Optional, Tuple, Union
 import numpy as np
 from scipy.stats import norm
 
-from .base_streams import DataStreamMET4FOF, MetrologicalDataStreamMET4FOF
+from .base_streams import DataStreamMET4FOF
+from .metrological_base_streams import MetrologicalDataStreamMET4FOF
 
 __all__ = [
     "SineGenerator",

@@ -9,20 +9,26 @@ from agentMET4FOF.agents import (
 )
 from agentMET4FOF.streams import DataStreamMET4FOF, SineGenerator, CosineGenerator
 from agentMET4FOF.agents.base_agents import (
-    AgentBuffer,
     AgentMET4FOF,
-    AgentNetwork,
-    Coalition,
     DataStreamAgent,
-    MesaModel,
-    MetrologicalAgent,
-    MetrologicalAgentBuffer,
-    MetrologicalMonitorAgent,
     MonitorAgent,
 )
+from agentMET4FOF.agents.utils import (
+    AgentBuffer,
+    MetrologicalAgentBuffer,
+)
+from agentMET4FOF.agents.network import (
+    AgentNetwork,
+)
+from agentMET4FOF.agents.metrological_base_agents import (
+    MetrologicalAgent,
+    MetrologicalMonitorAgent,
+)
 from agentMET4FOF.agents.signal_agents import (
-    MetrologicalGeneratorAgent,
     SineGeneratorAgent,
+)
+from agentMET4FOF.agents.metrological_signal_agents import (
+    MetrologicalGeneratorAgent,
 )
 from agentMET4FOF.metrological_agents import (
     MetrologicalAgent,
