@@ -14,7 +14,7 @@ class MultiGeneratorAgent(AgentMET4FOF):
     def agent_loop(self):
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
-            cosine_data = self._sine_stream.next_sample()  # dictionary
+            cosine_data = self._cos_stream.next_sample()  # dictionary
             self.send_output(sine_data["quantities"], channel="sine")
             self.send_output(cosine_data["quantities"], channel="cosine")
 
