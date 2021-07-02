@@ -4,9 +4,7 @@ class SensorsNotLinearlyIndependentError(Exception):
 
 
 class SystemMatrixNotReducibleError(Exception):
-    """
-    Custom exception to handle the case when the system matrix *A* is not reducible
-    """
+    """Custom exception to handle not reducible system matrix *A*"""
     pass
 
 
