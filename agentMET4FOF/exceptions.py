@@ -1,7 +1,5 @@
 class SensorsNotLinearlyIndependentError(Exception):
-    """
-    Custom exception to handle the case when sensor results are not linearly independent
-    """
+    """Custom exception to indicate linearly dependent sensor results"""
     pass
 
 
