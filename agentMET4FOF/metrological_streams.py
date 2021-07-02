@@ -216,9 +216,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         called. Defaults to 500.
     sine_freq : float, optional
         Frequency of the wave function. Defaults to 50.
-    ampl : float, optional
+    amplitude : float, optional
         Amplitude of the wave function. Defaults to 1.
-    phase_ini : float, optional
+    initial_phase : float, optional
         Initial phase of the wave function. Defaults to 0.
     device_id : str, optional
         Name of the represented generator. Defaults to 'SineGenerator'.
@@ -278,9 +278,9 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             phase_ini=phase_ini
         )
 
-    def _sine_wave_function(self, time, sine_freq, ampl, phase_ini):
+    def _sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator"""
-        value = ampl * np.sin(np.multiply(2 * np.pi * sine_freq, time) + phase_ini)
+        value = amplitude * np.sin(np.multiply(2 * np.pi * sine_freq, time) + initial_phase)
         value += np.random.normal(0, self.value_unc, value.shape)
         return value
 
