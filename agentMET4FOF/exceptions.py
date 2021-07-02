@@ -11,7 +11,5 @@ class SystemMatrixNotReducibleError(Exception):
 
 
 class ColumnNotZeroError(Exception):
-    """
-    Custom exception to handle the case when a redundant column has not been reduced to zero
-    """
+    """Custom exception to handle redundant columns not reduced to zero"""
     pass
