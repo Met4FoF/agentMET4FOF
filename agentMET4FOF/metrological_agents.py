@@ -14,7 +14,11 @@ from .metrological_streams import (
     MetrologicalDataStreamMET4FOF,
     MetrologicalSineGenerator,
 )
-from .exceptions import *
+from .exceptions import (
+    ColumnNotZeroError,
+    SystemMatrixNotReducibleError,
+    SensorsNotLinearlyIndependentError,
+)
 
 
 class MetrologicalAgent(AgentMET4FOF):
