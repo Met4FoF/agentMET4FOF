@@ -1342,6 +1342,29 @@ class RedundancyAgent(MetrologicalAgent):
     def print_output_lcss(
         self, n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
     ):
+        """Prints the outputs of the method :meth:`lcss`
+
+        Parameters
+        ----------
+        n_solutions : int or np.ndarray of ints
+            number of solutions
+        ybest : float or np.ndarray of floats
+            best estimate
+        uybest : float or np.ndarray of floats
+            standard uncertainty of best estimate
+        chi2obs : float or np.ndarray of floats
+            observed chi-squared value
+        indkeep : np.ndarray of int
+            indices of kept estimates
+        x_arr : np.ndarray of shape (n_estimates)
+            vector **a** of linear system **y** = **a** + A * **x**
+        a_arr2d : np.ndarray of shape (n_estimates, n_sensors)
+            matrix A of linear system **y** = **a** + A * **x**
+
+        Returns
+        -------
+        None
+        """
         n_sensors = len(x_arr)
         n_eq = a_arr2d.shape[0]
         n_keep = indkeep.shape[
