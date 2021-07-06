@@ -1094,9 +1094,6 @@ class RedundancyAgent(MetrologicalAgent):
         ared_arr = a_arr
         ared_arr2d = a_arr2d
 
-        #  print('cbels: x_arr = ', x_arr)
-        #  print('cbels: a_arr2d = ', a_arr2d)
-
         # Reduce the system if the covariance matrix vx_arr2d is rank deficient.
         while np.linalg.matrix_rank(vxred_arr2d) < vxred_arr2d.shape[0]:
             print(
@@ -1142,8 +1139,6 @@ class RedundancyAgent(MetrologicalAgent):
         isconsist, ybest, uybest, chi2obs = self.calc_best_estimate(
             y_arr, vy_arr2d, problim
         )
-        # print('y_arr = ', y_arr)
-        # print('chi2obs = ', chi2obs)
         return isconsist, ybest, uybest, chi2obs
 
     def calc_lcss(self, a_arr, a_arr2d, x_arr, vx_arr2d, problim):
