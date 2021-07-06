@@ -376,6 +376,14 @@ class RedundancyAgent(MetrologicalAgent):
     * Kok and Harris [Kok2020]_
     """
 
+    metadata: MetaData
+    calc_type: str
+    sensor_key_list: List[str]
+    n_pr: int
+    problim: float
+    a_arr: np.ndarray
+    a_arr2d: np.ndarray
+
     def init_parameters(
         self,
         input_data_maxlen: int = 25,
@@ -468,9 +476,7 @@ class RedundancyAgent(MetrologicalAgent):
         a_row4 = c4 * cfft[ind_freq2, :].reshape((1, -1))
 
         self.a_arr2d = np.concatenate((a_row1, a_row2, a_row3, a_row4), axis=0)
-        """a_arr : np.ndarray of float"""
         self.a_arr = np.zeros(shape=(4, 1))
-        """a_arr2d : np.ndarray of float"""
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -520,8 +526,8 @@ class RedundancyAgent(MetrologicalAgent):
                 ux_data_arr2d[:, i_sensor] = data_arr[:, 3]
                 i_sensor = i_sensor + 1
 
+            data = np.full(shape=(self.n_pr, 4), fill_value=np.nan)
             if self.calc_type == "lcs":
-                data = np.full(shape=(self.n_pr, 4), fill_value=np.nan)
                 for i_pnt in range(self.n_pr):
                     y_arr = np.array(x_data_arr2d[i_pnt, :])
                     y_arr = y_arr.reshape((n_sensors, 1))
@@ -772,6 +778,9 @@ class RedundancyAgent(MetrologicalAgent):
         problim: float
             limit probability used in the consistency evaluation. Typically 0.95.
         """
+        n_solutions = 0
+        indkeep = np.nan
+
         isconsist, ybest, uybest, chi2obs = self.calc_best_estimate(
             y_arr, vy_arr2d, problim
         )
