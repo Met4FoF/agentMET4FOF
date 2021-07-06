@@ -1339,8 +1339,9 @@ class RedundancyAgent(MetrologicalAgent):
         Limit probability for chi-squared test: p = {problim}"""
         )
 
+    @staticmethod
     def print_output_lcss(
-        self, n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
+            n_solutions, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
     ):
         """Prints the outputs of the method :meth:`lcss`
 
