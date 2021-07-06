@@ -790,6 +790,19 @@ class RedundancyAgent(MetrologicalAgent):
             uncertainty matrix of the vector y_arr
         problim: float
             limit probability used in the consistency evaluation. Typically 0.95.
+
+        Returns
+        -------
+        n_solutions : int or np.ndarray of ints
+            number of solutions
+        ybest : float or np.ndarray of floats
+            best estimate
+        uybest : float or np.ndarray of floats
+            standard uncertainty of best estimate
+        chi2obs : float or np.ndarray of floats
+            observed chi-squared value
+        indkeep : list of int
+            indices of kept estimates
         """
         n_solutions = 0
         indkeep = np.nan
@@ -846,7 +859,7 @@ class RedundancyAgent(MetrologicalAgent):
                     uybest = uybest_arr[indmin[0]]
                     indkeep = self.get_combination(
                         estim_arr, n_estims - n_remove, indmin
-                    )  # indices of kept estimates
+                    )
                 else:  # multiple solutions exist, the return types become arrays
                     ybest = np.full(n_solutions, np.nan)
                     uybest = np.full(n_solutions, np.nan)
