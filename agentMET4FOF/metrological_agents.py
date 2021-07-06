@@ -920,7 +920,8 @@ class RedundancyAgent(MetrologicalAgent):
 
         if n_solutions == 1:
             print(
-                f"calc_lcs found a unique solution with chi2obs = {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} estimates."
+                f"calc_lcs found a unique solution with chi2obs = {chi2obs:4.4f} using"
+                f"{n_keep:.0f} of the provided {n_estims:.0f} estimates."
             )
             print(f"\ty = {ybest:4.4f}, u(y) = {uybest:4.4f}")
             print(f"\tIndices and values of retained provided estimates:", end=" ")
@@ -933,7 +934,9 @@ class RedundancyAgent(MetrologicalAgent):
             print(f"y[{indint:.0f}]= {y_arr[indint]:2.2f}.\n")
         else:
             print(
-                f"calc_lcs found {n_solutions:.0f} equally good solutions with chi2obs = {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} estimates."
+                f"calc_lcs found {n_solutions:.0f} equally good solutions with chi2obs "
+                f"= {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} "
+                f"estimates."
             )
 
             for i_sol in range(n_solutions):
@@ -1019,7 +1022,8 @@ class RedundancyAgent(MetrologicalAgent):
 
         if abs(np.dot(b, x_arr)) > epszero:
             raise SensorsNotLinearlyIndependentError(
-                "Sensors in x should be linearly independent with b^T * x = 0, but this is not the case!"
+                "Sensors in x should be linearly independent with b^T * x = 0, but"
+                "this is not the case!"
             )
 
         indrem = np.where(abs(b) > epszero)[
@@ -1044,7 +1048,8 @@ class RedundancyAgent(MetrologicalAgent):
         ared_arr2d = a_arr2d[:, indsenskeep]  # remove the zero column from A
         ared_arr = a_arr + np.dot(
             a_arr2d - ared_arr2d, x_arr
-        )  # adapt vector a_arr such that the vector of estimates y = a + A*x remains the same
+        )  # adapt vector a_arr such that the vector of estimates y = a + A*x remains
+        # the same
 
         return xred_arr, vxred_arr2d, ared_arr, ared_arr2d
 
@@ -1081,8 +1086,9 @@ class RedundancyAgent(MetrologicalAgent):
         print("start calc_best_est_lin_sys")
         epszero = 1e-10  # some small constant used for some checks
 
-        # The main procedure only works when vy_arr2d has full rank. Therefore first a_arr, a_arr2d and vx_arr2d need to be
-        # reduced such that vy_arr2d will have full rank.
+        # The main procedure only works when vy_arr2d has full rank. Therefore first
+        # a_arr, a_arr2d and vx_arr2d need to be reduced such that vy_arr2d will have
+        # full rank.
         xred_arr = x_arr
         vxred_arr2d = vx_arr2d
         ared_arr = a_arr
@@ -1221,21 +1227,25 @@ class RedundancyAgent(MetrologicalAgent):
                     )
                     == np.linalg.matrix_rank(a_arr2d[:, boolremove_arr], epszero)
                 ):
-                    # there is no vector c such that c' * ones = 1 and c' * ai = 0 at the same time.
-                    # Thus this combination of sensors cannot be removed as a group from the matrix A.
+                    # there is no vector c such that c' * ones = 1 and c' * ai = 0 at
+                    # the same time. Thus this combination of sensors cannot be
+                    # removed as a group from the matrix A.
                     isconsist_arr[i_subset] = False
                     continue  # continue with next subset
 
                 ared_arr2d = np.concatenate(
                     (a_arr2d[:, boolremove_arr], a_arr2d[:, sublistsenskeep]), axis=1
-                )  # move the columns corresponding to sensors to be taken out to the front
+                )  # move the columns corresponding to sensors to be taken out to the
+                # front
                 q, r = np.linalg.qr(ared_arr2d)
                 q1 = q[
                     :, n_remove:
-                ]  # these (n_sens-n_remove) columns are orthogonal to the first n_remove columns of ared_arr2d
+                ]  # these (n_sens-n_remove) columns are orthogonal to the first n
+                # remove columns of ared_arr2d
                 s = np.sum(
                     q1, axis=0
-                )  # column sums might be zero which is a problem for normalization to unit sum
+                )  # column sums might be zero which is a problem for normalization
+                # to unit sum
                 indzero = np.where(np.abs(s) < epszero)[0]
                 if len(indzero) > 0:
                     indnonzero = np.full(n_sens - n_remove, True)  # all True array
@@ -1254,11 +1264,13 @@ class RedundancyAgent(MetrologicalAgent):
                         )  # add b to prevent zero column sum
                 q1 = q1 / np.sum(
                     q1, axis=0
-                )  # unit column sums, in order not to introduce a bias in the estimate of the measurand
+                )  # unit column sums, in order not to introduce a bias in the estimate
+                # of the measurand
 
                 ared_arr2d = np.matmul(np.transpose(q1), ared_arr2d)
                 ared_arr = np.matmul(np.transpose(q1), a_arr)
-                # The columns of matrix ared_arr2d are still in the wrong order compared to the order of the sensors
+                # The columns of matrix ared_arr2d are still in the wrong order compared
+                # to the order of the sensors
                 ared2_arr2d = np.full_like(ared_arr2d, np.nan)
                 ared2_arr2d[:, boolremove_arr] = ared_arr2d[
                     :, :n_remove
@@ -1275,7 +1287,8 @@ class RedundancyAgent(MetrologicalAgent):
 
                 ared_arr2d = ared_arr2d[
                     :, sublistsenskeep
-                ]  # np.invert(boolremove_arr)] # reduce the matrix A by removing the appropriate columns of A, which are zero anyway.
+                ]  # reduce the matrix A by removing the appropriate columns of A,
+                # which are zero anyway.
 
                 (
                     isconsist_arr[i_subset],
@@ -1286,11 +1299,13 @@ class RedundancyAgent(MetrologicalAgent):
                     ared_arr, ared_arr2d, xred_arr, vxred_arr2d, problim
                 )
 
-            # After analyzing all subset, find the smallest chi2obs value amongst all subsets.
+            # After analyzing all subset, find the smallest chi2obs value amongst all
+            # subsets.
             # If multiple possibilities exist, return them all
             indmin = np.argmin(chi2obs_arr)
             if isconsist_arr[indmin]:
-                # consistent solution found (otherwise isconsist remains false and the while loop continues)
+                # consistent solution found (otherwise isconsist remains false and
+                # the while loop continues)
                 isconsist = True
                 chi2obs = chi2obs_arr[indmin]  # minimum chi2obs value
                 indmin = np.where(np.abs(chi2obs_arr - chi2obs) < eps_chi2)[
@@ -1375,11 +1390,13 @@ class RedundancyAgent(MetrologicalAgent):
             -1
         ]  # number of retained estimates in the best solution(s)
         print(
-            f"Provided number of sensors (or sensor values) was {n_sensors} and number of equations was {n_eq}."
+            f"Provided number of sensors (or sensor values) was {n_sensors} and "
+            f"number of equations was {n_eq}."
         )
         if n_solutions == 1:
             print(
-                "calc_lcss found a unique solution with chi2obs = %4.4f using %d of the provided %d sensor values."
+                "calc_lcss found a unique solution with chi2obs = %4.4f using %d of "
+                "the provided %d sensor values."
                 % (chi2obs, n_keep, n_sensors)
             )
             print("\ty = %4.4f, u(y) = %4.4f" % (ybest, uybest))
