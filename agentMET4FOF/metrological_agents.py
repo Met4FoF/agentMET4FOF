@@ -965,12 +965,12 @@ class RedundancyAgent(MetrologicalAgent):
         a_arr2d : np.ndarray
             The matrix to be reduced as 2-dimensional array
         epszero : float
-            some small constant used for some checks
+            some small constant used for checking equality to zero
 
         Returns
         -------
         int
-            the last row that can be taken out
+            the index of the last row that can be taken out
         """
         if a_arr2d.shape[0] <= np.linalg.matrix_rank(a_arr2d):
             raise SystemMatrixNotReducibleError("A cannot be reduced!")
