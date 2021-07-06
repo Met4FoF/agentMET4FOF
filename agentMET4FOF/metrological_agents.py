@@ -984,9 +984,31 @@ class RedundancyAgent(MetrologicalAgent):
         indrem = indrem[-1]
         return indrem
 
-    # Reduced the system if matrix Vx is not of full rank.
-    # This might be ambiguous, as constant sensor values or offsets have to be estimated and are not known.
-    def reduce_vx(self, x_arr, vx_arr2d, a_arr, a_arr2d, epszero):
+    @staticmethod
+    def reduce_vx(x_arr, vx_arr2d, a_arr, a_arr2d, epszero):
+        """Reduce the system if matrix Vx is not of full rank
+
+        This might be ambiguous, as constant sensor values or offsets have to be
+        estimated and are not known.
+
+        Parameters
+        ----------
+        x_arr : np.ndarray
+            The vector x to be reduced
+        vx_arr2d : np.ndarray
+            The matrix Vx to be reduced as 2-dimensional array
+        a_arr : np.ndarray
+            The vector a to be reduced
+        a_arr2d : np.ndarray
+            The matrix A to be reduced as 2-dimensional array
+        epszero : float
+            some small constant used for checking equality to zero
+
+        Returns
+        -------
+        np.ndarray, np.ndarray, np.ndarray, np.ndarray
+            The reduced matrices and vectors xred_arr, vxred_arr2d, ared_arr, ared_arr2d
+        """
         if vx_arr2d.shape[0] <= np.linalg.matrix_rank(vx_arr2d, epszero):
             print("Vx cannot be reduced any further!")
             return
