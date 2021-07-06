@@ -948,15 +948,29 @@ class RedundancyAgent(MetrologicalAgent):
 
         return
 
-    # Function that returns the index of a row of A that can be written as a linear combination of the others.
-    # This row does not contribute any new information to the system.
-    def ind_reduce_a(self, a_arr2d, epszero):
+    @staticmethod
+    def ind_reduce_a(a_arr2d, epszero):
+        """Returns the index of a linear dependent row of a matrix A
+
+        The motivation for this is, that this row does not contribute any new
+        information to the system.
+
+        Parameters
+        ----------
+        a_arr2d : np.ndarray
+            The matrix to be reduced as 2-dimensional array
+        epszero : float
+            some small constant used for some checks
+
+        Returns
+        -------
+        int
+            the last row that can be taken out
+        """
         if a_arr2d.shape[0] <= np.linalg.matrix_rank(a_arr2d):
             raise SystemMatrixNotReducibleError("A cannot be reduced!")
-        # Remove one row from A that is a linear combination of the other rows.
         # Find a solution of A' * b = 0.
         u, s, vh = np.linalg.svd(np.transpose(a_arr2d))
-        # singVals = diag(S)%;
         b = vh[-1, :]
         indrem = np.where(abs(b) > epszero)[
             0
@@ -965,8 +979,7 @@ class RedundancyAgent(MetrologicalAgent):
         if len(indrem) == 0:
             raise ValueError("b is a zero vector!")
 
-        indrem = indrem[-1]  # return the last row that can be taken out
-        # print('ReduceA: Identified row %d to be removed from a and A.\n', indRem);
+        indrem = indrem[-1]
         return indrem
 
     # Reduced the system if matrix Vx is not of full rank.
