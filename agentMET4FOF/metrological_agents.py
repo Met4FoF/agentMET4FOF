@@ -484,7 +484,8 @@ class RedundancyAgent(MetrologicalAgent):
         """Model the agent's behaviour
 
         On state *Running* the agent will extract sample by sample the input data
-        streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
+        streams content and push it via invoking
+        :py:func:`send_output <agentMET4FOF.agents.AgentMET4FOF.send_output>`.
         """
         if self.current_state == "Running":
             key_list = [
@@ -1353,10 +1354,8 @@ class RedundancyAgent(MetrologicalAgent):
         )
 
     @staticmethod
-    def print_output_lcss(
-            n_solutions, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
-    ):
-        """Prints the outputs of the method :meth:`lcss`
+    def print_output_lcss(n_solutions, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d):
+        """Prints the outputs of the method :meth:`calc_lcss`
 
         Parameters
         ----------
