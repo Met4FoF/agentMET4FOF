@@ -1049,34 +1049,34 @@ class RedundancyAgent(MetrologicalAgent):
         return xred_arr, vxred_arr2d, ared_arr, ared_arr2d
 
     def calc_best_est_lin_sys(self, a_arr, a_arr2d, x_arr, vx_arr2d, problim):
-        """
-        Function to calculate the best estimate of a linear system **y** = **a** + A * **x**
-        and determines if the inputs are consistent in view of *problim*.
+        """Calculate the best estimate of a linear system **y** = **a** + A * **x**
+
+        Additionally determine if the inputs are consistent in view of *problim*.
 
         Parameters
         ----------
-        a_arr:      np.ndarray of shape (n_estimates)
-                    vector **a** of linear system **y** = **a** + A * **x**
-        a_arr2d:    np.ndarray of shape (n_estimates, n_sensors)
-                    matrix A of linear system **y** = **a** + A * **x**
-        x_arr:      np.ndarray of shape (n_sensors)
-                    vector with sensor values
-                    vector **x** of linear system **y** = **a** + A * **x**
-        vx_arr2d:   np.ndarray of shape (n_sensors, n_sensors)
-                    uncertainty matrix associated with vector x_arr
-        problim:    float
-                    probability limit used for consistency evaluation. Typically 0.95.
+        a_arr : np.ndarray of shape (n_estimates)
+            vector **a** of linear system **y** = **a** + A * **x**
+        a_arr2d : np.ndarray of shape (n_estimates, n_sensors)
+            matrix A of linear system **y** = **a** + A * **x**
+        x_arr : np.ndarray of shape (n_sensors)
+            vector with sensor values, vector **x** of linear system **y** = **a** +
+            A * **x**
+        vx_arr2d : np.ndarray of shape (n_sensors, n_sensors)
+            uncertainty matrix associated with vector x_arr
+        problim : float
+            probability limit used for consistency evaluation. Typically 0.95.
 
         Returns
         -------
-        isconsist:  bool
-                    indicator whether provided estimates are consistent in view of *problim*
-        ybest:      float
-                    best estimate
-        uybest:     float
-                    standard uncertainty of best estimate
-        chi2obs:    float
-                    observed chi-squared value
+        isconsist : bool
+            indicator whether provided estimates are consistent in view of *problim*
+        ybest : float
+            best estimate
+        uybest : float
+            standard uncertainty of best estimate
+        chi2obs : float
+            observed chi-squared value
         """
         print("start calc_best_est_lin_sys")
         epszero = 1e-10  # some small constant used for some checks
