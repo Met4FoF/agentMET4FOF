@@ -757,13 +757,26 @@ class RedundancyAgent(MetrologicalAgent):
 
         return isconsist, ybest, uybest, chi2obs
 
-    def get_combination(self, val_arr, n_keep, indcomb):
-        subsets = combinations(val_arr, n_keep)
+    @staticmethod
+    def get_combination(values, n_keep, certain_combinations_index):
+        """Return a certain subset of n_keep elements in a given array
+
+        Parameters
+        ----------
+        values : np.ndarray
+            original values
+        n_keep : int
+            number of elements in subset
+        certain_combinations_index : int
+            the index of the desired combination as a result of a call
+            of ``combinations(values, n_keep)``
+        """
+        subsets = combinations(values, n_keep)
         i_subset = -1
 
         for subset in subsets:
             i_subset += 1
-            if i_subset == indcomb:
+            if i_subset == certain_combinations_index:
                 return np.array(list(subset))
 
     def calc_lcs(self, y_arr, vy_arr2d, problim):
