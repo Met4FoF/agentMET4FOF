@@ -1374,7 +1374,7 @@ class RedundancyAgent(MetrologicalAgent):
         print(
             f"Provided number of sensors (or sensor values) was {n_sensors} and number of equations was {n_eq}."
         )
-        if n_sols == 1:
+        if n_solutions == 1:
             print(
                 "calc_lcss found a unique solution with chi2obs = %4.4f using %d of the provided %d sensor values."
                 % (chi2obs, n_keep, n_sensors)
@@ -1388,10 +1388,11 @@ class RedundancyAgent(MetrologicalAgent):
             print("x[%d]= %2.2f.\n" % (indint, x_arr[indint]))
         else:
             print(
-                "calc_lcss found %d equally good solutions with chi2obs = %4.4f using %d of the provided %d sensor values."
-                % (n_sols, chi2obs, n_keep, n_eq)
+                "calc_lcss found %d equally good solutions with chi2obs = %4.4f "
+                "using %d of the provided %d sensor values."
+                % (n_solutions, chi2obs, n_keep, n_eq)
             )
-            for i_sol in range(n_sols):
+            for i_sol in range(n_solutions):
                 print("\tSolution %d is:" % i_sol)
                 print("\ty = %4.4f, u(y) = %4.4f" % (ybest[i_sol], uybest[i_sol]))
                 print(
