@@ -853,31 +853,33 @@ class RedundancyAgent(MetrologicalAgent):
             self.buffer_store(agent_from=message["from"], data=message["data"])
         return 0
 
-    def print_output_lcs(self, n_sols, ybest, uybest, chi2obs, indkeep, y_arr):
-        """
-        Method to print the output of the method :func:`calc_lcs`.
+    @staticmethod
+    def print_output_lcs(n_solutions, ybest, uybest, chi2obs, indkeep, y_arr):
+        """Method to print the output of the method :func:`calc_lcs`
 
         Parameters
         ----------
-        n_sols:     int
-                    number of best solutions
-        ybest:      float or np.ndarray of shape (n_sols)
-                    best estimate or vector of best estimates
-        uybest:     float or np.ndarray of shape (n_sols)
-                    standard uncertainty of best estimate or vector with standard uncertainty of best estimates
-        chi2obs:    float
-                    observed chi-squared value of all best solutions
-        indkeep:    np.ndarary of shape (n) or (n_sols, n)
-                    indices of retained estimates of y_arr for the calculation of the best estimate ybest
-        y_arr:      np.ndarray of shape (n)
-                    individual estimates of measurand
+        n_solutions : int
+            number of best solutions
+        ybest : float or np.ndarray of shape (n_sols)
+            best estimate or vector of best estimates
+        uybest : float or np.ndarray of shape (n_sols)
+            standard uncertainty of best estimate or vector with standard uncertainty
+            of best estimates
+        chi2obs : float
+            observed chi-squared value of all best solutions
+        indkeep : np.ndarary of shape (n) or (n_sols, n)
+            indices of retained estimates of y_arr for the calculation of the best
+            estimate ybest
+        y_arr : np.ndarray of shape (n)
+            individual estimates of measurand
         """
         n_estims = len(y_arr)
         n_keep = indkeep.shape[
             -1
         ]  # number of retained estimates in the best solution(s)
 
-        if n_sols == 1:
+        if n_solutions == 1:
             print(
                 f"calc_lcs found a unique solution with chi2obs = {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} estimates."
             )
@@ -892,10 +894,10 @@ class RedundancyAgent(MetrologicalAgent):
             print(f"y[{indint:.0f}]= {y_arr[indint]:2.2f}.\n")
         else:
             print(
-                f"calc_lcs found {n_sols:.0f} equally good solutions with chi2obs = {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} estimates."
+                f"calc_lcs found {n_solutions:.0f} equally good solutions with chi2obs = {chi2obs:4.4f} using {n_keep:.0f} of the provided {n_estims:.0f} estimates."
             )
 
-            for i_sol in range(n_sols):
+            for i_sol in range(n_solutions):
                 print(f"\tSolution {i_sol:.0f} is:")
                 print(f"\ty = {ybest[i_sol]:4.4f}, u(y) = {uybest[i_sol]:4.4f}")
                 print("\tIndices and values of retained provided estimates:", end=" ")
