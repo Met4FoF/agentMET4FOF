@@ -478,8 +478,6 @@ class RedundancyAgent(MetrologicalAgent):
         streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            # sometimes the buffer does not contain values for all sensors
-            # sensor_key_list = ["Sensor1", "Sensor2"]
             key_list = [
                 key for key in self.sensor_key_list if key in self.buffer.keys()
             ]
@@ -511,7 +509,6 @@ class RedundancyAgent(MetrologicalAgent):
             x_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             ux_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             i_sensor = 0
-            # for key in buff.keys(): # arbitrary order
 
             for key in key_list:
                 data_arr = buff[key]
