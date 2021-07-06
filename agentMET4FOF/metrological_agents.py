@@ -875,9 +875,9 @@ class RedundancyAgent(MetrologicalAgent):
         return n_solutions, ybest, uybest, chi2obs, indkeep
 
     def on_received_message(self, message):
-        """
-        Handles incoming data from 'default' channels.
-        Stores 'default' data into an internal buffer
+        """Handle incoming data from 'default' channels
+
+        Store 'default' data into an internal buffer.
 
         Parameters
         ----------
