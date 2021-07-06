@@ -591,7 +591,7 @@ class RedundancyAgent(MetrologicalAgent):
 
     @staticmethod
     def calc_consistent_estimates_no_corr(y_arr2d, uy_arr2d, prob_lim):
-        """Calculation of consistent estimate for n_sets of estimates y_ij
+        """Calculation of consistent estimate for sets of estimates y_ij
 
         The y_ij (contained in y_arr2d) are the elements of Y, where each
         set contains n_estims estimates. The uncertainties are assumed to be
