@@ -1312,7 +1312,24 @@ class RedundancyAgent(MetrologicalAgent):
                         )
         return n_solutions, ybest, uybest, chi2obs, indkeep
 
-    def print_input_lcss(self, x_arr, vx_arr2d, a_arr, a_arr2d, problim):
+    @staticmethod
+    def print_input_lcss(x_arr, vx_arr2d, a_arr, a_arr2d, problim):
+        """Prints the input parameters of the method
+
+        Parameters
+        ----------
+        x_arr : np.ndarray of shape (n_sensors)
+            vector with sensor values, vector **x** of linear system **y** = **a** +
+            A * **x**
+        vx_arr2d : np.ndarray of shape (n_sensors, n_sensors)
+            uncertainty matrix associated with vector x_arr
+        a_arr : np.ndarray of shape (n_estimates)
+            vector **a** of linear system **y** = **a** + A * **x**
+        a_arr2d : np.ndarray of shape (n_estimates, n_sensors)
+            matrix A of linear system **y** = **a** + A * **x**
+        problim : float
+            probability limit used for consistency evaluation. Typically 0.95
+        """
         print(
             f"""INPUT of lcss function call:
         Vector a of linear system: a_arr = {a_arr}
