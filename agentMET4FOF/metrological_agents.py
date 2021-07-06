@@ -589,23 +589,25 @@ class RedundancyAgent(MetrologicalAgent):
             self.set_output_data(channel="default", data=data)
             super().agent_loop()
 
+    @staticmethod
     def calc_consistent_estimates_no_corr(y_arr2d, uy_arr2d, prob_lim):
-        """
-        Calculation of consistent estimate for n_sets of estimates y_ij (contained in
-        y_arr2d) of a quantity Y, where each set contains n_estims estimates.
-        The uncertainties are assumed to be independent and given in uy_arr2d.
-        The consistency test is using limit probability limit prob_lim.
-        For each set of estimates, the best estimate, uncertainty,
-        observed chi-2 value and a flag if the
+        """Calculation of consistent estimate for n_sets of estimates y_ij
+
+        The y_ij (contained in y_arr2d) are the elements of Y, where each
+        set contains n_estims estimates. The uncertainties are assumed to be
+        independent and given in uy_arr2d. The consistency test is using limit
+        probability limit prob_lim. For each set of estimates, the best estimate,
+        uncertainty, observed chi-2 value and a flag if the
         provided estimates were consistent given the model are given as output.
 
         Parameters
         ----------
-        y_arr2d:    np.ndarray of size (n_rows, n_estimates)
-                    each row contains m=n_estimates independent estimates of a measurand
-        uy_arr2d:   np.ndarray of size (n_rows, n_estimates)
-                    each row contains the standard uncertainty u(y_ij) of y_ij = y_arr2d[i,j]
-        prob_lim:   limit probability used in consistency test. Typically 0.95.
+        y_arr2d: np.ndarray of size (n_rows, n_estimates)
+            each row contains m=n_estimates independent estimates of a measurand
+        uy_arr2d: np.ndarray of size (n_rows, n_estimates)
+            each row contains the standard uncertainty u(y_ij) of y_ij = y_arr2d[i,j]
+        prob_lim: float
+            limit probability used in consistency test. Typically 0.95.
 
         Returns
         -------
@@ -616,7 +618,6 @@ class RedundancyAgent(MetrologicalAgent):
         uybest_arr:     np.ndarray of shape (n_rows)
                         contains the uncertainty associated with each best estimate for each row of *y_arr2d*
         chi2obs_arr:    observed chi-squared value for each row
-
         """
 
         if len(y_arr2d.shape) > 1:
