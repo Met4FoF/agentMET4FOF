@@ -701,28 +701,31 @@ class RedundancyAgent(MetrologicalAgent):
                 )
 
     def calc_best_estimate(self, y_arr, vy_arr2d, problim):
-        """Calculate the best estimate for a set of estimates with associated uncertainty matrix,
-        and determine if the set of estimates are consistent using a provided limit probability.
+        """Calculate the best estimate for a set of estimates with uncertainties
+
+        Additionally determine if the set of estimates are consistent using a provided
+        limit probability.
 
         Parameters
         ----------
-        y_arr:      np.ndarray of shape (n)
-                    vector of estimates of a measurand Y
-        vy_arr2d:   np.ndarray of shape (n, n)
-                    uncertainty matrix associated with y_arr
-        problim:    float
-                    probability limit used for assessing the consistency of the estimates. Typically, problim equals 0.95.
+        y_arr: np.ndarray of shape (n)
+            vector of estimates of a measurand Y
+        vy_arr2d: np.ndarray of shape (n, n)
+            uncertainty matrix associated with y_arr
+        problim: float
+            probability limit used for assessing the consistency of the estimates.
+            Typically, problim equals 0.95.
 
         Returns
         -------
-        isconsist:  bool
-                    indicator whether provided estimates are consistent in view of *problim*
-        ybest:      float
-                    best estimate of measurand
-        uybest:     float
-                    uncertainty associated with *ybest*
-        chi2obs:    float
-                    observed value of chi-squared, used for consistency evaluation
+        isconsist: bool
+            indicator whether provided estimates are consistent in view of *problim*
+        ybest: float
+            best estimate of measurand
+        uybest: float
+            uncertainty associated with *ybest*
+        chi2obs: float
+            observed value of chi-squared, used for consistency evaluation
         """
 
         print(f"cbe y_arr = {y_arr}")
