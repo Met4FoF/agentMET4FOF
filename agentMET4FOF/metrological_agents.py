@@ -251,7 +251,7 @@ class MetrologicalAgentBuffer(AgentBuffer):
 
         Parameters
         ----------
-        single_data : iterable of iterables (list, tuple, np.ndarrray) with shape (N, M)
+        single_data : iterable of iterables (list, tuple, np.ndarray) with shape (N, M)
 
             * M==2 (pairs): assumed to be like (time, value)
             * M==3 (triple): assumed to be like (time, value, value_unc)
@@ -905,7 +905,7 @@ class RedundancyAgent(MetrologicalAgent):
             of best estimates
         chi2obs : float
             observed chi-squared value of all best solutions
-        indkeep : np.ndarary of shape (n) or (n_sols, n)
+        indkeep : np.ndarray of shape (n) or (n_sols, n)
             indices of retained estimates of y_arr for the calculation of the best
             estimate ybest
         y_arr : np.ndarray of shape (n)
@@ -974,7 +974,7 @@ class RedundancyAgent(MetrologicalAgent):
         b = vh[-1, :]
         indrem = np.where(abs(b) > epszero)[
             0
-        ]  # remove a row corresponding to a non-zero entry in b.
+        ]  # Remove a row corresponding to a non-zero entry in b.
 
         if len(indrem) == 0:
             raise ValueError("b is a zero vector!")
@@ -988,8 +988,8 @@ class RedundancyAgent(MetrologicalAgent):
         if vx_arr2d.shape[0] <= np.linalg.matrix_rank(vx_arr2d, epszero):
             print("Vx cannot be reduced any further!")
             return
-        # Remove one sensor from Vx, A and x that is a linear combination of the other sensors.
-        # Find a solution of Vx * b = 0. This
+        # Remove one sensor from Vx, A and x that is a linear combination of the other
+        # sensors. Find a solution of Vx * b = 0.
         u, s, vh = np.linalg.svd(vx_arr2d)
         b = vh[-1, :]  # bottom row of vh is orthogonal to Vx
 
@@ -1000,7 +1000,7 @@ class RedundancyAgent(MetrologicalAgent):
 
         indrem = np.where(abs(b) > epszero)[
             0
-        ]  # remove a sensor corresponding to a non-zero entry in b.
+        ]  # Remove a sensor corresponding to a non-zero entry in b.
         if len(indrem) == 0:
             raise ValueError("b is the zero vector!")
 
@@ -1139,7 +1139,7 @@ class RedundancyAgent(MetrologicalAgent):
         -------
         n_solutions: int or np.ndarray of ints
             number of solutions
-        isconsist: bool or np.ndarray of bools
+        isconsist: bool or np.ndarray of bool
             indicator whether provided estimates are consistent in view of *problim*
         ybest: float or np.ndarray of floats
             best estimate
