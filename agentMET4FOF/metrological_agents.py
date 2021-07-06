@@ -532,10 +532,10 @@ class RedundancyAgent(MetrologicalAgent):
                             ux_data_arr2d[i_pnt, i_sensor]
                         )
 
-                    n_sols, ybest, uybest, chi2obs, indkeep = self.calc_lcs(
+                    n_solutions, ybest, uybest, chi2obs, indkeep = self.calc_lcs(
                         y_arr, vy_arr2d, self.problim
                     )
-                    if n_sols == 1:  # time stamp is value of first sensor
+                    if n_solutions == 1:
                         if isinstance(ybest, np.ndarray):
                             ybest = ybest[0]
                         data[i_pnt, :] = np.array(
@@ -565,14 +565,14 @@ class RedundancyAgent(MetrologicalAgent):
                 for i_val in range(self.n_pr):
                     vx_arr2d[i_val, i_val] = ux2_data_arr[i_val]
 
-                n_sols, ybest, uybest, chi2obs, indkeep = self.calc_lcss(
+                n_solutions, ybest, uybest, chi2obs, indkeep = self.calc_lcss(
                     self.a_arr, self.a_arr2d, x_data_arr, vx_arr2d, self.problim
                 )
                 print("calc lcss finished")
-                print("n_sols: ", n_sols)
+                print("n_solutions: ", n_solutions)
                 print("ybest: ", ybest)
                 print("uybest: ", uybest)
-                if n_sols == 1:  # time stamp is latest value
+                if n_solutions == 1:  # time stamp is latest value
                     if isinstance(ybest, np.ndarray):
                         ybest = ybest[0]
                     data = np.array(
@@ -830,7 +830,7 @@ class RedundancyAgent(MetrologicalAgent):
         n_remove = 0
 
         if isconsist:  # set the other return variables
-            n_sols = 1
+            n_solutions = 1
             indkeep = estim_arr
 
         while not isconsist:
@@ -865,27 +865,27 @@ class RedundancyAgent(MetrologicalAgent):
                 indmin = np.where(chi2obs_arr == chi2obs)[
                     0
                 ]  # list with all indices with minimum chi2obs value
-                n_sols = len(indmin)
+                n_solutions = len(indmin)
 
-                if n_sols == 1:
+                if n_solutions == 1:
                     ybest = ybest_arr[indmin[0]]
                     uybest = uybest_arr[indmin[0]]
                     indkeep = self.get_combination(
                         estim_arr, n_estims - n_remove, indmin
                     )  # indices of kept estimates
                 else:  # multiple solutions exist, the return types become arrays
-                    ybest = np.full(n_sols, np.nan)
-                    uybest = np.full(n_sols, np.nan)
-                    indkeep = np.full((n_sols, n_estims - n_remove), np.nan)
+                    ybest = np.full(n_solutions, np.nan)
+                    uybest = np.full(n_solutions, np.nan)
+                    indkeep = np.full((n_solutions, n_estims - n_remove), np.nan)
 
-                    for i_sol in range(n_sols):
+                    for i_sol in range(n_solutions):
                         ybest[i_sol] = ybest_arr[indmin[i_sol]]
                         uybest[i_sol] = uybest_arr[indmin[i_sol]]
                         indkeep[i_sol] = self.get_combination(
                             estim_arr, n_estims - n_remove, indmin[i_sol]
                         )
 
-        return n_sols, ybest, uybest, chi2obs, indkeep
+        return n_solutions, ybest, uybest, chi2obs, indkeep
 
     def on_received_message(self, message):
         """
