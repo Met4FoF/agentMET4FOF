@@ -1137,17 +1137,16 @@ class RedundancyAgent(MetrologicalAgent):
 
         Returns
         -------
-        isconsist:  bool
-                    indicator whether provided estimates are consistent in view of *problim*
-        ybest:      float
-                    best estimate
-        uybest:     float
-                    standard uncertainty of best estimate
-        chi2obs:    float
-                    observed chi-squared value
-        Returns
-        -------
-
+        n_solutions: int
+            number of solutions
+        isconsist: bool
+            indicator whether provided estimates are consistent in view of *problim*
+        ybest: float
+            best estimate
+        uybest: float
+            standard uncertainty of best estimate
+        chi2obs: float
+            observed chi-squared value
         """
         print("start calc_lcss")
         epszero = 1e-7  # epsilon for rank check
@@ -1160,7 +1159,7 @@ class RedundancyAgent(MetrologicalAgent):
         sens_arr = np.arange(n_sens)
         n_remove = 0
         if isconsist:  # set the other return variables
-            n_sols = 1
+            n_solutions = 1
             indkeep = sens_arr
 
         # no consistent solution, remove sensors 1 by 1, 2 by 2, etc.
@@ -1269,24 +1268,24 @@ class RedundancyAgent(MetrologicalAgent):
                 indmin = np.where(np.abs(chi2obs_arr - chi2obs) < eps_chi2)[
                     0
                 ]  # list with all indices with minimum chi2obs value
-                n_sols = len(indmin)
-                if n_sols == 1:
+                n_solutions = len(indmin)
+                if n_solutions == 1:
                     ybest = ybest_arr[indmin[0]]
                     uybest = uybest_arr[indmin[0]]
                     indkeep = self.get_combination(
                         sens_arr, n_sens - n_remove, indmin
                     )  # indices of kept estimates
                 else:  # multiple solutions exist, the return types become arrays
-                    ybest = np.full(n_sols, np.nan)
-                    uybest = np.full(n_sols, np.nan)
-                    indkeep = np.full((n_sols, n_sens - n_remove), np.nan)
-                    for i_sol in range(n_sols):
+                    ybest = np.full(n_solutions, np.nan)
+                    uybest = np.full(n_solutions, np.nan)
+                    indkeep = np.full((n_solutions, n_sens - n_remove), np.nan)
+                    for i_sol in range(n_solutions):
                         ybest[i_sol] = ybest_arr[indmin[i_sol]]
                         uybest[i_sol] = uybest_arr[indmin[i_sol]]
                         indkeep[i_sol] = self.get_combination(
                             sens_arr, n_sens - n_remove, indmin[i_sol]
                         )
-        return n_sols, ybest, uybest, chi2obs, indkeep
+        return n_solutions, ybest, uybest, chi2obs, indkeep
 
     def print_input_lcss(self, x_arr, vx_arr2d, a_arr, a_arr2d, problim):
         print(
