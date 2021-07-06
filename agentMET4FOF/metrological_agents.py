@@ -425,25 +425,26 @@ class RedundancyAgent(MetrologicalAgent):
         self.set_output_data(channel="default", metadata=self.metadata)
 
     def init_lcss_parameters(self, fsam, f1, f2, ampl_ratio, phi1, phi2):
-        """
-        Additional parameters used for this particular example in combination with the :py:func:`lcss` method.
-        It provides the prior knowledge needed to make the information contained in the data redundant.
-        This method sets up the vector **a** and matrix *A* for the system **y** = **a** + *A* * **x**.
+        """Additional parameters used for this particular example
+
+        Provides the prior knowledge needed to make the information contained in the
+        data redundant. This method sets up the vector **a** and matrix *A* for the
+        system **y** = **a** + *A* * **x**.
 
         Parameters
         ----------
-        fsam :   float
-                sampling frequency
-        f1 :     float
-                first frequency of interest in signal
-        f2 :    float
-                second frequency of interest in signal
-        ampl_ratio : float
-                    ratio of the amplitudes of the two frequency components
-        phi1 :   float
-                initial phase of first frequency component
-        phi2 :   float
-                initial phase of second frequency component
+        fsam: float
+            sampling frequency
+        f1: float
+            first frequency of interest in signal
+        f2: float
+            second frequency of interest in signal
+        ampl_ratio: float
+            ratio of the amplitudes of the two frequency components
+        phi1: float
+            initial phase of first frequency component
+        phi2: float
+            initial phase of second frequency component
         """
         # set-up vector a_arr and matrix a_arr2d for redundancy method
         id_mat = np.identity(self.n_pr)
