@@ -1034,10 +1034,10 @@ class RedundancyAgent(MetrologicalAgent):
 
         indrem = indrem[-1]  # take out the last sensor
         indsenskeep = np.concatenate(
-            np.arange(indrem), np.arange(indrem, vx_arr2d.shape[0])
+            (np.arange(indrem), np.arange(indrem, vx_arr2d.shape[0]))
         )
         vxred_arr2d = vx_arr2d[indsenskeep, indsenskeep]
-        xred_arr = x_arr(indsenskeep)
+        xred_arr = x_arr[indsenskeep]
         # Update A by removing the sensor and updating the system of equations
 
         ared_arr2d = a_arr2d - a_arr2d[:, indrem] / b[indrem] * np.transpose(b)
