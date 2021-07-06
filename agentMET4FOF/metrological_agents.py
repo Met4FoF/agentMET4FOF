@@ -385,27 +385,24 @@ class RedundancyAgent(MetrologicalAgent):
         problim: float = 0.9,
         calc_type: str = "lcs",
     ):
-        """
-        Initialize the redundancy agent as an instance of the :py:mod:`MetrologicalAgent` class.
-
+        """Initialize the redundancy agent
 
         Parameters
         ----------
+        input_data_maxlen: int, optional
+            Defaults to 25
+        output_data_maxlen: int, optional
+            Defaults to 25
+        sensor_key_list : list of str, optional
+            list containing the names of the sensors that should feed data to the
+            Redundancy Agent. Defaults to None
         n_pr : int, optional
-            size of the batch of data that is handled at a time by the Redundancy Agent. Defaults to 1
+            size of the batch of data that is handled at a time by the Redundancy Agent.
+            Defaults to 1
         problim : float, optional
             limit probability used for consistency evaluation. Defaults to .9
         calc_type : str, optional
             calculation type: 'lcs' or 'lcss'. Defaults to 'lcs'
-        sensor_key_list : list of str
-            list containing the names of the sensors that should feed data to the Redundancy Agent. Defaults to None
-
-        Parent class parameters
-        ----------
-        input_data_maxlen: int
-
-        output_data_maxlen: int
-
         """
 
         if sensor_key_list is None:
