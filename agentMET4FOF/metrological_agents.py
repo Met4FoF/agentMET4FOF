@@ -649,19 +649,18 @@ class RedundancyAgent(MetrologicalAgent):
         return isconsist_arr, ybest_arr, uybest_arr, chi2obs_arr
 
     def print_output_single(self, isconsist, ybest, uybest, chi2obs):
-        """
-        Function to print the output of a single row of the calculate_best_estimate function.
+        """Print the output of a single row of the calculate_best_estimate function
 
         Parameters
         ----------
-        isconsist:  bool
-                    Indicates if provided estimates were consistent
-        ybest:      float
-                    best estimate
-        uybest:     float
-                    uncertainty of best estimate
-        chi2obs:    float
-                    observed value of chi-squared
+        isconsist: bool
+            Indicates if provided estimates were consistent
+        ybest: float
+            best estimate
+        uybest: float
+            uncertainty of best estimate
+        chi2obs: float
+            observed value of chi-squared
         """
         print("\tThe observed chi-2 value is %3.3f." % chi2obs)
 
@@ -673,22 +672,19 @@ class RedundancyAgent(MetrologicalAgent):
         print(f"\tThe best estimate is {ybest:3.3f} with uncertainty {uybest:3.3f}.\n")
 
     def print_output_cbe(self, isconsist_arr, ybest_arr, uybest_arr, chi2obs_arr):
-        """
-        Function to print the full output of calc_best_estimate.
+        """Function to print the full output of calc_best_estimate.
 
         Parameters
         ----------
-        isconsist_arr:  bool array of shape (n_rows)
-                        indicates for each row if the n_estimates are consistent or not
-        ybest_arr:      np.ndarray of shape (n_rows)
-                        contains the best estimate for each row of individual estimates
-        uybest_arr:     np.ndarray of shape (n_rows)
-                        contains the uncertainty associated with each best estimate for each row of *y_arr2d*
-        chi2obs_arr:    observed chi-squared value for each row
-
-        Returns
-        -------
-
+        isconsist_arr: bool array of shape (n_rows)
+            indicates for each row if the n_estimates are consistent or not
+        ybest_arr: np.ndarray of floats in shape (n_rows)
+            contains the best estimate for each row of individual estimates
+        uybest_arr: np.ndarray of floats in shape (n_rows)
+            contains the uncertainty associated with each best estimate for each row
+            of *y_arr2d*
+        chi2obs_arr: np.ndarray of floats in shape (n_rows)
+            observed chi-squared value for each row
         """
         if len(ybest_arr.shape) == 0:
             self.print_output_single(isconsist_arr, ybest_arr, uybest_arr, chi2obs_arr)
