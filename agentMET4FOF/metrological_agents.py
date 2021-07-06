@@ -1147,17 +1147,17 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        a_arr: np.ndarray of shape (n_estimates)
+        a_arr : np.ndarray of shape (n_estimates)
             vector **a** of linear system **y** = **a** + A * **x**
-        a_arr2d: np.ndarray of shape (n_estimates, n_sensors)
+        a_arr2d : np.ndarray of shape (n_estimates, n_sensors)
             matrix A of linear system **y** = **a** + A * **x**
-        x_arr: np.ndarray of shape (n_sensors)
+        x_arr : np.ndarray of shape (n_sensors)
             vector with sensor values
             vector **x** of linear system **y** = **a** + A * **x**
-        vx_arr2d: np.ndarray of shape (n_sensors, n_sensors)
+        vx_arr2d : np.ndarray of shape (n_sensors, n_sensors)
             uncertainty matrix associated with vector x_arr
-        problim: float
-            probability limit used for consistency evaluation. Typically 0.95.
+        problim : float
+            probability limit used for consistency evaluation. Typically 0.95
 
         Returns
         -------
