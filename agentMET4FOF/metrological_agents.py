@@ -805,7 +805,7 @@ class RedundancyAgent(MetrologicalAgent):
             standard uncertainty of best estimate
         chi2obs : float or np.ndarray of floats
             observed chi-squared value
-        indkeep : list of int
+        indkeep : np.ndarray of shape (n) or (n_sols, n)
             indices of kept estimates
         """
         n_solutions = 0
