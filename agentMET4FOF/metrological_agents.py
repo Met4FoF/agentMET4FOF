@@ -1172,6 +1172,9 @@ class RedundancyAgent(MetrologicalAgent):
         chi2obs: float or np.ndarray of floats
             observed chi-squared value
         """
+        n_solutions = 0
+        indkeep = np.nan
+
         print("start calc_lcss")
         epszero = 1e-7  # epsilon for rank check
         eps_chi2 = 1e-7  # epsilon for chi2 equivalence check
