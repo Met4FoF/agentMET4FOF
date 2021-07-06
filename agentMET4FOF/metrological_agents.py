@@ -389,9 +389,9 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        input_data_maxlen: int, optional
+        input_data_maxlen : int, optional
             Defaults to 25
-        output_data_maxlen: int, optional
+        output_data_maxlen : int, optional
             Defaults to 25
         sensor_key_list : list of str, optional
             list containing the names of the sensors that should feed data to the
@@ -433,17 +433,17 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        fsam: float
+        fsam : float
             sampling frequency
-        f1: float
+        f1 : float
             first frequency of interest in signal
-        f2: float
+        f2 : float
             second frequency of interest in signal
-        ampl_ratio: float
+        ampl_ratio : float
             ratio of the amplitudes of the two frequency components
-        phi1: float
+        phi1 : float
             initial phase of first frequency component
-        phi2: float
+        phi2 : float
             initial phase of second frequency component
         """
         # set-up vector a_arr and matrix a_arr2d for redundancy method
@@ -602,23 +602,23 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        y_arr2d: np.ndarray of size (n_rows, n_estimates)
+        y_arr2d : np.ndarray of size (n_rows, n_estimates)
             each row contains m=n_estimates independent estimates of a measurand
-        uy_arr2d: np.ndarray of size (n_rows, n_estimates)
+        uy_arr2d : np.ndarray of size (n_rows, n_estimates)
             each row contains the standard uncertainty u(y_ij) of y_ij = y_arr2d[i,j]
-        prob_lim: float
+        prob_lim : float
             limit probability used in consistency test. Typically 0.95.
 
         Returns
         -------
-        isconsist_arr: bool array of shape (n_rows)
+        isconsist_arr : bool array of shape (n_rows)
             indicates for each row if the n_estimates are consistent or not
-        ybest_arr: np.ndarray of shape (n_rows)
+        ybest_arr : np.ndarray of shape (n_rows)
             contains the best estimate for each row of individual estimates
-        uybest_arr: np.ndarray of shape (n_rows)
+        uybest_arr : np.ndarray of shape (n_rows)
             contains the uncertainty associated with each best estimate for each row
             of *y_arr2d*
-        chi2obs_arr: observed chi-squared value for each row
+        chi2obs_arr : observed chi-squared value for each row
         """
 
         if len(y_arr2d.shape) > 1:
@@ -653,13 +653,13 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        isconsist: bool
+        isconsist : bool
             Indicates if provided estimates were consistent
-        ybest: float
+        ybest : float
             best estimate
-        uybest: float
+        uybest : float
             uncertainty of best estimate
-        chi2obs: float
+        chi2obs : float
             observed value of chi-squared
         """
         print("\tThe observed chi-2 value is %3.3f." % chi2obs)
@@ -676,14 +676,14 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        isconsist_arr: bool array of shape (n_rows)
+        isconsist_arr : bool array of shape (n_rows)
             indicates for each row if the n_estimates are consistent or not
-        ybest_arr: np.ndarray of floats in shape (n_rows)
+        ybest_arr : np.ndarray of floats in shape (n_rows)
             contains the best estimate for each row of individual estimates
-        uybest_arr: np.ndarray of floats in shape (n_rows)
+        uybest_arr : np.ndarray of floats in shape (n_rows)
             contains the uncertainty associated with each best estimate for each row
             of *y_arr2d*
-        chi2obs_arr: np.ndarray of floats in shape (n_rows)
+        chi2obs_arr : np.ndarray of floats in shape (n_rows)
             observed chi-squared value for each row
         """
         if len(ybest_arr.shape) == 0:
@@ -708,23 +708,23 @@ class RedundancyAgent(MetrologicalAgent):
 
         Parameters
         ----------
-        y_arr: np.ndarray of shape (n)
+        y_arr : np.ndarray of shape (n)
             vector of estimates of a measurand Y
-        vy_arr2d: np.ndarray of shape (n, n)
+        vy_arr2d : np.ndarray of shape (n, n)
             uncertainty matrix associated with y_arr
-        problim: float
+        problim : float
             probability limit used for assessing the consistency of the estimates.
             Typically, problim equals 0.95.
 
         Returns
         -------
-        isconsist: bool
+        isconsist : bool
             indicator whether provided estimates are consistent in view of *problim*
-        ybest: float
+        ybest : float
             best estimate of measurand
-        uybest: float
+        uybest : float
             uncertainty associated with *ybest*
-        chi2obs: float
+        chi2obs : float
             observed value of chi-squared, used for consistency evaluation
         """
 
@@ -1106,6 +1106,7 @@ class RedundancyAgent(MetrologicalAgent):
         n_sens = len(x_arr)
         sens_arr = np.arange(n_sens)
         n_remove = 0
+
         if isconsist:  # set the other return variables
             n_solutions = 1
             indkeep = sens_arr
