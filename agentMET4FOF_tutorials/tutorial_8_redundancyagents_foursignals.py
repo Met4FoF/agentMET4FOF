@@ -25,7 +25,7 @@ def demonstrate_redundancy_agent_four_signals():
     is started. The network and the calculated results can be monitored in a browser at the address http://127.0.0.1:8050/.
     """
     # parameters
-    batch_size = 20
+    batch_size = 10
     n_pr = batch_size
     fsam = 100
     intercept = 10
@@ -39,10 +39,9 @@ def demonstrate_redundancy_agent_four_signals():
     agent_network: AgentNetwork = AgentNetwork(dashboard_modules=True)
 
     # Initialize signal generating class outside of agent framework.
-    signal_arr = [MetrologicalMultiWaveGenerator(sfreq=fsam, freq_arr=np.array([freq]), intercept=intercept,
-                                                 ampl_arr=np.array([ampl]), phase_ini_arr=np.array([phi]),
-                                                 value_unc=exp_unc_abs) for freq, phi, ampl in
-                  zip(freqs, phases, ampls)]
+    signal_arr = [MetrologicalMultiWaveGenerator(sfreq=fsam, freq_arr=np.array([freq]), ampl_arr=np.array([ampl]),
+                                        phase_ini_arr=np.array([phi]), intercept=intercept, value_unc=exp_unc_abs)
+                                        for freq, ampl, phi in zip(freqs, ampls, phases)]
 
     # Data source agents.
     source_agents = []
@@ -55,7 +54,7 @@ def demonstrate_redundancy_agent_four_signals():
     # Redundant data processing agent
     redundancy_name1 = "RedundancyAgent1"
     redundancy_agent1 = agent_network.add_agent(name=redundancy_name1, agentType=RedundancyAgent)
-    redundancy_agent1.init_parameters1(sensor_key_list=sensor_key_list, n_pr=n_pr, problim=problim,  calc_type="lcs")
+    redundancy_agent1.init_parameters(sensor_key_list=sensor_key_list, n_pr=n_pr, problim=problim,  calc_type="lcs")
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent1 = agent_network.add_agent(name="MonitorAgent_SensorValues",

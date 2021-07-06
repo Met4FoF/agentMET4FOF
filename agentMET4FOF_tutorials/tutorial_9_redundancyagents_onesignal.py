@@ -10,7 +10,7 @@ from agentMET4FOF.agents import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalMonitorAgent
 
 from agentMET4FOF.metrological_streams import MetrologicalMultiWaveGenerator
-from agentMET4FOF.metrological_agents import MetrologicalMultiWaveGeneratorAgent, RedundancyAgent
+from agentMET4FOF.metrological_agents import MetrologicalGeneratorAgent, RedundancyAgent
 
 
 def demonstrate_redundancy_agent_onesignal():
@@ -19,8 +19,8 @@ def demonstrate_redundancy_agent_onesignal():
     is started. The network and the calculated results can be monitored in a browser at the address http://127.0.0.1:8050/.
     """
     # parameters
-    batch_size = 20
-    n_pr = 20
+    batch_size = 10
+    n_pr = batch_size
     fsam = 40
     f1 = 6
     f2 = 10
@@ -41,16 +41,16 @@ def demonstrate_redundancy_agent_onesignal():
 
     # Data source agents.
     source_name1 = "Sensor1"  #signal1.metadata.metadata["device_id"]
-    source_agent1 = agent_network.add_agent(name=source_name1, agentType=MetrologicalMultiWaveGeneratorAgent)
+    source_agent1 = agent_network.add_agent(name=source_name1, agentType=MetrologicalGeneratorAgent)
     source_agent1.init_parameters(signal=signal1, batch_size=batch_size)
 
     # Redundant data processing agent
     sensor_key_list = [source_name1]
     redundancy_name1 = "RedundancyAgent1"  # Name cannot contain spaces!!
     redundancy_agent1 = agent_network.add_agent(name=redundancy_name1, agentType=RedundancyAgent)
-    redundancy_agent1.init_parameters1(sensor_key_list=sensor_key_list, calc_type="lcss", n_pr=n_pr, problim=problim)
+    redundancy_agent1.init_parameters(sensor_key_list=sensor_key_list, calc_type="lcss", n_pr=n_pr, problim=problim)
     # prior knowledge needed for redundant evaluation of the data
-    redundancy_agent1.init_parameters2(fsam=fsam, f1=f1, f2=f2, ampl_ratio=ampl1 / ampl2, phi1=phi1, phi2=phi2)
+    redundancy_agent1.init_lcss_parameters(fsam=fsam, f1=f1, f2=f2, ampl_ratio=ampl1 / ampl2, phi1=phi1, phi2=phi2)
 
     # Initialize metrologically enabled plotting agent. Agent name cannot contain spaces!!
     monitor_agent1 = agent_network.add_agent(name="MonitorAgent_SensorValues", agentType=MetrologicalMonitorAgent)
