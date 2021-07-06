@@ -58,4 +58,4 @@ References
                 Roma, Italy, 2020,
                 pp. 84-88,
                 doi: `10.1109/MetroInd4.0IoT48571.2020.9138297
-                    <https://dx.doi.org/10.1109/MetroInd4.0IoT48571.2020.9138297>`_.
+                <https://dx.doi.org/10.1109/MetroInd4.0IoT48571.2020.9138297>`_.
