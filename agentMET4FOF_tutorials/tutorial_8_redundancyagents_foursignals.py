@@ -13,8 +13,8 @@ from agentMET4FOF.metrological_streams import (
     MetrologicalMultiWaveGenerator,
 )
 
-from agentMET4FOF.redundancyAgents1 import (
-    MetrologicalMultiWaveGeneratorAgent,
+from agentMET4FOF.metrological_agents import (
+    MetrologicalGeneratorAgent,
     RedundancyAgent,
 )
 
@@ -49,7 +49,7 @@ def demonstrate_redundancy_agent_four_signals():
     sensor_key_list = []
     for count, signal in enumerate(signal_arr):
         sensor_key_list += ["Sensor" + str(count + 1)]
-        source_agents += [agent_network.add_agent(name=sensor_key_list[-1], agentType=MetrologicalMultiWaveGeneratorAgent)]
+        source_agents += [agent_network.add_agent(name=sensor_key_list[-1], agentType=MetrologicalGeneratorAgent)]
         source_agents[-1].init_parameters(signal=signal, batch_size=batch_size)
 
     # Redundant data processing agent
