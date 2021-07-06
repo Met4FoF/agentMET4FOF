@@ -1390,8 +1390,7 @@ class RedundancyAgent(MetrologicalAgent):
         if n_solutions == 1:
             print(
                 "calc_lcss found a unique solution with chi2obs = %4.4f using %d of "
-                "the provided %d sensor values."
-                % (chi2obs, n_keep, n_sensors)
+                "the provided %d sensor values." % (chi2obs, n_keep, n_sensors)
             )
             print("\ty = %4.4f, u(y) = %4.4f" % (ybest, uybest))
             print("\tIndices and values of retained provided sensor values:", end=" ")
