@@ -654,7 +654,8 @@ class RedundancyAgent(MetrologicalAgent):
 
         return isconsist_arr, ybest_arr, uybest_arr, chi2obs_arr
 
-    def print_output_single(self, isconsist, ybest, uybest, chi2obs):
+    @staticmethod
+    def print_output_single(isconsist, ybest, uybest, chi2obs):
         """Print the output of a single row of the calculate_best_estimate function
 
         Parameters
@@ -706,7 +707,8 @@ class RedundancyAgent(MetrologicalAgent):
                     chi2obs_arr.item(i_set),
                 )
 
-    def calc_best_estimate(self, y_arr, vy_arr2d, problim):
+    @staticmethod
+    def calc_best_estimate(y_arr, vy_arr2d, problim):
         """Calculate the best estimate for a set of estimates with uncertainties
 
         Additionally determine if the set of estimates are consistent using a provided
