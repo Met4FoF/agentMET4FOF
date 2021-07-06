@@ -761,18 +761,16 @@ class RedundancyAgent(MetrologicalAgent):
                 return np.array(list(subset))
 
     def calc_lcs(self, y_arr, vy_arr2d, problim):
-        """
-        Function to calculate the best estimate of a measurand based on individual estimates of the
-        measurand with associated uncertainty matrix.
+        """Calculate the best estimate of a measurand with associated uncertainty matrix
 
         Parameters
         ----------
-        y_arr:      np.ndarray of shape (n)
-                    vector with estimates of the measurand
-        vy_arr2d:   np.ndarray of shape (n, n)
-                    uncertainty matrix of the vector y_arr
-        problim:    float
-                    limit probability used in the consistency evaluation. Typically 0.95.
+        y_arr: np.ndarray of shape (n)
+            vector with estimates of the measurand
+        vy_arr2d: np.ndarray of shape (n, n)
+            uncertainty matrix of the vector y_arr
+        problim: float
+            limit probability used in the consistency evaluation. Typically 0.95.
         """
         isconsist, ybest, uybest, chi2obs = self.calc_best_estimate(
             y_arr, vy_arr2d, problim
@@ -807,11 +805,13 @@ class RedundancyAgent(MetrologicalAgent):
                     chi2obs_arr[i_subset],
                 ) = self.calc_best_estimate(yred_arr, vyred_arr2d, problim)
 
-            # Find smallest chi2obs value amongst all subsets. If multiple possibilities exist, return them all
+            # Find smallest chi2obs value amongst all subsets. If multiple possibilities
+            # exist, return them all
             indmin = np.argmin(chi2obs_arr)
 
             if isconsist_arr[indmin]:
-                # consistent solution found (otherwise isconsist remains false and the while loop continues)
+                # consistent solution found (otherwise isconsist remains false and the
+                # while loop continues)
                 isconsist = True
                 chi2obs = chi2obs_arr[indmin]  # minimum chi2obs value
                 indmin = np.where(chi2obs_arr == chi2obs)[
