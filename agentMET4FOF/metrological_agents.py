@@ -425,25 +425,26 @@ class RedundancyAgent(MetrologicalAgent):
         self.set_output_data(channel="default", metadata=self.metadata)
 
     def init_lcss_parameters(self, fsam, f1, f2, ampl_ratio, phi1, phi2):
-        """
-        Additional parameters used for this particular example in combination with the :py:func:`lcss` method.
-        It provides the prior knowledge needed to make the information contained in the data redundant.
-        This method sets up the vector **a** and matrix *A* for the system **y** = **a** + *A* * **x**.
+        """Additional parameters used for this particular example
+
+        Provides the prior knowledge needed to make the information contained in the
+        data redundant. This method sets up the vector **a** and matrix *A* for the
+        system **y** = **a** + *A* * **x**.
 
         Parameters
         ----------
-        fsam :   float
-                sampling frequency
-        f1 :     float
-                first frequency of interest in signal
-        f2 :    float
-                second frequency of interest in signal
-        ampl_ratio : float
-                    ratio of the amplitudes of the two frequency components
-        phi1 :   float
-                initial phase of first frequency component
-        phi2 :   float
-                initial phase of second frequency component
+        fsam: float
+            sampling frequency
+        f1: float
+            first frequency of interest in signal
+        f2: float
+            second frequency of interest in signal
+        ampl_ratio: float
+            ratio of the amplitudes of the two frequency components
+        phi1: float
+            initial phase of first frequency component
+        phi2: float
+            initial phase of second frequency component
         """
         # set-up vector a_arr and matrix a_arr2d for redundancy method
         id_mat = np.identity(self.n_pr)
@@ -472,21 +473,20 @@ class RedundancyAgent(MetrologicalAgent):
         """a_arr2d : np.ndarray of float"""
 
     def agent_loop(self):
-        """
-        Model the agent's behaviour
+        """Model the agent's behaviour
+
         On state *Running* the agent will extract sample by sample the input data
         streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
         """
         if self.current_state == "Running":
-            # sometimes the buffer does not contain values for all sensors
-            # sensor_key_list = ["Sensor1", "Sensor2"]
             key_list = [
                 key for key in self.sensor_key_list if key in self.buffer.keys()
             ]
             n_sensors = len(key_list)
             if n_sensors != len(self.sensor_key_list):  # expected number of sensors
                 print(
-                    "Not all sensors were present in the buffer. Not evaluating the data."
+                    "Not all sensors were present in the buffer."
+                    "Not evaluating the data."
                 )
                 return 0
 
@@ -511,7 +511,6 @@ class RedundancyAgent(MetrologicalAgent):
             x_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             ux_data_arr2d = np.full(shape=(self.n_pr, n_sensors), fill_value=np.nan)
             i_sensor = 0
-            # for key in buff.keys(): # arbitrary order
 
             for key in key_list:
                 data_arr = buff[key]
@@ -532,10 +531,10 @@ class RedundancyAgent(MetrologicalAgent):
                             ux_data_arr2d[i_pnt, i_sensor]
                         )
 
-                    n_sols, ybest, uybest, chi2obs, indkeep = self.calc_lcs(
+                    n_solutions, ybest, uybest, chi2obs, indkeep = self.calc_lcs(
                         y_arr, vy_arr2d, self.problim
                     )
-                    if n_sols == 1:  # time stamp is value of first sensor
+                    if n_solutions == 1:
                         if isinstance(ybest, np.ndarray):
                             ybest = ybest[0]
                         data[i_pnt, :] = np.array(
@@ -565,14 +564,14 @@ class RedundancyAgent(MetrologicalAgent):
                 for i_val in range(self.n_pr):
                     vx_arr2d[i_val, i_val] = ux2_data_arr[i_val]
 
-                n_sols, ybest, uybest, chi2obs, indkeep = self.calc_lcss(
+                n_solutions, ybest, uybest, chi2obs, indkeep = self.calc_lcss(
                     self.a_arr, self.a_arr2d, x_data_arr, vx_arr2d, self.problim
                 )
                 print("calc lcss finished")
-                print("n_sols: ", n_sols)
+                print("n_solutions: ", n_solutions)
                 print("ybest: ", ybest)
                 print("uybest: ", uybest)
-                if n_sols == 1:  # time stamp is latest value
+                if n_solutions == 1:  # time stamp is latest value
                     if isinstance(ybest, np.ndarray):
                         ybest = ybest[0]
                     data = np.array(
@@ -590,34 +589,36 @@ class RedundancyAgent(MetrologicalAgent):
             self.set_output_data(channel="default", data=data)
             super().agent_loop()
 
+    @staticmethod
     def calc_consistent_estimates_no_corr(y_arr2d, uy_arr2d, prob_lim):
-        """
-        Calculation of consistent estimate for n_sets of estimates y_ij (contained in
-        y_arr2d) of a quantity Y, where each set contains n_estims estimates.
-        The uncertainties are assumed to be independent and given in uy_arr2d.
-        The consistency test is using limit probability limit prob_lim.
-        For each set of estimates, the best estimate, uncertainty,
-        observed chi-2 value and a flag if the
+        """Calculation of consistent estimate for sets of estimates y_ij
+
+        The y_ij (contained in y_arr2d) are the elements of Y, where each
+        set contains n_estims estimates. The uncertainties are assumed to be
+        independent and given in uy_arr2d. The consistency test is using limit
+        probability limit prob_lim. For each set of estimates, the best estimate,
+        uncertainty, observed chi-2 value and a flag if the
         provided estimates were consistent given the model are given as output.
 
         Parameters
         ----------
-        y_arr2d:    np.ndarray of size (n_rows, n_estimates)
-                    each row contains m=n_estimates independent estimates of a measurand
-        uy_arr2d:   np.ndarray of size (n_rows, n_estimates)
-                    each row contains the standard uncertainty u(y_ij) of y_ij = y_arr2d[i,j]
-        prob_lim:   limit probability used in consistency test. Typically 0.95.
+        y_arr2d: np.ndarray of size (n_rows, n_estimates)
+            each row contains m=n_estimates independent estimates of a measurand
+        uy_arr2d: np.ndarray of size (n_rows, n_estimates)
+            each row contains the standard uncertainty u(y_ij) of y_ij = y_arr2d[i,j]
+        prob_lim: float
+            limit probability used in consistency test. Typically 0.95.
 
         Returns
         -------
-        isconsist_arr:  bool array of shape (n_rows)
-                        indicates for each row if the n_estimates are consistent or not
-        ybest_arr:      np.ndarray of shape (n_rows)
-                        contains the best estimate for each row of individual estimates
-        uybest_arr:     np.ndarray of shape (n_rows)
-                        contains the uncertainty associated with each best estimate for each row of *y_arr2d*
-        chi2obs_arr:    observed chi-squared value for each row
-
+        isconsist_arr: bool array of shape (n_rows)
+            indicates for each row if the n_estimates are consistent or not
+        ybest_arr: np.ndarray of shape (n_rows)
+            contains the best estimate for each row of individual estimates
+        uybest_arr: np.ndarray of shape (n_rows)
+            contains the uncertainty associated with each best estimate for each row
+            of *y_arr2d*
+        chi2obs_arr: observed chi-squared value for each row
         """
 
         if len(y_arr2d.shape) > 1:
@@ -830,7 +831,7 @@ class RedundancyAgent(MetrologicalAgent):
         n_remove = 0
 
         if isconsist:  # set the other return variables
-            n_sols = 1
+            n_solutions = 1
             indkeep = estim_arr
 
         while not isconsist:
@@ -865,27 +866,27 @@ class RedundancyAgent(MetrologicalAgent):
                 indmin = np.where(chi2obs_arr == chi2obs)[
                     0
                 ]  # list with all indices with minimum chi2obs value
-                n_sols = len(indmin)
+                n_solutions = len(indmin)
 
-                if n_sols == 1:
+                if n_solutions == 1:
                     ybest = ybest_arr[indmin[0]]
                     uybest = uybest_arr[indmin[0]]
                     indkeep = self.get_combination(
                         estim_arr, n_estims - n_remove, indmin
                     )  # indices of kept estimates
                 else:  # multiple solutions exist, the return types become arrays
-                    ybest = np.full(n_sols, np.nan)
-                    uybest = np.full(n_sols, np.nan)
-                    indkeep = np.full((n_sols, n_estims - n_remove), np.nan)
+                    ybest = np.full(n_solutions, np.nan)
+                    uybest = np.full(n_solutions, np.nan)
+                    indkeep = np.full((n_solutions, n_estims - n_remove), np.nan)
 
-                    for i_sol in range(n_sols):
+                    for i_sol in range(n_solutions):
                         ybest[i_sol] = ybest_arr[indmin[i_sol]]
                         uybest[i_sol] = uybest_arr[indmin[i_sol]]
                         indkeep[i_sol] = self.get_combination(
                             estim_arr, n_estims - n_remove, indmin[i_sol]
                         )
 
-        return n_sols, ybest, uybest, chi2obs, indkeep
+        return n_solutions, ybest, uybest, chi2obs, indkeep
 
     def on_received_message(self, message):
         """
@@ -1138,17 +1139,16 @@ class RedundancyAgent(MetrologicalAgent):
 
         Returns
         -------
-        isconsist:  bool
-                    indicator whether provided estimates are consistent in view of *problim*
-        ybest:      float
-                    best estimate
-        uybest:     float
-                    standard uncertainty of best estimate
-        chi2obs:    float
-                    observed chi-squared value
-        Returns
-        -------
-
+        n_solutions: int
+            number of solutions
+        isconsist: bool
+            indicator whether provided estimates are consistent in view of *problim*
+        ybest: float
+            best estimate
+        uybest: float
+            standard uncertainty of best estimate
+        chi2obs: float
+            observed chi-squared value
         """
         print("start calc_lcss")
         epszero = 1e-7  # epsilon for rank check
@@ -1161,7 +1161,7 @@ class RedundancyAgent(MetrologicalAgent):
         sens_arr = np.arange(n_sens)
         n_remove = 0
         if isconsist:  # set the other return variables
-            n_sols = 1
+            n_solutions = 1
             indkeep = sens_arr
 
         # no consistent solution, remove sensors 1 by 1, 2 by 2, etc.
@@ -1270,24 +1270,24 @@ class RedundancyAgent(MetrologicalAgent):
                 indmin = np.where(np.abs(chi2obs_arr - chi2obs) < eps_chi2)[
                     0
                 ]  # list with all indices with minimum chi2obs value
-                n_sols = len(indmin)
-                if n_sols == 1:
+                n_solutions = len(indmin)
+                if n_solutions == 1:
                     ybest = ybest_arr[indmin[0]]
                     uybest = uybest_arr[indmin[0]]
                     indkeep = self.get_combination(
                         sens_arr, n_sens - n_remove, indmin
                     )  # indices of kept estimates
                 else:  # multiple solutions exist, the return types become arrays
-                    ybest = np.full(n_sols, np.nan)
-                    uybest = np.full(n_sols, np.nan)
-                    indkeep = np.full((n_sols, n_sens - n_remove), np.nan)
-                    for i_sol in range(n_sols):
+                    ybest = np.full(n_solutions, np.nan)
+                    uybest = np.full(n_solutions, np.nan)
+                    indkeep = np.full((n_solutions, n_sens - n_remove), np.nan)
+                    for i_sol in range(n_solutions):
                         ybest[i_sol] = ybest_arr[indmin[i_sol]]
                         uybest[i_sol] = uybest_arr[indmin[i_sol]]
                         indkeep[i_sol] = self.get_combination(
                             sens_arr, n_sens - n_remove, indmin[i_sol]
                         )
-        return n_sols, ybest, uybest, chi2obs, indkeep
+        return n_solutions, ybest, uybest, chi2obs, indkeep
 
     def print_input_lcss(self, x_arr, vx_arr2d, a_arr, a_arr2d, problim):
         print(
