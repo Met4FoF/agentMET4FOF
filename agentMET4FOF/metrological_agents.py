@@ -473,8 +473,8 @@ class RedundancyAgent(MetrologicalAgent):
         """a_arr2d : np.ndarray of float"""
 
     def agent_loop(self):
-        """
-        Model the agent's behaviour
+        """Model the agent's behaviour
+
         On state *Running* the agent will extract sample by sample the input data
         streams content and push it via invoking :py:func:`AgentMET4FOF.send_output`.
         """
@@ -485,7 +485,8 @@ class RedundancyAgent(MetrologicalAgent):
             n_sensors = len(key_list)
             if n_sensors != len(self.sensor_key_list):  # expected number of sensors
                 print(
-                    "Not all sensors were present in the buffer. Not evaluating the data."
+                    "Not all sensors were present in the buffer."
+                    "Not evaluating the data."
                 )
                 return 0
 
