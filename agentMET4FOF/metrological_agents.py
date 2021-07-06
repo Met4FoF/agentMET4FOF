@@ -1085,15 +1085,15 @@ class RedundancyAgent(MetrologicalAgent):
 
         Returns
         -------
-        n_solutions: int
+        n_solutions: int or np.ndarray of ints
             number of solutions
-        isconsist: bool
+        isconsist: bool or np.ndarray of bools
             indicator whether provided estimates are consistent in view of *problim*
-        ybest: float
+        ybest: float or np.ndarray of floats
             best estimate
-        uybest: float
+        uybest: float or np.ndarray of floats
             standard uncertainty of best estimate
-        chi2obs: float
+        chi2obs: float or np.ndarray of floats
             observed chi-squared value
         """
         print("start calc_lcss")
