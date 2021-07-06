@@ -367,9 +367,13 @@ class MetrologicalGeneratorAgent(MetrologicalAgent):
 
 
 class RedundancyAgent(MetrologicalAgent):
-    """
-    This is the main Redundancy Agent class. Main calculation types are :py:func:`lcs` and :py:func:`lcss`, as defined
-    in the module :mod:`redundancy1`.
+    """This is the main Redundancy Agent class
+
+    Main calculations are performed in :py:func:`calc_lcs` and :py:func:`calc_lcss`.
+
+    References
+    ----------
+    * Kok and Harris [Kok2020]_
     """
 
     def init_parameters(
