@@ -748,54 +748,6 @@ class RedundancyAgent(MetrologicalAgent):
 
         return isconsist, ybest, uybest, chi2obs
 
-    def calc_best_estimate(self, y_arr, vy_arr2d, problim):
-        """Calculate the best estimate for a set of estimates with associated uncertainty matrix,
-        and determine if the set of estimates are consistent using a provided limit probability.
-
-        Parameters
-        ----------
-        y_arr:      np.ndarray of shape (n)
-                    vector of estimates of a measurand Y
-        vy_arr2d:   np.ndarray of shape (n, n)
-                    uncertainty matrix associated with y_arr
-        problim:    float
-                    probability limit used for assessing the consistency of the estimates. Typically, problim equals 0.95.
-
-        Returns
-        -------
-        isconsist:  bool
-                    indicator whether provided estimates are consistent in view of *problim*
-        ybest:      float
-                    best estimate of measurand
-        uybest:     float
-                    uncertainty associated with *ybest*
-        chi2obs:    float
-                    observed value of chi-squared, used for consistency evaluation
-        """
-
-        print(f"cbe y_arr = {y_arr}")
-        n_estims = len(y_arr)
-
-        if n_estims == 1:
-            isconsist = True
-            ybest = y_arr[0]
-            uybest = np.sqrt(vy_arr2d[0, 0])
-            chi2obs = 0.0
-        else:
-            e_arr = np.ones(n_estims)
-            vyinve_arr = np.linalg.solve(vy_arr2d, e_arr)
-            uy2 = 1 / np.dot(e_arr, vyinve_arr)
-            uybest = np.sqrt(uy2)
-            ybest = np.dot(vyinve_arr, y_arr) * uy2
-            yred_arr = y_arr - ybest
-            chi2obs = np.dot(
-                yred_arr.transpose(), np.linalg.solve(vy_arr2d, yred_arr)
-            )  # check need for transpose
-            chi2lim = chi2.ppf(problim, n_estims - 1)
-            isconsist = chi2obs <= chi2lim
-
-        return isconsist, ybest, uybest, chi2obs
-
     def get_combination(self, val_arr, n_keep, indcomb):
         subsets = combinations(val_arr, n_keep)
         i_subset = -1
