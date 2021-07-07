@@ -9,8 +9,7 @@ __all__ = ["DataStreamMET4FOF"]
 
 
 class DataStreamMET4FOF:
-    """
-    Abstract class for creating datastreams.
+    """Abstract class for creating datastreams
 
     Data can be fetched sequentially using :func:`next_sample` or all at once
     :func:`all_samples`. This increments the internal sample index :attr:`_sample_idx`.
