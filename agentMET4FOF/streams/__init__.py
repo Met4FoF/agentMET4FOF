@@ -1,9 +1,4 @@
-"""This module ensures backwards compatibility of the module to package refactoring
-
-Up until version 0.8.1 we had several modules instead of the packages `agents` and
-`streams`. We have included this package to not break the previously needed import
-statements.
-"""
+"""All pre-assembled streams and base classes for custom datastreams"""
 import warnings
 
 from .base_streams import DataStreamMET4FOF
@@ -22,7 +17,6 @@ __all__ = [
     "MetrologicalSineGenerator",
     "SineGenerator",
 ]
-
 
 warnings.warn(
     "The package metrological_agents is deprecated and might be removed any "
