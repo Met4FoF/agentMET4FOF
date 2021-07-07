@@ -10,27 +10,28 @@ module :mod:`redundancy1`. These test functions are:
 """
 
 import numpy as np
-from agentMET4FOF.metrological_agents import RedundancyAgent
 from scipy.stats import multivariate_normal as mvn
+
+from agentMET4FOF.metrological_agents import RedundancyAgent
 
 
 def test_calc_consistent_estimates_no_corr():
-    """
-    Test function for calc_consistent_estimates_no_corr(), implementing two test cases.
-
-    """
-    # case with only one set of estimates
-    print("Testing case with single set of estimates.")
-    # input
+    # Two test cases comparing actual to expected output.
     y_arr = np.array([20.2, 21.3, 20.5])
     uy_arr = np.array([0.5, 0.8, 0.3])
     prob_lim = 0.05
-    # function
-    isconsist, ybest, uybest, chi2obs = RedundancyAgent.calc_consistent_estimates_no_corr(
-        y_arr, uy_arr, prob_lim
-    )
-    # print of output#initialize redundancy agent
-    RedundancyAgent.print_output_single(isconsist, ybest, uybest, chi2obs)
+
+    (
+        isconsist,
+        ybest,
+        uybest,
+        chi2obs,
+    ) = RedundancyAgent.calc_consistent_estimates_no_corr(y_arr, uy_arr, prob_lim)
+
+    assert isconsist == [True]
+    assert ybest == 20.502998750520614
+    assert uybest == 0.24489795918367346
+    assert chi2obs[0], 1.35985006
 
     # case with two sets of estimates
     print("Testing case with two sets of estimates.")
@@ -61,7 +62,9 @@ def test_calc_best_estimate():
     y_arr = np.array([20.2, 20.5, 20.8])
     vy_arr2d = np.array([[2, 1, 1], [1, 3, 1], [1, 1, 4]])
     problim = 0.95
-    isconsist, ybest, uybest, chi2obs = RedundancyAgent.calc_best_estimate(y_arr, vy_arr2d, problim)
+    isconsist, ybest, uybest, chi2obs = RedundancyAgent.calc_best_estimate(
+        y_arr, vy_arr2d, problim
+    )
     RedundancyAgent.print_output_single(isconsist, ybest, uybest, chi2obs)
 
     # Test case 1: check limit probability limprob
@@ -78,7 +81,9 @@ def test_calc_best_estimate():
     n_casekeep = 0
     for i_rep in range(n_reps):
         y_arr = ymean + mvn.rvs(mean=None, cov=vy_arr2d)
-        isconsist, ybest, uybest, chi2obs = RedundancyAgent.calc_best_estimate(y_arr, vy_arr2d, problim)
+        isconsist, ybest, uybest, chi2obs = RedundancyAgent.calc_best_estimate(
+            y_arr, vy_arr2d, problim
+        )
         if isconsist:
             n_casekeep += 1
     frackeep = n_casekeep / n_reps
@@ -104,7 +109,9 @@ def test_calc_lcs():
     problim = 0.95
     redagent = RedundancyAgent()  # Initialize redundancy agent
     # function
-    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(y_arr, vy_arr2d, problim)
+    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(
+        y_arr, vy_arr2d, problim
+    )
     # print output
     RedundancyAgent.print_output_lcs(n_sols, ybest, uybest, chi2obs, indkeep, y_arr)
 
@@ -115,7 +122,9 @@ def test_calc_lcs():
     vy_arr2d = np.identity(4) + np.ones((4, 4))
     problim = 0.95
     # function
-    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(y_arr, vy_arr2d, problim)
+    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(
+        y_arr, vy_arr2d, problim
+    )
     # print output
     RedundancyAgent.print_output_lcs(n_sols, ybest, uybest, chi2obs, indkeep, y_arr)
 
@@ -126,7 +135,9 @@ def test_calc_lcs():
     vy_arr2d = 5 * np.identity(4) + np.ones((4, 4))
     problim = 0.95
     # function
-    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(y_arr, vy_arr2d, problim)
+    n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(
+        y_arr, vy_arr2d, problim
+    )
     # print output
     RedundancyAgent.print_output_lcs(n_sols, ybest, uybest, chi2obs, indkeep, y_arr)
 
@@ -144,7 +155,9 @@ def test_calc_lcs():
     n_casekeep = 0
     for i_rep in range(n_reps):
         y_arr = ymean + mvn.rvs(mean=None, cov=vy_arr2d)
-        n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(y_arr, vy_arr2d, problim)
+        n_sols, ybest, uybest, chi2obs, indkeep = redagent.calc_lcs(
+            y_arr, vy_arr2d, problim
+        )
         if indkeep.shape[-1] == len(y_arr):
             n_casekeep += 1
     frackeep = n_casekeep / n_reps
@@ -179,7 +192,9 @@ def test_calc_lcss():
         a_arr, a_arr2d, x_arr, vx_arr2d, problim
     )
     # print output
-    RedundancyAgent.print_output_lcss(n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d)
+    RedundancyAgent.print_output_lcss(
+        n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
+    )
 
     # Test case 1:
     print(
@@ -210,7 +225,9 @@ def test_calc_lcss():
         a_arr, a_arr2d, x_arr, vx_arr2d, problim
     )
     # print output
-    RedundancyAgent.print_output_lcss(n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d)
+    RedundancyAgent.print_output_lcss(
+        n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
+    )
 
     # Test case 2 with two optimal solutions
     print("TEST CASE 2")
@@ -232,7 +249,9 @@ def test_calc_lcss():
         a_arr, a_arr2d, x_arr, vx_arr2d, problim
     )
     # print output
-    RedundancyAgent.print_output_lcss(n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d)
+    RedundancyAgent.print_output_lcss(
+        n_sols, ybest, uybest, chi2obs, indkeep, x_arr, a_arr2d
+    )
 
     # Test case 3: check limit probability limprob
     print("TEST CASE 3")
