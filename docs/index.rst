@@ -24,7 +24,8 @@ agentMET4FOF - Metrological Agent-based system
    agentMET4FOF_tutorials/tutorial_5_coalition.ipynb
    agentMET4FOF_tutorials/tutorial_6_mesa_backend.ipynb
    agentMET4FOF_tutorials/tutorial_7_generic_metrological_agent.ipynb
-
+   agentMET4FOF_tutorials/redundancy/redundancy_agent_four_signals.ipynb
+   agentMET4FOF_tutorials/redundancy/redundancy_agent_one_signal.ipynb
 
 .. toctree::
    :maxdepth: 1
