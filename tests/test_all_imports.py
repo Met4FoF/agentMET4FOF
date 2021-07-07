@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_legacy_imports():
     from agentMET4FOF import agents, streams
     from agentMET4FOF.agents import (
