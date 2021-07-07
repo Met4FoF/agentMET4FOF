@@ -19,6 +19,7 @@ from ..utils.buffer import AgentBuffer
 
 __all__ = [
     "AgentMET4FOF",
+    "DataStreamAgent",
     "MonitorAgent",
 ]
 
