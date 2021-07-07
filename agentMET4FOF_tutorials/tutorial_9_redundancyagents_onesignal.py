@@ -18,7 +18,7 @@ def demonstrate_redundancy_agent_onesignal():
     At the start of the main module all important parameters are defined. Then the agents are defined and the network
     is started. The network and the calculated results can be monitored in a browser at the address http://127.0.0.1:8050/.
     """
-    # parameters
+    #For detailed descriptions of the parameters please refer to the docstrings of the respective methods
     batch_size = 10
     n_pr = batch_size
     fsam = 40
