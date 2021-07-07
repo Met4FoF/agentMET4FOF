@@ -9,8 +9,8 @@ from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import NSProxy, run_agent, run_nameserver
 
-from .base_agents import AgentMET4FOF
-from ..dashboard.default_network_stylesheet import default_agent_network_stylesheet
+from .agents.base_agents import AgentMET4FOF
+from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
 
 __all__ = ["AgentNetwork"]
 
@@ -528,7 +528,7 @@ class AgentNetwork:
         # handle instantiating the dashboard
         # if dashboard_modules is False, the dashboard will not be launched
         if dashboard_modules is not False:
-            from ..dashboard.Dashboard_agt_net import Dashboard_agt_net
+            from .dashboard.Dashboard_agt_net import Dashboard_agt_net
 
             # Initialize common dashboard parameters for both types of dashboards
             # corresponding to different backends.
@@ -546,11 +546,11 @@ class AgentNetwork:
 
             # Initialize dashboard process/thread.
             if self.backend == "osbrain":
-                from ..dashboard.Dashboard import AgentDashboardThread
+                from .dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             elif self.backend == "mesa":
-                from ..dashboard.Dashboard import AgentDashboardThread
+                from .dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
             self.dashboard_proc.start()
