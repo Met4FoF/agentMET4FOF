@@ -622,12 +622,13 @@ class RedundancyAgent(MetrologicalAgent):
         -------
         isconsist_arr : bool array of shape (n_rows)
             indicates for each row if the n_estimates are consistent or not
-        ybest_arr : np.ndarray of shape (n_rows)
+        ybest_arr : float or np.ndarray of float in shape (n_rows)
             contains the best estimate for each row of individual estimates
-        uybest_arr : np.ndarray of shape (n_rows)
+        uybest_arr : float or np.ndarray of float in shape (n_rows)
             contains the uncertainty associated with each best estimate for each row
             of *y_arr2d*
-        chi2obs_arr : observed chi-squared value for each row
+        chi2obs_arr : np.ndarray of float in shape (n_rows)
+            observed chi-squared value for each row
         """
 
         if len(y_arr2d.shape) > 1:
