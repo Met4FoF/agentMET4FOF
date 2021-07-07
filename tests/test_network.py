@@ -1,6 +1,6 @@
 import pytest
 
-from agentMET4FOF.agents.network import AgentNetwork
+from agentMET4FOF.network import AgentNetwork
 from tests.conftest import test_timeout
 
 
