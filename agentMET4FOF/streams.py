@@ -410,7 +410,7 @@ class CosineGenerator(DataStreamMET4FOF):
     sfreq : int
         sampling frequency which determines the time step when :meth:`.next_sample`
         is called
-    F : int
+    cosine_freq : int
         frequency of wave function
     """
     def __init__(self, sfreq = 500, cosine_freq=5):
