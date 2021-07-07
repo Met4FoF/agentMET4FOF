@@ -1,6 +1,6 @@
 :github_url: https://github.com/Met4FoF/agentMET4FOF
 
-agentMET4FOF - Metrological Agent-based system
+agentMET4FOF - Metrological agent-based system
 ==============================================
 
 .. toctree::
@@ -12,6 +12,7 @@ agentMET4FOF - Metrological Agent-based system
    UMLs
    CONTRIBUTING
    CHANGELOG
+
 
 .. toctree::
    :maxdepth: 1
@@ -32,9 +33,9 @@ agentMET4FOF - Metrological Agent-based system
 
    agentMET4FOF_agents
    agentMET4FOF_streams
-   agentMET4FOF_metrological_agents
-   agentMET4FOF_metrological_streams
    agentMET4FOF_dashboard
+   agentMET4FOF_network
+   agentMET4FOF_utilities
 
 Indices and tables
 ==================
