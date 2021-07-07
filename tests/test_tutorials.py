@@ -16,6 +16,14 @@ from agentMET4FOF_tutorials.tutorial_7_generic_metrological_agent import (
     demonstrate_metrological_stream as tut7,
 )
 
+from agentMET4FOF_tutorials.tutorial_8_redundancy_agent_four_signals import (
+    demonstrate_redundancy_agent_four_signals as tut8,
+)
+
+from agentMET4FOF_tutorials.tutorial_9_redundancy_agent_one_signal import (
+    demonstrate_redundancy_agent_onesignal as tut9,
+)
+
 
 def test_tutorial_1():
     """Test executability of tutorial_1_generator_agent."""
@@ -50,3 +58,13 @@ def test_tutorial_6():
 def test_tutorial_7():
     """Test executability of tutorial_7_generic_metrological_agent.py."""
     tut7().shutdown()
+
+
+def test_tutorial_8():
+    """Test executability of tutorial_8_redundancy_agent_four_signals.py."""
+    tut8().shutdown()
+
+
+def test_tutorial_9():
+    """Test executability of tutorial_9_redundancy_agent_one_signal.py."""
+    tut9().shutdown()
