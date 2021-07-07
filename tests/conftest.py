@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 
-from agentMET4FOF.agents import AgentMET4FOF
-from agentMET4FOF.agents.network import AgentNetwork
+from agentMET4FOF.agents.base_agents import AgentMET4FOF
+from agentMET4FOF.network import AgentNetwork
 
 # Set time to wait for before agents should have done their jobs in networks.
 test_timeout = 20
