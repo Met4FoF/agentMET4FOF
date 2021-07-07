@@ -14,8 +14,8 @@ from osbrain import Agent as osBrainAgent
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
 
-from .utils import AgentBuffer
 from ..streams.base_streams import DataStreamMET4FOF
+from ..utils.buffer import AgentBuffer
 
 __all__ = [
     "AgentMET4FOF",
@@ -1063,5 +1063,3 @@ class MonitorAgent(AgentMET4FOF):
         super(MonitorAgent, self).reset()
         del self.plots
         self.plots = {}
-
-
