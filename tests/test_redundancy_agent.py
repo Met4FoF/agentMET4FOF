@@ -4,8 +4,7 @@ from scipy.stats import multivariate_normal as mvn
 from agentMET4FOF.metrological_agents import RedundancyAgent
 
 
-def test_calc_consistent_estimates_no_corr():
-    # Two test cases comparing actual to expected output.
+def test_calc_consistent_estimates_no_corr_with_one_elemental_example():
     y_arr = np.array([20.2, 21.3, 20.5])
     uy_arr = np.array([0.5, 0.8, 0.3])
     prob_lim = 0.05
@@ -22,13 +21,12 @@ def test_calc_consistent_estimates_no_corr():
     assert uybest == 0.24489795918367346
     assert chi2obs[0], 1.35985006
 
-    # case with two sets of estimates
-    print("Testing case with two sets of estimates.")
-    # input
+
+def test_calc_consistent_estimates_no_corr_with_two_elemental_example():
     y_arr = np.array([[20.2, 21.3, 20.5], [19.5, 19.7, 20.3]])
     uy_arr = np.array([[0.5, 0.8, 0.3], [0.1, 0.2, 0.3]])
     prob_lim = 0.05
-    # function
+
     (
         isconsist_arr,
         ybest_arr,
