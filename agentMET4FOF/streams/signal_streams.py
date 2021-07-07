@@ -59,7 +59,7 @@ class CosineGenerator(DataStreamMET4FOF):
     sfreq : int
         sampling frequency which determines the time step when :meth:`.next_sample`
         is called
-    F : int
+    cosine_freq : int
         frequency of wave function
     """
 
