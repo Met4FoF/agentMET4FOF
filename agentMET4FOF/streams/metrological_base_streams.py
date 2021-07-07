@@ -4,9 +4,9 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 
-__all__ = ["MetrologicalDataStreamMET4FOF"]
-
 from .base_streams import DataStreamMET4FOF
+
+__all__ = ["MetrologicalDataStreamMET4FOF"]
 
 
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
