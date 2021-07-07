@@ -1,14 +1,3 @@
-"""
-The module :mod:`test_MFred.py` calls all test functions which are implemented in the
-module :mod:`redundancy1`. These test functions are:
-
-* :func:`test_calc_consistent_estimates_no_corr`
-* :func:`test_calc_best_estimate`
-* :func:`test_calc_lcs`
-* :func:`test_calc_lcss`
-
-"""
-
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
 
