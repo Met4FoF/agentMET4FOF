@@ -32,8 +32,8 @@ def test_signal_agents_import():
     )
 
 
-def test_agents_utils_imports():
-    from agentMET4FOF.agents.utils import (
+def test_agents_buffer_imports():
+    from agentMET4FOF.utils.buffer import (
         AgentBuffer,
         MetrologicalAgentBuffer,
     )
