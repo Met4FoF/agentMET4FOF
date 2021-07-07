@@ -40,7 +40,7 @@ def test_agents_buffer_imports():
 
 
 def test_agents_network_import():
-    from agentMET4FOF.agents.network import (
+    from agentMET4FOF.network import (
         AgentNetwork,
     )
 
