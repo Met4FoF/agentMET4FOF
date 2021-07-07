@@ -1,3 +1,13 @@
+"""This module contains the buffer classes utilized by the agents
+
+It contains the following classes:
+
+- :class:`AgentBuffer`: Buffer class which is instantiated in every agent to store data
+  incrementally
+- :class:`MetrologicalAgentBuffer`: Buffer class which is instantiated in every
+  metrological agent to store data
+"""
+
 import copy
 from typing import Dict, Iterable, List, Optional, Sized, Tuple, Union
 
