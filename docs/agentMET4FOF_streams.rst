@@ -23,7 +23,7 @@ Metrologically enabled base streams
 
 
 Metrologically enabled signal streams
-------------------------------------
+-------------------------------------
 .. automodule:: agentMET4FOF.streams.metrological_signal_streams
     :members:
     :private-members:
