@@ -43,11 +43,12 @@ Indices and search:
 References:
 -----------
 
-.. [Ban2019]  Bang X. Yong, A. Brintrup
-              Multi Agent System for Machine Learning Under Uncertainty in
-              Cyber Physical Manufacturing System,
-              9th Workshop on Service Oriented, Holonic and Multi-agent
-              Manufacturing Systems for Industry of the Future
+.. [Bang2019]  Bang X. Yong, A. Brintrup
+               Multi Agent System for Machine Learning Under Uncertainty in
+               Cyber Physical Manufacturing System,
+               9th Workshop on Service Oriented, Holonic and Multi-agent
+               Manufacturing Systems for Industry of the Future
+
 .. [Kok2020]  G. Kok, P. Harris
               Uncertainty SEvaluation for Metrologically
               Redundant Industrial Sensor Networks,
