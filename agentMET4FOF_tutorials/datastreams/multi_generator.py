@@ -21,8 +21,8 @@ class SineGenerator(DataStreamMET4FOF):
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
 
     def sine_wave_function(self, time, F=50):
-        amplitude = np.sin(2*np.pi*F*time)
-        return amplitude
+        value = np.sin(2*np.pi*F*time)
+        return value
 
 class SawToothGenerator(DataStreamMET4FOF):
     """
@@ -38,8 +38,8 @@ class SawToothGenerator(DataStreamMET4FOF):
         self.set_generator_function(generator_function=self.sawtooth_wave_function, sfreq=sfreq, F=F)
 
     def sawtooth_wave_function(self, time, F):
-        amplitude = signal.sawtooth(2 * np.pi * F * time)
-        return amplitude
+        value = signal.sawtooth(2 * np.pi * F * time)
+        return value
 
 class SquareGenerator(DataStreamMET4FOF):
     """
@@ -55,8 +55,8 @@ class SquareGenerator(DataStreamMET4FOF):
         self.set_generator_function(generator_function=self.square_wave_function, sfreq=sfreq, F=F)
 
     def square_wave_function(self, time, F):
-        amplitude = signal.square(2 * np.pi * F * time)
-        return amplitude
+        value = signal.square(2 * np.pi * F * time)
+        return value
 
 class MultiGeneratorAgent(AgentMET4FOF):
     """

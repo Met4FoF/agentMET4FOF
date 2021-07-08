@@ -59,17 +59,17 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
         Parameters
         ----------
-        value_unc : float, optional (defaults to 0)
+        value_unc : float, optional (defaults to 0.0)
             standard uncertainties associated with values
-        time_unc : float, optional (defaults to 0)
+        time_unc : float, optional (defaults to 0.0)
             standard uncertainties associated with timestamps
-        exp_unc : float, optional (defaults to None)
-            expanded uncertainties associated with values
-        cov_factor : float, optional (defaults to 1)
-            coverage factor associated with the expanded uncertainty
-
-        If exp_unc and cov_factor are given explicit values, they override value_unc
-        according to value_unc = exp_unc / cov_factor
+        exp_unc : float, optional
+            expanded uncertainties associated with values. If ``exp_unc`` is given
+            explicitly, it overrides ``value_unc`` according to ``value_unc = exp_unc
+            / cov_factor``.
+        cov_factor : float, optional (defaults to 1.0)
+            coverage factor associated with the expanded uncertainty, only used,
+            if ``exp_unc`` is specified
         """
         super().__init__()
         self._uncertainty_parameters: Dict
@@ -135,7 +135,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         if uncertainty_generator is None:
             warnings.warn(
                 "No uncertainty generator function specified. Setting to default ("
-                "constant)."
+                "value_unc and time_unc each constant)."
             )
             self._generator_function_unc = self._default_uncertainty_generator
         else:

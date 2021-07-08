@@ -23,9 +23,19 @@ class SineGenerator(DataStreamMET4FOF):
         is called
     sine_freq : float
         frequency of wave function
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.0.
     """
 
-    def __init__(self, sfreq=500, sine_freq=50):
+    def __init__(
+        self,
+        sfreq=500,
+        sine_freq=50,
+        amplitude: float = 1.0,
+        initial_phase: float = 0.0,
+    ):
         super().__init__()
         self.set_metadata(
             "SineGenerator",
@@ -36,12 +46,16 @@ class SineGenerator(DataStreamMET4FOF):
             "Simple sine wave generator",
         )
         self.set_generator_function(
-            generator_function=self.sine_wave_function, sfreq=sfreq, sine_freq=sine_freq
+            generator_function=self.sine_wave_function,
+            sfreq=sfreq,
+            sine_freq=sine_freq,
+            amplitude=amplitude,
+            initial_phase=initial_phase,
         )
 
-    def sine_wave_function(self, time, sine_freq):
+    def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator"""
-        value = np.sin(2 * np.pi * sine_freq * time)
+        value = amplitude * np.sin(2 * np.pi * sine_freq * time + initial_phase)
         return value
 
 
@@ -61,9 +75,15 @@ class CosineGenerator(DataStreamMET4FOF):
         is called
     cosine_freq : int
         frequency of wave function
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.0.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.0.
     """
 
-    def __init__(self, sfreq=500, cosine_freq=5):
+    def __init__(
+        self, sfreq=500, cosine_freq=50, amplitude: float = 1, initial_phase: float = 0
+    ):
         super().__init__()
         self.set_metadata(
             "CosineGenerator",
@@ -77,9 +97,11 @@ class CosineGenerator(DataStreamMET4FOF):
             generator_function=self.cosine_wave_function,
             sfreq=sfreq,
             cosine_freq=cosine_freq,
+            amplitude=amplitude,
+            initial_phase=initial_phase,
         )
 
-    def cosine_wave_function(self, time, cosine_freq=50):
+    def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
         """A simple cosine wave generator"""
-        value = np.cos(2 * np.pi * cosine_freq * time)
+        value = amplitude * np.cos(2 * np.pi * cosine_freq * time + initial_phase)
         return value

@@ -1,6 +1,6 @@
 from typing import Dict, Union
 
-from plotly import graph_objs as go
+import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
 
@@ -10,11 +10,6 @@ __all__ = ["MetrologicalAgent", "MetrologicalMonitorAgent"]
 
 
 class MetrologicalAgent(AgentMET4FOF):
-    # dict like {
-    #     <from>: {
-    #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata": MetaData(**kwargs).metadata,
-    #     }
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
     """Input dictionary of all incoming data including metadata::
 
@@ -26,11 +21,6 @@ class MetrologicalAgent(AgentMET4FOF):
     """
     _input_data_maxlen: int
 
-    # dict like {
-    #     <channel> : {
-    #         "buffer" : TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata" : MetaData(**kwargs)
-    #     }
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
     """Output dictionary of all outgoing data including metadata::
 
@@ -153,7 +143,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                 }
             self.buffer_store(
                 agent_from=message["from"],
-                data={"data": message["data"], "metadata": message.get("metadata")},
+                data={"data": message["data"], "metadata": message["metadata"]},
             )
         elif message["channel"] == "plot":
             self.update_plot_memory(message)

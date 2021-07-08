@@ -2,6 +2,7 @@ from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import DataStreamMET4FOF
 import numpy as np
 
+
 class SineGenerator(DataStreamMET4FOF):
     """
     Built-in class of sine wave generator.
@@ -11,14 +12,25 @@ class SineGenerator(DataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+
+    def __init__(self, sfreq=500, F=5):
         super().__init__()
-        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
+        self.set_metadata(
+            "SineGenerator",
+            "time",
+            "s",
+            ("Voltage"),
+            ("V"),
+            "Simple sine wave generator",
+        )
+        self.set_generator_function(
+            generator_function=self.sine_wave_function, sfreq=sfreq, F=F
+        )
 
     def sine_wave_function(self, time, F=50):
-        amplitude = np.sin(2*np.pi*F*time)
-        return amplitude
+        value = np.sin(2 * np.pi * F * time)
+        return value
+
 
 class SineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal

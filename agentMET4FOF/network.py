@@ -469,9 +469,10 @@ class AgentNetwork:
         log_filename: str
             Name of log file, acceptable csv format. It will be saved locally,
             in the same folder as the python script in which this AgentNetwork is
-            instantiated on. If set to None or False, then will not save in a file.
-            Note that the overhead of updating the log file can be huge, especially
-            for high number of agents and large data transmission.
+            instantiated on.
+            If set to None or False, then will not save in a file. Note that the
+            overhead of updating the log file can be huge, especially for high
+            number of agents and large data transmission.
         dashboard_modules : list of modules , modules or bool
             Accepts list of modules which contains the AgentMET4FOF and
             DataStreamMET4FOF derived classes. If set to True, will initiate the
@@ -853,17 +854,19 @@ class AgentNetwork:
 
         Parameters
         ----------
-        name str : (Optional) Unique name of agent. here cannot be more than one agent
-            with the same name. Defaults to the agent's class name.
-        agentType AgentMET4FOF : (Optional) Agent class to be instantiated in the
-            network. Defaults to :py:class:`AgentMET4FOF`
-        log_mode bool : (Optional) Determines if messages will be logged to background
-            Logger Agent. Defaults to `True`.
+        name : str, optional
+            Unique name of agent, defaults to the agent's class name.
+        agentType : AgentMET4FOF, optional
+            Agent class to be instantiated in the network. Defaults to
+            :py:class:`AgentMET4FOF`
+        log_mode : bool, optional
+            Determines if messages will be logged to background Logger Agent.
+            Defaults to ``True``.
 
         Returns
         -------
-        AgentMET4FOF : Newly instantiated agent
-
+        AgentMET4FOF
+            Newly instantiated agent
         """
 
         if ip_addr is None:

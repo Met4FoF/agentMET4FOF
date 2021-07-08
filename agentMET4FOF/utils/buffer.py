@@ -385,7 +385,7 @@ class MetrologicalAgentBuffer(AgentBuffer):
 
         Parameters
         ----------
-        single_data : iterable of iterables (list, tuple, np.ndarrray) with shape (N, M)
+        single_data : iterable of iterables (list, tuple, np.ndarray) with shape (N, M)
 
             * M==2 (pairs): assumed to be like (time, value)
             * M==3 (triple): assumed to be like (time, value, value_unc)

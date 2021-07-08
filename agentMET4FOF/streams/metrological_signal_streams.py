@@ -20,7 +20,11 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         Sampling frequency which determines the time step when :meth:`.next_sample` is
         called. Defaults to 500.
     sine_freq : float, optional
-        Frequency of the wave function. Defaults to 50.
+        Frequency of the wave function. Defaults to 50.0.
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.0.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.0.
     device_id : str, optional
         Name of the represented generator. Defaults to 'SineGenerator'.
     time_name : str, optional
@@ -39,13 +43,15 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
     value_unc : iterable of floats or float, optional
         standard uncertainty(ies) of the quantity values. Defaults to 0.1.
     time_unc : iterable of floats or float, optional
-        standard uncertainty of the time stamps. Defaults to 0.
+        standard uncertainty of the time stamps. Defaults to 0.0.
     """
 
     def __init__(
         self,
         sfreq: int = 500,
         sine_freq: float = 50,
+        amplitude: float = 1.0,
+        initial_phase: float = 0.0,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
@@ -73,11 +79,15 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             uncertainty_generator=self._default_uncertainty_generator,
             sfreq=sfreq,
             sine_freq=sine_freq,
+            amplitude=amplitude,
+            initial_phase=initial_phase,
         )
 
-    def _sine_wave_function(self, time, sine_freq):
+    def _sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator"""
-        value = np.sin(np.multiply(2 * np.pi * sine_freq, time))
+        value = amplitude * np.sin(
+            np.multiply(2 * np.pi * sine_freq, time) + initial_phase
+        )
         value += np.random.normal(0, self.value_unc, value.shape)
         return value
 
@@ -95,9 +105,9 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
         constant intercept of the signal
     freq_arr : np.ndarray of float
         array with frequencies of components included in the signal
-    ampl_arr : np.ndarray of float
+    amplitude_arr : np.ndarray of float
         array with amplitudes of components included in the signal
-    phase_ini_arr : np.ndarray of float
+    initial_phase_arr : np.ndarray of float
         array with initial phases of components included in the signal
     noisy : bool
         boolean to determine whether the generated signal should be noisy or "clean"
@@ -108,8 +118,8 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
         self,
         sfreq: int = 500,
         freq_arr: np.array = np.array([50]),
-        ampl_arr: np.array = np.array([1]),
-        phase_ini_arr: np.array = np.array([0]),
+        amplitude_arr: np.array = np.array([1.0]),
+        initial_phase_arr: np.array = np.array([0.0]),
         intercept: float = 0,
         device_id: str = "MultiWaveDataGenerator",
         time_name: str = "time",
@@ -139,20 +149,22 @@ class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
             sfreq=sfreq,
             intercept=intercept,
             freq_arr=freq_arr,
-            ampl_arr=ampl_arr,
-            phase_ini_arr=phase_ini_arr,
+            amplitude_arr=amplitude_arr,
+            initial_phase_arr=initial_phase_arr,
             noisy=noisy,
         )
 
     def _multi_wave_function(
-        self, time, intercept, freq_arr, ampl_arr, phase_ini_arr, noisy
+        self, time, intercept, freq_arr, amplitude_arr, initial_phase_arr, noisy
     ):
 
         value_arr = intercept
         if noisy:
             value_arr += self.value_unc / 2 * norm.rvs(size=time.shape)
 
-        for freq, ampl, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
-            value_arr += ampl * np.cos(2 * np.pi * freq * time + phase_ini)
+        for freq, amplitude, initial_phase in zip(
+            freq_arr, amplitude_arr, initial_phase_arr
+        ):
+            value_arr += amplitude * np.cos(2 * np.pi * freq * time + initial_phase)
 
         return value_arr

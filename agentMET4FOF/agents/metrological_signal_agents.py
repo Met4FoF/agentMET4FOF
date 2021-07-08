@@ -8,8 +8,9 @@ __all__ = ["MetrologicalGeneratorAgent"]
 class MetrologicalGeneratorAgent(MetrologicalAgent):
     """An agent streaming a specified signal
 
-    Takes samples from an instance of :py:class:`MetrologicalDataStreamMET4FOF` with sampling frequency `sfreq` and
-    signal frequency `sine_freq` and pushes them sample by sample to connected agents via its output channel.
+    Takes samples from an instance of :py:class:`MetrologicalDataStreamMET4FOF` with
+    sampling frequency ``sfreq`` and signal frequency ``sine_freq`` and pushes them
+    sample by sample to connected agents via its output channel.
     """
 
     # The datatype of the stream will be MetrologicalSineGenerator.
@@ -18,14 +19,15 @@ class MetrologicalGeneratorAgent(MetrologicalAgent):
     def init_parameters(
         self,
         signal: MetrologicalDataStreamMET4FOF = MetrologicalSineGenerator(),
-        **kwargs
+        **kwargs,
     ):
         """Initialize the input data stream
 
         Parameters
         ----------
-        signal : MetrologicalDataStreamMET4FOF (defaults to :py:class:`MetrologicalSineGenerator`)
-            the underlying signal for the generator
+        signal : MetrologicalDataStreamMET4FOF
+            the underlying signal for the generator (defaults to
+            :py:class:`MetrologicalSineGenerator`)
         """
         self._stream = signal
         super().init_parameters()
