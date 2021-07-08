@@ -134,7 +134,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         if uncertainty_generator is None:
             warnings.warn(
                 "No uncertainty generator function specified. Setting to default ("
-                "constant)."
+                "value_unc = constant, time_unc = 0)."
             )
             self._generator_function_unc = self._default_uncertainty_generator
         else:
@@ -216,6 +216,10 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         called. Defaults to 500.
     sine_freq : float, optional
         Frequency of the wave function. Defaults to 50.
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.
     device_id : str, optional
         Name of the represented generator. Defaults to 'SineGenerator'.
     time_name : str, optional
@@ -241,6 +245,8 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
         self,
         sfreq: int = 500,
         sine_freq: float = 50,
+        ampl: float = 1,
+        phase_ini: float = 0,
         device_id: str = "SineGenerator",
         time_name: str = "time",
         time_unit: str = "s",
@@ -268,18 +274,20 @@ class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
             uncertainty_generator=self._default_uncertainty_generator,
             sfreq=sfreq,
             sine_freq=sine_freq,
+            ampl=ampl,
+            phase_ini=phase_ini
         )
 
-    def _sine_wave_function(self, time, sine_freq):
+    def _sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator"""
-        value = np.sin(np.multiply(2 * np.pi * sine_freq, time))
+        value = amplitude * np.sin(np.multiply(2 * np.pi * sine_freq, time) + initial_phase)
         value += np.random.normal(0, self.value_unc, value.shape)
         return value
 
 
 class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
-    """Class to generate data as a sum of cosine wave and additional Gaussian noise.
-    
+    """
+    Class to generate data as a sum of cosine wave and additional Gaussian noise.
     Values with associated uncertainty are returned.
 
     Parameters
