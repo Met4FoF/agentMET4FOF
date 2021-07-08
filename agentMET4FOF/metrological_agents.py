@@ -1,25 +1,24 @@
+from itertools import combinations
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
-from time_series_buffer import TimeSeriesBuffer
-from time_series_metadata.scheme import MetaData
-from itertools import combinations
 from scipy.special import comb
 from scipy.stats import chi2
+from time_series_buffer import TimeSeriesBuffer
+from time_series_metadata.scheme import MetaData
 
 from .agents import AgentBuffer, AgentMET4FOF
+from .exceptions import (
+    ColumnNotZeroError,
+    SensorsNotLinearlyIndependentError,
+    SystemMatrixNotReducibleError,
+)
 from .metrological_streams import (
     MetrologicalDataStreamMET4FOF,
     MetrologicalSineGenerator,
 )
-from .exceptions import (
-    ColumnNotZeroError,
-    SystemMatrixNotReducibleError,
-    SensorsNotLinearlyIndependentError,
-)
-
 
 
 class MetrologicalAgent(AgentMET4FOF):
