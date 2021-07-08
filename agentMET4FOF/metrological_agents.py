@@ -371,16 +371,37 @@ class MetrologicalGeneratorAgent(MetrologicalAgent):
 class RedundancyAgent(MetrologicalAgent):
     """This is the main Redundancy Agent class
 
+    `Redundancy` means that there is more than one way to derive the value of the
+    measurand Y from the values of the sensor data X_i. Following main cases are
+    considered in the agent:
+
+    * Redundant measurement of the measurand Y by independent sensors directly
+      measuring Y
+    * Redundant measurement of the measurand Y by correlated sensors directly
+      measuring Y
+    * Redundant measurement of the measurand Y by correlated sensors X_i indirectly
+      measuring Y, with a linear relationship y = a + A * x between the vector x of
+      sensor values and the vector y containing the various (redundant) estimates of
+      the measurand Y, where a is a vector and A a matrix both of appropriate size.
+
     Main calculations are performed in :py:func:`calc_lcs` and :py:func:`calc_lcss`.
     Usage of the :class:`RedundancyAgent` is relatively straightforward. Note that
     all static functions have `their own test functions
     <https://github.com/Met4FoF/agentMET4FOF/blob/develop/tests/
-    test_redundancy_agent.py/>`_ illustrating their usage. Please refer to other
-    sections in this documentation for more information.
+    test_redundancy_agent.py/>`_ illustrating their usage. Details of the different
+    methods are presented in their respective docstrings.
+
+    Please refer to other sections in this documentation for more information. A
+    scientific publication explaining the ideas behind this agent can be found in [
+    Kok2020_1]_. Related work can be found in [Kok2020_2]_.
+
+    The usage of the Redundancy Agent is illustrated with two examples contained in
+    :ref:`two tutorials <redundancy_tutorials>`.
 
     References
     ----------
-    * Kok and Harris [Kok2020]_
+    * Kok and Harris [Kok2020_1]_
+    * Kok and Harris [Kok2020_2]_
     """
 
     metadata: MetaData

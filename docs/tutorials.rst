@@ -12,6 +12,8 @@ Learning how to use the agents
    agentMET4FOF_tutorials/tutorial_6_mesa_backend.ipynb
    agentMET4FOF_tutorials/tutorial_7_generic_metrological_agent.ipynb
 
+.. _redundancy_tutorials:
+
 Working with signals carrying redundant information
 ===================================================
 
