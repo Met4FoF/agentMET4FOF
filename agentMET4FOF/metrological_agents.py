@@ -372,6 +372,11 @@ class RedundancyAgent(MetrologicalAgent):
     """This is the main Redundancy Agent class
 
     Main calculations are performed in :py:func:`calc_lcs` and :py:func:`calc_lcss`.
+    Usage of the :class:`RedundancyAgent` is relatively straightforward. Note that
+    all static functions have `their own test functions
+    <https://github.com/Met4FoF/agentMET4FOF/blob/develop/tests/
+    test_redundancy_agent.py/>`_ illustrating their usage. Please refer to other
+    sections in this documentation for more information.
 
     References
     ----------
