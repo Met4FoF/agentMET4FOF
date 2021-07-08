@@ -21,7 +21,7 @@ class AgentDashboard:
     def __init__(self, dashboard_modules=[], dashboard_layouts=[],
                  dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",
                  port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,
-                 agent_port=None):
+                 agent_port=None, network_stylesheet=[], hide_default_edge=True, **kwargs):
         """
         Parameters
         ----------
@@ -63,7 +63,7 @@ class AgentDashboard:
                 self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
                 self.external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
                 self.app = self.init_app_layout(
-                    update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts)
+                    update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts, network_stylesheet=network_stylesheet, hide_default_edge=hide_default_edge, **kwargs)
                 self.app.dashboard_ctrl = _Dashboard_Control(modules=dashboard_modules,agent_ip_addr=agent_ip_addr,agent_port=agent_port,agentNetwork=agentNetwork)
                 # Spawn a very simple WSGI server.
                 self._server = make_server(host=self.ip_addr, port=self.port, app=self.app.server)
@@ -88,7 +88,9 @@ class AgentDashboard:
             )
             self._server.serve_forever()
 
-    def init_app_layout(self,update_interval_seconds=3, max_monitors=10, dashboard_layouts=[]):
+    def init_app_layout(self,update_interval_seconds=3, max_monitors=10,
+                        dashboard_layouts=[],
+                        network_stylesheet=[], hide_default_edge=True, **kwargs):
         """
         Initialises the overall dash app "layout" which has two sub-pages (Agent network and ML experiment)
 
@@ -109,8 +111,13 @@ class AgentDashboard:
                         external_stylesheets=self.external_stylesheets,
                         external_scripts=self.external_scripts
                         )
+        app.network_stylesheet = network_stylesheet
         app.update_interval_seconds = update_interval_seconds
         app.num_monitors = max_monitors
+        app.hide_default_edge = hide_default_edge
+
+        for key in kwargs.keys():
+            setattr(app,key,kwargs[key])
 
         #initialise dashboard layout objects
         self.dashboard_layouts = [dashboard_layout(app) for dashboard_layout in dashboard_layouts]
@@ -179,7 +186,8 @@ class AgentDashboardThread(AgentDashboard, Thread):
             port=8050,
             agentNetwork="127.0.0.1",
             agent_ip_addr=3333,
-            agent_port=None
+            agent_port=None,
+            **kwargs
     ):
         super(AgentDashboardThread, self).__init__(
             dashboard_modules=dashboard_modules,
@@ -190,7 +198,8 @@ class AgentDashboardThread(AgentDashboard, Thread):
             port=port,
             agentNetwork=agentNetwork,
             agent_ip_addr=agent_ip_addr,
-            agent_port=agent_port
+            agent_port=agent_port,
+            **kwargs
         )
         # Make sure, we are actually able to stop the server running from outside by
         # calling terminate() later.

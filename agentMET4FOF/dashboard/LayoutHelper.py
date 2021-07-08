@@ -1,6 +1,7 @@
 from typing import Dict, Union
 
 import dash_html_components as html
+import dash_core_components as dcc
 import dash_table
 import networkx as nx
 import numpy as np
@@ -24,10 +25,25 @@ def create_nodes_cytoscape(agent_graph):
 
     return new_elements
 
-def create_edges_cytoscape(edges):
+def create_edges_cytoscape(edges, hide_default_edge=True):
+    """
+    Converts data of network edges into a form accepted by cytoscape network generation in the dashboard.
+
+    Parameters
+    ----------
+    edges : list
+        List of edges where index 0 and 1 are names of sources and targets respectively. Index 2 is a dictionary with key of 'channel'.
+
+    hide_default_edge : boolean
+        Set to hide 'default' channel display or not.
+    """
+
     new_elements =[]
     for edge in edges:
-        new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        if hide_default_edge and isinstance(edge[2]['channel'], str) and edge[2]['channel'] == "default":
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        else:
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1], 'channel': edge[2]['channel']}}]
     return new_elements
 
 def create_monitor_graph(
@@ -126,3 +142,28 @@ def visualise_agent_parameters(k,v):
         return html.Div([html.H6(k),output_info_table])
     else:
         return html.H6(k +": "+str(v))
+
+def get_param_dash_component(param_key,param_set):
+    """
+    Converts param_key:iterable (param_set) into a list of dash dropdowns
+    """
+    if isinstance(param_set, set) or isinstance(param_set, list):
+        dropdown_options = [{'label':param, 'value':param} for param in param_set]
+        return dcc.Dropdown(
+            options = dropdown_options,
+            placeholder=param_key
+        )
+    else:
+        return []
+
+def extract_param_dropdown(params_div):
+    """
+    Extracts parameters from the init_param dropdown list.
+    These extracted parameters will be passed to the agent's initialisation in the add agent button.
+    """
+    init_params = {}
+    for div in params_div:
+        if isinstance(div,dict):
+            if 'value' in div['props'].keys():
+                init_params.update({div['props']['placeholder']:div['props']['value']})
+    return init_params

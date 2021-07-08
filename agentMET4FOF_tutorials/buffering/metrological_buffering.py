@@ -55,7 +55,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
             metrological_sine_data = self._stream.next_sample()
 
             # Equivalent to self.buffer_store but without logging.
-            self.buffer.store(agent_from=self.name, data=[metrological_sine_data])
+            self.buffer.store(agent_from=self.name, data=metrological_sine_data)
 
             # The actual dictionary is stored in self.buffer.buffer
             self.log_info(str((self.buffer.buffer)))
@@ -95,7 +95,7 @@ def demonstrate_metrological_stream():
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
-        "MonitorAgent", agentType=MetrologicalMonitorAgent
+        "MonitorAgent", agentType=MetrologicalMonitorAgent, buffer_size=50,
     )
 
     # Bind agents.

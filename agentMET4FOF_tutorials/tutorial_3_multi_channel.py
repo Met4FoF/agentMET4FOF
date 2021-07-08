@@ -14,7 +14,7 @@ class MultiGeneratorAgent(AgentMET4FOF):
     def agent_loop(self):
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
-            cosine_data = self._sine_stream.next_sample()  # dictionary
+            cosine_data = self._cos_stream.next_sample()  # dictionary
             self.send_output(sine_data["quantities"], channel="sine")
             self.send_output(cosine_data["quantities"], channel="cosine")
 
@@ -52,15 +52,17 @@ class MultiOutputMathAgent(AgentMET4FOF):
 def main():
     # start agent network server
     agentNetwork = AgentNetwork()
+
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=MultiGeneratorAgent)
     multi_math_agent = agentNetwork.add_agent(agentType=MultiOutputMathAgent)
     monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
+
     # connect agents : We can connect multiple agents to any particular agent
     # However the agent needs to implement handling multiple inputs
-    agentNetwork.bind_agents(gen_agent, multi_math_agent)
-    agentNetwork.bind_agents(gen_agent, monitor_agent)
+    agentNetwork.bind_agents(gen_agent, multi_math_agent, channel=["sine","cosine"])
     agentNetwork.bind_agents(multi_math_agent, monitor_agent)
+
     # set all agents states to "Running"
     agentNetwork.set_running_state()
 

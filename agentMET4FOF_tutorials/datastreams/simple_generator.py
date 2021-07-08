@@ -17,8 +17,8 @@ class SineGenerator(DataStreamMET4FOF):
         self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
 
     def sine_wave_function(self, time, F=50):
-        amplitude = np.sin(2*np.pi*F*time)
-        return amplitude
+        value = np.sin(2*np.pi*F*time)
+        return value
 
 class SineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal

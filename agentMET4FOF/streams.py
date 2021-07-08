@@ -164,8 +164,8 @@ class DataStreamMET4FOF():
         ----------
         time : Union[List, DataFrame, np.ndarray]
         """
-        amplitude = np.sin(2*np.pi*self.F*time)
-        return amplitude
+        value = np.sin(2*np.pi*self.F*time)
+        return value
 
     def set_generator_function(
             self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
@@ -218,11 +218,11 @@ class DataStreamMET4FOF():
                                      1)/self.sfreq
         self._sample_idx += batch_size
 
-        amplitude: np.ndarray = self._generator_function(
+        value: np.ndarray = self._generator_function(
             time, **self._generator_parameters
         )
 
-        return {'quantities': amplitude, 'time': time}
+        return {'quantities': value, 'time': time}
 
     def set_data_source(
             self,
@@ -384,16 +384,26 @@ class SineGenerator(DataStreamMET4FOF):
         is called
     sine_freq : float
         frequency of wave function
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.
     """
-    def __init__(self, sfreq = 500, sine_freq=5):
+    def __init__(self, sfreq=500, sine_freq=50, amplitude: float = 1, initial_phase: float = 0):
         super().__init__()
         self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, sine_freq=sine_freq)
+        self.set_generator_function(
+            generator_function=self.sine_wave_function,
+            sfreq=sfreq,
+            sine_freq=sine_freq,
+            ampl=amplitude,
+            phase_ini=initial_phase
+        )
 
-    def sine_wave_function(self, time, sine_freq=50):
+    def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator"""
-        amplitude = np.sin(2 * np.pi * sine_freq * time)
-        return amplitude
+        value = amplitude * np.sin(2 * np.pi * sine_freq * time + initial_phase)
+        return value
 
 
 class CosineGenerator(DataStreamMET4FOF):
@@ -410,18 +420,28 @@ class CosineGenerator(DataStreamMET4FOF):
     sfreq : int
         sampling frequency which determines the time step when :meth:`.next_sample`
         is called
-    F : int
+    cosine_freq : int
         frequency of wave function
+    amplitude : float, optional
+        Amplitude of the wave function. Defaults to 1.
+    initial_phase : float, optional
+        Initial phase of the wave function. Defaults to 0.
     """
-    def __init__(self, sfreq = 500, cosine_freq=5):
+    def __init__(self, sfreq = 500, cosine_freq=50, amplitude: float = 1, initial_phase: float = 0):
         super().__init__()
         self.set_metadata("CosineGenerator","time","s",("Voltage"),("V"),"Simple cosine wave generator")
-        self.set_generator_function(generator_function=self.cosine_wave_function, sfreq=sfreq, cosine_freq=cosine_freq)
+        self.set_generator_function(
+            generator_function=self.cosine_wave_function,
+            sfreq=sfreq,
+            cosine_freq=cosine_freq,
+            ampl=amplitude,
+            phase_ini = initial_phase
+        )
 
-    def cosine_wave_function(self, time, cosine_freq=50):
+    def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
         """A simple cosine wave generator"""
-        amplitude = np.cos(2 * np.pi * cosine_freq * time)
-        return amplitude
+        value = amplitude * np.cos(2 * np.pi * cosine_freq * time + initial_phase)
+        return value
 
 
 def extract_x_y(message):

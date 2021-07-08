@@ -101,10 +101,10 @@ and processing as well as propagating metadata alongside the data itself.
 One of the many questions that drive us in the project is:
 </p>
 <p align="justify">
-  <cite>
+  <blockquote>
   How can metrological input be incorporated into an agent-based system for addressing
   uncertainty of machine learning in future manufacturing?
-  </cite>
+  </blockquote>
 </p>
 
 ## 📈The agentMET4FOF dashboard

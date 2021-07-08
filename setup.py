@@ -77,6 +77,10 @@ setup(
         "mpld3",
         "mesa",
         "multiprocess",
+        "visdcc",
+        "click<8,>=7",  # This unfortunately is needed as of now, due to a constraint
+        # from our development dependency python-semantic-release. As soon as they
+        # drop that exact constraint, we should also do that.
     ],
     extras_require={"tutorials": ["notebook", "PyDynamic"]},
     python_requires=">=3.8",
