@@ -1,12 +1,14 @@
 import numpy as np
 
-from agentMET4FOF.agents import AgentNetwork
-from agentMET4FOF.metrological_agents import (
-    MetrologicalGeneratorAgent,
+from agentMET4FOF.agents.metrological_base_agents import (
     MetrologicalMonitorAgent,
-    RedundancyAgent,
 )
-from agentMET4FOF.metrological_streams import (
+from agentMET4FOF.agents.metrological_redundancy_agents import RedundancyAgent
+from agentMET4FOF.agents.metrological_signal_agents import (
+    MetrologicalGeneratorAgent,
+)
+from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.streams.metrological_signal_streams import (
     MetrologicalMultiWaveGenerator,
 )
 
@@ -30,8 +32,8 @@ def demonstrate_redundancy_agent_four_signals():
         MetrologicalMultiWaveGenerator(
             sfreq=fsam,
             freq_arr=np.array([frequency]),
-            ampl_arr=np.array([amplitude]),
-            phase_ini_arr=np.array([phase]),
+            amplitude_arr=np.array([amplitude]),
+            initial_phase_arr=np.array([phase]),
             intercept=intercept,
             value_unc=exp_unc_abs,
         )

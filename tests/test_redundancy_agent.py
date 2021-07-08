@@ -7,7 +7,7 @@ from numpy.testing import (
 )
 from scipy.stats import multivariate_normal as mvn
 
-from agentMET4FOF.metrological_agents import RedundancyAgent
+from agentMET4FOF.agents.metrological_redundancy_agents import RedundancyAgent
 
 
 @pytest.fixture(scope="module")

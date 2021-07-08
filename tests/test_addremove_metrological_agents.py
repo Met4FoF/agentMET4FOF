@@ -1,11 +1,9 @@
-import time
-
 import pytest
 
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
-
-# Create a list of permutations with which we want to test creation of agents and
-# binding.
+from agentMET4FOF.agents.metrological_base_agents import (
+    MetrologicalAgent,
+    MetrologicalMonitorAgent,
+)
 from tests.conftest import test_timeout
 
 agent_type_permutations = [

@@ -5,7 +5,10 @@ import numpy as np
 import pytest
 from time_series_metadata.scheme import MetaData
 
-from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
+from agentMET4FOF.agents.metrological_base_agents import (
+    MetrologicalAgent,
+    MetrologicalMonitorAgent,
+)
 from tests.conftest import test_timeout
 
 
@@ -129,9 +132,7 @@ def test_simple_metrological_agent(agent_network):
             # the error message, it means, the addressed attribute's content does not
             # match the expected expression.
             # Check if key 'metadata' is present in the received data
-            buffer_dict = list(monitor_agent_1.get_attr('buffer').values())[0]
+            buffer_dict = list(monitor_agent_1.get_attr("buffer").values())[0]
             is_present = "metadata" in buffer_dict.keys()
         except IndexError:
             pass
-
-

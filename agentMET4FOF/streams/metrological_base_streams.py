@@ -3,9 +3,10 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 
-from .streams import DataStreamMET4FOF
+from .base_streams import DataStreamMET4FOF
+
+__all__ = ["MetrologicalDataStreamMET4FOF"]
 
 
 class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
@@ -58,14 +59,17 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
         Parameters
         ----------
-        value_unc : float, optional (defaults to 0)
+        value_unc : float, optional (defaults to 0.0)
             standard uncertainties associated with values
-        time_unc : float, optional (defaults to 0)
+        time_unc : float, optional (defaults to 0.0)
             standard uncertainties associated with timestamps
         exp_unc : float, optional
-            expanded uncertainties associated with values. If ``exp_unc`` is given explicitly, it overrides ``value_unc`` according to ``value_unc = exp_unc / cov_factor``.
-        cov_factor : float, optional (defaults to 1)
-            coverage factor associated with the expanded uncertainty, only used, if ``exp_unc`` is specified
+            expanded uncertainties associated with values. If ``exp_unc`` is given
+            explicitly, it overrides ``value_unc`` according to ``value_unc = exp_unc
+            / cov_factor``.
+        cov_factor : float, optional (defaults to 1.0)
+            coverage factor associated with the expanded uncertainty, only used,
+            if ``exp_unc`` is specified
         """
         super().__init__()
         self._uncertainty_parameters: Dict
@@ -86,7 +90,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         generator_function: Callable = None,
         uncertainty_generator: Callable = None,
         sfreq: int = None,
-        **kwargs: Optional[Any]
+        **kwargs: Optional[Any],
     ) -> Callable:
         """
         Set value and uncertainty generators based on user-defined functions. By
@@ -131,7 +135,7 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
         if uncertainty_generator is None:
             warnings.warn(
                 "No uncertainty generator function specified. Setting to default ("
-                "value_unc = constant, time_unc = 0)."
+                "value_unc and time_unc each constant)."
             )
             self._generator_function_unc = self._default_uncertainty_generator
         else:
@@ -201,157 +205,3 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
     @time_unc.setter
     def time_unc(self, value: Union[float, Iterable[float]]):
         self._time_unc = value
-
-
-class MetrologicalSineGenerator(MetrologicalDataStreamMET4FOF):
-    """Built-in class of sine wave generator
-
-    Parameters
-    ----------
-    sfreq : int, optional
-        Sampling frequency which determines the time step when :meth:`.next_sample` is
-        called. Defaults to 500.
-    sine_freq : float, optional
-        Frequency of the wave function. Defaults to 50.
-    amplitude : float, optional
-        Amplitude of the wave function. Defaults to 1.
-    initial_phase : float, optional
-        Initial phase of the wave function. Defaults to 0.
-    device_id : str, optional
-        Name of the represented generator. Defaults to 'SineGenerator'.
-    time_name : str, optional
-        Name for the time dimension. Defaults to 'time'.
-    time_unit : str, optional
-        Unit for the time. Defaults to 's'.
-    quantity_names : iterable of str or str, optional
-        An iterable of names of the represented quantities' values.
-        Defaults to ('Voltage')
-    quantity_units : iterable of str or str, optional
-        An iterable of units for the quantities' values. Defaults to ('V')
-    misc : Any, optional
-        This parameter can take any additional metadata which will be handed over to
-        the corresponding attribute of the created :class:`Metadata` object. Defaults to
-        'Simple sine wave generator'.
-    value_unc : iterable of floats or float, optional
-        standard uncertainty(ies) of the quantity values. Defaults to 0.1.
-    time_unc : iterable of floats or float, optional
-        standard uncertainty of the time stamps. Defaults to 0.
-    """
-
-    def __init__(
-        self,
-        sfreq: int = 500,
-        sine_freq: float = 50,
-        ampl: float = 1,
-        phase_ini: float = 0,
-        device_id: str = "SineGenerator",
-        time_name: str = "time",
-        time_unit: str = "s",
-        quantity_names: Union[str, Tuple[str, ...]] = "Voltage",
-        quantity_units: Union[str, Tuple[str, ...]] = "V",
-        misc: Optional[Any] = "Simple sine wave generator",
-        value_unc: float = 0.1,
-        time_unc: float = 0,
-    ):
-        super(MetrologicalSineGenerator, self).__init__(
-            value_unc=value_unc, time_unc=time_unc
-        )
-        self.set_metadata(
-            device_id=device_id,
-            time_name=time_name,
-            time_unit=time_unit,
-            quantity_names=quantity_names,
-            quantity_units=quantity_units,
-            misc=misc,
-        )
-        self.value_unc = value_unc
-        self.time_unc = time_unc
-        self.set_generator_function(
-            generator_function=self._sine_wave_function,
-            uncertainty_generator=self._default_uncertainty_generator,
-            sfreq=sfreq,
-            sine_freq=sine_freq,
-            ampl=ampl,
-            phase_ini=phase_ini
-        )
-
-    def _sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
-        """A simple sine wave generator"""
-        value = amplitude * np.sin(np.multiply(2 * np.pi * sine_freq, time) + initial_phase)
-        value += np.random.normal(0, self.value_unc, value.shape)
-        return value
-
-
-class MetrologicalMultiWaveGenerator(MetrologicalDataStreamMET4FOF):
-    """
-    Class to generate data as a sum of cosine wave and additional Gaussian noise.
-    Values with associated uncertainty are returned.
-
-    Parameters
-    ----------
-    sfreq : float
-        sampling frequency which determines the time step when next_sample is called.
-    intercept : float
-        constant intercept of the signal
-    freq_arr : np.ndarray of float
-        array with frequencies of components included in the signal
-    ampl_arr : np.ndarray of float
-        array with amplitudes of components included in the signal
-    phase_ini_arr : np.ndarray of float
-        array with initial phases of components included in the signal
-    noisy : bool
-        boolean to determine whether the generated signal should be noisy or "clean"
-        defaults to True
-    """
-
-    def __init__(
-                 self,
-                 sfreq: int = 500,
-                 freq_arr: np.array = np.array([50]),
-                 ampl_arr: np.array = np.array([1]),
-                 phase_ini_arr: np.array = np.array([0]),
-                 intercept: float = 0,
-                 device_id: str = "MultiWaveDataGenerator",
-                 time_name: str = "time",
-                 time_unit: str = "s",
-                 quantity_names: Union[str, Tuple[str, ...]] = ("Length", "Mass"),
-                 quantity_units: Union[str, Tuple[str, ...]] = ("m", "kg"),
-                 misc: Optional[Any] = " Generator for a linear sum of cosines",
-                 value_unc: Union[float, Iterable[float]] = 0.1,
-                 time_unc: Union[float, Iterable[float]] = 0,
-                 noisy: bool = True
-                 ):
-        super(MetrologicalMultiWaveGenerator, self).__init__(
-            value_unc=value_unc, time_unc=time_unc
-        )
-        self.set_metadata(
-            device_id=device_id,
-            time_name=time_name,
-            time_unit=time_unit,
-            quantity_names=quantity_names,
-            quantity_units=quantity_units,
-            misc=misc
-        )
-        self.value_unc = value_unc
-        self.time_unc = time_unc
-        self.set_generator_function(
-            generator_function=self._multi_wave_function,
-            sfreq=sfreq,
-            intercept=intercept,
-            freq_arr=freq_arr,
-            ampl_arr=ampl_arr,
-            phase_ini_arr=phase_ini_arr,
-            noisy=noisy
-        )
-
-    def _multi_wave_function(self, time, intercept, freq_arr, ampl_arr,
-                             phase_ini_arr, noisy):
-
-        value_arr = intercept
-        if noisy:
-            value_arr += self.value_unc / 2 * norm.rvs(size=time.shape)
-
-        for freq, ampl, phase_ini in zip(freq_arr, ampl_arr, phase_ini_arr):
-            value_arr += ampl * np.cos(2 * np.pi * freq * time + phase_ini)
-
-        return value_arr

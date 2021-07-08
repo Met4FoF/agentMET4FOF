@@ -1,13 +1,15 @@
+import warnings
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from pandas import DataFrame
 from time_series_metadata.scheme import MetaData
-import warnings
 
-class DataStreamMET4FOF():
-    """
-    Abstract class for creating datastreams.
+__all__ = ["DataStreamMET4FOF"]
+
+
+class DataStreamMET4FOF:
+    """Abstract class for creating datastreams
 
     Data can be fetched sequentially using :func:`next_sample` or all at once
     :func:`all_samples`. This increments the internal sample index :attr:`_sample_idx`.
@@ -79,10 +81,10 @@ class DataStreamMET4FOF():
         self._current_sample_quantities: Union[List, DataFrame, np.ndarray]
         self._current_sample_target: Union[List, DataFrame, np.ndarray]
         self._current_sample_time: Union[List, DataFrame, np.ndarray]
-        self._sample_idx: int = 0 #current sample index
-        self._n_samples: int = 0 #total number of samples
+        self._sample_idx: int = 0  # current sample index
+        self._n_samples: int = 0  # total number of samples
         self._data_source_type: str = "function"
-        self._generator_function : Callable
+        self._generator_function: Callable
         self._generator_parameters: Dict = {}
         self.sfreq: int = 1
         self._metadata: MetaData
@@ -105,7 +107,10 @@ class DataStreamMET4FOF():
         np.random.shuffle(random_index)
         self._quantities = self._quantities[random_index]
 
-        if type(self._target).__name__ == "ndarray" or type(self._target).__name__ == "list":
+        if (
+            type(self._target).__name__ == "ndarray"
+            or type(self._target).__name__ == "list"
+        ):
             self._target = self._target[random_index]
         elif type(self._target).__name__ == "DataFrame":
             self._target = self._target.iloc[random_index]
@@ -119,13 +124,13 @@ class DataStreamMET4FOF():
         return self._sample_idx
 
     def set_metadata(
-            self,
-            device_id: str,
-            time_name: str,
-            time_unit: str,
-            quantity_names: Union[str, Tuple[str, ...]],
-            quantity_units: Union[str, Tuple[str, ...]],
-            misc: Optional[Any] = None
+        self,
+        device_id: str,
+        time_name: str,
+        time_unit: str,
+        quantity_names: Union[str, Tuple[str, ...]],
+        quantity_units: Union[str, Tuple[str, ...]],
+        misc: Optional[Any] = None,
     ):
         """Set the quantities metadata as a ``MetaData`` object
 
@@ -154,7 +159,7 @@ class DataStreamMET4FOF():
             time_unit=time_unit,
             quantity_names=quantity_names,
             quantity_units=quantity_units,
-            misc=misc
+            misc=misc,
         )
 
     def _default_generator_function(self, time):
@@ -164,11 +169,11 @@ class DataStreamMET4FOF():
         ----------
         time : Union[List, DataFrame, np.ndarray]
         """
-        value = np.sin(2*np.pi*self.F*time)
+        value = np.sin(2 * np.pi * self.F * time)
         return value
 
     def set_generator_function(
-            self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
+        self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
     ):
         """
         Sets the data source to a generator function. By default, this function resorts
@@ -191,14 +196,14 @@ class DataStreamMET4FOF():
             The generator function call for every sample will be supplied with the
             ``**generator_parameters``.
         """
-        #save the kwargs into generator_parameters
+        # save the kwargs into generator_parameters
         self._generator_parameters = kwargs
 
         if sfreq is not None:
             self.sfreq = sfreq
         self._set_data_source_type("function")
 
-        #resort to default wave generator if one is not supplied
+        # resort to default wave generator if one is not supplied
         if generator_function is None:
             warnings.warn(
                 "No uncertainty generator function specified. Setting to default ("
@@ -214,21 +219,20 @@ class DataStreamMET4FOF():
         """
         Internal method for generating a batch of samples from the generator function.
         """
-        time: np.ndarray = np.arange(self._sample_idx, self._sample_idx + batch_size,
-                                     1)/self.sfreq
+        time: np.ndarray = (
+            np.arange(self._sample_idx, self._sample_idx + batch_size, 1) / self.sfreq
+        )
         self._sample_idx += batch_size
 
-        value: np.ndarray = self._generator_function(
-            time, **self._generator_parameters
-        )
+        value: np.ndarray = self._generator_function(time, **self._generator_parameters)
 
-        return {'quantities': value, 'time': time}
+        return {"quantities": value, "time": time}
 
     def set_data_source(
-            self,
-            quantities: Union[List, DataFrame, np.ndarray]=None,
-            target: Optional[Union[List, DataFrame, np.ndarray]]=None,
-            time: Optional[Union[List, DataFrame, np.ndarray]]=None
+        self,
+        quantities: Union[List, DataFrame, np.ndarray] = None,
+        target: Optional[Union[List, DataFrame, np.ndarray]] = None,
+        time: Optional[Union[List, DataFrame, np.ndarray]] = None,
     ):
         """
         This sets the data source by providing up to three iterables: ``quantities`` ,
@@ -269,10 +273,10 @@ class DataStreamMET4FOF():
             self._target = target
             self._time = time
 
-        #infer number of samples
+        # infer number of samples
         if type(self._quantities).__name__ == "list":
             self._n_samples = len(self._quantities)
-        elif type(self._quantities).__name__ == "DataFrame": #dataframe or numpy
+        elif type(self._quantities).__name__ == "DataFrame":  # dataframe or numpy
             self._quantities = self._quantities.to_numpy()
             self._n_samples = self._quantities.shape[0]
         elif type(self._quantities).__name__ == "ndarray":
@@ -312,9 +316,9 @@ class DataStreamMET4FOF():
             'target':current_sample_target}``
         """
 
-        if self._data_source_type == 'function':
+        if self._data_source_type == "function":
             return self._next_sample_generator(batch_size)
-        elif self._data_source_type == 'dataset':
+        elif self._data_source_type == "dataset":
             return self._next_sample_data_source(batch_size)
 
     def _next_sample_data_source(
@@ -340,18 +344,23 @@ class DataStreamMET4FOF():
         self._sample_idx += batch_size
 
         try:
-            self._current_sample_quantities = self._quantities[self._sample_idx - batch_size:self._sample_idx]
+            self._current_sample_quantities = self._quantities[
+                self._sample_idx - batch_size : self._sample_idx
+            ]
 
-            #if target is available
+            # if target is available
             if self._target is not None:
-                self._current_sample_target = self._target[self._sample_idx - batch_size:self._sample_idx]
+                self._current_sample_target = self._target[
+                    self._sample_idx - batch_size : self._sample_idx
+                ]
             else:
                 self._current_sample_target = None
 
-            #if time is available
+            # if time is available
             if self._time is not None:
-                self._current_sample_time = self._time[self._sample_idx - batch_size
-                                                       :self._sample_idx]
+                self._current_sample_time = self._time[
+                    self._sample_idx - batch_size : self._sample_idx
+                ]
             else:
                 self._current_sample_time = None
         except IndexError:
@@ -359,107 +368,14 @@ class DataStreamMET4FOF():
             self._current_sample_target = None
             self._current_sample_time = None
 
-        return {'time':self._current_sample_time, 'quantities': self._current_sample_quantities, 'target': self._current_sample_target}
+        return {
+            "time": self._current_sample_time,
+            "quantities": self._current_sample_quantities,
+            "target": self._current_sample_target,
+        }
 
     def reset(self):
         self._sample_idx = 0
 
     def has_more_samples(self):
         return self._sample_idx < self._n_samples
-
-
-# Built-in classes with DataStreamMET4FOF
-class SineGenerator(DataStreamMET4FOF):
-    """
-    Built-in class of sine wave generator which inherits all
-    methods and attributes from :class:`DataStreamMET4FOF`.
-    :func:`sine_wave_function` is a custom defined function which has a required
-    keyword ``time`` as argument and any number of optional additional arguments
-    (e.g ``F``) to be supplied to the :meth:`.DataStreamMET4FOF.set_generator_function`.
-
-    Parameters
-    ----------
-    sfreq : int
-        sampling frequency which determines the time step when :meth:`.next_sample`
-        is called
-    sine_freq : float
-        frequency of wave function
-    amplitude : float, optional
-        Amplitude of the wave function. Defaults to 1.
-    initial_phase : float, optional
-        Initial phase of the wave function. Defaults to 0.
-    """
-    def __init__(self, sfreq=500, sine_freq=50, amplitude: float = 1, initial_phase: float = 0):
-        super().__init__()
-        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(
-            generator_function=self.sine_wave_function,
-            sfreq=sfreq,
-            sine_freq=sine_freq,
-            ampl=amplitude,
-            phase_ini=initial_phase
-        )
-
-    def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
-        """A simple sine wave generator"""
-        value = amplitude * np.sin(2 * np.pi * sine_freq * time + initial_phase)
-        return value
-
-
-class CosineGenerator(DataStreamMET4FOF):
-    """
-    Built-in class of cosine wave generator which inherits all
-    methods and attributes from :class:`DataStreamMET4FOF`.
-    :func:`cosine_wave_function` is a custom defined function which has a required
-    keyword ``time`` as argument and any number of
-    optional additional arguments (e.g ``cosine_freq``) to be supplied to the
-    :meth:`.DataStreamMET4FOF.set_generator_function`.
-
-    Parameters
-    ----------
-    sfreq : int
-        sampling frequency which determines the time step when :meth:`.next_sample`
-        is called
-    cosine_freq : int
-        frequency of wave function
-    amplitude : float, optional
-        Amplitude of the wave function. Defaults to 1.
-    initial_phase : float, optional
-        Initial phase of the wave function. Defaults to 0.
-    """
-    def __init__(self, sfreq = 500, cosine_freq=50, amplitude: float = 1, initial_phase: float = 0):
-        super().__init__()
-        self.set_metadata("CosineGenerator","time","s",("Voltage"),("V"),"Simple cosine wave generator")
-        self.set_generator_function(
-            generator_function=self.cosine_wave_function,
-            sfreq=sfreq,
-            cosine_freq=cosine_freq,
-            ampl=amplitude,
-            phase_ini = initial_phase
-        )
-
-    def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
-        """A simple cosine wave generator"""
-        value = amplitude * np.cos(2 * np.pi * cosine_freq * time + initial_phase)
-        return value
-
-
-def extract_x_y(message):
-    """
-    Extracts features & target from ``message['data']`` with expected structure such as:
-
-    1. tuple - (x,y)
-    2. dict - {'x':x_data,'y':y_data}
-
-    Handle data structures of dictionary to extract features & target
-    """
-    if type(message['data']) == tuple:
-        x = message['data'][0]
-        y = message['data'][1]
-    elif type(message['data']) == dict:
-        x = message['data']['x']
-        y = message['data']['y']
-    else:
-        return 1
-    return x, y
-

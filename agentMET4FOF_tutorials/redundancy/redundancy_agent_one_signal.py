@@ -1,12 +1,16 @@
 import numpy as np
 
-from agentMET4FOF.agents import AgentNetwork
-from agentMET4FOF.metrological_agents import (
-    MetrologicalGeneratorAgent,
+from agentMET4FOF.agents.metrological_base_agents import (
     MetrologicalMonitorAgent,
-    RedundancyAgent,
 )
-from agentMET4FOF.metrological_streams import MetrologicalMultiWaveGenerator
+from agentMET4FOF.agents.metrological_redundancy_agents import RedundancyAgent
+from agentMET4FOF.agents.metrological_signal_agents import (
+    MetrologicalGeneratorAgent,
+)
+from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.streams.metrological_signal_streams import (
+    MetrologicalMultiWaveGenerator,
+)
 
 
 def demonstrate_redundancy_agent_onesignal():
@@ -29,8 +33,8 @@ def demonstrate_redundancy_agent_onesignal():
     signal1 = MetrologicalMultiWaveGenerator(
         sfreq=sampling_frequency,
         freq_arr=np.array([signal_1_frequency, signal_2_frequency]),
-        ampl_arr=np.array([signal_1_amplitude, signal_2_amplitude]),
-        phase_ini_arr=np.array([signal_1_initial_phase, signal_2_initial_phase]),
+        amplitude_arr=np.array([signal_1_amplitude, signal_2_amplitude]),
+        initial_phase_arr=np.array([signal_1_initial_phase, signal_2_initial_phase]),
         value_unc=exp_unc_abs,
     )
     # signal1.init_parameters(batch_size1=batch_size)
