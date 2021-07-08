@@ -49,11 +49,17 @@ References:
                9th Workshop on Service Oriented, Holonic and Multi-agent
                Manufacturing Systems for Industry of the Future
 
-.. [Kok2020]  G. Kok, P. Harris
-              Uncertainty SEvaluation for Metrologically
-              Redundant Industrial Sensor Networks,
-              2020 IEEE International Workshop on Metrology for Industry 4.0 & IoT,
-              Roma, Italy, 2020,
-              pp. 84-88,
-              doi: `10.1109/MetroInd4.0IoT48571.2020.9138297
-              <https://dx.doi.org/10.1109/MetroInd4.0IoT48571.2020.9138297>`_.
+.. [Kok2020_1]  G. Kok, P. Harris
+                "Uncertainty Evaluation for Metrologically
+                Redundant Industrial Sensor Networks",
+                2020 IEEE International Workshop on Metrology for Industry 4.0 & IoT,
+                Roma, Italy, 2020, pp. 84-88,
+                doi: `10.1109/MetroInd4.0IoT48571.2020.9138297
+                <https://dx.doi.org/10.1109/MetroInd4.0IoT48571.2020.9138297>`_.
+
+.. [Kok2020_2]  G. Kok, P. Harris
+                "Quantifying Metrological Redundancy in an Industry 4.0 Environment",
+                2020 IEEE International Workshop on Metrology for Industry 4.0 & IoT,
+                Roma, Italy, 2020, pp. 464-468,
+                doi: `10.1109/MetroInd4.0IoT48571.2020.9138235
+                <https://dx.doi.org/10.1109/MetroInd4.0IoT48571.2020.9138235>`_.
