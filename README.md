@@ -107,6 +107,16 @@ One of the many questions that drive us in the project is:
   </blockquote>
 </p>
 
+### Features
+
+Some of the notable features of agentMET4FOF include : 
+- Modular agent classes for metrological data streams and analytics 
+- Built-in buffering mechanism  
+- Easy connection among software agents to send and receive data 
+- Option to choose backends : Osbrain for real distributed systems and Mesa for simulated distributed systems.  
+- Group cooperative agents under a Coalition.  
+- Interactive and customisable dashboard from the get-go. 
+
 ## 📈The agentMET4FOF dashboard
 
 agentMET4FOF comes bundled with our so called _dashboard_. It is an optional component
