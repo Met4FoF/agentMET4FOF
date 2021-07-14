@@ -22,6 +22,13 @@ Metrologically enabled base agents
     :private-members:
 
 
+Metrological agents to reduce redundancy
+----------------------------------------
+.. automodule:: agentMET4FOF.agents.metrological_redundancy_agents
+    :members:
+    :private-members:
+
+
 Metrologically enabled signal agents
 ------------------------------------
 .. automodule:: agentMET4FOF.agents.metrological_signal_agents
