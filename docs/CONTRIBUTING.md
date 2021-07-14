@@ -87,6 +87,7 @@ releases as a result. We use the following types:
 - _chore_: Commits that affect other non-PyDynamic components (e.g. ReadTheDocs, Git
 , ... )
 - _revert_: commits, which undo previous commits using `git revert`
+- _refactor_: commits, which contain to refactoring activities
 - _wip_: Commits which are not recognizable as one of the above-mentioned types until
   later, usually during a PR merge.  The merge commit is then marked as the
   corresponding type.
