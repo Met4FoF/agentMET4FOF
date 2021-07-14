@@ -40,8 +40,8 @@ class RedundancyAgent(MetrologicalAgent):
     methods are presented in their respective docstrings.
 
     Please refer to other sections in this documentation for more information. A
-    scientific publication explaining the ideas behind this agent can be found in [
-    Kok2020_1]_. Related work can be found in [Kok2020_2]_.
+    scientific publication explaining the ideas behind this agent can be found in
+    [Kok2020_1]_. Related work can be found in [Kok2020_2]_.
 
     The usage of the Redundancy Agent is illustrated with two examples contained in
     :ref:`two tutorials <redundancy_tutorials>`.
