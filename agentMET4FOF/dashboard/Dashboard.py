@@ -19,7 +19,7 @@ class AgentDashboard:
     An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
     """
     def __init__(self, dashboard_modules=[], dashboard_layouts=[],
-                 dashboard_update_interval = 3, max_monitors=10, ip_addr="127.0.0.1",
+                 dashboard_update_interval = 3, max_monitors=10, ip_addr="0.0.0.0",
                  port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,
                  agent_port=None, network_stylesheet=[], hide_default_edge=True, **kwargs):
         """
