@@ -117,7 +117,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
     def init_parameters(self, *args, **kwargs):
         super(MetrologicalMonitorAgent, self).init_parameters(*args, **kwargs)
         # create alias/dummies to match dashboard expectations
-        self.memory = self._input_data
         self.plot_filter = []
         self.plots = {}
         self.custom_plot_parameters = {}
