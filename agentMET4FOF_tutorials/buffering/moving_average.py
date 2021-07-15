@@ -6,9 +6,8 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
 import numpy as np
-import plotly.graph_objs as go
 
-class SineGeneratorAgent(AgentMET4FOF):
+class NoisySineGeneratorAgent(AgentMET4FOF):
     """An agent streaming a sine signal
 
     Takes samples from the :py:mod:`SineGenerator` and pushes them sample by sample
@@ -34,6 +33,7 @@ class SineGeneratorAgent(AgentMET4FOF):
         """
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
+            sine_data["quantities"] = sine_data["quantities"] + np.random.rand(*sine_data["quantities"].shape)
             self.send_output(sine_data)
 
 class RollingMeanAgent(AgentMET4FOF):
@@ -64,7 +64,8 @@ def demonstrate_generator_agent_use():
     agent_network = AgentNetwork()
 
     # Initialize agents by adding them to the agent network.
-    gen_agent = agent_network.add_agent(agentType=SineGeneratorAgent)
+    gen_agent = agent_network.add_agent(agentType=NoisySineGeneratorAgent)
+    # the buffer size controls the window size of the moving average filter
     fast_rolling_mean_agent = agent_network.add_agent(agentType=RollingMeanAgent, buffer_size=5)
     slow_rolling_mean_agent = agent_network.add_agent(agentType=RollingMeanAgent, buffer_size=10)
 

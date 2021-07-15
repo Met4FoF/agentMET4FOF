@@ -10,11 +10,11 @@ appdirs==1.4.4
     # via virtualenv
 async-generator==1.10
     # via nbclient
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   jsonschema
     #   pytest
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 backcall==0.2.0
     # via ipython
@@ -22,7 +22,7 @@ bleach==3.3.0
     # via
     #   nbconvert
     #   readme-renderer
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   -c requirements.txt
     #   requests
@@ -43,17 +43,17 @@ colorama==0.4.4
     # via twine
 commonmark==0.9.1
     # via recommonmark
-coverage==5.4
+coverage==5.5
     # via pytest-cov
-cryptography==3.4.6
+cryptography==3.4.7
     # via secretstorage
 decorator==4.4.2
     # via
     #   -c requirements.txt
     #   ipython
-defusedxml==0.6.0
+defusedxml==0.7.1
     # via nbconvert
-distlib==0.3.1
+distlib==0.3.2
     # via virtualenv
 docutils==0.16
     # via
@@ -61,6 +61,7 @@ docutils==0.16
     #   readme-renderer
     #   recommonmark
     #   sphinx
+    #   sphinx-rtd-theme
 dotty-dict==1.3.0
     # via python-semantic-release
 entrypoints==0.3
@@ -69,9 +70,9 @@ filelock==3.0.12
     # via
     #   tox
     #   virtualenv
-gitdb==4.0.5
+gitdb==4.0.7
     # via gitpython
-gitpython==3.1.13
+gitpython==3.1.17
     # via python-semantic-release
 idna==2.10
     # via
@@ -79,6 +80,10 @@ idna==2.10
     #   requests
 imagesize==1.2.0
     # via sphinx
+importlib-metadata==4.5.0
+    # via
+    #   keyring
+    #   twine
 iniconfig==1.1.1
     # via pytest
 invoke==1.5.0
@@ -87,7 +92,7 @@ ipython-genutils==0.2.0
     # via
     #   nbformat
     #   traitlets
-ipython==7.20.0
+ipython==7.24.1
     # via -r dev-requirements.in
 jedi==0.18.0
     # via ipython
@@ -95,7 +100,7 @@ jeepney==0.6.0
     # via
     #   keyring
     #   secretstorage
-jinja2==2.11.3
+jinja2==3.0.1
     # via
     #   -c requirements.txt
     #   nbconvert
@@ -103,7 +108,7 @@ jinja2==2.11.3
     #   sphinx
 jsonschema==3.2.0
     # via nbformat
-jupyter-client==6.1.11
+jupyter-client==6.1.12
     # via nbclient
 jupyter-core==4.7.1
     # via
@@ -112,24 +117,26 @@ jupyter-core==4.7.1
     #   nbformat
 jupyterlab-pygments==0.1.2
     # via nbconvert
-keyring==22.0.1
+keyring==23.0.1
     # via twine
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   -c requirements.txt
     #   jinja2
+matplotlib-inline==0.1.2
+    # via ipython
 mistune==0.8.4
     # via nbconvert
-nbclient==0.5.2
+nbclient==0.5.3
     # via nbconvert
 nbconvert==6.0.7
     # via nbsphinx
-nbformat==5.1.2
+nbformat==5.1.3
     # via
     #   nbclient
     #   nbconvert
     #   nbsphinx
-nbsphinx==0.8.1
+nbsphinx==0.8.6
     # via -r dev-requirements.in
 nest-asyncio==1.5.1
     # via nbclient
@@ -141,7 +148,7 @@ packaging==20.9
     #   tox
 pandocfilters==1.4.3
     # via nbconvert
-parso==0.8.1
+parso==0.8.2
     # via jedi
 pexpect==4.8.0
     # via ipython
@@ -153,7 +160,7 @@ pluggy==0.13.1
     # via
     #   pytest
     #   tox
-prompt-toolkit==3.0.16
+prompt-toolkit==3.0.18
     # via ipython
 psutil==5.8.0
     # via -r dev-requirements.in
@@ -165,7 +172,7 @@ py==1.10.0
     #   tox
 pycparser==2.20
     # via cffi
-pygments==2.8.0
+pygments==2.9.0
     # via
     #   ipython
     #   jupyterlab-pygments
@@ -178,11 +185,11 @@ pyparsing==2.4.7
     #   packaging
 pyrsistent==0.17.3
     # via jsonschema
-pytest-cov==2.11.1
+pytest-cov==2.12.1
     # via -r dev-requirements.in
 pytest-timeout==1.4.2
     # via -r dev-requirements.in
-pytest==6.2.2
+pytest==6.2.4
     # via
     #   -r dev-requirements.in
     #   pytest-cov
@@ -191,15 +198,15 @@ python-dateutil==2.8.1
     # via
     #   -c requirements.txt
     #   jupyter-client
-python-gitlab==1.15.0
+python-gitlab==2.7.1
     # via python-semantic-release
-python-semantic-release==7.15.0
+python-semantic-release==7.15.5
     # via -r dev-requirements.in
 pytz==2021.1
     # via
     #   -c requirements.txt
     #   babel
-pyzmq==22.0.3
+pyzmq==22.1.0
     # via
     #   -c requirements.txt
     #   jupyter-client
@@ -208,7 +215,9 @@ readme-renderer==29.0
 recommonmark==0.7.1
     # via -r dev-requirements.in
 requests-toolbelt==0.9.1
-    # via twine
+    # via
+    #   python-gitlab
+    #   twine
 requests==2.25.1
     # via
     #   -c requirements.txt
@@ -218,31 +227,30 @@ requests==2.25.1
     #   requests-toolbelt
     #   sphinx
     #   twine
-rfc3986==1.4.0
+rfc3986==1.5.0
     # via twine
 secretstorage==3.3.1
     # via keyring
 semver==2.13.0
     # via python-semantic-release
-setuptools-scm==5.0.1
+setuptools-scm==6.0.1
     # via dotty-dict
-six==1.15.0
+six==1.16.0
     # via
     #   -c requirements.txt
     #   bleach
     #   jsonschema
     #   python-dateutil
-    #   python-gitlab
     #   readme-renderer
     #   tox
     #   virtualenv
-smmap==3.0.5
+smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx-rtd-theme==0.5.1
+sphinx-rtd-theme==0.5.2
     # via -r dev-requirements.in
-sphinx==3.5.1
+sphinx==4.0.2
     # via
     #   -r dev-requirements.in
     #   nbsphinx
@@ -252,19 +260,20 @@ sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-testpath==0.4.4
+testpath==0.5.0
     # via nbconvert
 toml==0.10.2
     # via
     #   pytest
+    #   pytest-cov
     #   tox
 tomlkit==0.7.0
     # via python-semantic-release
@@ -272,9 +281,9 @@ tornado==6.1
     # via
     #   -c requirements.txt
     #   jupyter-client
-tox==3.22.0
+tox==3.23.1
     # via -r dev-requirements.in
-tqdm==4.57.0
+tqdm==4.61.0
     # via
     #   -c requirements.txt
     #   twine
@@ -283,17 +292,18 @@ traitlets==5.0.5
     #   ipython
     #   jupyter-client
     #   jupyter-core
+    #   matplotlib-inline
     #   nbclient
     #   nbconvert
     #   nbformat
     #   nbsphinx
-twine==3.3.0
+twine==3.4.1
     # via python-semantic-release
-urllib3==1.26.3
+urllib3==1.26.5
     # via
     #   -c requirements.txt
     #   requests
-virtualenv==20.4.2
+virtualenv==20.4.7
     # via tox
 wcwidth==0.2.5
     # via prompt-toolkit
@@ -301,6 +311,8 @@ webencodings==0.5.1
     # via bleach
 wheel==0.36.2
     # via python-semantic-release
+zipp==3.4.1
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

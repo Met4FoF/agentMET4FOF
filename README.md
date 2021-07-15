@@ -17,6 +17,9 @@
   <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
     <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
   </a>
+  <!-- Zenodo DOI -->
+  <a href="https://doi.org/10.5281/zenodo.4560343">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4560343.svg" alt="DOI"></a>
 </p>
 
 <h1 align="center">Multi-Agent System for IIoT</h1>
@@ -36,6 +39,7 @@ in the section <a href="#about">About</a>.
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
 - [💨 Coming soon](#coming-soon)
+- [🖋 Citation](#citation)
 - [💎 Acknowledgement](#acknowledgement)
 - [⚠ Disclaimer](#disclaimer)
 - [© License](#license)
@@ -85,11 +89,11 @@ corresponding data analysis. An excellent way to represent such networks is a
 multi-agent system (MAS), where independent software modules (agents) encapsulate
 properties and functionalities. agentMET4FOF is an interactive and flexible open-source
 implementation of such a MAS. The software engineering process is driven by several
-industry-oriented use cases with the aim of impacting on IIoT applications. This leads
+industry-oriented use cases with the aim of enabling IIoT applications. This leads
 to a framework that is specialized in representing heterogeneous sensor networks.
 </p>
 <p align="justify">
-A special emphasize is put on supporting metrological treatment of sensor streaming
+A special emphasis is put on supporting metrological treatment of sensor streaming
 data. This includes the consideration of measurement uncertainties during data analysis
 and processing as well as propagating metadata alongside the data itself.
 </p>
@@ -97,11 +101,21 @@ and processing as well as propagating metadata alongside the data itself.
 One of the many questions that drive us in the project is:
 </p>
 <p align="justify">
-  <cite>
+  <blockquote>
   How can metrological input be incorporated into an agent-based system for addressing
   uncertainty of machine learning in future manufacturing?
-  </cite>
+  </blockquote>
 </p>
+
+### Features
+
+Some of the notable features of agentMET4FOF include : 
+- Modular agent classes for metrological data streams and analytics 
+- Built-in buffering mechanism  
+- Easy connection among software agents to send and receive data 
+- Option to choose backends : Osbrain for real distributed systems and Mesa for simulated distributed systems.  
+- Group cooperative agents under a Coalition.  
+- Interactive and customisable dashboard from the get-go. 
 
 ## 📈The agentMET4FOF dashboard
 
@@ -156,6 +170,11 @@ For a comprehensive overview of current development activities and upcoming task
 take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/projects/1),
 [issues](https://github.com/Met4FoF/agentMET4FOF/issues) and
 [pull requests](https://github.com/Met4FoF/agentMET4FOF/pulls).
+
+## 🖋Citation
+
+If you publish results obtained with the help of agentMET4FOF, please cite the linked
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)](https://doi.org/10.5281/zenodo.4560344).
 
 ## 💎Acknowledgement
 

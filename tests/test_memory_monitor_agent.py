@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.agents.base_agents import AgentMET4FOF, MonitorAgent
 from tests.conftest import test_timeout
 
 num_samples = 10

@@ -3,25 +3,33 @@ from typing import Dict, Union
 import plotly.graph_objs as go
 from time_series_buffer import TimeSeriesBuffer
 from time_series_metadata.scheme import MetaData
-import numpy as np
-from agentMET4FOF.agents import AgentMET4FOF
+
+from .base_agents import AgentMET4FOF
+
+__all__ = ["MetrologicalAgent", "MetrologicalMonitorAgent"]
 
 
 class MetrologicalAgent(AgentMET4FOF):
-    # dict like {
-    #     <from>: {
-    #         "buffer": TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata": MetaData(**kwargs).metadata,
-    #     }
     _input_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, Dict]]]
+    """Input dictionary of all incoming data including metadata::
+
+        dict like {
+            <from>: {
+                "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+                "metadata": MetaData(**kwargs).metadata,
+            }
+    """
     _input_data_maxlen: int
 
-    # dict like {
-    #     <channel> : {
-    #         "buffer" : TimeSeriesBuffer(maxlen=buffer_size),
-    #         "metadata" : MetaData(**kwargs)
-    #     }
     _output_data: Dict[str, Dict[str, Union[TimeSeriesBuffer, MetaData]]]
+    """Output dictionary of all outgoing data including metadata::
+
+        dict like {
+            <from>: {
+                "buffer": TimeSeriesBuffer(maxlen=buffer_size),
+                "metadata": MetaData(**kwargs).metadata,
+            }
+    """
     _output_data_maxlen: int
 
     def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
@@ -114,7 +122,6 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         self.plots = {}
         self.custom_plot_parameters = {}
 
-
     def on_received_message(self, message):
         """
         Handles incoming data from 'default' and 'plot' channels.
@@ -126,12 +133,19 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
         message : dict
             Acceptable channel values are 'default' or 'plot'
         """
-        if message['channel'] == 'default':
+        if message["channel"] == "default":
             if self.plot_filter != []:
-                message['data'] = {key: message['data'][key] for key in self.plot_filter}
-                message['metadata'] = {key: message['metadata'][key] for key in self.plot_filter}
-            self.buffer_store(agent_from=message["from"], data={"data": message["data"], "metadata": message["metadata"]})
-        elif message['channel'] == 'plot':
+                message["data"] = {
+                    key: message["data"][key] for key in self.plot_filter
+                }
+                message["metadata"] = {
+                    key: message["metadata"][key] for key in self.plot_filter
+                }
+            self.buffer_store(
+                agent_from=message["from"],
+                data={"data": message["data"], "metadata": message["metadata"]},
+            )
+        elif message["channel"] == "plot":
             self.update_plot_memory(message)
         return 0
 
@@ -147,11 +161,11 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
             Only the latest plot will be shown kept and does not keep a history of the plots.
         """
 
-        if type(message['data']) != dict or message['from'] not in self.plots.keys():
-            self.plots[message['from']] = message['data']
-        elif type(message['data']) == dict:
-            for key in message['data'].keys():
-                self.plots[message['from']].update({key: message['data'][key]})
+        if type(message["data"]) != dict or message["from"] not in self.plots.keys():
+            self.plots[message["from"]] = message["data"]
+        elif type(message["data"]) == dict:
+            for key in message["data"].keys():
+                self.plots[message["from"]].update({key: message["data"][key]})
         self.log_info("PLOTS: " + str(self.plots))
 
     def reset(self):

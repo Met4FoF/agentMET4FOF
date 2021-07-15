@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from agentMET4FOF.agents import AgentMET4FOF
+from agentMET4FOF.agents.base_agents import AgentMET4FOF
 from tests.conftest import test_timeout
 
 
