@@ -114,8 +114,8 @@ Some notable features of agentMET4FOF include :
 - A built-in buffering mechanism to decouple transmission, processing and visualization of data
 - Easy connection among software agents to send and receive data
 - Choose backends between:
-  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating real distributed 
-    systems connected via a TCP network, and 
+  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating as well as handling real distributed 
+    systems running Python connected via a TCP network, and 
   - [_Mesa_](https://mesa.readthedocs.io/en/stable/) for local simulations of distributed systems, debugging and 
     more high-performance execution
 - Interactive and customisable dashboard from the get-go to:
