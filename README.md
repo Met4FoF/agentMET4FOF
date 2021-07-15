@@ -111,18 +111,18 @@ One of the many questions that drive us in the project is:
 Some notable features of agentMET4FOF include : 
 
 - Modular agent classes for metrological data streams and analytics 
-- Built-in buffering mechanism to decouple transmission, processing and plotting of data
+- A built-in buffering mechanism to decouple transmission, processing and visualization of data
 - Easy connection among software agents to send and receive data
 - Choose backends between:
-  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for real distributed 
+  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating real distributed 
     systems connected via a TCP network, and 
-  - [_Mesa_]() for local simulations of distributed systems, debugging and more 
-    performant execution
+  - [_Mesa_](https://mesa.readthedocs.io/en/stable/) for local simulations of distributed systems, debugging and 
+    more high-performance execution
 - Interactive and customisable dashboard from the get-go to:
-  - Visualize and change agent networks' topologies
+  - Visualize and change agent-network topologies
   - Visualize groups of cooperative agents as _Coalitions_
-  - View and change agents parameter
-  - View agents' outputs as plotly or matplotlib plots or generate and embed your 
+  - View and change the agents' parameters
+  - View the agents' outputs as plotly or matplotlib plots or generate and embed your 
     own images  
 
 ## 📈The agentMET4FOF dashboard
