@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# Here we could fire up a dashboard. This gets executed when the conatiner gets started.
-
-# This executes the provided command when the container was started.
-exec "$@"
