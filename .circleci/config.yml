@@ -23,7 +23,8 @@ workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      - build_image
+      - build_image:
+          context: Docker publishing for agents
 #      - test_against_venv
 #      - test_against_conda
 #      - test_against_setup
