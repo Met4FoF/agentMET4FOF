@@ -17,7 +17,7 @@ executors:
   builder:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:3.9
+      - image: circleci/python:3.7
 
 workflows:
   # Create workflow for testing and deploying agentMET4FOF.
