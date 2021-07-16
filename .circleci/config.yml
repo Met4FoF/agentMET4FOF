@@ -424,7 +424,7 @@ jobs:
 
       - run:
           name: Login to GitHub cli
-          command: gh auth login --hostname github.com
+          command: gh auth login --hostname github.com --with-token
 
       - run:
           name: Upload current image
