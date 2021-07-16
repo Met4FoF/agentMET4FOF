@@ -410,11 +410,11 @@ jobs:
     steps:
 
 
-#      - restore_cache:
-#          keys:
-#            - workspace1
-      - attach_workspace:
-          at: /tmp/workspace
+      - restore_cache:
+          keys:
+            - workspace1
+#      - attach_workspace:
+#          at: /tmp/workspace
 
       - run:
           name: Installing the GitHub cli 'gh'
