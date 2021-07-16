@@ -105,17 +105,25 @@ One of the many questions that drive us in the project is:
   How can metrological input be incorporated into an agent-based system for addressing
   uncertainty of machine learning in future manufacturing?
   </blockquote>
-</p>
 
 ### Features
 
-Some of the notable features of agentMET4FOF include : 
+Some notable features of agentMET4FOF include : 
+
 - Modular agent classes for metrological data streams and analytics 
-- Built-in buffering mechanism  
-- Easy connection among software agents to send and receive data 
-- Option to choose backends : Osbrain for real distributed systems and Mesa for simulated distributed systems.  
-- Group cooperative agents under a Coalition.  
-- Interactive and customisable dashboard from the get-go. 
+- A built-in buffering mechanism to decouple transmission, processing and visualization of data
+- Easy connection among software agents to send and receive data
+- Choose backends between:
+  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating as well as handling real distributed 
+    systems running Python connected via a TCP network, and 
+  - [_Mesa_](https://mesa.readthedocs.io/en/stable/) for local simulations of distributed systems, debugging and 
+    more high-performance execution
+- Interactive and customisable dashboard from the get-go to:
+  - Visualize and change agent-network topologies
+  - Visualize groups of cooperative agents as _Coalitions_
+  - View and change the agents' parameters
+  - View the agents' outputs as plotly or matplotlib plots or generate and embed your 
+    own images  
 
 ## 📈The agentMET4FOF dashboard
 

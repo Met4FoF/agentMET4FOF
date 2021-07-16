@@ -117,24 +117,29 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
     def init_parameters(self, *args, **kwargs):
         super(MetrologicalMonitorAgent, self).init_parameters(*args, **kwargs)
         # create alias/dummies to match dashboard expectations
-        self.memory = self._input_data
         self.plot_filter = []
         self.plots = {}
         self.custom_plot_parameters = {}
 
     def on_received_message(self, message):
-        """
-        Handles incoming data from 'default' and 'plot' channels.
+        """Handles incoming data from ``default`` and ``plot`` channels
 
-        Stores 'default' data into `self.memory` and 'plot' data into `self.plots`
+        Feeds ``default`` data into the buffer as a dictionary::
+
+        dict like {
+            "data": message["data"],
+            "metadata": message["metadata"],
+        }
+
+        and hands over 'plot' data to plot memory.
 
         Parameters
         ----------
         message : dict
-            Acceptable channel values are 'default' or 'plot'
+            Acceptable ``channel`` values are ``default`` or ``plot``
         """
         if message["channel"] == "default":
-            if self.plot_filter != []:
+            if self.plot_filter:
                 message["data"] = {
                     key: message["data"][key] for key in self.plot_filter
                 }
