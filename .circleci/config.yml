@@ -39,7 +39,7 @@ workflows:
       - deploy_image:
           context:
             - Docker publishing for agents
-            - GitHub pushes to BjoernLudwigPTB's public_repos
+            - CircleCI agentMET4FOF docker publishing
           requires:
             - test_image
 #      - test_against_venv
