@@ -349,16 +349,17 @@ jobs:
 
       - run:
           name: Save Docker image
-          command: docker save ${IMAGE_NAME}:latest | gzip > agentMET4FOF_jupyter.tar.gz
+          command: docker save ${IMAGE_NAME}:latest | \
+              gzip > docker_image_agentMET4FOF_jupyter.tar.gz
 
       # Permanently store the built image to test and potentially deploy it.
       - persist_to_workspace:
           root: .
           paths:
-            - ./agentMET4FOF_jupyter.tar.gz
+            - ./docker_image_agentMET4FOF_jupyter.tar.gz
 
       - store_artifacts:
-          path: ./agentMET4FOF_jupyter.tar.gz
+          path: ./docker_image_agentMET4FOF_jupyter.tar.gz
 
   test_image:
     executor: image_dealer
@@ -376,7 +377,8 @@ jobs:
 
       - run:
           name: Retrieve built and stored image for testing
-          command: docker load -i /tmp/workspace/agentMET4FOF_jupyter.tar.gz
+          command: |
+            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
 
       - run:
           name: Test image
@@ -412,4 +414,6 @@ jobs:
 
       - run:
           name: Upload current image
-          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar.gz
+          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev \
+            /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker image for \
+            agentMET4FOF Jupyter Notebook Server"
