@@ -355,10 +355,10 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./image.tar
+            - ./agentMET4FOF_jupyter.tar
 
       - store_artifacts:
-          path: ./image.tar
+          path: ./agentMET4FOF_jupyter.tar
 
   test_image:
     executor: image_dealer
@@ -376,7 +376,7 @@ jobs:
 
       - run:
           name: Retrieve built and stored image for testing
-          command: docker load -i /tmp/workspace/image.tar
+          command: docker load -i /tmp/workspace/agentMET4FOF_jupyter.tar
 
       - run:
           name: Test image
