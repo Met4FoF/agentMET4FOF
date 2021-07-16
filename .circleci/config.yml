@@ -62,8 +62,6 @@ workflows:
       - build_image:
           context:
             - Docker publishing for agents
-          requires:
-            - release
       - test_image:
           context:
             - Docker publishing for agents
