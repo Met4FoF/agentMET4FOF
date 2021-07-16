@@ -349,7 +349,8 @@ jobs:
 
       - run:
           name: Save Docker image
-          command: docker save ${IMAGE_NAME}:latest | \
+          command: |
+            docker save ${IMAGE_NAME}:latest | \
               gzip > docker_image_agentMET4FOF_jupyter.tar.gz
 
       # Permanently store the built image to test and potentially deploy it.
