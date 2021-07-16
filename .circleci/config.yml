@@ -14,42 +14,47 @@ executors:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.8
+  builder:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/buildpack-deps:focal
 
 workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      - test_against_venv
-      - test_against_conda
-      - test_against_setup
-      - preview_release:
-          # Test the 'release' job to avoid trouble when Pull Requests get merged and
-          # to preview publishing actions and the new changelog.
-          requires:
-            - test_against_venv
-            - test_against_conda
-            - test_against_setup
-      - confirm_previewed_release_actions:
-          # This job allows for checking that the release we will create in the
-          # next step actually is the desired release, by observing the result of
-          # preview_release.
-          type: approval
-          requires:
-            - preview_release
-          filters:
-            branches:
-              # This assures the job only being triggered on branch master.
-              only: /develop/
-      - release:
-          # Job to potentially create a release based on python-semantic-release's
-          # decision and publish it on GitHub, Zenodo and PyPI.org. This requires manual
-          # approval in the previous step, which is only triggered on branch master,
-          # thus this job here is triggered only on master as well.
-          context:
-            - pypi.org publishing for agentMET4FOF
-            - GitHub pushes to BjoernLudwigPTB's public_repos
-          requires:
-            - confirm_previewed_release_actions
+      - build_image
+#      - test_against_venv
+#      - test_against_conda
+#      - test_against_setup
+#      - preview_release:
+#          # Test the 'release' job to avoid trouble when Pull Requests get merged and
+#          # to preview publishing actions and the new changelog.
+#          requires:
+#            - test_against_venv
+#            - test_against_conda
+#            - test_against_setup
+#      - confirm_previewed_release_actions:
+#          # This job allows for checking that the release we will create in the
+#          # next step actually is the desired release, by observing the result of
+#          # preview_release.
+#          type: approval
+#          requires:
+#            - preview_release
+#          filters:
+#            branches:
+#              # This assures the job only being triggered on branch master.
+#              only: /develop/
+#      - release:
+#          # Job to potentially create a release based on python-semantic-release's
+#          # decision and publish it on GitHub, Zenodo and PyPI.org. This requires manual
+#          # approval in the previous step, which is only triggered on branch master,
+#          # thus this job here is triggered only on master as well.
+#          context:
+#            - pypi.org publishing for agentMET4FOF
+#            - GitHub pushes to BjoernLudwigPTB's public_repos
+#          requires:
+#            - confirm_previewed_release_actions
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -305,3 +310,35 @@ jobs:
             python-semantic-release would perform the following actions:
             "
             semantic-release --noop publish
+
+  build_image:
+    executor: builder
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      # This builds the image. Taken from
+      # https://circleci.com/docs/2.0/building-docker-images/#overview
+      - setup_remote_docker
+
+      # Build image.
+      - run:
+          name: Install repo2docker
+          command: |
+            python3 -m pip install jupyter-repo2docker
+
+      # Build image.
+      - run:
+          name: Build image
+          command: |
+            jupyter-repo2docker --no-run --publish 8888:8888 --publish 8050:8050 \
+                --image-name ${IMAGE_NAME}:latest .
+
+      # Save the image.
+      - run:
+          name: Save Docker image
+          command: docker save -o image.tar ${IMAGE_NAME}:latest
+
+      # Permanently store the built image to test and potentially deploy it.
+      - store_artifacts:
+          path: ./image.tar
