@@ -426,13 +426,9 @@ jobs:
                 sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt-get update
             sudo apt-get install gh
-#
-#      - run:
-#          name: Login to GitHub cli
-#          command: gh auth login --hostname github.com --with-token
-#
-#      - run:
-#          name: Upload current image
-#          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev \
-#            /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker image for \
-#            agentMET4FOF Jupyter Notebook Server"
+
+      - run:
+          name: Upload current image
+          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev \
+            /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker image for \
+            agentMET4FOF Jupyter Notebook Server"
