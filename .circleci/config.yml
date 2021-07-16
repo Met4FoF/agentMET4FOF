@@ -18,13 +18,30 @@ executors:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.9
+  image_dealer:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/buildpack-deps:focal
 
 workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
       - build_image:
-          context: Docker publishing for agents
+          context:
+            - Docker publishing for agents
+      - test_image:
+          context:
+            - Docker publishing for agents
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+          requires:
+            - build_image
+      - deploy_image:
+          context:
+            - Docker publishing for agents
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+          requires:
+            - test_image
 #      - test_against_venv
 #      - test_against_conda
 #      - test_against_setup
@@ -340,5 +357,63 @@ jobs:
           command: docker save -o image.tar ${IMAGE_NAME}:latest
 
       # Permanently store the built image to test and potentially deploy it.
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+
       - store_artifacts:
           path: ./image.tar
+
+  test_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+
+      # Attach workflow workspace to retrieve saved image.
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker
+
+      # Retrieve built and stored image.
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+
+      # Test image.
+      - run:
+          name: Test images
+          command: |
+            docker run -d ${IMAGE_NAME}:latest
+            docker run --network container:contacts \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://localhost:8888
+
+  deploy_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+
+      # Attach workflow workspace to retrieve saved image.
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker
+
+      # Retrieve built and stored image.
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+
+      - run:
+          name: Installing the GitHub cli 'gh'
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install gh
+
+      - run:
+          name: Login to GitHub cli
+          command: gh auth login --with-token ${GH_TOKEN}
