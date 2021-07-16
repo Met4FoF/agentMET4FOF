@@ -325,7 +325,7 @@ jobs:
       - run:
           name: Install repo2docker
           command: |
-            python3 -m pip install jupyter-repo2docker
+            python3 -m pip install chardet jupyter-repo2docker
 
       # Build image.
       - run:
