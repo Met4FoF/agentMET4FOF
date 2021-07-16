@@ -355,10 +355,10 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./agentMET4FOF_jupyter.tar
+            - ./agentMET4FOF_jupyter.tar.gz
 
       - store_artifacts:
-          path: ./agentMET4FOF_jupyter.tar
+          path: ./agentMET4FOF_jupyter.tar.gz
 
   test_image:
     executor: image_dealer
@@ -376,7 +376,7 @@ jobs:
 
       - run:
           name: Retrieve built and stored image for testing
-          command: docker load -i /tmp/workspace/agentMET4FOF_jupyter.tar
+          command: docker load -i /tmp/workspace/agentMET4FOF_jupyter.tar.gz
 
       - run:
           name: Test image
@@ -412,4 +412,4 @@ jobs:
 
       - run:
           name: Upload current image
-          command: gh release upload --repo Met4FoF/agentMET4FOF v.0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar
+          command: gh release upload --repo Met4FoF/agentMET4FOF v.0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar.gz
