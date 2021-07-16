@@ -398,12 +398,6 @@ jobs:
 #      - attach_workspace:
 #          at: /tmp/workspace
 
-      - setup_remote_docker
-
-      - run:
-          name: Retrieve built and stored image
-          command: docker load -i /tmp/workspace/image.tar
-
       - run:
           name: Installing the GitHub cli 'gh'
           command: |
