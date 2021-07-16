@@ -71,11 +71,11 @@ workflows:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
           requires:
+            - release
             - test_against_venv
             - test_against_conda
             - test_against_setup
             - test_image
-            - release
 
 commands:
   # Reusable command to prepare the environment for testing.
