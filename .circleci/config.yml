@@ -408,4 +408,8 @@ jobs:
 
       - run:
           name: Login to GitHub cli
-          command: gh auth login --with-token
+          command: gh auth login --hostname github.com
+
+      - run:
+          name: Upload current image
+          command: gh release upload --repo Met4FoF/agentMET4FOF v.0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar
