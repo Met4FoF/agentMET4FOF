@@ -412,4 +412,4 @@ jobs:
 
       - run:
           name: Upload current image
-          command: gh release upload --repo Met4FoF/agentMET4FOF v.0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar.gz
+          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev /tmp/workspace/agentMET4FOF_jupyter.tar.gz
