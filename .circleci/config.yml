@@ -44,6 +44,7 @@ workflows:
           type: approval
           requires:
             - preview_release
+            - test_image
           filters:
             branches:
               # This assures the job only being triggered on branch master.
@@ -61,6 +62,8 @@ workflows:
       - build_image:
           context:
             - Docker publishing for agents
+          requires:
+            - release
       - test_image:
           context:
             - Docker publishing for agents
@@ -72,7 +75,6 @@ workflows:
             - CircleCI agentMET4FOF docker publishing
           requires:
             - release
-            - test_image
 
 commands:
   # Reusable command to prepare the environment for testing.
