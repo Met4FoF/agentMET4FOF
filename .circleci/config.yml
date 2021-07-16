@@ -332,8 +332,7 @@ jobs:
       - run:
           name: Build image
           command: |
-            jupyter-repo2docker --no-run --publish 8888:8888 --publish 8050:8050 \
-                --image-name ${IMAGE_NAME}:latest .
+            jupyter-repo2docker --no-run --image-name ${IMAGE_NAME}:latest .
 
       # Save the image.
       - run:
