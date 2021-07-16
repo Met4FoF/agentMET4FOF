@@ -375,19 +375,16 @@ jobs:
 
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
             - workspace1
 
       - setup_remote_docker
 
-      # Retrieve built and stored image.
       - run:
-          name: Load archived Docker image
+          name: Retrieve built and stored image for testing
           command: docker load -i /tmp/workspace/image.tar
 
-      # Test image.
       - run:
-          name: Test images
+          name: Test image
           command: |
             docker run --name agents --publish 127.0.0.1:8888:8888 -d ${IMAGE_NAME}:latest
             docker run --network container:agents \
@@ -408,9 +405,8 @@ jobs:
 
       - setup_remote_docker
 
-      # Retrieve built and stored image.
       - run:
-          name: Load archived Docker image
+          name: Retrieve built and stored image
           command: docker load -i /tmp/workspace/image.tar
 
       - run:
