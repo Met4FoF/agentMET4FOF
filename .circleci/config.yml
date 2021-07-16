@@ -30,18 +30,18 @@ workflows:
 #      - build_image:
 #          context:
 #            - Docker publishing for agents
-      - test_image:
-          context:
-            - Docker publishing for agents
-            - GitHub pushes to BjoernLudwigPTB's public_repos
+#      - test_image:
+#          context:
+#            - Docker publishing for agents
+#            - GitHub pushes to BjoernLudwigPTB's public_repos
 #          requires:
 #            - build_image
       - deploy_image:
           context:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
-          requires:
-            - test_image
+#          requires:
+#            - test_image
 #      - test_against_venv
 #      - test_against_conda
 #      - test_against_setup
@@ -426,13 +426,13 @@ jobs:
                 sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt-get update
             sudo apt-get install gh
-
-      - run:
-          name: Login to GitHub cli
-          command: gh auth login --hostname github.com --with-token
-
-      - run:
-          name: Upload current image
-          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev \
-            /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker image for \
-            agentMET4FOF Jupyter Notebook Server"
+#
+#      - run:
+#          name: Login to GitHub cli
+#          command: gh auth login --hostname github.com --with-token
+#
+#      - run:
+#          name: Upload current image
+#          command: gh release upload --repo Met4FoF/agentMET4FOF v0.9.1dev \
+#            /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker image for \
+#            agentMET4FOF Jupyter Notebook Server"
