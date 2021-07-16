@@ -414,4 +414,4 @@ jobs:
 
       - run:
           name: Login to GitHub cli
-          command: gh auth login --with-token ${GH_TOKEN}
+          command: gh auth login --with-token
