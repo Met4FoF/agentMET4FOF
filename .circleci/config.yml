@@ -374,12 +374,6 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
 
-      - save_cache:
-          paths:
-            - /tmp/workspace/
-          key: workspace1
-
-      # Download and cache dependencies.
       - restore_cache:
           keys:
             # Specify the unique identifier for the cache.
