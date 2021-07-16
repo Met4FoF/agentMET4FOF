@@ -366,9 +366,13 @@ jobs:
     executor: image_dealer
     working_directory: ~/repo
     steps:
-
       - attach_workspace:
           at: /tmp/workspace
+
+      - save_cache:
+          paths:
+            - /tmp/workspace/
+          key: workspace1
 
 #      - restore_cache:
 #          keys:
