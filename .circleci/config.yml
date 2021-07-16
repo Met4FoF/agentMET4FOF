@@ -389,7 +389,7 @@ jobs:
           name: Test image's notebook server
           command: |
             docker run --name agents --publish 127.0.0.1:8888:8888 \
-              -d ${IMAGE_NAME}:latest
+              -d --rm ${IMAGE_NAME}:latest
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8888
