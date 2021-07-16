@@ -33,7 +33,6 @@ workflows:
       - test_image:
           context:
             - Docker publishing for agents
-            - GitHub pushes to BjoernLudwigPTB's public_repos
           requires:
             - build_image
       - deploy_image:
