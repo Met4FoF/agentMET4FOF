@@ -335,23 +335,18 @@ jobs:
     steps:
       - checkout
 
-      # This builds the image. Taken from
-      # https://circleci.com/docs/2.0/building-docker-images/#overview
       - setup_remote_docker
 
-      # Build image.
       - run:
           name: Install repo2docker
           command: |
             python3 -m pip install chardet jupyter-repo2docker
 
-      # Build image.
       - run:
           name: Build image
           command: |
             jupyter-repo2docker --no-run --image-name ${IMAGE_NAME}:latest .
 
-      # Save the image.
       - run:
           name: Save Docker image
           command: docker save -o image.tar ${IMAGE_NAME}:latest
