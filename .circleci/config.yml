@@ -433,8 +433,8 @@ jobs:
             most_current_release=$(
               git -c 'versionsort.suffix=-' ls-remote \
                 --exit-code --refs --sort='version:refname' --tags \
-                ${CIRCLE_REPOSITORY_URL} '*.*.*' | tail --lines=1 | \
-                cut --delimiter='/' --fields=3
+                https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git \
+                '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3
             )
             gh release upload --repo \
               ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
