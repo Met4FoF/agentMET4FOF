@@ -27,15 +27,15 @@ workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-#      - build_image:
-#          context:
-#            - Docker publishing for agents
+      - build_image:
+          context:
+            - Docker publishing for agents
       - test_image:
           context:
             - Docker publishing for agents
             - GitHub pushes to BjoernLudwigPTB's public_repos
-#          requires:
-#            - build_image
+          requires:
+            - build_image
       - deploy_image:
           context:
             - Docker publishing for agents
@@ -373,6 +373,17 @@ jobs:
       # Attach workflow workspace to retrieve saved image.
       - attach_workspace:
           at: /tmp/workspace
+
+      - save_cache:
+          paths:
+            - /tmp/workspace/
+          key: workspace1
+
+       Download and cache dependencies.
+      - restore_cache:
+          keys:
+            # Specify the unique identifier for the cache.
+            - workspace1
 
       - setup_remote_docker
 
