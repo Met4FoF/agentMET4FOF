@@ -381,9 +381,19 @@ jobs:
             docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
 
       - run:
-          name: Test image
+          name: Test image's notebook server
           command: |
-            docker run --name agents --publish 127.0.0.1:8888:8888 -d ${IMAGE_NAME}:latest
+            docker run --name agents --publish 127.0.0.1:8888:8888 \
+              -d ${IMAGE_NAME}:latest
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8888
+
+      - run:
+          name: Test image's dashboard
+          command: |
+            docker run --name agents --publish 127.0.0.1:8888:8888 \
+              -d ${IMAGE_NAME}:latest
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8888
@@ -403,8 +413,12 @@ jobs:
       - run:
           name: Installing the GitHub cli 'gh'
           command: |
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
+                sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) \
+                signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
+                https://cli.github.com/packages stable main" | \
+                sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt-get update
             sudo apt-get install gh
 
