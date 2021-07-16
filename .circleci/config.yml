@@ -61,8 +61,6 @@ workflows:
       - build_image:
           context:
             - Docker publishing for agents
-          requires:
-            - release
       - test_image:
           context:
             - Docker publishing for agents
@@ -73,7 +71,11 @@ workflows:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
           requires:
+            - test_against_venv
+            - test_against_conda
+            - test_against_setup
             - test_image
+            - release
 
 commands:
   # Reusable command to prepare the environment for testing.
