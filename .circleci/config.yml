@@ -36,12 +36,12 @@ workflows:
             - GitHub pushes to BjoernLudwigPTB's public_repos
 #          requires:
 #            - build_image
-#      - deploy_image:
-#          context:
-#            - Docker publishing for agents
-#            - CircleCI agentMET4FOF docker publishing
-#          requires:
-#            - test_image
+      - deploy_image:
+          context:
+            - Docker publishing for agents
+            - CircleCI agentMET4FOF docker publishing
+          requires:
+            - test_image
 #      - test_against_venv
 #      - test_against_conda
 #      - test_against_setup
@@ -393,6 +393,7 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8888
+            docker stop agents
 
       - run:
           name: Test image's dashboard
