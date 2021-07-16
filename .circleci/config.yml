@@ -27,21 +27,21 @@ workflows:
   # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-#      - build_image:
-#          context:
-#            - Docker publishing for agents
-#      - test_image:
-#          context:
-#            - Docker publishing for agents
-#            - GitHub pushes to BjoernLudwigPTB's public_repos
-#          requires:
-#            - build_image
+      - build_image:
+          context:
+            - Docker publishing for agents
+      - test_image:
+          context:
+            - Docker publishing for agents
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+          requires:
+            - build_image
       - deploy_image:
           context:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
-#          requires:
-#            - test_image
+          requires:
+            - test_image
 #      - test_against_venv
 #      - test_against_conda
 #      - test_against_setup
@@ -372,11 +372,7 @@ jobs:
       - save_cache:
           paths:
             - /tmp/workspace/
-          key: workspace2
-
-#      - restore_cache:
-#          keys:
-#            - workspace2
+          key: workspace3
 
       - setup_remote_docker
 
@@ -409,11 +405,8 @@ jobs:
     executor: image_dealer
     working_directory: ~/repo
     steps:
-      - restore_cache:
-          keys:
-            - workspace2
-#      - attach_workspace:
-#          at: /tmp/workspace
+      - attach_workspace:
+          at: /tmp/workspace
 
       - run:
           name: Installing the GitHub cli 'gh'
