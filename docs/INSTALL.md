@@ -100,9 +100,9 @@ once you completed the Docker installation.
 
 ### Download and import the agentMET4FOF Docker image
 
-You can download [the _Docker image for agentMET4FOF Jupyter Notebook Server
-_ as one of the release assets](https://github.com/Met4FoF/agentMET4FOF/releases/latest)
-, import it locally with
+You can download [the _Docker image for agentMET4FOF Jupyter Notebook server_ as one of
+the release assets](https://github.com/Met4FoF/agentMET4FOF/releases/latest), import it
+locally with
 
 ```bash
 > docker load -i LOCAL\PATH\TO\DOWNLOADS\docker_image_agentMET4FOF_jupyter.tar.gz
@@ -117,10 +117,9 @@ After importing the image, you can run it straight away with
 ```
 
 In this command's output you will find the usual Jupyter Notebook token 
-URL on your command line, which you can open in your browser. After starting an 
-agent network in one of the tutorials or your own notebooks, you will find the 
-dashboard URL in the notebook's output resembling something like 
-`http://0.0.0.0:8050`.
+URL, which you can open in your browser. After starting an agent network in one of 
+the tutorials or your own notebooks, you will find the dashboard URL in the 
+notebook's output resembling something like `http://0.0.0.0:8050`.
 
 ## Get started developing
 

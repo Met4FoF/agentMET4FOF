@@ -433,4 +433,4 @@ jobs:
               ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
               $most_current_release \
               /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
-              image for agentMET4FOF Jupyter Notebook Server"
+              image for agentMET4FOF Jupyter Notebook server"

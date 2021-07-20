@@ -177,7 +177,7 @@ There are two ways to run agentMET4FOF. Either:
    environment on your computer, or
 2. you [install Docker](https://docs.docker.com/get-docker/), [start agentMET4FOF in 
    a container](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image)
-   and visit the Jupyter Notebook Server and the agentMET4FOF Dashboard directly in 
+   and visit the Jupyter Notebook server and the agentMET4FOF dashboard directly in 
    your browser.
 
 In the [video tutorials series](#video-tutorial-series)
