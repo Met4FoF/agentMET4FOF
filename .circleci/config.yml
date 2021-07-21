@@ -405,6 +405,7 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050
+            docker stop agents
 
       - run:
           name: Test image's dashboard in a subfolder
