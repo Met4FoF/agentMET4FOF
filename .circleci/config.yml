@@ -67,12 +67,17 @@ workflows:
             - Docker publishing for agents
           requires:
             - build_image
+      - retag_image:
+          context:
+            - Docker publishing for agents
+          requires:
+            - release
       - deploy_image:
           context:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
           requires:
-            - release
+            - retag_image
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -413,6 +418,38 @@ jobs:
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/$subfolder_name
 
+  retag_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+
+      - setup_remote_docker
+
+      - run:
+          name: Retrieve built and tested image
+          command: |
+            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - run:
+          name: Retag image with corresponding version number
+          command: |
+            version=$(docker run --rm r2d-2e1626350958 \
+              awk -F '"' '/__version/{print $(NF-1)}' agentMET4FOF/__init__.py)
+            docker tag ${IMAGE_NAME} met4fof/${IMAGE_NAME}:$version
+
+      - run:
+          name: Save Docker image
+          command: |
+            docker save met4fof/${IMAGE_NAME}:latest | \
+              gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+
+      # Permanently store the built image to test and potentially deploy it.
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+
+
   deploy_image:
     executor: image_dealer
     working_directory: ~/repo
@@ -444,5 +481,5 @@ jobs:
             gh release upload --repo \
               ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
               $most_current_release \
-              /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
+              /tmp/workspace/tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
               image for agentMET4FOF Jupyter Notebook server"
