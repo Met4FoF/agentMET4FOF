@@ -170,15 +170,16 @@ If questions arise, or you feel something is missing, reach out to
 
 ## 💻Installation
 
-There are two ways to run agentMET4FOF. Either:
+There are different ways to run agentMET4FOF. Either:
 
 1. you [install Python](https://www.python.org/downloads/) and our package
    [agentMET4FOF](https://pypi.org/project/agentMET4FOF/) in a virtual Python 
    environment on your computer, or
 2. you [install Docker](https://docs.docker.com/get-docker/), [start agentMET4FOF in 
    a container](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image)
-   and visit the Jupyter Notebook server and the agentMET4FOF dashboard directly in 
-   your browser.
+   and [visit the Jupyter Notebook server and the agentMET4FOF dashboard directly in 
+   your browser](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image-for-local-use)
+   or even [deploy it over a proper webserver](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#deploy-the-containerized-agents-via-a-webserver).
 
 In the [video tutorials series](#video-tutorial-series)
 we guide you through every step of option 1. More detailed instructions on both 
