@@ -74,6 +74,8 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/
 
 commands:
   # Reusable command to prepare the environment for testing.
