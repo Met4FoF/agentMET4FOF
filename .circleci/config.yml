@@ -71,8 +71,6 @@ workflows:
           context:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
-          requires:
-            - test_image
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -418,8 +416,9 @@ jobs:
     executor: image_dealer
     working_directory: ~/repo
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
+      - restore_cache:
+          keys:
+            - workspace3
 
       - setup_remote_docker
 
