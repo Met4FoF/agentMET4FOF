@@ -107,7 +107,7 @@ the release assets](https://github.com/Met4FoF/agentMET4FOF/releases/latest), im
 locally with
 
 ```bash
-> docker load -i LOCAL\PATH\TO\DOWNLOADS\docker_image_agentMET4FOF_jupyter.tar.gz
+> docker load -i LOCAL\PATH\TO\DOWNLOADS\tagged_docker_image_agentMET4FOF_jupyter.tar.gz
 ```
 
 ### Start a container from the image for local use
