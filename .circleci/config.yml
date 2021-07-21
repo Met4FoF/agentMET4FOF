@@ -71,8 +71,9 @@ workflows:
           context:
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
-          requires:
-            - release
+          filters:
+            tags:
+              only: /^v.*/
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -409,12 +410,20 @@ jobs:
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/$subfolder_name/
 
+      - save_cache:
+          paths:
+            - /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+          key: >-
+            v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
+
   retag_and_deploy_image:
     executor: image_dealer
-    working_directory: ~/repo
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
       - setup_remote_docker
 
@@ -427,10 +436,14 @@ jobs:
           name: Retag image with corresponding version number and store new archive
           command: |
             version=$(docker run --rm ${IMAGE_NAME}:latest \
-              awk -F '"' '/__version/{print $(NF-1)}' agentMET4FOF/__init__.py)
-            docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
-            docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
-              gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+              python -c "from agentMET4FOF import __version__;print(__version__)")
+            if [ $CIRCLE_TAG = $version ]; then
+              docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
+              docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
+                gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+            else
+              exit 1
+            fi
 
       - run:
           name: Install the GitHub cli 'gh'
@@ -447,14 +460,8 @@ jobs:
       - run:
           name: Upload current image
           command: |
-            most_current_release=$(
-              git -c 'versionsort.suffix=-' ls-remote \
-                --exit-code --refs --sort='version:refname' --tags \
-                https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git \
-                '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3
-            )
             gh release upload --repo \
               ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
-              $most_current_release \
+              v${CIRCLE_TAG} \
               tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
               image for agentMET4FOF Jupyter Notebook server"
