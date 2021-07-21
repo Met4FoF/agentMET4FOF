@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.0 (2021-07-21)
+### Feature
+* **Docker:** Create container image for every release ([`1a40eaf`](https://github.com/Met4FoF/agentMET4FOF/commit/1a40eaf5724a0f956074d7cbee69dcee449c009b))
+
+### Refactor
+* **network:** Change delivery ip to 0.0.0.0, i.e. all interfaces instead of 127.0.0.1 to enable docker deployment ([`2472826`](https://github.com/Met4FoF/agentMET4FOF/commit/24728269a1485376ebaf2492d3849c232f88c05a))
+
+### Documentation
+* **ReadTheDocs:** Include Docker guide ([`7c35bba`](https://github.com/Met4FoF/agentMET4FOF/commit/7c35bba0aa45635c782830389d0c53c0c23d9cb7))
+* **CONTRIBUTING:** Mention commit type refactor in contributing guide ([`a4891e7`](https://github.com/Met4FoF/agentMET4FOF/commit/a4891e7a5d4267955f8a1d582c2faf3bc369cc09))
+* **metrological_redundancy_agents:** Introduce redundancy agent into docs ([`cb493cb`](https://github.com/Met4FoF/agentMET4FOF/commit/cb493cb24aa1c6cc499446552e952b5ec053a8a7))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.9.0...v0.10.0)**
+
 ## v0.9.0 (2021-07-08)
 ### Feature
 * **agents:** Adds `ampl` and `phase_ini` parameters to SineGeneratorAgent ([`774a91b`](https://github.com/Met4FoF/agentMET4FOF/commit/774a91b454aac2f9caa1c3ce5b6577ccea27dfdb))
