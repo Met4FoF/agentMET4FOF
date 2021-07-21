@@ -136,7 +136,7 @@ class AgentNetwork:
         ):
             try:
                 if ip_addr is None:
-                    ip_addr = "localhost"
+                    ip_addr = "0.0.0.0"
 
                 if name == " ":
                     new_name = self.generate_module_name_byType(agentType)
@@ -441,7 +441,7 @@ class AgentNetwork:
 
     def __init__(
         self,
-        ip_addr="127.0.0.1",
+        ip_addr="0.0.0.0",
         port=3333,
         connect=False,
         log_filename="log_file.csv",

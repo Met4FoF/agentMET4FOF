@@ -1,0 +1,70 @@
+version: '3.8'
+
+# This file was created with the docker-compose.yml from the Wekan project as
+# template as it is so full of examples and usage documentation, which we are
+# very thankful for. The actual container configuration follows at the bottom.
+#----------------------------------------------------------------------------------
+# ==== USAGE OF THIS docker-compose.yml ====
+# 1) For firing up the app and the webserver and look at the logs instantly execute:
+#       $ docker-compose up
+#    stop the print out and leave the log mode with Ctrl-C, which will also
+#    stop the container.
+# 2) Restart once stopped container:
+#      $ docker-compose start
+# 3) To fire up container without looking at the logs execute:
+#      $ docker-compose up -d
+# 4) Inspect running container:
+#      $ docker-compose ps
+# 5) Stop Docker containers without loosing persistent or temporary data:
+#      $ docker-compose stop
+# 6) Stop and remove Docker containers without loosing persistent data but with
+#    loosing temporary data:
+#      $ docker-compose down
+# ----------------------------------------------------------------------------------
+# ==== INSIDE DOCKER CONTAINERS ====
+# 1) Going into agentMET4FOF container:
+#      $ docker-compose exec app bash
+#-------------------------------------------------------------------------
+services:
+
+  app:
+    image: PTBPSt1/agentMET4FOF2docker
+    container_name: node-red
+    restart: always
+    expose:
+      - 80
+    ports:
+      - target: 8050
+        published: 8050
+        protocol: tcp
+        mode: host
+      - target: 8888
+        published: 88888
+        protocol: tcp
+        mode: host
+    networks:
+      - tier
+
+  webserver:
+    image: nginx:latest
+    restart: always
+    command: mongod --auth --config /etc/mongod.conf --oplogSize 128
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+    networks:
+      - tier
+      - brdige
+    depends_on:
+      - app
+
+networks:
+  tier:
+    driver: bridge

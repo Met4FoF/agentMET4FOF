@@ -14,6 +14,14 @@ executors:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.8
+  builder:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.9
+  image_dealer:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/buildpack-deps:focal
 
 workflows:
   # Create workflow for testing and deploying agentMET4FOF.
@@ -36,6 +44,7 @@ workflows:
           type: approval
           requires:
             - preview_release
+            - test_image
           filters:
             branches:
               # This assures the job only being triggered on branch master.
@@ -50,6 +59,20 @@ workflows:
             - GitHub pushes to BjoernLudwigPTB's public_repos
           requires:
             - confirm_previewed_release_actions
+      - build_image:
+          context:
+            - Docker publishing for agents
+      - test_image:
+          context:
+            - Docker publishing for agents
+          requires:
+            - build_image
+      - retag_and_deploy_image:
+          context:
+            - Docker publishing for agents
+            - CircleCI agentMET4FOF docker publishing
+          requires:
+            - release
 
 commands:
   # Reusable command to prepare the environment for testing.
@@ -305,3 +328,133 @@ jobs:
             python-semantic-release would perform the following actions:
             "
             semantic-release --noop publish
+
+  build_image:
+    executor: builder
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Install repo2docker
+          command: |
+            python3 -m pip install chardet jupyter-repo2docker
+
+      - run:
+          name: Build image
+          command: |
+            jupyter-repo2docker --no-run --image-name ${IMAGE_NAME}:latest .
+
+      - run:
+          name: Save Docker image
+          command: |
+            docker save ${IMAGE_NAME}:latest | \
+              gzip > docker_image_agentMET4FOF_jupyter.tar.gz
+
+      # Permanently store the built image to test and potentially deploy it.
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - store_artifacts:
+          path: ./docker_image_agentMET4FOF_jupyter.tar.gz
+
+  test_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker
+
+      - run:
+          name: Retrieve built and stored image for testing
+          command: |
+            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - run:
+          name: Test image's notebook server
+          command: |
+            docker run --name agents --publish 127.0.0.1:8888:8888 \
+              -d --rm ${IMAGE_NAME}:latest
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8888
+            docker stop agents
+
+      - run:
+          name: Test image's dashboard
+          command: |
+            docker run --name agents --publish 127.0.0.1:8050:8050 --rm -d \
+              ${IMAGE_NAME}:latest python \
+              ${HOME}/agentMET4FOF_tutorials/tutorial_1_generator_agent.py
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8050
+            docker stop agents
+
+      - run:
+          name: Test image's dashboard in a subfolder
+          command: |
+            subfolder_name=dashboard_subfolder
+            docker run --name agents --publish 127.0.0.1:8050:8050 --rm -d \
+              --env DASH_URL_BASE_PATHNAME=/$subfolder_name/ \
+              ${IMAGE_NAME}:latest python \
+              ${HOME}/agentMET4FOF_tutorials/tutorial_1_generator_agent.py
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8050/$subfolder_name/
+
+  retag_and_deploy_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker
+
+      - run:
+          name: Retrieve built and tested image
+          command: |
+            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - run:
+          name: Retag image with corresponding version number and store new archive
+          command: |
+            version=$(docker run --rm ${IMAGE_NAME}:latest \
+              awk -F '"' '/__version/{print $(NF-1)}' agentMET4FOF/__init__.py)
+            docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
+            docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
+              gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - run:
+          name: Install the GitHub cli 'gh'
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
+                sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) \
+                signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
+                https://cli.github.com/packages stable main" | \
+                sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install gh
+
+      - run:
+          name: Upload current image
+          command: |
+            most_current_release=$(
+              git -c 'versionsort.suffix=-' ls-remote \
+                --exit-code --refs --sort='version:refname' --tags \
+                https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git \
+                '*.*.*' | tail --lines=1 | cut --delimiter='/' --fields=3
+            )
+            gh release upload --repo \
+              ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
+              $most_current_release \
+              tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
+              image for agentMET4FOF Jupyter Notebook server"

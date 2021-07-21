@@ -1,13 +1,15 @@
 <p align="center">
   <!-- CircleCI Tests -->
-  <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield"></a>
+  <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline
+    status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?
+    style=shield"></a>
   <!-- ReadTheDocs Documentation -->
   <a href="https://agentmet4fof.readthedocs.io/">
     <img src="https://readthedocs.org/projects/agentmet4fof/badge/?version=latest" alt="ReadTheDocs badge">
   </a>
   <!-- CodeCov(erage) -->
   <a href="https://codecov.io/gh/Met4FoF/agentMET4FOF">
-    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy"/>
+    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy" alt="CodeCov badge"/>
   </a>
   <!-- PyPI Version -->
   <a href="https://pypi.org/project/agentmet4fof">
@@ -15,7 +17,8 @@
   </a>
   <!-- PyPI License -->
   <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
-    <img alt="PyPI - license badge" src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
+    <img alt="PyPI - license badge" 
+    src="https://img.shields.io/pypi/l/agentMET4FOF?color=bright">
   </a>
   <!-- Zenodo DOI -->
   <a href="https://doi.org/10.5281/zenodo.4560343">
@@ -28,7 +31,7 @@
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
 analysis and processing of both static data sets and data streams with IIoT 
 applications in mind. More on the motivation that drives the project can be found
-in the section <a href="#about">About</a>.
+in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a>.
 </p>
 
 ## Table of content
@@ -111,13 +114,14 @@ One of the many questions that drive us in the project is:
 Some notable features of agentMET4FOF include : 
 
 - Modular agent classes for metrological data streams and analytics 
-- A built-in buffering mechanism to decouple transmission, processing and visualization of data
+- A built-in buffering mechanism to decouple transmission, processing and visualization
+  of data
 - Easy connection among software agents to send and receive data
 - Choose backends between:
-  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating as well as handling real distributed 
-    systems running Python connected via a TCP network, and 
-  - [_Mesa_](https://mesa.readthedocs.io/en/stable/) for local simulations of distributed systems, debugging and 
-    more high-performance execution
+  - [_Osbrain_](https://osbrain.readthedocs.io/en/stable/) for simulating as well as 
+    handling real distributed systems running Python connected via a TCP network, and 
+  - [_Mesa_](https://mesa.readthedocs.io/en/stable/) for local simulations of
+    distributed systems, debugging and more high-performance execution
 - Interactive and customisable dashboard from the get-go to:
   - Visualize and change agent-network topologies
   - Visualize groups of cooperative agents as _Coalitions_
@@ -134,9 +138,10 @@ more pre-made agents to your network all during run-time. The address to your
 dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
-tutorial 2. For details on the tutorials visit our [video tutorial series](#video-tutorial-series).
+tutorial 2. For details on the tutorials visit our
+[video tutorial series](#video-tutorial-series).
 
-![Web Screenshot](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
+![](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
 ## 📖Documentation and video tutorials
 
@@ -145,7 +150,9 @@ Extended
 
 ### Video tutorial series
 
-Additionally, we provide some [video tutorials based on agentMET4FOF 0.4.1 on the project homepage](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
+Additionally, we provide some
+[video tutorials based on agentMET4FOF 0.4.1 on the project homepage
+](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
 in the section _Tutorials for the multi-agent system agentMET4FOF_. 
 You can self-register on the linked page and get started immediately. The video series
 begins with our motivation for creating agentMET4FOF, guide you through the
@@ -158,21 +165,31 @@ In an early development stage we held a live online tutorial based on
 [agentMET4FOF 0.1.0](https://github.com/Met4FoF/agentMET4FOF/releases/0.1.0/) 
 which you can [download](https://github.com/Met4FoF/agentMET4FOF/releases/download/0.1.0/Met4FoF.MAS.webinar.mp4).
 
-If questions arise, or you feel something is missing, reach out to [us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
+If questions arise, or you feel something is missing, reach out to
+[us](https://github.com/Met4FoF/agentMET4FOF/graphs/contributors).
 
 ## 💻Installation
 
-The installation of agentMET4FOF is as straightforward as the Python 
-ecosystem suggests. In the [video tutorials series](#video-tutorial-series)
-we guide you through every step until you have agentMET4FOF running on 
-your machine. Besides that we have more details in the [installation 
+There are different ways to run agentMET4FOF. Either:
+
+1. you [install Python](https://www.python.org/downloads/) and our package
+   [agentMET4FOF](https://pypi.org/project/agentMET4FOF/) in a virtual Python 
+   environment on your computer, or
+2. you [install Docker](https://docs.docker.com/get-docker/), [start agentMET4FOF in 
+   a container](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image)
+   and [visit the Jupyter Notebook server and the agentMET4FOF dashboard directly in 
+   your browser](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image-for-local-use)
+   or even [deploy it over a proper webserver](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#deploy-the-containerized-agents-via-a-webserver).
+
+In the [video tutorials series](#video-tutorial-series)
+we guide you through every step of option 1. More detailed instructions on both 
+options you can find in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html).
 
 ## 💨Coming soon
 
-- Dockerize agentMET4FOF
-- Improve handling of metadata
-- Further improve plotting
+- Improved handling of metadata
+- More advanced signal processing
 
 For a comprehensive overview of current development activities and upcoming tasks,
 take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/projects/1),
@@ -182,20 +199,23 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 ## 🖋Citation
 
 If you publish results obtained with the help of agentMET4FOF, please cite the linked
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)](https://doi.org/10.5281/zenodo.4560344).
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)
+](https://doi.org/10.5281/zenodo.4560344).
 
 ## 💎Acknowledgement
 
-This work was part of the Joint Research Project [Metrology for the Factory of the Future (Met4FoF), project number 17IND12](https://www.ptb.de/empir2018/met4fof/home/)
-of the European Metrology Programme for Innovation and Research (EMPIR). The [EMPIR](http://msu.euramet.org)
-is jointly funded by the EMPIR participating countries within EURAMET and the European 
-Union.
+This work was part of the Joint Research Project [Metrology for the Factory of the 
+Future (Met4FoF), project number 17IND12](https://www.ptb.de/empir2018/met4fof/home/)
+of the European Metrology Programme for Innovation and Research (EMPIR). The 
+[EMPIR](http://msu.euramet.org) is jointly funded by the EMPIR participating 
+countries within EURAMET and the European Union.
 
 ## ⚠Disclaimer
 
 This software is developed as a joint effort of several project partners namely:
 
-- [Institute for Manufacturing of the University of Cambridge (IfM)](https://www.ifm.eng.cam.ac.uk/)
+- [Institute for Manufacturing of the University of Cambridge (IfM)
+  ](https://www.ifm.eng.cam.ac.uk/)
 - [Physikalisch-Technische Bundesanstalt (PTB)](https://www.ptb.de/)
 - [Van Swinden Laboratory (VSL)](https://www.vsl.nl/en/)
 - [National Physics Laboratory (NPL)](https://www.npl.co.uk/)
@@ -209,5 +229,5 @@ connection with the use of this software.
 
 ## ©License
 
-agentMET4FOF is distributed under the [LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
-
+agentMET4FOF is distributed under the
+[LGPLv3 license](https://github.com/Met4FoF/agentMET4FOF/blob/develop/license.md).
