@@ -428,8 +428,8 @@ jobs:
           command: |
             version=$(docker run --rm ${IMAGE_NAME}:latest \
               awk -F '"' '/__version/{print $(NF-1)}' agentMET4FOF/__init__.py)
-            docker tag ${IMAGE_NAME} met4fof/${IMAGE_NAME}:$version
-            docker save met4fof/${IMAGE_NAME}:$version | \
+            docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
+            docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
               gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
 
       - run:
