@@ -313,7 +313,6 @@ jobs:
             docker save ${IMAGE_NAME}:latest | \
               gzip > docker_image_agentMET4FOF_jupyter.tar.gz
 
-      # Permanently store the built image to test and potentially deploy it.
       - persist_to_workspace:
           root: .
           paths:
