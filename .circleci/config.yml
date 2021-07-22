@@ -9,26 +9,46 @@ executors:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.8
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
   publisher:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.8
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
   builder:
     working_directory: ~/repo
     docker:
       - image: circleci/python:3.9
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
   image_dealer:
     working_directory: ~/repo
     docker:
       - image: circleci/buildpack-deps:focal
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 workflows:
   test_and_deploy:
     jobs:
-      - test_against_venv
-      - test_against_conda
-      - test_against_setup
+      - test_against_venv:
+          context:
+            - Docker pulls
+      - test_against_conda:
+          context:
+            - Docker pulls
+      - test_against_setup:
+          context:
+            - Docker pulls
       - preview_release:
+          context:
+            - Docker pulls
           requires:
             - test_against_venv
             - test_against_conda
@@ -43,20 +63,24 @@ workflows:
               only: /develop/
       - release:
           context:
+            - Docker pulls
             - pypi.org publishing for agentMET4FOF
             - GitHub pushes to BjoernLudwigPTB's public_repos
           requires:
             - confirm_previewed_release_actions
       - build_image:
           context:
+            - Docker pulls
             - Docker publishing for agents
       - test_image:
           context:
+            - Docker pulls
             - Docker publishing for agents
           requires:
             - build_image
       - retag_and_deploy_image:
           context:
+            - Docker pulls
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
           filters:
@@ -344,12 +368,6 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/$subfolder_name/
-
-      - save_cache:
-          paths:
-            - /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
-          key: >-
-            v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
   retag_and_deploy_image:
     executor: image_dealer
