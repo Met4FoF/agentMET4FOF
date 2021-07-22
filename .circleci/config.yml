@@ -279,29 +279,6 @@ jobs:
       # Run tests! We use pytest's test-runner.
       - run_venv_tests
 
-  release:
-    executor:
-      name: publisher
-
-    steps:
-      # Set the SSH key which has write access to GitHub repo for including our
-      # CHANGELOG.
-      - add_ssh_keys:
-          fingerprints:
-            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
-
-      - checkout
-      - install_all_deps
-
-      # Publish it, if there is anything to publish!
-      - run:
-          name: Run semantic-release publish
-          command: |
-            source venv/bin/activate
-            git config --global user.name "semantic-release (via CircleCI)"
-            git config --global user.email "bjoern.ludwig@ptb.de"
-            semantic-release publish
-
   preview_release:
     executor:
       name: publisher
@@ -331,6 +308,38 @@ jobs:
             python-semantic-release would perform the following actions:
             "
             semantic-release --noop publish
+
+  release:
+    executor:
+      name: publisher
+
+    steps:
+      # Set the SSH key which has write access to GitHub repo for including our
+      # CHANGELOG.
+      - add_ssh_keys:
+          fingerprints:
+            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
+
+      - checkout
+      - install_all_deps
+
+      # Publish it, if there is anything to publish!
+      - run:
+          name: Run semantic-release publish
+          command: |
+            source venv/bin/activate
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            semantic-release publish
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - save_cache:
+          paths:
+            - /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+          key: >-
+            v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
   build_image:
     executor: builder
