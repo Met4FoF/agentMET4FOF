@@ -333,11 +333,11 @@ jobs:
             semantic-release publish
 
       - attach_workspace:
-          at: /tmp/workspace
-
+          at: /tmp/images
       - save_cache:
+          name: Cache image with version key only when version increments
           paths:
-            - /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+            - /tmp/images/docker_image_agentMET4FOF_jupyter.tar.gz
           key: >-
             v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
@@ -441,7 +441,7 @@ jobs:
       - run:
           name: Retrieve built and tested image
           command: |
-            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+            docker load -i /tmp/images/docker_image_agentMET4FOF_jupyter.tar.gz
 
       - run:
           name: Retag image with corresponding version number and store new archive
