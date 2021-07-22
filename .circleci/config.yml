@@ -5,7 +5,6 @@
 version: 2.1
 
 executors:
-  # Specify a common so-called executor containing the desired Python interpreter.
   tester:
     working_directory: ~/repo
     docker:
@@ -24,36 +23,25 @@ executors:
       - image: circleci/buildpack-deps:focal
 
 workflows:
-  # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
       - test_against_venv
       - test_against_conda
       - test_against_setup
       - preview_release:
-          # Test the 'release' job to avoid trouble when Pull Requests get merged and
-          # to preview publishing actions and the new changelog.
           requires:
             - test_against_venv
             - test_against_conda
             - test_against_setup
       - confirm_previewed_release_actions:
-          # This job allows for checking that the release we will create in the
-          # next step actually is the desired release, by observing the result of
-          # preview_release.
           type: approval
           requires:
             - preview_release
             - test_image
           filters:
             branches:
-              # This assures the job only being triggered on branch master.
               only: /develop/
       - release:
-          # Job to potentially create a release based on python-semantic-release's
-          # decision and publish it on GitHub, Zenodo and PyPI.org. This requires manual
-          # approval in the previous step, which is only triggered on branch master,
-          # thus this job here is triggered only on master as well.
           context:
             - pypi.org publishing for agentMET4FOF
             - GitHub pushes to BjoernLudwigPTB's public_repos
@@ -78,37 +66,26 @@ workflows:
               ignore: /.*/
 
 commands:
-  # Reusable command to prepare the environment for testing.
   create_result_folder:
-    description: "Create test-result folder."
+    description: "Create test-result folder"
     steps:
-    # Create folder for test results.
     - run:
         name: Create test result folder
         command: |
           mkdir -p test-results
 
   run_venv_tests:
-    description: "Run and store test results."
-    # Define a parameter for the job, to be able to run all tests against different
-    # sets of dependencies. This allows specifically to run the tests against the
-    # possibly pinned versions from requirements.txt and against the automatically
-    # installed most current versions from setup.py. The send_cov variable is only to
-    # ensure that only one coverage report gets send for each commit.
+    description: "Run and store test results"
     parameters:
       send_cov:
         type: boolean
         default: false
-
     steps:
-    # Run tests! We use pytest's test-runner.
     - run:
         name: Run tests
         command: |
           source venv/bin/activate
           tox | tee --append test-results/agentMET4FOF.log
-
-    # Upload coverage report if the according parameter is set to `true`.
     - when:
         condition: << parameters.send_cov >>
         steps:
@@ -125,22 +102,19 @@ commands:
                 done
                 chmod u+x codecov
                 ./codecov
-
     - store_test_artifacts_and_results
 
   store_test_artifacts_and_results:
-    description: "Store test results."
+    description: "Store test results"
     steps:
-    # Store test results.
     - store_artifacts:
         path: test-results
         destination: test-results
-
     - store_test_results:
         path: test-results
 
   install_all_deps:
-    description: "Install dependencies."
+    description: "Install dependencies"
     steps:
       - run:
           name: Install dependencies
@@ -150,12 +124,8 @@ commands:
             pip install -r requirements.txt -r dev-requirements.txt
 
 jobs:
-  # Define one 'test' job to run their test suites against the
-  # installed dependencies from the environment.yml.
   test_against_conda:
-
     executor: tester
-
     steps:
       - checkout
       - create_result_folder
@@ -171,16 +141,10 @@ jobs:
             conda config --set always_yes yes --set changeps1 no
             conda update -q conda
             echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
-
-      # Download and cache dependencies.
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
             - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
             - v1-conda-dependencies-
-
-      # Create environment and install extra_requires dependencies manually.
       - run:
           name: Create or update environment
           command: |
@@ -191,77 +155,51 @@ jobs:
             fi
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-
       - save_cache:
           paths:
             - /home/circleci/conda/envs/
           key: >-
             v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
-      # Run tests! We use pytest's test-runner.
       - run:
           name: Run tests
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
             tox | tee --append test-results/agentMET4FOF.log
-
       - store_test_artifacts_and_results
 
-
-  # Define one 'test' job to run their test suites against the
-  # installed dependencies from the setup.py.
   test_against_setup:
-
     executor: tester
-
     steps:
       - checkout
       - create_result_folder
-      # Download and cache dependencies.
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
             - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
             - v2-setup-dependencies-
-
-      # Install dependencies. visdcc should be taken out as soon as possible again.
       - run:
           name: Install dependencies
           command: |
             python3 -m venv venv
             source venv/bin/activate
             pip install --upgrade tox
-
       - save_cache:
           paths:
             - ./venv
           key: >-
             v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-
-      # Run tests! We use pytest's test-runner and request to send coverage report.
       - run_venv_tests:
           send_cov: true
 
-  # Define one 'test' job to run their test suites against the
-  # installed dependencies from the requirements files.
   test_against_venv:
-
     executor: tester
-
     steps:
       - checkout
       - create_result_folder
-      # Download and cache dependencies.
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
             - v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
             - v5-venv-dependencies-
-
-      # Install dependencies and extra_requires dependencies manually.
       - run:
           name: Install dependencies
           command: |
@@ -269,26 +207,19 @@ jobs:
             source venv/bin/activate
             pip install --upgrade pip tox
             pip install -r requirements.txt
-
       - save_cache:
           paths:
             - ./venv
           key: >-
             v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-
-      # Run tests! We use pytest's test-runner.
       - run_venv_tests
 
   preview_release:
     executor:
       name: publisher
-
     steps:
       - checkout
       - install_all_deps
-
-      # Fake publish, just to make sure everything works after merging a PR and
-      # before actual release jos run.
       - run:
           name: Preview python-semantic-release actions
           command: |
@@ -312,18 +243,12 @@ jobs:
   release:
     executor:
       name: publisher
-
     steps:
-      # Set the SSH key which has write access to GitHub repo for including our
-      # CHANGELOG.
       - add_ssh_keys:
           fingerprints:
             - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
-
       - checkout
       - install_all_deps
-
-      # Publish it, if there is anything to publish!
       - run:
           name: Run semantic-release publish
           command: |
@@ -331,7 +256,6 @@ jobs:
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             semantic-release publish
-
       - attach_workspace:
           at: /tmp/images
       - save_cache:
