@@ -1,8 +1,7 @@
 <p align="center">
   <!-- CircleCI Tests -->
   <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline
-    status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?
-    style=shield"></a>
+    status badge" src="https://circleci.com/gh/Met4FoF/agentMET4FOF.svg?style=shield"></a>
   <!-- ReadTheDocs Documentation -->
   <a href="https://agentmet4fof.readthedocs.io/">
     <img src="https://readthedocs.org/projects/agentmet4fof/badge/?version=latest" alt="ReadTheDocs badge">
