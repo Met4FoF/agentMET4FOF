@@ -44,3 +44,8 @@ class SineGeneratorAgent(AgentMET4FOF):
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
             self.send_output(sine_data["quantities"])
+
+
+class NoiseAgent(AgentMET4FOF):
+    def on_received_message(self, message):
+        raise NotImplementedError
