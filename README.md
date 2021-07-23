@@ -27,7 +27,7 @@
     <img src="https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
-<h1 align="center">Multi-Agent System for IIoT</h1>
+# Multi-Agent System for IIoT
 
 <p align="justify">
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
