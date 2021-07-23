@@ -1,4 +1,4 @@
-# How to contribute to agentMET4FOF
+# Contribute to agentMET4FOF
 
 If you want to contribute back to the project, we provide a guide to get the desired
 system configuration aligned with our development environments. The code you produce
