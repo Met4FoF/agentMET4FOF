@@ -90,20 +90,15 @@ nbsphinx_allow_errors = True
 # Copy over examples and tutorials and all other folders to docs' source
 # This makes it so that nbsphinx can properly load the notebook images
 
-# Copy over README.md from root folder.
-shutil.copyfile(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "README.md")),
-    os.path.join(os.path.dirname(__file__), "README.md"),
-)
-# Copy over CHANGELOG from root folder.
-shutil.copyfile(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "CHANGELOG.md")),
-    os.path.join(os.path.dirname(__file__), "CHANGELOG.md"),
-)
+md_files_from_root_into_docs = {"README.md", "CHANGELOG.md", "CONTRIBUTING.md"}
+
+for file_from_root in md_files_from_root_into_docs:
+    shutil.copyfile(
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", file_from_root)),
+        os.path.join(os.path.dirname(__file__), file_from_root),
+    )
 
 # Copy over all other specified folders from repository tree.
-
-
 def make_path_dict(source: str, destination: str) -> dict:
     # Function to construct the desired dict structure for the folders to copy.
     return {"source": source, "destination": destination}
