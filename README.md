@@ -22,6 +22,9 @@
   <!-- Zenodo DOI -->
   <a href="https://doi.org/10.5281/zenodo.4560343">
     <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4560343.svg" alt="DOI"></a>
+  <!-- Contributor Covenant -->
+  <a href="https://github.com/Met4FoF/agentMET4FOF/blob/develop/CODE_OF_CONDUCT.md">
+    <img src="https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
 <h1 align="center">Multi-Agent System for IIoT</h1>
