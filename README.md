@@ -36,7 +36,7 @@ applications in mind. More on the motivation that drives the project can be foun
 in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a>.
 </p>
 
-## Key facts
+### Key facts
 
 - [FOSS project](#contributing)
 - allows to
