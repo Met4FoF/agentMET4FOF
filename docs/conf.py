@@ -90,7 +90,12 @@ nbsphinx_allow_errors = True
 # Copy over examples and tutorials and all other folders to docs' source
 # This makes it so that nbsphinx can properly load the notebook images
 
-md_files_from_root_into_docs = {"README.md", "CHANGELOG.md", "CONTRIBUTING.md"}
+md_files_from_root_into_docs = {
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+}
 
 for file_from_root in md_files_from_root_into_docs:
     shutil.copyfile(
