@@ -42,7 +42,7 @@ in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a
 - [💬 About](#about)
 - [📈 The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
 - [🤓 Tutorials](#tutorials)
-- [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
+- [📖 Documentation and screencasts](#documentation-and-screencasts)
 - [💻 Installation](#installation)
 - [🐝 Contributing](#contributing)
 - [💨 Coming soon](#coming-soon)
@@ -161,15 +161,15 @@ get you started as quick as possible. You will find tutorials on how to set up:
 
 … and more!
 
-## 📖Documentation and video tutorials
+## 📖Documentation and screencasts
 
 Extended
 [documentation can be found on ReadTheDocs](https://agentmet4fof.readthedocs.io).
 
-### Video tutorial series
+### Screencast series
 
 Additionally, we provide some
-[video tutorials based on agentMET4FOF 0.4.1 on the project homepage
+[screencasts based on agentMET4FOF 0.4.1 on the project homepage
 ](https://www.ptb.de/empir2018/met4fof/information-communication/video-portal/)
 in the section _Tutorials for the multi-agent system agentMET4FOF_. 
 You can self-register on the linked page and get started immediately. The video series
