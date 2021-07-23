@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v0.10.1 (2021-07-23)
+### Fix
+* **CODE_OF_CONDUCT:** Finally add a code of conduct ([`56ee503`](https://github.com/Met4FoF/agentMET4FOF/commit/56ee503d09157f6b83da926c24b841171ded5ffd))
+
+### Refactor
+* **CONTRIBUTING:** Change heading and location of _CONTRIBUTING.md_ to make it more visible ([`1ff173f`](https://github.com/Met4FoF/agentMET4FOF/commit/1ff173f6b63de8cff9e06fd3e5fad3edc1c60b18))
+
+### Documentation
+* **README:** Introduce key facts ([`0e2d936`](https://github.com/Met4FoF/agentMET4FOF/commit/0e2d936c5d44fd26a26cec979c7d3bd32247d68e))
+* **README:** Introduce Tutorials section ([`e1f41e9`](https://github.com/Met4FoF/agentMET4FOF/commit/e1f41e9a745c4635d1749ae37274c7fa89096cf1))
+* **README:** Introduce Contributing section ([`85e8d9f`](https://github.com/Met4FoF/agentMET4FOF/commit/85e8d9f0fe7013eea8a761feb6662dc06ecb9c2c))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.10.0...v0.10.1)**
+
 ## v0.10.0 (2021-07-21)
 ### Feature
 * **Docker:** Create container image for every release ([`1a40eaf`](https://github.com/Met4FoF/agentMET4FOF/commit/1a40eaf5724a0f956074d7cbee69dcee449c009b))
