@@ -5,6 +5,7 @@ from .base_streams import DataStreamMET4FOF
 __all__ = [
     "SineGenerator",
     "CosineGenerator",
+    "StaticSineGeneratorWithJitter"
 ]
 
 
@@ -105,3 +106,23 @@ class CosineGenerator(DataStreamMET4FOF):
         """A simple cosine wave generator"""
         value = amplitude * np.cos(2 * np.pi * cosine_freq * time + initial_phase)
         return value
+
+
+class StaticSineGeneratorWithJitter(DataStreamMET4FOF):
+    r"""Represents a fixed length sine signal with jitter
+
+    Parameters
+    ----------
+    num_cycles : int, optional
+        numbers of cycles, determines the signal length by :math:`\pi \cdot
+        num_cycles`, defaults to 1000
+    jitter_std : float, optional
+        the standard deviation of the distribution to randomly draw jitter from,
+        defaults to 0.02
+    """
+
+    def __init__(self, num_cycles=1000, jitter_std=0.02):
+        xnn = np.arange(0, np.pi * num_cycles, 0.1)
+        xjitter = np.random.normal(loc=xnn, scale=jitter_std, size=np.size(xnn))
+        xn = np.sin(xjitter)
+        self.set_data_source(quantities=xn, time=xnn)
