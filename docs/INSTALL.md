@@ -177,33 +177,3 @@ server {
 
 }
 ```
-
-## Get started developing
-
-As a starter we recommend working through the tutorials which we present in detail in
-our [video tutorial series linked in the README
-](https://github.com/Met4FoF/agentMET4FOF#video-tutorial-series). 
-
-## Orphaned processes
-
-In the event of agents not terminating cleanly, you can end all Python processes
-running on your system. **Caution**: the following commands affect **all** running 
-Python processes, not just those that emerged from the agents.
-
-### Killing all Python processes in Windows
-
-In your Windows command prompt execute the following to terminate all python processes.
-
-```shell
-> taskkill /f /im python.exe /t
->
-```
-
-### Killing all Python processes on Mac and Linux
-
-In your terminal execute the following to terminate all python processes.
-
-```shell
-$ pkill python
-$
-```
