@@ -41,6 +41,7 @@ in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a
 - [💫 Quickstart](#quickstart)
 - [💬 About](#about)
 - [📈 The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
+- [🤓 Tutorials](#tutorials)
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
 - [🐝 Contributing](#contributing)
@@ -145,6 +146,20 @@ tutorial 2. For details on the tutorials visit our
 [video tutorial series](#video-tutorial-series).
 
 ![](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
+
+## 🤓Tutorials
+
+As mentioned above, agentMET4FOF comes bundled with several [tutorials
+](https://agentmet4fof.readthedocs.io/en/latest/tutorials.html) to 
+get you started as quick as possible. You will find tutorials on how to set up:
+
+- [a simple pipeline to plot a signal](https://agentmet4fof.readthedocs.i  o/en/latest/agentMET4FOF_tutorials/tutorial_1_generator_agent.html)
+- [a simple pipeline with signal postprocessing](https://agentmet4fof.readthedocs.io/en/latest/agentMET4FOF_tutorials/tutorial_2_math_agent.html)
+- [an advanced pipeline with multichannel signals](https://agentmet4fof.readthedocs.io/en/latest/agentMET4FOF_tutorials/tutorial_3_multi_channel.html)
+- [a simple metrological datastream](https://agentmet4fof.readthedocs.io/en/latest/agentMET4FOF_tutorials/tutorial_4_metrological_streams.html)
+- [pipelines to determine redundancy in sensor networks](https://agentmet4fof.readthedocs.io/en/latest/tutorials.html#working-with-signals-carrying-redundant-information)
+
+… and more!
 
 ## 📖Documentation and video tutorials
 
