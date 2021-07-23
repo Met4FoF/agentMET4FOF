@@ -43,6 +43,7 @@ in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a
 - [📈 The agentMET4FOF dashboard](#the-agentmet4fof-dashboard)
 - [📖 Documentation and video tutorials](#documentation-and-video-tutorials)
 - [💻 Installation](#installation)
+- [🐝 Contributing](#contributing)
 - [💨 Coming soon](#coming-soon)
 - [🖋 Citation](#citation)
 - [💎 Acknowledgement](#acknowledgement)
@@ -187,6 +188,20 @@ In the [video tutorials series](#video-tutorial-series)
 we guide you through every step of option 1. More detailed instructions on both 
 options you can find in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html).
+
+## 🐝Contributing
+
+Whenever you are involved with agentMET4FOF, please respect our [Code of Conduct
+](https://github.com/Met4FoF/agentMET4FOF/blob/develop/CODE_OF_CONDUCT.md).
+If you want to contribute back to the project, after reading our Code of Conduct,
+take a look at our open developments in the [project board
+](https://github.com/Met4FoF/agentMET4FOF/projects/1), [pull requests
+](https://github.com/Met4FoF/agentMET4FOF/pulls) and search [the issues
+](https://github.com/Met4FoF/agentMET4FOF/issues). If you find something similar to
+your ideas or troubles, let us know by leaving a comment or remark. If you have
+something new to tell us, feel free to open a feature request or bug report in the
+issues. If you want to contribute code or improve our documentation, please check our
+[contributing guide](https://agentmet4fof.readthedocs.io/en/latest/CONTRIBUTING.html).
 
 ## 💨Coming soon
 
