@@ -1,10 +1,13 @@
-import dash_html_components as html
-import dash_table
+from typing import Dict, Union
 
+import dash_html_components as html
+import dash_core_components as dcc
+import dash_table
 import networkx as nx
 import numpy as np
-import plotly.graph_objs as go
 import pandas as pd
+import plotly.graph_objs as go
+from plotly.graph_objs import Scatter
 
 
 #return icon and text for button
@@ -18,20 +21,74 @@ def html_button(icon="play_circle_filled", text="Start",id=" ", style ={}):
 
 def create_nodes_cytoscape(agent_graph):
     pos = nx.fruchterman_reingold_layout(agent_graph)
-    new_elements = [{'data': {'id': k, 'label': k}, 'position': {'x': pos[k][0], 'y': pos[k][1]}} for k in agent_graph.nodes()]
+    new_elements = [{'data': {'id': k, 'label': k}, 'position': {'x': pos[k][0], 'y': pos[k][1]}, 'classes':agent_graph.nodes[k]['stylesheet']} for k in agent_graph.nodes()]
 
     return new_elements
 
-def create_edges_cytoscape(edges):
+def create_edges_cytoscape(edges, hide_default_edge=True):
+    """
+    Converts data of network edges into a form accepted by cytoscape network generation in the dashboard.
+
+    Parameters
+    ----------
+    edges : list
+        List of edges where index 0 and 1 are names of sources and targets respectively. Index 2 is a dictionary with key of 'channel'.
+
+    hide_default_edge : boolean
+        Set to hide 'default' channel display or not.
+    """
+
     new_elements =[]
     for edge in edges:
-        new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        if hide_default_edge and isinstance(edge[2]['channel'], str) and edge[2]['channel'] == "default":
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1]}}]
+        else:
+            new_elements += [{'data': {'source': edge[0], 'target': edge[1], 'channel': edge[2]['channel']}}]
     return new_elements
 
-def create_monitor_graph(data,sender_agent = 'Monitor Agent'):
-    y = data
-    x = np.arange(len(y))
-    trace = go.Scatter(x=x, y=y,mode="lines", name=sender_agent)
+def create_monitor_graph(
+    data: Union[Dict, np.ndarray], sender_agent: str = "Monitor Agent"
+) -> Scatter:
+    """
+    Parameters
+    ----------
+    data : dict or np.ndarray
+        The data saved in the MonitorAgent's buffer, for each Inputs (Agents) it is
+        connected to.
+    sender_agent : str
+        Name of the sender agent
+
+    Returns
+    -------
+    Scatter
+        Plotly scatter plot of the data
+    """
+    if isinstance(data, dict):
+        if "time" not in data.keys():
+            trace = [
+                go.Scatter(
+                    x=np.arange(len(data[key])),
+                    y=data[key],
+                    mode="lines",
+                    name=f"{sender_agent}:{key}",
+                )
+                for key in data.keys()
+            ]
+        else:
+            trace = [
+                go.Scatter(
+                    x=data["time"],
+                    y=data[key],
+                    mode="lines",
+                    name=f"{sender_agent}:{key}",
+                )
+                for key in data.keys()
+                if key != "time"
+            ]
+    else:
+        y = data
+        x = np.arange(len(y))
+        trace = go.Scatter(x=x, y=y, mode="lines", name=sender_agent)
     return trace
 
 def create_params_table(table_name="",data={}, columns=None, **kwargs):
@@ -85,3 +142,28 @@ def visualise_agent_parameters(k,v):
         return html.Div([html.H6(k),output_info_table])
     else:
         return html.H6(k +": "+str(v))
+
+def get_param_dash_component(param_key,param_set):
+    """
+    Converts param_key:iterable (param_set) into a list of dash dropdowns
+    """
+    if isinstance(param_set, set) or isinstance(param_set, list):
+        dropdown_options = [{'label':param, 'value':param} for param in param_set]
+        return dcc.Dropdown(
+            options = dropdown_options,
+            placeholder=param_key
+        )
+    else:
+        return []
+
+def extract_param_dropdown(params_div):
+    """
+    Extracts parameters from the init_param dropdown list.
+    These extracted parameters will be passed to the agent's initialisation in the add agent button.
+    """
+    init_params = {}
+    for div in params_div:
+        if isinstance(div,dict):
+            if 'value' in div['props'].keys():
+                init_params.update({div['props']['placeholder']:div['props']['value']})
+    return init_params

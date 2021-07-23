@@ -47,7 +47,8 @@ setup(
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/bangxiangyong/agentMET4FOF",
-    author=u"Bang Xiang Yong, Björn Ludwig, Haris Lulic",
+    author=u"Bang Xiang Yong, Björn Ludwig, Anupam Prasad Vedurmudi, "
+    u"Maximilian Gruber, Haris Lulic",
     author_email="bxy20@cam.ac.uk",
     keywords="uncertainty metrology MAS agent-based agents",
     packages=find_packages(exclude=["tests"]),
@@ -58,16 +59,31 @@ setup(
     },
     install_requires=[
         "numpy",
-        "scikit-learn",
-        "matplotlib",
+        "scipy",
+        "matplotlib<3.3.0",  # Version 3.3 caused an error. Details you can find in
+        # docs/matplotlib3.3_pytest_error_log
+        # Actually the mpl_to_plotly feature is considered
+        # deprecated from version 3.3 on. See
+        # https://github.com/plotly/plotly.py/issues/1568
+        # for more details.
         "pandas",
         "osbrain",
         "dash",
         "dash_cytoscape",
         "networkx",
         "plotly",
+        "time-series-buffer",
+        "time-series-metadata",
+        "mpld3",
+        "mesa",
+        "multiprocess",
+        "visdcc",
+        "click<8,>=7",  # This unfortunately is needed as of now, due to a constraint
+        # from our development dependency python-semantic-release. As soon as they
+        # drop that exact constraint, we should also do that.
     ],
-    python_requires=">=3.6",
+    extras_require={"tutorials": ["notebook", "PyDynamic"]},
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Topic :: Utilities",
@@ -81,5 +97,5 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    cmdclass={"verify": VerifyVersionCommand,},
+    cmdclass={"verify": VerifyVersionCommand},
 )

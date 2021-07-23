@@ -1,45 +1,38 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
-
-
-# Define simple math functions.
-def divide_by_two(numerator: float) -> float:
-    return numerator / 2
-
-
-def minus(minuend: float, subtrahend: float) -> float:
-    return minuend - subtrahend
-
-
-def plus(summand_1: float, summand_2: float) -> float:
-    return summand_1+summand_2
-
+from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, SineGeneratorAgent
 
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
-        data = divide_by_two(message['data'])
+        data = self.divide_by_two(message["data"])
         self.send_output(data)
 
+    # Define simple math functions.
+    @staticmethod
+    def divide_by_two(numerator: float) -> float:
+        return numerator / 2
+
+
 class MultiMathAgent(AgentMET4FOF):
-    def init_parameters(self,minus_param=0.5,plus_param=0.5):
-        self.minus_param = minus_param
-        self.plus_param = plus_param
+
+    _minus_param: float
+    _plus_param: float
+
+    def init_parameters(self, minus_param=0.5, plus_param=0.5):
+        self._minus_param = minus_param
+        self._plus_param = plus_param
 
     def on_received_message(self, message):
-        minus_data = minus(message['data'], self.minus_param)
-        plus_data = plus(message['data'], self.plus_param)
+        minus_data = self.minus(message["data"], self._minus_param)
+        plus_data = self.plus(message["data"], self._plus_param)
 
-        self.send_output({'minus':minus_data,'plus':plus_data})
+        self.send_output({"minus": minus_data, "plus": plus_data})
 
-class SineGeneratorAgent(AgentMET4FOF):
-    def init_parameters(self):
-        self.stream = SineGenerator()
+    @staticmethod
+    def minus(minuend: float, subtrahend: float) -> float:
+        return minuend - subtrahend
 
-    def agent_loop(self):
-        if self.current_state == "Running":
-            sine_data = self.stream.next_sample() #dictionary
-            self.send_output(sine_data['x'])
-
+    @staticmethod
+    def plus(summand_1: float, summand_2: float) -> float:
+        return summand_1 + summand_2
 
 def main():
     # start agent network server
@@ -63,7 +56,5 @@ def main():
     return agentNetwork
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-

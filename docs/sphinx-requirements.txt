@@ -1,15 +1,4 @@
-ipykernel
-numpy
-scikit-learn
-scikit-multiflow
-scipy
-matplotlib
-pandas
-osbrain
-dash
-dash_cytoscape
-networkx
-plotly
 nbsphinx
 recommonmark
 sphinx_rtd_theme
+ipython

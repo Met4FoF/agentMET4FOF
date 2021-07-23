@@ -1,5 +1,36 @@
 agentMET4FOF agents
 ===================
 
-.. automodule:: agentMET4FOF.agents
+Base agents
+-----------
+.. automodule:: agentMET4FOF.agents.base_agents
     :members:
+    :private-members:
+
+
+Signal agents
+-------------
+.. automodule:: agentMET4FOF.agents.signal_agents
+    :members:
+    :private-members:
+
+
+Metrologically enabled base agents
+----------------------------------
+.. automodule:: agentMET4FOF.agents.metrological_base_agents
+    :members:
+    :private-members:
+
+
+Metrological agents to reduce redundancy
+----------------------------------------
+.. automodule:: agentMET4FOF.agents.metrological_redundancy_agents
+    :members:
+    :private-members:
+
+
+Metrologically enabled signal agents
+------------------------------------
+.. automodule:: agentMET4FOF.agents.metrological_signal_agents
+    :members:
+    :private-members:

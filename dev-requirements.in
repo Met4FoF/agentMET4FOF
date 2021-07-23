@@ -1,0 +1,14 @@
+-c requirements.txt
+
+pytest
+pytest-cov
+pytest-timeout
+requests
+psutil
+sphinx
+nbsphinx
+recommonmark
+sphinx_rtd_theme
+ipython
+tox
+python-semantic-release

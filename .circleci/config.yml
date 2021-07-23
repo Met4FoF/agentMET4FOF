@@ -5,158 +5,415 @@
 version: 2.1
 
 executors:
-  # Specify a common so-called executor containing the desired Python interpreter.
-  python:
+  tester:
+    working_directory: ~/repo
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+  publisher:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.8
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+  builder:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+  image_dealer:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/buildpack-deps:focal
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 workflows:
-  # Create workflow for testing and deploying agentMET4FOF.
   test_and_deploy:
     jobs:
-      # Create 'test' job to test agentMET4FOF for every commit.
-      - test:
-          filters:
-              tags:
-                # Include tag filter to trigger as well on tag pushes.
-                only: /.*/
-      - deploy:
-          # Create 'deploy' job to upload agentMET4FOF to PyPI.org on certain tag
-          # pushes, which successfully run 'test' job and are tagged with version.
+      - test_against_venv:
+          context:
+            - Docker pulls
+      - test_against_conda:
+          context:
+            - Docker pulls
+      - test_against_setup:
+          context:
+            - Docker pulls
+      - preview_release:
+          context:
+            - Docker pulls
           requires:
-              - test
+            - test_against_venv
+            - test_against_conda
+            - test_against_setup
+      - confirm_previewed_release_actions:
+          type: approval
+          requires:
+            - preview_release
+            - test_image
           filters:
-              tags:
-                # Specify the tags which trigger the job as regular expression.
-                only: /[0-9]+(\.[0-9]+)*/
-              branches:
-                # This assures the job only being triggered by tag pushes.
-                ignore: /.*/
+            branches:
+              only: /develop/
+      - release:
+          context:
+            - Docker pulls
+            - pypi.org publishing for agentMET4FOF
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+          requires:
+            - confirm_previewed_release_actions
+      - build_image:
+          context:
+            - Docker pulls
+            - Docker publishing for agents
+      - test_image:
+          context:
+            - Docker pulls
+            - Docker publishing for agents
+          requires:
+            - build_image
+      - retag_and_deploy_image:
+          context:
+            - Docker pulls
+            - Docker publishing for agents
+            - CircleCI agentMET4FOF docker publishing
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
 
-jobs:
-  test:
-    executor: python
-
-    working_directory: ~/repo
-
+commands:
+  create_result_folder:
+    description: "Create test-result folder"
     steps:
-      # Checkout code.
-      - checkout
-
-      # Create folder for test results.
       - run:
           name: Create test result folder
           command: |
-            mkdir test-reports
+            mkdir -p test-results
 
-      # Download and cache dependencies.
+  run_venv_tests:
+    description: "Run and store test results"
+    parameters:
+      send_cov:
+        type: boolean
+        default: false
+    steps:
+      - run:
+          name: Run tests
+          command: |
+            source venv/bin/activate
+            tox | tee --append test-results/agentMET4FOF.log
+      - when:
+          condition: << parameters.send_cov >>
+          steps:
+            - run:
+                name: Upload coverage report
+                command: |
+                  source venv/bin/activate
+                  curl -s https://codecov.io/bash > codecov;
+                  VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
+                  for i in 1 256 512
+                  do
+                    shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
+                    shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM")
+                  done
+                  chmod u+x codecov
+                  ./codecov
+      - store_test_artifacts_and_results
+
+  store_test_artifacts_and_results:
+    description: "Store test results"
+    steps:
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+      - store_test_results:
+          path: test-results
+
+  install_all_deps:
+    description: "Install dependencies"
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt -r dev-requirements.txt
+
+jobs:
+  test_against_conda:
+    executor: tester
+    steps:
+      - checkout
+      - create_result_folder
+      - run:
+          name: Install Miniconda
+          command: |
+            wget "https://repo.anaconda.com/miniconda/\
+            Miniconda3-latest-Linux-x86_64.sh" -O $HOME/miniconda.sh
+            mkdir -p $HOME/.conda
+            bash $HOME/miniconda.sh -b -p /home/circleci/conda
+            source $HOME/conda/etc/profile.d/conda.sh
+            hash -r
+            conda config --set always_yes yes --set changeps1 no
+            conda update -q conda
+            echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
-            - v1-dependencies-
-
-      # Install dependencies if necessary.
+            - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v1-conda-dependencies-
       - run:
-         name: Install dependencies
-         command: |
-           python3 -m venv agent_venv
-           source agent_venv/bin/activate
-           pip install --upgrade pip
-           pip install -r requirements.txt
-           pip install pytest pytest-cov pytest-timeout
-
+          name: Create or update environment
+          command: |
+            if [ -d "$HOME/conda/envs/" ]; then
+                conda env update --prune --file environment.yml
+            else
+                conda env create -f environment.yml
+            fi
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
       - save_cache:
           paths:
-            - ./agent_venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # Run tests with coverage report! We use pytest's test-runner.
+            - /home/circleci/conda/envs/
+          key: >-
+            v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
       - run:
-          name: Run agentMET4FOF tests
+          name: Run tests
           command: |
-            source agent_venv/bin/activate
-            pytest -v --junitxml=test-reports/pytest.xml --cov=. . > \
-            test-reports/agentMET4FOF.log
+            source $HOME/conda/etc/profile.d/conda.sh
+            conda activate agentMET4FOF
+            tox | tee --append test-results/agentMET4FOF.log
+      - store_test_artifacts_and_results
 
-      # Upload coverage report.
-      - run:
-          name: Upload coverage report
-          command: |
-            source agent_venv/bin/activate
-            bash <(curl -s https://codecov.io/bash)
-
-      # Store test results as artifacts.
-      - store_artifacts:
-         path: test-reports
-         destination: test-reports
-
-      # Show test results as summary on job page.
-      - store_test_results:
-         path: test-reports
-
-  deploy:
-    executor: python
-
-    working_directory: ~/repo
-
+  test_against_setup:
+    executor: tester
     steps:
-      # Checkout code.
+      - checkout
+      - create_result_folder
+      - restore_cache:
+          keys:
+            - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            - v2-setup-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade tox
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+      - run_venv_tests:
+          send_cov: true
+
+  test_against_venv:
+    executor: tester
+    steps:
+      - checkout
+      - create_result_folder
+      - restore_cache:
+          keys:
+            - v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v5-venv-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip tox
+            pip install -r requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: >-
+            v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+      - run_venv_tests
+
+  preview_release:
+    executor:
+      name: publisher
+    steps:
+      - checkout
+      - install_all_deps
+      - run:
+          name: Preview python-semantic-release actions
+          command: |
+            unset CIRCLE_PULL_REQUEST CIRCLE_PULL_REQUESTS CI_PULL_REQUEST \
+              CI_PULL_REQUESTS
+            export CIRCLE_BRANCH=develop
+            source venv/bin/activate
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            echo "
+            The changelog of the next release will contain:
+            "
+            semantic-release --unreleased changelog
+            echo "
+            -----------------------------------------------------------
+
+            python-semantic-release would perform the following actions:
+            "
+            semantic-release --noop publish
+
+  release:
+    executor:
+      name: publisher
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
+      - checkout
+      - install_all_deps
+      - run:
+          name: Run semantic-release publish
+          command: |
+            source venv/bin/activate
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            semantic-release publish
+      - attach_workspace:
+          at: /tmp/images
+      - save_cache:
+          name: Cache image with version key only when version increments
+          paths:
+            - /tmp/images/docker_image_agentMET4FOF_jupyter.tar.gz
+          key: >-
+            v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
+
+  build_image:
+    executor: builder
+    working_directory: ~/repo
+    steps:
       - checkout
 
-      # Download and cache dependencies.
+      - setup_remote_docker
+
+      - run:
+          name: Install repo2docker
+          command: |
+            python3 -m pip install chardet jupyter-repo2docker
+
+      - run:
+          name: Build image
+          command: |
+            jupyter-repo2docker --no-run --image-name ${IMAGE_NAME}:latest .
+
+      - run:
+          name: Save Docker image
+          command: |
+            docker save ${IMAGE_NAME}:latest | \
+              gzip > docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - store_artifacts:
+          path: ./docker_image_agentMET4FOF_jupyter.tar.gz
+
+  test_image:
+    executor: image_dealer
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - setup_remote_docker
+
+      - run:
+          name: Retrieve built and stored image for testing
+          command: |
+            docker load -i /tmp/workspace/docker_image_agentMET4FOF_jupyter.tar.gz
+
+      - run:
+          name: Test image's notebook server
+          command: |
+            docker run --name agents --publish 127.0.0.1:8888:8888 \
+              -d --rm ${IMAGE_NAME}:latest
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8888
+            docker stop agents
+
+      - run:
+          name: Test image's dashboard
+          command: |
+            docker run --name agents --publish 127.0.0.1:8050:8050 --rm -d \
+              ${IMAGE_NAME}:latest python \
+              ${HOME}/agentMET4FOF_tutorials/tutorial_1_generator_agent.py
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8050
+            docker stop agents
+
+      - run:
+          name: Test image's dashboard in a subfolder
+          command: |
+            subfolder_name=dashboard_subfolder
+            docker run --name agents --publish 127.0.0.1:8050:8050 --rm -d \
+              --env DASH_URL_BASE_PATHNAME=/$subfolder_name/ \
+              ${IMAGE_NAME}:latest python \
+              ${HOME}/agentMET4FOF_tutorials/tutorial_1_generator_agent.py
+            docker run --network container:agents \
+                appropriate/curl --retry 10 --retry-delay 1 \
+                --retry-connrefused http://127.0.0.1:8050/$subfolder_name/
+
+  retag_and_deploy_image:
+    executor: image_dealer
+    steps:
+      - checkout
+
       - restore_cache:
           keys:
-            # Specify the unique identifier for the cache.
-            - v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
-            # Fallback to using the latest cache if no exact match is found.
-            - v1-dependencies-
+            - v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
-      # Install dependencies if necessary.
+      - setup_remote_docker
+
       - run:
-         name: Install dependencies
-         command: |
-           python3 -m venv agent_venv
-           source agent_venv/bin/activate
-           pip install -r requirements.txt
-           pip install --upgrade setuptools wheel twine
-
-      - save_cache:
-          paths:
-            - ./agent_venv
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
-
-      # Verify Git tag to version to ensure, only wanted versions are uploaded.
-      - run:
-          name: Verify Git tag vs. version
+          name: Retrieve built and tested image
           command: |
-            source agent_venv/bin/activate
-            python setup.py verify
+            docker load -i /tmp/images/docker_image_agentMET4FOF_jupyter.tar.gz
 
-      # Create a package.
       - run:
-          name: Create package
+          name: Retag image with corresponding version number and store new archive
           command: |
-            source agent_venv/bin/activate
-            python3 setup.py sdist bdist_wheel
+            version=$(docker run --rm ${IMAGE_NAME}:latest \
+              python -c "from agentMET4FOF import __version__;print(__version__)")
+            if [ $CIRCLE_TAG = $version ]; then
+              docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
+              docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
+                gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+            else
+              exit 1
+            fi
 
-      # Store test results as artifacts.
-      - store_artifacts:
-         path: dist
-         destination: dist
-
-      # We create a .pypirc to provide the username and password.
       - run:
-          name: Create .pypirc
+          name: Install the GitHub cli 'gh'
           command: |
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username: __token__" >> ~/.pypirc
-            echo -e "password: $PYPI_PASSWORD" >> ~/.pypirc
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
+                sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) \
+                signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
+                https://cli.github.com/packages stable main" | \
+                sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install gh
 
-      # Upload the created packages to test.pypi.org.
       - run:
-          name: Upload to PyPI.org
+          name: Upload current image
           command: |
-            source agent_venv/bin/activate
-            twine upload dist/*
+            gh release upload --repo \
+              ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
+              v${CIRCLE_TAG} \
+              tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
+              image for agentMET4FOF Jupyter Notebook server"

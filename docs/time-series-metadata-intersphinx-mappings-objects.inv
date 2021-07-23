@@ -1,0 +1,19 @@
+py:attribute
+	time_series_metadata.scheme.MetaData.metadata time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData.metadata
+	time_series_metadata.scheme.MetaData.misc time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData.misc
+	time_series_metadata.scheme.MetaData.quantities time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData.quantities
+	time_series_metadata.scheme.MetaData.time time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData.time
+py:class
+	time_series_metadata.scheme.MetaData     time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData
+py:method
+	time_series_metadata.scheme.MetaData.get_quantity time_series_metadata.scheme.html#time_series_metadata.scheme.MetaData.get_quantity
+py:module
+	time_series_metadata.scheme              time_series_metadata.scheme.html#module-time_series_metadata.scheme
+std:doc
+	README                                   time-series-metadata                    : README.html
+	index                                    time-series-metadata - metadata scheme for time-series with measurement uncertainties: index.html
+	time_series_metadata.scheme              MetaData - the metrologically enabled time-series metadata scheme: time_series_metadata.scheme.html
+std:label
+	genindex                                 Index                                   : genindex.html
+	modindex                                 Module Index                            : py-modindex.html
+	search                                   Search Page                             : search.html
