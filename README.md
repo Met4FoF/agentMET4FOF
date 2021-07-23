@@ -53,8 +53,9 @@ in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a
 
 ## 💫Quickstart
 
-agentMET4FOF comes bundled with some tutorials to get you started as quick as
-possible. In your Python console execute the following to run the first tutorial.
+agentMET4FOF comes bundled with several [tutorials](#tutorials) to get you started 
+as quick as possible. In your Python console execute the following to run the first 
+tutorial.
 
 ```python
 >>> from agentMET4FOF_tutorials.tutorial_1_generator_agent import demonstrate_generator_agent_use
@@ -67,12 +68,12 @@ Broadcast server running on 0.0.0.0:9091
 NS running on 127.0.0.1:3333 (127.0.0.1)
 URI = PYRO:Pyro.NameServer@127.0.0.1:3333
 
---------------------------------------------------------------
-|                                                            |
-| Your agent network is starting up. Open your browser and   |
-| visit the agentMET4FOF dashboard on http://127.0.0.1:8050/ |
-|                                                            |
---------------------------------------------------------------
+|----------------------------------------------------------|
+|                                                          |
+| Your agent network is starting up. Open your browser and |
+| visit the agentMET4FOF dashboard on http://0.0.0.0:8050/ |
+|                                                          |
+|----------------------------------------------------------|
 
 INFO [2021-02-05 18:12:52.277759] (SineGeneratorAgent_1): INITIALIZED
 INFO [2021-02-05 18:12:52.302862] (MonitorAgent_1): INITIALIZED
