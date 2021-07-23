@@ -72,20 +72,28 @@ workflows:
           context:
             - Docker pulls
             - Docker publishing for agents
+          filters:
+            tags:
+              only: /^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
       - test_image:
           context:
             - Docker pulls
             - Docker publishing for agents
           requires:
             - build_image
+          filters:
+            tags:
+              only: /^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
       - retag_and_deploy_image:
           context:
             - Docker pulls
             - Docker publishing for agents
             - CircleCI agentMET4FOF docker publishing
+          requires:
+            - test_image
           filters:
             tags:
-              only: /^v.*/
+              only: /^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
             branches:
               ignore: /.*/
 
@@ -280,14 +288,6 @@ jobs:
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             semantic-release publish
-      - attach_workspace:
-          at: /tmp/images
-      - save_cache:
-          name: Cache image with version key only when version increments
-          paths:
-            - /tmp/images/docker_image_agentMET4FOF_jupyter.tar.gz
-          key: >-
-            v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
 
   build_image:
     executor: builder
@@ -371,11 +371,8 @@ jobs:
   retag_and_deploy_image:
     executor: image_dealer
     steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - v1-docker-image-{{ checksum "agentMET4FOF/__init__.py" }}
+      - attach_workspace:
+          at: /tmp/images
 
       - setup_remote_docker
 
@@ -389,7 +386,7 @@ jobs:
           command: |
             version=$(docker run --rm ${IMAGE_NAME}:latest \
               python -c "from agentMET4FOF import __version__;print(__version__)")
-            if [ $CIRCLE_TAG = $version ]; then
+            if [ $CIRCLE_TAG = v$version ]; then
               docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
               docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
                 gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
