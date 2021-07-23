@@ -11,6 +11,8 @@ class SineGeneratorAgent(AgentMET4FOF):
     to connected agents via its output channel.
     """
 
+    _sine_stream: SineGenerator
+
     def init_parameters(self, sfreq=500, sine_freq=5, amplitude=1, initial_phase=0):
         """Initialize the input data
 
