@@ -1,7 +1,7 @@
 from .base_agents import AgentMET4FOF
-from ..streams.signal_streams import SineGenerator
+from ..streams.signal_streams import SineGenerator, StaticSineGeneratorWithJitter
 
-__all__ = ["SineGeneratorAgent"]
+__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent"]
 
 
 class SineGeneratorAgent(AgentMET4FOF):
@@ -36,6 +36,34 @@ class SineGeneratorAgent(AgentMET4FOF):
             amplitude=amplitude,
             initial_phase=initial_phase,
         )
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input data
+        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
+        """
+        if self.current_state == "Running":
+            sine_data = self._sine_stream.next_sample()  # dictionary
+            self.send_output(sine_data["quantities"])
+
+
+class StaticSineGeneratorWithJitterAgent(AgentMET4FOF):
+    """An agent streaming a pre generated sine signal of fixed length with jitter
+
+    Takes samples from the :py:mod:`StaticSineGeneratorWithJitter` and pushes them
+    sample by sample to connected agents via its output channel.
+    """
+
+    _sine_stream: StaticSineGeneratorWithJitter
+
+    def init_parameters(self):
+        """Initialize the input data
+
+        Initialize the static input data as an instance of the
+        :class:`StaticSineGeneratorWithJitter` class.
+        """
+        self._sine_stream = StaticSineGeneratorWithJitter()
 
     def agent_loop(self):
         """Model the agent's behaviour
