@@ -1,11 +1,23 @@
-# How to contribute to agentMET4FOF
+# Contribute to agentMET4FOF
 
-If you want to contribute back to the project, we provide a guide to get the desired
-system configuration aligned with our development environments. The code you produce
-should be seamlessly integrable into agentMET4FOF by aligning your work with the
-established workflows. This guide should work on all platforms and provide everything
-needed to start developing for agentMET4FOF. Please open an issue or ideally contribute
-to this guide as a start, if problems or questions arise.
+Whenever you are involved with agentMET4FOF, please respect our [Code of Conduct
+](https://github.com/Met4FoF/agentMET4FOF/blob/develop/CODE_OF_CONDUCT.md).
+If you want to contribute back to the project, after reading our Code of Conduct,
+take a look at our open developments in the [project board
+](https://github.com/Met4FoF/agentMET4FOF/projects/1), [pull requests
+](https://github.com/Met4FoF/agentMET4FOF/pulls) and search [the issues
+](https://github.com/Met4FoF/agentMET4FOF/issues). If you find something similar to
+your ideas or troubles, let us know by leaving a comment or remark. If you have
+something new to tell us, feel free to open a feature request or bug report in the
+issues.
+
+If you want to contribute code or improve our documentation, we provide this 
+guide to get the desired system configuration aligned with our development 
+environments. The code you produce should be seamlessly integrable into agentMET4FOF 
+by aligning your work with the established workflows. This guide should work on all 
+platforms and provide everything needed to start developing for agentMET4FOF. Please 
+open an issue or ideally contribute to this guide as a start, if problems or 
+questions arise.
 
 ## Guiding principles
 

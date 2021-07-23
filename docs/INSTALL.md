@@ -150,7 +150,7 @@ We assume you are confident in using Nginx in general. The corresponding
 configuration should contain the following server blocks to ensure the Jupyter
 Notebook server is working, as well as the dashboard
 
-```nginx
+```text
 server {
         server_name agent.domain.com;
 
