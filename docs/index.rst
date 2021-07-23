@@ -8,10 +8,15 @@ agentMET4FOF - Metrological agent-based system
    :caption: Getting started:
 
    README
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Detailed information:
+
    INSTALL
-   UMLs
-   CONTRIBUTING
    CHANGELOG
+   CODE_OF_CONDUCT
+   CONTRIBUTING
 
 
 .. toctree::
@@ -30,6 +35,7 @@ agentMET4FOF - Metrological agent-based system
    agentMET4FOF_dashboard
    agentMET4FOF_network
    agentMET4FOF_utilities
+   UMLs
 
 
 Indices and search:
