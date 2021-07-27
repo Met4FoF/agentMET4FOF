@@ -2,7 +2,7 @@ import csv
 import re
 import sys
 from threading import Timer
-from typing import List, Optional
+from typing import List, Optional, Type
 
 import networkx as nx
 from mesa import Agent as MesaAgent, Model
@@ -842,7 +842,7 @@ class AgentNetwork:
     def add_agent(
         self,
         name=" ",
-        agentType=AgentMET4FOF,
+        agentType: Type[AgentMET4FOF] = AgentMET4FOF,
         log_mode=True,
         buffer_size=1000,
         ip_addr=None,
@@ -856,7 +856,7 @@ class AgentNetwork:
         ----------
         name : str, optional
             Unique name of agent, defaults to the agent's class name.
-        agentType : AgentMET4FOF, optional
+        agentType : Type[AgentMET4FOF] or subclass of AgentMET4FOF, optional
             Agent class to be instantiated in the network. Defaults to
             :py:class:`AgentMET4FOF`
         log_mode : bool, optional
