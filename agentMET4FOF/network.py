@@ -31,7 +31,7 @@ class AgentNetwork:
         """
 
         def init_parameters(
-            self, ns=None, backend="osbrain", mesa_model="", log_mode=True
+            self, ns=None, backend="osbrain", mesa_model=None, log_mode=True
         ):
             self.backend = backend
             self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
