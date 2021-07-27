@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+import numpy.matlib
 from scipy.optimize import minimize
 
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
@@ -826,7 +827,7 @@ class NJRemoved(AgentMET4FOF):
 
 class SineGeneratorAgent(AgentMET4FOF):
     def init_parameters(self):
-        self.stream = StaticSineGeneratorWithJitter(jittersd=0.0005, noisesd=0.0002)
+        self.stream = StaticSineGeneratorWithJitter()
 
     def agent_loop(self):
         if self.current_state == "Running":
