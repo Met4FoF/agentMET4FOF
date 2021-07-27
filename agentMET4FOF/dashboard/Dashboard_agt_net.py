@@ -18,7 +18,7 @@ from .LayoutHelper import (
     extract_param_dropdown,
     get_param_dash_component,
 )
-from ..agents import MetrologicalMonitorAgent
+from ..agents.metrological_base_agents import MetrologicalMonitorAgent
 from ..agents.base_agents import MonitorAgent
 
 
@@ -552,9 +552,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     warnings.warn(
                         f"The Dashboard shows a plot for monitor agent '"
                         f"{monitor_agent.get_attr('name')}' without any axes "
-                        f"labels specified. The "
-                        f"labels will be represented by generic place holders. Check "
-                        f"out tutorial 4 to find out how to specify custom labels."
+                        f"labels specified. The labels will be represented by generic "
+                        f"place holders. Check out tutorial 4 to find out how to "
+                        f"specify custom labels."
                     )
                     x_label = "X"
                     y_label = "Y"
