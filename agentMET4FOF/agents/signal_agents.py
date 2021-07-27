@@ -1,7 +1,9 @@
+import numpy as np
+
 from .base_agents import AgentMET4FOF
 from ..streams.signal_streams import SineGenerator, StaticSineGeneratorWithJitter
 
-__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent"]
+__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent", "NoiseAgent"]
 
 
 class SineGeneratorAgent(AgentMET4FOF):
@@ -77,5 +79,28 @@ class StaticSineGeneratorWithJitterAgent(AgentMET4FOF):
 
 
 class NoiseAgent(AgentMET4FOF):
+    r"""An agent adding white noise to the incoming signal
+
+    Parameters
+    ----------
+    noise_std : float, optional
+        the standard deviation of the distribution to randomly draw noise from,
+        defaults to 0.05
+    """
+    _noise_std: float
+
+    @property
+    def noise_std(self):
+        return self._noise_std
+
+    def init_parameters(self, noise_std=0.05):
+        """Initialize the noise's standard deviation"""
+        self._noise_std = noise_std
+
     def on_received_message(self, message):
-        raise NotImplementedError
+        if self.current_state == "Running":
+            noisy_data = np.random.normal(
+                loc=message["data"],
+                scale=self._noise_std,
+            )
+            self.send_output({"quantities": noisy_data})
