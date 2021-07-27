@@ -218,14 +218,31 @@ class AgentNetwork:
                     self.log_info("Error:" + str(e))
             return agents_stylesheets
 
-        def agents(self, exclude_names=["AgentController", "Logger"]):
-            if self.backend == "osbrain":
-                agent_names = [
-                    name for name in self.ns.agents() if name not in exclude_names
+        def agents(self, exclude_names: Optional[List[str]] = None):
+            def return_osbrain_agents():
+                invisible_agents = ["AgentController", "Logger"]
+
+                def concatenate_exclude_names_with_anyway_invisibles():
+                    if exclude_names is None:
+                        return invisible_agents
+                    else:
+                        return exclude_names + invisible_agents
+
+                return [
+                    name
+                    for name in self.ns.agents()
+                    if name not in concatenate_exclude_names_with_anyway_invisibles()
                 ]
-            else:
-                agent_names = self.mesa_model.agents()
-            return agent_names
+
+            if self.backend == "osbrain":
+                return return_osbrain_agents()
+
+            if exclude_names is None:
+                return self.mesa_model.agents()
+
+            return [
+                name for name in self.mesa_model.agents() if name not in exclude_names
+            ]
 
         def update_networkx(self):
             agent_names = self.agents()
