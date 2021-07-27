@@ -146,7 +146,7 @@ class AgentNetwork:
                 # actual instantiation of agent, depending on backend
                 if self.backend == "osbrain":
                     new_agent = self._add_osbrain_agent(
-                        name=new_name,
+                        name=new_name.replace(" ", "_"),
                         agentType=agentType,
                         log_mode=log_mode,
                         buffer_size=buffer_size,
