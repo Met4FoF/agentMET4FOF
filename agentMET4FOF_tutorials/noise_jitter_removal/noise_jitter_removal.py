@@ -1,7 +1,4 @@
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-# from agentMET4FOF.streams import SineGeneratorJitter
-from Sinegen import SineGeneratorJitter
-
 import numpy as np
 from NJRemove.NJRemoval_class_withmcmc import MCMCMH_NJ
 
@@ -39,17 +36,6 @@ class NJRemoved(AgentMET4FOF):
             t = njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
             self.send_output(self.ydata[7] - t)
             self.ydata = self.ydata[1:self.N]
-
-
-class SineGeneratorAgent(AgentMET4FOF):
-    def init_parameters(self):
-        self.stream = SineGeneratorJitter(jittersd=0.0005, noisesd=0.0002)
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            sine_data = self.stream.next_sample()  # dictionary
-            self.send_output(sine_data['quantities'])
-
 
 def main():
     # start agent network server
