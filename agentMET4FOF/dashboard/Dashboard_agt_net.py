@@ -6,7 +6,6 @@ import dash_cytoscape as cyto
 import dash_html_components as html
 import networkx as nx
 import visdcc
-
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
@@ -19,7 +18,9 @@ from .LayoutHelper import (
     extract_param_dropdown,
     get_param_dash_component,
 )
-from .. import agents as agentmet4fof_module
+from ..agents import MetrologicalMonitorAgent
+from ..agents.base_agents import MonitorAgent
+
 
 class Dashboard_agt_net(Dashboard_Layout_Base):
     def set_layout_name(self, id="agt-net", title="Agent Network"):
@@ -471,14 +472,17 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and agentNetwork.get_mode() != "Reset" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_names = agentNetwork.agents(filter_agent='Monitor')  # get all agent names
-            app.num_monitor = len(agent_names)
+            monitor_agents = agentNetwork.agents_by_type(MonitorAgent).union(
+                agentNetwork.agents_by_type(MetrologicalMonitorAgent)
+            )
+            print("monitor_agents: " + str(monitor_agents))
+            app.num_monitor = len(monitor_agents)
             monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
             style_graphs = [{'opacity': 0, 'width': 10, 'height': 10} for i in range(app.num_monitors)]
 
-            for monitor_id, monitor_agent in enumerate(agent_names):
-                monitor_buffer = agentNetwork.get_agent(monitor_agent).get_attr('buffer').buffer
-                custom_plot_function = agentNetwork.get_agent(monitor_agent).get_attr('custom_plot_function')
+            for monitor_id, monitor_agent in enumerate(monitor_agents):
+                monitor_buffer = monitor_agent.get_attr('buffer').buffer
+                custom_plot_function = monitor_agent.get_attr('custom_plot_function')
                 data = []
                 for sender_agent, buffered_data in monitor_buffer.items():
                     # if custom plot function is not provided, resolve to default plotting
@@ -486,8 +490,9 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         traces = create_monitor_graph(buffered_data, sender_agent)
                     # otherwise call custom plot function and load up custom plot parameters
                     else:
-                        custom_plot_parameters = agentNetwork.get_agent(monitor_agent).get_attr(
-                            'custom_plot_parameters')
+                        custom_plot_parameters = monitor_agent.get_attr(
+                            'custom_plot_parameters'
+                        )
                         # Handle iterable of traces.
                         traces = custom_plot_function(
                             buffered_data,
@@ -546,7 +551,8 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     # frequency domain, we keep it fairly generic.
                     warnings.warn(
                         f"The Dashboard shows a plot for monitor agent '"
-                        f"{monitor_agent}' without any axes labels specified. The "
+                        f"{monitor_agent.get_attr('name')}' without any axes "
+                        f"labels specified. The "
                         f"labels will be represented by generic place holders. Check "
                         f"out tutorial 4 to find out how to specify custom labels."
                     )
@@ -557,7 +563,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                     'data': data,
                     'layout': {
                         'title': {
-                            'text': monitor_agent,
+                            'text': monitor_agent.get_attr('name'),
                             'y': y_title_offset,
                             'x': 0.5,
                             'xanchor': 'center',
@@ -614,16 +620,15 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             if agentNetwork.get_mode() != "Running" and n_interval > 0:
                 raise PreventUpdate
 
-            agent_name_filter = "Monitor"
-            agent_names = agentNetwork.agents(filter_agent=agent_name_filter)  # get all agent names
-              # all agents with Monitor in its name will be selected
+            monitor_agents = agentNetwork.agents_by_type(MonitorAgent).union(
+                agentNetwork.agents_by_type(MetrologicalMonitorAgent)
+            )
             plots_data = {}  # storage for all monitor agent's memory
 
             # load data from all Monitor agent's memory
-            for agent_name in agent_names:
-                monitor_agent = agentNetwork.get_agent(agent_name)
+            for monitor_agent in monitor_agents:
                 plots = monitor_agent.get_attr('plots')
-                plots_data.update({agent_name: plots})
+                plots_data.update({monitor_agent: plots})
 
             # now monitors_data = {'monitor_agent1_name':agent1_memory, 'monitor_agent2_name':agent2_memory }
             # now create a plot for each monitor agent
@@ -633,10 +638,10 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             all_graphs = []
             # now loop through monitors_data's every monitor agent's memory
             # build a graph from every monitor agent's `plots`
-            for count, agent_name in enumerate(plots_data.keys()):
-                plot_data = plots_data[agent_name]
+            for count, monitor_agent in enumerate(plots_data.keys()):
+                plot_data = plots_data[monitor_agent]
                 html_div_monitor = []
-                html_div_monitor.append(html.H5(agent_name, style={"text-align": "center"}))
+                html_div_monitor.append(html.H5(monitor_agent, style={"text-align": "center"}))
                 # create a new graph for every agent
                 for from_agent_name in plot_data:
                     # get the graph relevant to 'monitor_agent_input'

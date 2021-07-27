@@ -4,7 +4,7 @@ agentMET4FOF - Metrological agent-based system
 ==============================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Getting started:
 
    README
