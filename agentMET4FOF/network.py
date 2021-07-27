@@ -856,6 +856,41 @@ class AgentNetwork:
             return filtered_agent_names
         return all_agent_names
 
+    def agents_by_type(
+        self,
+        only_type: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+    ) -> Set[Optional[AgentMET4FOF, Proxy]]:
+        """Returns all or a subset of agents connected to an agent network
+
+        As expected, the returned set might be empty, if there is no agent of the
+        specified class present in the network.
+
+        Parameters
+        ----------
+        only_type : Type[AgentMET4FOF], optional
+            if present, only those agents which are instances of the class
+            ``only_type`` or a subclasses are listed
+
+        Returns
+        -------
+        Set[AgentMET4FOF, Proxy]
+            requested agents' objects depending on the backend either instances of
+            subclasses of :class:`AgentMET4FOF` or of osBrain's``Proxy``.
+        """
+        all_agent_names = self._get_controller().agents()
+        all_agents = [
+            self._get_controller().get_agent(agent_name)
+            for agent_name in all_agent_names
+        ]
+        if self.backend == "mesa":
+            return {agent for agent in all_agents if isinstance(agent, only_type)}
+
+        return {
+            agent
+            for agent in all_agents
+            if agent.get_attr("AgentType") == str(only_type.__name__)
+        }
+
     def generate_module_name_byType(self, agentType):
         return self._get_controller().generate_module_name_byType(agentType)
 
