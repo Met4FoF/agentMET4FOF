@@ -122,7 +122,7 @@ class NoiseAgent(AgentMET4FOF):
 
             dict like {
                 "from": "<valid agent name>"
-                "data": <time series data as a np.ndarray>,
+                "data": <time series data as a list, np.ndarray or pd.Dataframe>,
                 "senderType": <any subclass of AgentMet4FoF>,
                 "channel": "<channel name>"
                 }
