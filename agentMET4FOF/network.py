@@ -859,7 +859,7 @@ class AgentNetwork:
     def agents_by_type(
         self,
         only_type: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
-    ) -> Set[Optional[AgentMET4FOF, Proxy]]:
+    ) -> Set[Optional[Union[AgentMET4FOF, Proxy]]]:
         """Returns all or a subset of agents connected to an agent network
 
         As expected, the returned set might be empty, if there is no agent of the
