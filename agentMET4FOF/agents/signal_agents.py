@@ -132,4 +132,4 @@ class NoiseAgent(AgentMET4FOF):
                 loc=message["data"],
                 scale=self._noise_std,
             )
-            self.send_output({"quantities": noisy_data})
+            self.send_output(noisy_data)
