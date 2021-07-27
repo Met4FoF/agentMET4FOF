@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import numpy as np
 
 from .base_agents import AgentMET4FOF
@@ -100,10 +102,31 @@ class NoiseAgent(AgentMET4FOF):
         return self._noise_std
 
     def init_parameters(self, noise_std=0.05):
-        """Initialize the noise's standard deviation"""
+        """Initialize the noise's standard deviation
+
+        Parameters
+        ----------
+        noise_std : float, optional
+            the standard deviation of the distribution to randomly draw noise from,
+            defaults to 0.05
+        """
         self._noise_std = noise_std
 
-    def on_received_message(self, message):
+    def on_received_message(self, message: Dict[str, Any]):
+        """Add noise to the received message's data
+
+        Parameters
+        ----------
+        message : Dictionary
+            The message received is in form::
+
+            dict like {
+                "from": "<valid agent name>"
+                "data": <time series data as a np.ndarray>,
+                "senderType": <any subclass of AgentMet4FoF>,
+                "channel": "<channel name>"
+                }
+        """
         if self.current_state == "Running":
             noisy_data = np.random.normal(
                 loc=message["data"],
