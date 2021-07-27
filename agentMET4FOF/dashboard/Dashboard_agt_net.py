@@ -18,7 +18,7 @@ from .LayoutHelper import (
     extract_param_dropdown,
     get_param_dash_component,
 )
-from ..agents import MetrologicalMonitorAgent
+from ..agents.metrological_base_agents import MetrologicalMonitorAgent
 from ..agents.base_agents import MonitorAgent
 
 
