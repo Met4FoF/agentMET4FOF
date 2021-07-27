@@ -1,11 +1,11 @@
 import numpy as np
 
-from agentMET4FOF.agents import (
-    AgentNetwork,
-    MonitorAgent,
+from agentMET4FOF.agents import MonitorAgent
+from agentMET4FOF.agents.signal_agents import (
     SineGeneratorAgent,
+    StaticSineGeneratorWithJitterAgent,
 )
-from agentMET4FOF.agents.signal_agents import StaticSineGeneratorWithJitterAgent
+from agentMET4FOF.network import AgentNetwork
 
 
 def demonstrate_generator_agent_use():
