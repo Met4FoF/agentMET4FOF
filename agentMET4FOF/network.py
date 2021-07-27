@@ -2,12 +2,12 @@ import csv
 import re
 import sys
 from threading import Timer
-from typing import List, Optional, Type
+from typing import List, Optional, Set, Type, Union
 
 import networkx as nx
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
-from osbrain import NSProxy, run_agent, run_nameserver
+from osbrain import NSProxy, Proxy, run_agent, run_nameserver
 
 from .agents.base_agents import AgentMET4FOF
 from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
@@ -106,7 +106,7 @@ class AgentNetwork:
                         num_count += 1
             return num_count
 
-        def generate_module_name_byType(self, agentType):
+        def generate_module_name_byType(self, agentType: Type[AgentMET4FOF]):
             # handle agent type
             if isinstance(agentType, str):
                 name = agentType
@@ -394,7 +394,7 @@ class AgentNetwork:
             self.schedule.add(agent)
             return agent
 
-        def get_agent(self, agentName: str):
+        def get_agent(self, agentName: str) -> Optional[AgentMET4FOF]:
             agent = next((x for x in self.schedule.agents if x.name == agentName), None)
             return agent
 
@@ -791,23 +791,26 @@ class AgentNetwork:
         source.unbind_output(target)
         return 0
 
-    def _get_controller(self):
+    def _get_controller(self) -> _AgentController:
         """Internal method to access the AgentController relative to the nameserver"""
         return self._controller
 
-    def _get_logger(self):
+    def _get_logger(self) -> _Logger:
         """Internal method to access the Logger relative to the nameserver"""
         return self._logger
 
-    def get_agent(self, agent_name):
-        """
-        Returns a particular agent connected to Agent Network.
+    def get_agent(self, agent_name: str) -> Union[AgentMET4FOF, Proxy]:
+        """Returns a particular agent connected to Agent Network
 
         Parameters
         ----------
         agent_name : str
             Name of agent to search for in the network
 
+        Returns
+        -------
+        Union[AgentMET4FOF, Proxy]
+            The particular agent with the provided name
         """
 
         return self._get_controller().get_agent(agent_name)
