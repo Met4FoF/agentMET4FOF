@@ -475,7 +475,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             monitor_agents = agentNetwork.agents_by_type(MonitorAgent).union(
                 agentNetwork.agents_by_type(MetrologicalMonitorAgent)
             )
-            print("monitor_agents: " + str(monitor_agents))
             app.num_monitor = len(monitor_agents)
             monitor_graphs = [{'data': []} for i in range(app.num_monitors)]
             style_graphs = [{'opacity': 0, 'width': 10, 'height': 10} for i in range(app.num_monitors)]
