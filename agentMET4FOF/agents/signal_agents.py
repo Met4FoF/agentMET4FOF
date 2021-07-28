@@ -83,7 +83,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
         """Extract sample by sample the input data stream's content and push it"""
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
-            self.send_output(sine_data["quantities"])
+            self.send_output(sine_data)
 
 
 class NoiseAgent(AgentMET4FOF):
