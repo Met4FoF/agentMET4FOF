@@ -2,7 +2,7 @@ import numpy as np
 
 from .base_streams import DataStreamMET4FOF
 
-__all__ = ["SineGenerator", "CosineGenerator", "StaticSineGeneratorWithJitter"]
+__all__ = ["SineGenerator", "CosineGenerator", "StaticSineWithJitterGenerator"]
 
 
 class SineGenerator(DataStreamMET4FOF):
@@ -104,7 +104,7 @@ class CosineGenerator(DataStreamMET4FOF):
         return value
 
 
-class StaticSineGeneratorWithJitter(DataStreamMET4FOF):
+class StaticSineWithJitterGenerator(DataStreamMET4FOF):
     r"""Represents a fixed length sine signal with jitter
 
     Parameters

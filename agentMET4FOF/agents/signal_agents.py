@@ -3,9 +3,9 @@ from typing import Any, Dict
 import numpy as np
 
 from .base_agents import AgentMET4FOF
-from ..streams.signal_streams import SineGenerator, StaticSineGeneratorWithJitter
+from ..streams.signal_streams import SineGenerator, StaticSineWithJitterGenerator
 
-__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent", "NoiseAgent"]
+__all__ = ["SineGeneratorAgent", "StaticSineWithJitterGeneratorAgent", "NoiseAgent"]
 
 
 class SineGeneratorAgent(AgentMET4FOF):
@@ -52,20 +52,20 @@ class SineGeneratorAgent(AgentMET4FOF):
             self.send_output(sine_data["quantities"])
 
 
-class StaticSineGeneratorWithJitterAgent(AgentMET4FOF):
+class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
     """An agent streaming a pre generated sine signal of fixed length with jitter
 
     Takes samples from the :py:mod:`StaticSineGeneratorWithJitter` and pushes them
     sample by sample to connected agents via its output channel.
     """
 
-    _sine_stream: StaticSineGeneratorWithJitter
+    _sine_stream: StaticSineWithJitterGenerator
 
     def init_parameters(self, jitter_std=0.02):
         """Initialize the input data
 
         Initialize the static input data as an instance of the
-        :class:`StaticSineGeneratorWithJitter` class.
+        :class:`StaticSineWithJitterGenerator` class with the provided parameters.
 
         Parameters
         ----------
