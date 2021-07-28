@@ -118,6 +118,7 @@ class StaticSineWithJitterGenerator(DataStreamMET4FOF):
     """
 
     def __init__(self, num_cycles=1000, jitter_std=0.02):
+        super().__init__()
         timestamps = np.arange(0, np.pi * num_cycles, 0.1)
         timestamps_with_jitter = np.random.normal(loc=timestamps, scale=jitter_std)
         signal_values_at_timestamps = np.sin(timestamps_with_jitter)
