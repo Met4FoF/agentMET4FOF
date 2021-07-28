@@ -816,7 +816,7 @@ class AgentNetwork:
         """Internal method to access the Logger relative to the nameserver"""
         return self._logger
 
-    def get_agent(self, agent_name: str) -> Union[AgentMET4FOF, Proxy]:
+    def get_agent(self, agent_name: str) -> Optional[Union[AgentMET4FOF, Proxy]]:
         """Returns a particular agent connected to Agent Network
 
         Parameters
