@@ -80,11 +80,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
             num_cycles=num_cycles, jitter_std=jitter_std
         )
     def agent_loop(self):
-        """Model the agent's behaviour
-
-        On state *Running* the agent will extract sample by sample the input data
-        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
-        """
+        """Extract sample by sample the input data stream's content and push it"""
         if self.current_state == "Running":
             sine_data = self._sine_stream.next_sample()  # dictionary
             self.send_output(sine_data["quantities"])
