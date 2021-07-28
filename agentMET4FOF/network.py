@@ -80,11 +80,47 @@ class AgentNetwork:
         def get_mesa_model(self):
             return self.mesa_model
 
-        def get_agent(self, agentName=""):
+        def _transform_string_into_valid_name(self, name: str) -> str:
+            """Ensure that name does not contain invalid characters
+
+            osBrain does not allow spaces in agents' names, so we replace them by
+            underscores.
+
+            Parameters
+            ----------
+            name : str
+                a string that is supposed to be an agent's name for assigning it or
+                to search for
+
+            Returns
+            -------
+            str
+                the cleaned version of the name, i.e. for ``backend == 'osbrain'``
+                without spaces
+            """
             if self.backend == "osbrain":
-                return self.ns.proxy(agentName)
+                return name.replace(" ", "_")
+            return name
+
+        def get_agent(self, agent_name: str) -> Optional[Union[AgentMET4FOF, Proxy]]:
+            """Returns a particular agent connected to Agent Network
+
+            Parameters
+            ----------
+            agent_name : str
+                Name of agent to search for in the network
+
+            Returns
+            -------
+            Union[AgentMET4FOF, Proxy]
+                The particular agent with the provided name or None, if no agent with
+                the provided name can be found
+            """
+            name_to_search_for = self._transform_string_into_valid_name(agent_name)
+            if self.backend == "osbrain":
+                return self.ns.proxy(name_to_search_for)
             elif self.backend == "mesa":
-                return self.mesa_model.get_agent(agentName)
+                return self.mesa_model.get_agent(name_to_search_for)
 
         def get_agentType_count(self, agentType):
             num_count = 1
@@ -146,7 +182,7 @@ class AgentNetwork:
                 # actual instantiation of agent, depending on backend
                 if self.backend == "osbrain":
                     new_agent = self._add_osbrain_agent(
-                        name=new_name.replace(" ", "_"),
+                        name=self._transform_string_into_valid_name(new_name),
                         agentType=agentType,
                         log_mode=log_mode,
                         buffer_size=buffer_size,
