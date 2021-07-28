@@ -863,7 +863,8 @@ class AgentNetwork:
         Returns
         -------
         Union[AgentMET4FOF, Proxy]
-            The particular agent with the provided name
+            The particular agent with the provided name or None, if no agent with
+            the provided name can be found
         """
 
         return self._get_controller().get_agent(agent_name)
