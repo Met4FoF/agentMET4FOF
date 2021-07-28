@@ -8,6 +8,7 @@ import networkx as nx
 from mesa import Agent as MesaAgent, Model
 from mesa.time import BaseScheduler
 from osbrain import NSProxy, Proxy, run_agent, run_nameserver
+from Pyro4.errors import NamingError
 
 from .agents.base_agents import AgentMET4FOF
 from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
@@ -118,7 +119,13 @@ class AgentNetwork:
             """
             name_to_search_for = self._transform_string_into_valid_name(agent_name)
             if self.backend == "osbrain":
-                return self.ns.proxy(name_to_search_for)
+                try:
+                    return self.ns.proxy(name_to_search_for)
+                except NamingError as e:
+                    self.log_info(
+                        f"{self.get_agent.__name__}(agent_name='{name_to_search_for}') "
+                        f"failed: {e}"
+                    )
             elif self.backend == "mesa":
                 return self.mesa_model.get_agent(name_to_search_for)
 
