@@ -17,8 +17,8 @@ from agentMET4FOF.network import AgentNetwork
 def test_naming_agents_for_mesa(name):
     agent_network = AgentNetwork(dashboard_modules=False, backend="mesa")
 
-    monitor_agent = agent_network.add_agent(name=name, agentType=AgentMET4FOF)
-    assert agent_network.get_agent(name).name == monitor_agent.name == name
+    agent = agent_network.add_agent(name=name, agentType=AgentMET4FOF)
+    assert agent_network.get_agent(name).name == agent.name == name
 
     agent_network.shutdown()
 
@@ -30,9 +30,9 @@ def test_naming_agents_for_osbrain(agent_network):
             k=random.randint(1, 100),
         )
     )
-    monitor_agent = agent_network.add_agent(name=random_name, agentType=AgentMET4FOF)
+    agent = agent_network.add_agent(name=random_name, agentType=AgentMET4FOF)
     assert (
         agent_network.get_agent(random_name).get_attr("name")
-        == monitor_agent.get_attr("name")
+        == agent.get_attr("name")
         == random_name.replace(" ", "_")
     )
