@@ -61,20 +61,24 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
 
     _sine_stream: StaticSineWithJitterGenerator
 
-    def init_parameters(self, jitter_std=0.02):
-        """Initialize the input data
+    def init_parameters(self, num_cycles=1000, jitter_std=0.02):
+        r"""Initialize the pre generated sine signal of fixed length with jitter
 
         Initialize the static input data as an instance of the
         :class:`StaticSineWithJitterGenerator` class with the provided parameters.
 
         Parameters
         ----------
+        num_cycles : int, optional
+            numbers of cycles, determines the signal length by :math:`\pi \cdot
+            num_cycles`, defaults to 1000
         jitter_std : float, optional
             the standard deviation of the distribution to randomly draw jitter from,
             defaults to 0.02
         """
-        self._sine_stream = StaticSineGeneratorWithJitter(jitter_std=jitter_std)
-
+        self._sine_stream = StaticSineWithJitterGenerator(
+            num_cycles=num_cycles, jitter_std=jitter_std
+        )
     def agent_loop(self):
         """Model the agent's behaviour
 
