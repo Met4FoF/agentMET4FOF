@@ -14,7 +14,10 @@ def demonstrate_generator_agent_use():
     sine_agent = agent_network.add_agent(
         name="Clean sine signal", agentType=SineGeneratorAgent
     )
-    sine_agent.init_parameters(sfreq=395, sine_freq=2 * np.pi)
+    sine_agent.init_parameters(
+        sfreq=10,
+        sine_freq=np.reciprocal(2 * np.pi),
+    )
     jitter_agent = agent_network.add_agent(
         name="Sine signal with jitter", agentType=StaticSineWithJitterGeneratorAgent
     )
