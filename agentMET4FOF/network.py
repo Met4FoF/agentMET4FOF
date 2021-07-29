@@ -200,7 +200,7 @@ class AgentNetwork:
                 elif self.backend == "mesa":
                     # handle osbrain and mesa here
                     new_agent = self._add_mesa_agent(
-                        name=new_name,
+                        name=self._transform_string_into_valid_name(new_name),
                         agentType=agentType,
                         buffer_size=buffer_size,
                         log_mode=log_mode,
