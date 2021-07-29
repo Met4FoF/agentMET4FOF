@@ -570,9 +570,9 @@ class AgentNetwork:
         # handle different choices of backends
         if self.backend == "osbrain":
             if connect:
-                self.connect(ip_addr, port, verbose=False)
+                self.connect(ip_addr, port)
             else:
-                self.connect(ip_addr, port, verbose=False)
+                self.connect(ip_addr, port)
                 if self.ns == 0:
                     self.start_server_osbrain(ip_addr, port)
         elif self.backend == "mesa":
@@ -618,9 +618,8 @@ class AgentNetwork:
         else:
             self.dashboard_proc = None
 
-    def connect(self, ip_addr="127.0.0.1", port=3333, verbose=True):
-        """
-        Only for osbrain backend. Connects to an existing AgentNetwork.
+    def connect(self, ip_addr="127.0.0.1", port=3333):
+        """Connects to an existing AgentNetwork for osBrain backend
 
         Parameters
         ----------
@@ -632,9 +631,11 @@ class AgentNetwork:
         """
         try:
             self.ns = NSProxy(nsaddr=ip_addr + ":" + str(port))
-        except:
-            if verbose:
-                print("Unable to connect to existing NameServer...")
+        except TimeoutError as e:
+            print(
+                f"Error on connecting to existing name server at http://{ip_addr}:"
+                f"{port}: {e}"
+            )
             self.ns = 0
 
     def start_server_osbrain(self, ip_addr: str = "127.0.0.1", port: int = 3333):
