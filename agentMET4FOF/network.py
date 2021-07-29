@@ -131,12 +131,12 @@ class AgentNetwork:
 
         def get_agentType_count(self, agent_type: Type[AgentMET4FOF]) -> int:
             num_count = 1
-            agentType_name = str(agentType.__name__)
+            agent_type_as_string = str(agent_type.__name__)
             agent_names = self.agents()
             if len(agent_names) != 0:
                 for agentName in agent_names:
                     current_agent_type = self.get_agent(agentName).get_attr("AgentType")
-                    if current_agent_type == agentType_name:
+                    if current_agent_type == agent_type_as_string:
                         num_count += 1
             return num_count
 
@@ -371,10 +371,8 @@ class AgentNetwork:
                     for agent in agents:
                         self.coalitions[coalition_i].add_agent(agent)
 
-        def remove_coalition_agent(self, coalition_name, agent_name=""):
-            """
-            Remove agent from coalition
-            """
+        def remove_agent_from_coalition(self, coalition_name: str, agent_name: str):
+            """Remove agent from a coalition"""
             # update coalition
             for coalition_i, coalition in enumerate(self.coalitions):
                 if coalition.name == coalition_name:
@@ -713,13 +711,8 @@ class AgentNetwork:
 
         self._get_controller().set_attr(current_state=state)
 
-    def _get_mode(self):
-        """
-        Returns
-        -------
-        state: str
-            State of Agent Network
-        """
+    def _get_controller_mode(self):
+        """Internal method to get mode of agent controller
 
         return self._get_controller().get_attr("current_state")
 
@@ -796,7 +789,7 @@ class AgentNetwork:
             State of agents to set
         """
 
-        self._set_mode(state)
+        self._set_controller_mode(state)
         for agent_name in self.agents():
             if (filter_agent is not None and filter_agent in agent_name) or (
                 filter_agent is None
@@ -815,7 +808,7 @@ class AgentNetwork:
             agent = self.get_agent(agent_name)
             agent.reset()
             agent.set_attr(current_state="Reset")
-        self._set_mode("Reset")
+        self._set_controller_mode("Reset")
         return 0
 
     def remove_agent(self, agent):
@@ -1017,7 +1010,7 @@ class AgentNetwork:
         """
         Remove agent from coalition
         """
-        self._get_controller().remove_coalition_agent(coalition_name, agent_name)
+        self._get_controller().remove_agent_from_coalition(coalition_name, agent_name)
 
     def get_coalition(self, name):
         """
