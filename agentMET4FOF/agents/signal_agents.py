@@ -126,14 +126,40 @@ class NoiseAgent(AgentMET4FOF):
 
             dict like {
                 "from": "<valid agent name>"
-                "data": <time series data as a list, np.ndarray or pd.Dataframe>,
+                "data": <time series data as a :class:`Python.list`,
+                    :class:`np.ndarray` or :class:`pd.Dataframe`> or
+                    dict like {
+                        "quantities": <time series data as a :class:`Python.list`,
+                            :class:`np.ndarray` or :class:`pd.Dataframe`>,
+                        "target": current_sample_target,
+                        "time": <time stamps as a :class:`Python.list`,
+                            :class:`np.ndarray` or :class:`pd.Dataframe` of
+                            :class:`Python.float` or :class:`np.datetime64`>
+                    }
                 "senderType": <any subclass of AgentMet4FoF>,
                 "channel": "<channel name>"
                 }
         """
-        if self.current_state == "Running":
-            noisy_data = np.random.normal(
-                loc=message["data"],
+
+        def _compute_noisy_signal_from_clean_signal(
+            clean_signal: Union[List, np.ndarray, pd.DataFrame]
+        ):
+            return np.random.normal(
+                loc=clean_signal,
                 scale=self._noise_std,
             )
-            self.send_output(noisy_data)
+
+        if self.current_state == "Running":
+            data_in_message = message["data"].copy()
+            if isinstance(data_in_message, (list, np.ndarray, pd.DataFrame)):
+                self.send_output(
+                    _compute_noisy_signal_from_clean_signal(data_in_message)
+                )
+            if isinstance(data_in_message, dict):
+                fully_assembled_resulting_data = message["data"].copy()
+                fully_assembled_resulting_data[
+                    "quantities"
+                ] = _compute_noisy_signal_from_clean_signal(
+                    data_in_message["quantities"]
+                )
+                self.send_output(fully_assembled_resulting_data)
