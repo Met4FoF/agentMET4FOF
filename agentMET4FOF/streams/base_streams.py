@@ -334,7 +334,7 @@ class DataStreamMET4FOF:
             return self._next_sample_data_source(batch_size)
 
     def _next_sample_data_source(
-        self, batch_size: int = 1
+        self, batch_size: Optional[int] = 1
     ) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
         """Internal method for fetching latest samples from a dataset
 
