@@ -632,8 +632,6 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
             # now monitors_data = {'monitor_agent1_name':agent1_memory, 'monitor_agent2_name':agent2_memory }
             # now create a plot for each monitor agent
             # initialize necessary variables for plotting multi-graphs
-            subplot_titles = tuple(list(plots_data.keys()))
-            num_graphs = len(list(plots_data.keys()))
             all_graphs = []
             # now loop through monitors_data's every monitor agent's memory
             # build a graph from every monitor agent's `plots`
