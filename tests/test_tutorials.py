@@ -1,3 +1,15 @@
+from agentMET4FOF_tutorials.jitter.sine_with_jitter import (
+    demonstrate_sine_with_jitter_agent_use,
+)
+from agentMET4FOF_tutorials.noise.sine_with_noise import (
+    demonstrate_noise_agent_use,
+)
+from agentMET4FOF_tutorials.redundancy.redundancy_agent_four_signals import (
+    demonstrate_redundancy_agent_four_signals as four_signal_redundancy,
+)
+from agentMET4FOF_tutorials.redundancy.redundancy_agent_one_signal import (
+    demonstrate_redundancy_agent_onesignal as one_signal_redundancy,
+)
 from agentMET4FOF_tutorials.tutorial_1_generator_agent import (
     demonstrate_generator_agent_use as tut1,
 )
@@ -16,13 +28,6 @@ from agentMET4FOF_tutorials.tutorial_7_generic_metrological_agent import (
     demonstrate_metrological_stream as tut7,
 )
 
-from agentMET4FOF_tutorials.redundancy.redundancy_agent_four_signals import (
-    demonstrate_redundancy_agent_four_signals as four_signal_redundancy,
-)
-
-from agentMET4FOF_tutorials.redundancy.redundancy_agent_one_signal import (
-    demonstrate_redundancy_agent_onesignal as one_signal_redundancy,
-)
 
 
 def test_tutorial_1():
@@ -68,3 +73,11 @@ def test_redundancy_agent_four_signals():
 def test_redundancy_agent_one_signal():
     """Test executability of redundancy_agent_one_signal.py."""
     one_signal_redundancy().shutdown()
+
+
+def test_noise_agent_demo_executability():
+    demonstrate_noise_agent_use().shutdown()
+
+
+def test_sine_with_jitter_demo_executability():
+    demonstrate_sine_with_jitter_agent_use().shutdown()
