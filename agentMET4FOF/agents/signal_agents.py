@@ -116,7 +116,7 @@ class NoiseAgent(AgentMET4FOF):
         Parameters
         ----------
         message : Dictionary
-            The message received is in form::
+            the received message in the expected form::
 
             dict like {
                 "from": "<valid agent name>"
@@ -124,7 +124,7 @@ class NoiseAgent(AgentMET4FOF):
                     dict like {
                         "quantities": <time series data as a list, np.ndarray or
                             pd.Dataframe>,
-                        "target": current_sample_target,
+                        "target": <target labels as a list, np.ndarray or pd.Dataframe>,
                         "time": <time stamps as a list, np.ndarray or pd.Dataframe of
                             float or np.datetime64>
                     }
