@@ -208,7 +208,7 @@ class AgentNetwork:
                     )
                 return new_agent
             except Exception as e:
-                self.log_info("ERROR:" + str(e))
+                self.log_info("ERROR while adding an agent to the network:" + str(e))
 
         def _add_osbrain_agent(
             self,
