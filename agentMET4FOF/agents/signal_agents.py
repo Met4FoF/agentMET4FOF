@@ -91,7 +91,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
 
 
 class NoiseAgent(AgentMET4FOF):
-    r"""An agent adding white noise to the incoming signal"""
+    """An agent adding white noise to the incoming signal"""
     _noise_std: float
 
     @property
