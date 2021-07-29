@@ -344,21 +344,18 @@ class AgentNetwork:
             return edges
 
         def _get_logger(self):
-            """
-            Internal method to access the Logger relative to the nameserver
-            """
+            """Internal method to access the Logger relative to the nameserver"""
             if self._logger is None:
                 self._logger = self.ns.proxy("Logger")
             return self._logger
 
         def add_coalition(self, new_coalition):
-            """
-            Instantiates a coalition of agents.
-            """
+            """Instantiates a coalition of agents"""
             self.coalitions.append(new_coalition)
             return new_coalition
 
         def del_coalition(self):
+            """Delete all coalitions"""
             self.coalitions = []
 
         def add_coalition_agent(
@@ -685,12 +682,7 @@ class AgentNetwork:
         )
 
     def start_server_mesa(self):
-        """Starts a new AgentNetwork for Mesa and initializes :attr:`_controller`
-
-        Handles the initialisation for :attr:`backend` ``== "mesa"``. Involves
-        spawning two nested objects :attr:`mesa_model` and :attr:`_controller` and
-        calls :meth:`start_mesa_timer`.
-        """
+        """Starts a new AgentNetwork for Mesa"""
         self.mesa_model = self.MesaModel()
         self._controller = self._AgentController(
             name="AgentController", backend=self.backend
@@ -705,8 +697,8 @@ class AgentNetwork:
 
         Parameters
         ----------
-        state: str
-            State of AgentController to set.
+        state : str
+            State of agent controller to set
         """
 
         self._get_controller().set_attr(current_state=state)
@@ -714,16 +706,11 @@ class AgentNetwork:
     def _get_controller_mode(self):
         """Internal method to get mode of agent controller
 
-        return self._get_controller().get_attr("current_state")
-
-    def get_mode(self):
-        """
         Returns
         -------
-        state: str
+        state : str
             State of Agent Network
         """
-
         return self._get_controller().get_attr("current_state")
 
     def set_running_state(self, filter_agent: Optional[str] = None):
@@ -804,6 +791,7 @@ class AgentNetwork:
         return 0
 
     def reset_agents(self):
+        """Reset all agents' states and parameters to their initialization state"""
         for agent_name in self.agents():
             agent = self.get_agent(agent_name)
             agent.reset()
@@ -812,6 +800,7 @@ class AgentNetwork:
         return 0
 
     def remove_agent(self, agent):
+        """Reset all agents' states and parameters to their initialization state"""
         if type(agent) == str:
             agent_proxy = self.get_agent(agent)
         else:
