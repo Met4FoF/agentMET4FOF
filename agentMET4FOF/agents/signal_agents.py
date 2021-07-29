@@ -91,18 +91,12 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
 
 
 class NoiseAgent(AgentMET4FOF):
-    r"""An agent adding white noise to the incoming signal
-
-    Parameters
-    ----------
-    noise_std : float, optional
-        the standard deviation of the distribution to randomly draw noise from,
-        defaults to 0.05
-    """
+    r"""An agent adding white noise to the incoming signal"""
     _noise_std: float
 
     @property
     def noise_std(self):
+        """Standard deviation of the distribution to randomly draw noise from"""
         return self._noise_std
 
     def init_parameters(self, noise_std: Optional[float] = 0.05):
@@ -126,15 +120,13 @@ class NoiseAgent(AgentMET4FOF):
 
             dict like {
                 "from": "<valid agent name>"
-                "data": <time series data as a :class:`Python.list`,
-                    :class:`np.ndarray` or :class:`pd.Dataframe`> or
+                "data": <time series data as a list, np.ndarray or pd.Dataframe> or
                     dict like {
-                        "quantities": <time series data as a :class:`Python.list`,
-                            :class:`np.ndarray` or :class:`pd.Dataframe`>,
+                        "quantities": <time series data as a list, np.ndarray or
+                            pd.Dataframe>,
                         "target": current_sample_target,
-                        "time": <time stamps as a :class:`Python.list`,
-                            :class:`np.ndarray` or :class:`pd.Dataframe` of
-                            :class:`Python.float` or :class:`np.datetime64`>
+                        "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                            float or np.datetime64>
                     }
                 "senderType": <any subclass of AgentMet4FoF>,
                 "channel": "<channel name>"
