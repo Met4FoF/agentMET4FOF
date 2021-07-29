@@ -1,6 +1,7 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
+import pandas as pd
 
 from .base_agents import AgentMET4FOF
 from ..streams.signal_streams import SineGenerator, StaticSineWithJitterGenerator
@@ -61,7 +62,9 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
 
     _sine_stream: StaticSineWithJitterGenerator
 
-    def init_parameters(self, num_cycles=1000, jitter_std=0.02):
+    def init_parameters(
+        self, num_cycles: Optional[int] = 1000, jitter_std: Optional[float] = 0.02
+    ):
         r"""Initialize the pre generated sine signal of fixed length with jitter
 
         Initialize the static input data as an instance of the
@@ -79,6 +82,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
         self._sine_stream = StaticSineWithJitterGenerator(
             num_cycles=num_cycles, jitter_std=jitter_std
         )
+
     def agent_loop(self):
         """Extract sample by sample the input data stream's content and push it"""
         if self.current_state == "Running":
@@ -101,7 +105,7 @@ class NoiseAgent(AgentMET4FOF):
     def noise_std(self):
         return self._noise_std
 
-    def init_parameters(self, noise_std=0.05):
+    def init_parameters(self, noise_std: Optional[float] = 0.05):
         """Initialize the noise's standard deviation
 
         Parameters
