@@ -2,6 +2,25 @@
 
 <!--next-version-placeholder-->
 
+## v0.11.0 (2021-07-29)
+### Feature
+* **Plots:** Adapt dashboard such that all agents of types `MonitorAgent` and `MetrologicalMonitorAgent` get plotted regardless of their name ([`67a2544`](https://github.com/Met4FoF/agentMET4FOF/commit/67a25448f1709fbf8a5f9a4b6991d0c1fccb740f))
+* **network:** Introduce a method `agents_by_type` to query for agents of a given type ([`e43a5b9`](https://github.com/Met4FoF/agentMET4FOF/commit/e43a5b9a7e2fffe53b90c2de6baae74265a400c2))
+
+### Fix
+* Allow spaces in agents' names which get replaced by underscores for the _osBrain_ backend ([`2d8437d`](https://github.com/Met4FoF/agentMET4FOF/commit/2d8437daeb04ff19a52c771d31ca5ec16b5c3e68))
+
+### Refactor
+* **AgentNetwork:** Change some of the internal variable ([`06c9a36`](https://github.com/Met4FoF/agentMET4FOF/commit/06c9a3661c6f9eab788c49b8044bbdc61b009893))
+* **SineGeneratorAgent:** Improve data sending by including actually computed time ([`87c3e34`](https://github.com/Met4FoF/agentMET4FOF/commit/87c3e341ff1ca3974b4967974c4f45ef04fb92aa))
+* **signal_agents:** Introduce "official" _sine_stream instance variable for SineGeneratorAgent ([`98d0f19`](https://github.com/Met4FoF/agentMET4FOF/commit/98d0f1995003aea5e843fef547d4e09cfe8f6aa4))
+* **signal_agents:** Reintroduce NoiseAgent placeholder after module refactorization ([`f97f4d9`](https://github.com/Met4FoF/agentMET4FOF/commit/f97f4d9d281379502ea0e9c90649d3c59d0b224b))
+
+### Documentation
+* **network:** Introduce some more type hints ([`ee4b158`](https://github.com/Met4FoF/agentMET4FOF/commit/ee4b158664397362b403d044f30084560cd71b79))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.10.1...v0.11.0)**
+
 ## v0.10.1 (2021-07-23)
 ### Fix
 * **CODE_OF_CONDUCT:** Finally add a code of conduct ([`56ee503`](https://github.com/Met4FoF/agentMET4FOF/commit/56ee503d09157f6b83da926c24b841171ded5ffd))
