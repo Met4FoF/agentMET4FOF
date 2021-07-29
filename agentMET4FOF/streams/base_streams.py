@@ -287,7 +287,7 @@ class DataStreamMET4FOF:
         self.reset()
 
     def all_samples(self) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
-        """Returns all the samples in the data stream
+        """Return all the samples in the data stream
 
         Returns
         -------
@@ -295,20 +295,19 @@ class DataStreamMET4FOF:
             all samples in the form::
 
             dict like {
-                "quantities": current_sample_quantities,
-                "target": current_sample_target,
-                "time": current_sample_time
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
             }
         """
         return self.next_sample(-1)
 
     def next_sample(
-        self, batch_size: int = 1
+        self, batch_size: Optional[int] = 1
     ) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
-        """
-        Fetches the latest ``batch_size`` samples from the iterables: ``quantities``,
-        ``time`` and ``target``. This advances the internal pointer ``_sample_idx`` by
-        ``batch_size``.
+        """Fetch the latest samples from the ``quantities``, ``time`` and ``target``
 
         Parameters
         ----------
@@ -321,9 +320,11 @@ class DataStreamMET4FOF:
             latest samples in the form::
 
             dict like {
-                "quantities": current_sample_quantities,
-                "target": current_sample_target,
-                "time": current_sample_time
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
             }
         """
 
@@ -348,9 +349,11 @@ class DataStreamMET4FOF:
             latest samples in the form::
 
             dict like {
-                "quantities": current_sample_quantities,
-                "target": current_sample_target,
-                "time": current_sample_time
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
             }
         """
         if batch_size < 0:
