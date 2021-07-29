@@ -2,7 +2,7 @@ import csv
 import re
 import sys
 from threading import Timer
-from typing import List, Optional, Set, Type, Union
+from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import networkx as nx
 from mesa import Agent as MesaAgent, Model
@@ -129,7 +129,7 @@ class AgentNetwork:
             elif self.backend == "mesa":
                 return self.mesa_model.get_agent(name_to_search_for)
 
-        def get_agentType_count(self, agentType):
+        def get_agentType_count(self, agent_type: Type[AgentMET4FOF]) -> int:
             num_count = 1
             agentType_name = str(agentType.__name__)
             agent_names = self.agents()
@@ -140,7 +140,7 @@ class AgentNetwork:
                         num_count += 1
             return num_count
 
-        def get_agent_name_count(self, new_agent_name):
+        def get_agent_name_count(self, new_agent_name: str) -> int:
             num_count = 1
             agent_names = self.agents()
             if len(agent_names) != 0:
@@ -149,7 +149,7 @@ class AgentNetwork:
                         num_count += 1
             return num_count
 
-        def generate_module_name_byType(self, agentType: Type[AgentMET4FOF]):
+        def generate_module_name_byType(self, agentType: Type[AgentMET4FOF]) -> str:
             # handle agent type
             if isinstance(agentType, str):
                 name = agentType
@@ -158,7 +158,7 @@ class AgentNetwork:
             name += "_" + str(self.get_agentType_count(agentType))
             return name
 
-        def generate_module_name_byUnique(self, agent_name):
+        def generate_module_name_byUnique(self, agent_name: str) -> str:
             name = agent_name
             agent_copy_count = self.get_agent_name_count(
                 agent_name
@@ -169,12 +169,12 @@ class AgentNetwork:
 
         def add_agent(
             self,
-            name=" ",
-            agentType=AgentMET4FOF,
-            log_mode=True,
-            buffer_size=1000,
-            ip_addr=None,
-            loop_wait=None,
+            name: Optional[str] = " ",
+            agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+            log_mode: Optional[bool] = True,
+            buffer_size: Optional[int] = 1000,
+            ip_addr: Optional[str] = None,
+            loop_wait: Optional[bool] = None,
             **kwargs,
         ):
             try:
@@ -212,12 +212,12 @@ class AgentNetwork:
 
         def _add_osbrain_agent(
             self,
-            name=" ",
-            agentType=AgentMET4FOF,
-            log_mode=True,
-            buffer_size=1000,
-            ip_addr=None,
-            loop_wait=None,
+            name: Optional[str] = " ",
+            agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+            log_mode: Optional[bool] = True,
+            buffer_size: Optional[int] = 1000,
+            ip_addr: Optional[str] = None,
+            loop_wait: Optional[bool] = None,
             **kwargs,
         ):
             new_agent = run_agent(
@@ -236,10 +236,10 @@ class AgentNetwork:
 
         def _add_mesa_agent(
             self,
-            name=" ",
-            agentType=AgentMET4FOF,
-            log_mode=True,
-            buffer_size=1000,
+            name: Optional[str] = " ",
+            agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+            log_mode: Optional[bool] = True,
+            buffer_size: Optional[int] = 1000,
             **kwargs,
         ):
             new_agent = agentType(
@@ -250,7 +250,7 @@ class AgentNetwork:
             new_agent = self.mesa_model.add_agent(new_agent)
             return new_agent
 
-        def get_agents_stylesheets(self, agent_names):
+        def get_agents_stylesheets(self, agent_names: List[str]) -> List:
             # for customising display purposes in dashboard
             agents_stylesheets = []
             for agent in agent_names:
@@ -261,7 +261,7 @@ class AgentNetwork:
                     self.log_info("Error:" + str(e))
             return agents_stylesheets
 
-        def agents(self, exclude_names: Optional[List[str]] = None):
+        def agents(self, exclude_names: Optional[List[str]] = None) -> List[str]:
             """Returns all or subset of agents' names connected to agent network
 
             For the osBrain backend , the mandatory agents ``AgentController``,
@@ -278,6 +278,7 @@ class AgentNetwork:
             list[str]
                 requested names of agents
             """
+
             def return_osbrain_agents():
                 invisible_agents = ["AgentController", "Logger"]
 
@@ -317,10 +318,12 @@ class AgentNetwork:
                 new_G.add_edges_from(edges)
                 self.G = new_G
 
-        def get_networkx(self):
+        def get_networkx(self) -> nx.DiGraph:
             return self.G
 
-        def get_latest_edges(self, agent_names):
+        def get_latest_edges(
+            self, agent_names: List[str]
+        ) -> List[Tuple[Union[str, Dict[str, str]]]]:
             edges = []
             for agent_name in agent_names:
                 temp_agent = self.get_agent(agent_name)
@@ -358,10 +361,10 @@ class AgentNetwork:
         def del_coalition(self):
             self.coalitions = []
 
-        def add_coalition_agent(self, name, agents=[]):
-            """
-            Add agents into the coalition
-            """
+        def add_coalition_agent(
+            self, name: str, agents: List[Union[AgentMET4FOF, Proxy]]
+        ):
+            """Add agents into the coalition"""
             # update coalition
             for coalition_i, coalition in enumerate(self.coalitions):
                 if coalition.name == name:
@@ -377,10 +380,8 @@ class AgentNetwork:
                 if coalition.name == coalition_name:
                     self.coalitions[coalition_i].remove_agent(agent_name)
 
-        def get_coalition(self, name):
-            """
-            Gets the coalition based on provided name
-            """
+        def get_coalition(self, name: str):
+            """Gets the coalition based on provided name"""
             for coalition_i, coalition in enumerate(self.coalitions):
                 if coalition.name == name:
                     return coalition
@@ -634,16 +635,15 @@ class AgentNetwork:
         else:
             self.dashboard_proc = None
 
-    def connect(self, ip_addr="127.0.0.1", port=3333):
-        """Connects to an existing AgentNetwork for osBrain backend
+    def connect(self, ip_addr: Optional[str] = "127.0.0.1", port: Optional[int] = 3333):
+        """Connects to an existing agent network's name server for osBrain backend
 
         Parameters
         ----------
-        ip_addr: str
-            IP Address of server to connect to
-
-        port: int
-            Port of server to connect to
+        ip_addr : str, optional
+            IP Address of osBrain name server to connect to, defaults to "127.0.0.1"
+        port : int, optional
+            Port of osBrain name server to connect to, defaults to 3333
         """
         try:
             self.ns = NSProxy(nsaddr=ip_addr + ":" + str(port))
@@ -654,16 +654,18 @@ class AgentNetwork:
             )
             self.ns = 0
 
-    def start_server_osbrain(self, ip_addr: str = "127.0.0.1", port: int = 3333):
-        """Starts a new AgentNetwork for osBrain and initializes :attr:`_controller`
+    def start_server_osbrain(
+        self, ip_addr: Optional[str] = "127.0.0.1", port: Optional[int] = 3333
+    ):
+        """Starts a new agent network's name server for osBrain
 
         Parameters
         ----------
-        ip_addr: str
-            IP Address of server to start
+        ip_addr : str, optional
+            IP Address of osBrain name server to start, defaults to "127.0.0.1"
 
-        port: int
-            Port of server to start
+        port : int, optional
+            Port of osBrain name server to start, defaults to 3333
         """
 
         print("Starting NameServer...")
@@ -700,9 +702,9 @@ class AgentNetwork:
         )
         self.start_mesa_timer(self.mesa_update_interval)
 
-    def _set_mode(self, state):
-        """
-        Internal method to set mode of Agent Controller
+    def _set_controller_mode(self, state: str):
+        """Internal method to set mode of agent controller
+
         Parameters
         ----------
         state: str
@@ -731,16 +733,13 @@ class AgentNetwork:
 
         return self._get_controller().get_attr("current_state")
 
-    def set_running_state(self, filter_agent=None):
-        """Blanket operation on all agents to set their `current_state` to "Running"
-
-        Users will need to define their own flow of handling each type of
-        `self.current_state` in the `agent_loop`.
+    def set_running_state(self, filter_agent: Optional[str] = None):
+        """Blanket operation on all agents to set their ``current_state`` to "Running"
 
         Parameters
         ----------
-        filter_agent : str
-            (Optional) Filter name of agents to set the states
+        filter_agent : str, optional
+            Filter name of agents to set the states
 
         """
 
@@ -780,8 +779,10 @@ class AgentNetwork:
 
         self.set_agents_state(filter_agent=filter_agent, state="Stop")
 
-    def set_agents_state(self, filter_agent=None, state="Idle"):
-        """Blanket operation on all agents to set their `current_state` to given state
+    def set_agents_state(
+        self, filter_agent: Optional[str] = None, state: Optional[str] = "Idle"
+    ):
+        """Blanket operation on all agents to set their ``current_state`` to given state
 
         Can be used to define different states of operation such as "Running",
         "Idle, "Stop", etc.. Users will need to define their own flow of handling
@@ -789,12 +790,10 @@ class AgentNetwork:
 
         Parameters
         ----------
-        filter_agent : str
-            (Optional) Filter name of agents to set the states
-
-        state : str
+        filter_agent : str, optional
+            Filter name of agents to set the states
+        state : str, optional
             State of agents to set
-
         """
 
         self._set_mode(state)
