@@ -393,7 +393,9 @@ class DataStreamMET4FOF:
         }
 
     def reset(self):
+        """Set the sample count to zero to prepare for new extractions"""
         self._sample_idx = 0
 
-    def has_more_samples(self):
+    def has_more_samples(self) -> bool:
+        """Tell if there are more samples to extract"""
         return self._sample_idx < self._n_samples
