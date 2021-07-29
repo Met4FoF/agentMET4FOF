@@ -1,4 +1,10 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent, SineGeneratorAgent
+from agentMET4FOF.agents import (
+    AgentMET4FOF,
+    AgentNetwork,
+    MonitorAgent,
+    SineGeneratorAgent,
+)
+
 
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
@@ -21,10 +27,12 @@ class MultiMathAgent(AgentMET4FOF):
         self._plus_param = plus_param
 
     def on_received_message(self, message):
-        minus_data = self.minus(message["data"], self._minus_param)
-        plus_data = self.plus(message["data"], self._plus_param)
+        minus_data = self.minus(message["data"]["quantities"], self._minus_param)
+        plus_data = self.plus(message["data"]["quantities"], self._plus_param)
 
-        self.send_output({"minus": minus_data, "plus": plus_data})
+        self.send_output(
+            {"minus": minus_data, "plus": plus_data, "time": message["data"]["time"]}
+        )
 
     @staticmethod
     def minus(minuend: float, subtrahend: float) -> float:
@@ -33,6 +41,7 @@ class MultiMathAgent(AgentMET4FOF):
     @staticmethod
     def plus(summand_1: float, summand_2: float) -> float:
         return summand_1 + summand_2
+
 
 def main():
     # start agent network server

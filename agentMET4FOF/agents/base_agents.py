@@ -183,13 +183,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         return buffer
 
     def reset(self):
-        """
-        This method will be called on all agents when the global `reset_agents` is
-        called by the AgentNetwork and when the Reset button is clicked on the
-        dashboard.
+        """Reset the agent's states and parameters
 
-        Method to reset the agent's states and parameters. User can override this
-        method to reset the specific parameters.
+        User can override this method to reset the specific parameters.
         """
         self.log_info("RESET AGENT STATE")
         self.buffer.clear()

@@ -46,7 +46,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
 def demonstrate_metrological_stream():
 
     # start agent network server
-    agent_network = AgentNetwork(dashboard_modules=True)
+    agent_network = AgentNetwork(backend="mesa")
 
     # Initialize signal generating class outside of agent framework.
     signal = MetrologicalSineGenerator()
@@ -60,7 +60,9 @@ def demonstrate_metrological_stream():
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
-        "MonitorAgent", agentType=MetrologicalMonitorAgent, buffer_size=50,
+        "Metrological plot including measurement uncertainties",
+        agentType=MetrologicalMonitorAgent,
+        buffer_size=50,
     )
 
     # Bind agents.
