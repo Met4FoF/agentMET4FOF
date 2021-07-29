@@ -262,6 +262,22 @@ class AgentNetwork:
             return agents_stylesheets
 
         def agents(self, exclude_names: Optional[List[str]] = None):
+            """Returns all or subset of agents' names connected to agent network
+
+            For the osBrain backend , the mandatory agents ``AgentController``,
+            ``Logger`` are never returned.
+
+            Parameters
+            ----------
+            exclude_names : str, optional
+                if present, only those names are returned which contain
+                ``exclude_names``'s value
+
+            Returns
+            -------
+            list[str]
+                requested names of agents
+            """
             def return_osbrain_agents():
                 invisible_agents = ["AgentController", "Logger"]
 
