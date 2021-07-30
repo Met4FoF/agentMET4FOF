@@ -7,7 +7,7 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MCMCMH_NJ:
-    """Bayesian Noise and jitter reduction algorithm
+    """ This is the main class that implements the Bayesian Noise and jitter reduction algorithm
 
     MCMC used to determine the noise and jitter variances. Noise and jitter variances
     are then used in an iterative algorithm to remove the noise and jitter from the
@@ -20,7 +20,6 @@ class MCMCMH_NJ:
         # variables for AnalyseSignalN and NJAlgorithm
         self.fs = fs
         self.ydata = ydata
-        # self.xdata = xdata
         self.N = N
         self.niter = niter
         self.tol = tol
@@ -32,9 +31,6 @@ class MCMCMH_NJ:
         self.M0 = M0
         self.Nc = Nc
         self.Q = Q
-        # outs = MCMCMH.mcmcm_decayexp.main(ydata, xdata, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q)
-        # self.jitterSD = outs[0]
-        # self.noiseSD = outs[1]
 
     def AnalyseSignalN(self):
         """
@@ -84,13 +80,12 @@ class MCMCMH_NJ:
         # Loop through indices L of window
         L = 0
         if np.size(self.ydata) > 10:
-            # for L in range(1, m-self.N+1):
-            # while
             # Index k of indices L of windows
             k = L + n
-            # print(k)
+
             # Extract data in window
             datay = self.ydata[L : L + self.N]
+
             # Inital polynomial approximation
             p = np.polyfit(datax, datay, 3)
             pval = np.polyval(p, datax)
@@ -100,7 +95,7 @@ class MCMCMH_NJ:
             [yhat[k], ck, vark, R[k]] = MCMCMH_NJ.NJAlgorithm(
                 self, datax, datay, p, pval
             )
-            print(yhat[k])
+
             # First n windows, start building the covariance matrix Vmat for the data
             if L < n + 1:
                 Vmat[L - 1, L - 1] = vark
@@ -190,6 +185,7 @@ class MCMCMH_NJ:
         n = np.divide(self.N - 2, 2)
         k = np.int64(n + 1)
         t = np.array([np.power(datax[k], 3), np.power(datax[k], 2), datax[k], 1])
+
         # Deisgn Matrix
         X = np.array(
             [
@@ -605,7 +601,6 @@ class MCMCMH_NJ:
 
         # The convergence statistics can only be evaluated if there are multiple chains
         # and the chain length is greater than the burn in length
-
         if N > 1 and M > M0 + 1:
             Mt = M - M0
 
