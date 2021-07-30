@@ -82,9 +82,10 @@ class AgentDashboard:
 
     def _show_startup_message(self):
         """This method prints the startup message of the webserver/dashboard"""
+        ip_to_print = "127.0.0.1" if self.ip_addr == "0.0.0.0" else self.ip_addr
         crucial_line = (
             f"\n| visit the agentMET4FOF dashboard on http:/"
-            f"/{self.ip_addr}:{self.port}/ |"
+            f"/{ip_to_print}:{self.port}/ |"
         )
         crucial_line_len = len(crucial_line)
 
@@ -98,8 +99,7 @@ class AgentDashboard:
             "|",
             crucial_line,
             "\n|".ljust(crucial_line_len - 1, " "),
-            f"|"
-            f"\n|-".ljust(crucial_line_len, "-"),
+            f"|" f"\n|-".ljust(crucial_line_len, "-"),
             "|\n",
             sep="",
         )
