@@ -14,6 +14,12 @@ Signal agents
     :members:
     :private-members:
 
+An agent to reduce noise and jitter in a signal
+-----------------------------------------------
+.. automodule:: agentMET4FOF.agents.noise_jitter_removal_agents
+    :members:
+    :private-members:
+
 
 Metrologically enabled base agents
 ----------------------------------

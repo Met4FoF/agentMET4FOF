@@ -10,7 +10,12 @@ from ..streams.signal_streams import (
     StaticSineWithJitterGenerator,
 )
 
-__all__ = ["SineGeneratorAgent", "StaticSineWithJitterGeneratorAgent", "NoiseAgent"]
+__all__ = [
+    "SineGeneratorAgent",
+    "SineWithJitterGeneratorAgent",
+    "StaticSineWithJitterGeneratorAgent",
+    "NoiseAgent",
+]
 
 
 class SineGeneratorAgent(AgentMET4FOF):
