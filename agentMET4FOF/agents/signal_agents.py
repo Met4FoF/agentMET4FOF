@@ -77,7 +77,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
         r"""Initialize the pre generated sine signal of fixed length with jitter
 
         Initialize the static input data as an instance of the
-        :class:`.StaticSineWithJitterGenerator` class with the provided parameters.
+        :class:`StaticSineWithJitterGenerator` class with the provided parameters.
 
         Parameters
         ----------
