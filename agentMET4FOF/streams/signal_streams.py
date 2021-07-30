@@ -1,37 +1,34 @@
+from typing import Optional
+
 import numpy as np
 
 from .base_streams import DataStreamMET4FOF
 
-__all__ = ["SineGenerator", "CosineGenerator", "StaticSineGeneratorWithJitter"]
+__all__ = ["SineGenerator", "CosineGenerator", "StaticSineWithJitterGenerator"]
 
 
 class SineGenerator(DataStreamMET4FOF):
-    """
-    Built-in class of sine wave generator which inherits all
-    methods and attributes from :class:`DataStreamMET4FOF`.
-    :func:`sine_wave_function` is a custom defined function which has a required
-    keyword ``time`` as argument and any number of optional additional arguments
-    (e.g ``F``) to be supplied to the :meth:`.DataStreamMET4FOF.set_generator_function`.
+    """Streaming sine wave generator
 
     Parameters
     ----------
-    sfreq : int
+    sfreq : int, optional
         sampling frequency which determines the time step when :meth:`.next_sample`
-        is called
-    sine_freq : float
-        frequency of wave function
+        is called, defaults to 500
+    sine_freq : float, optional
+        frequency of wave function, defaults to 50.0
     amplitude : float, optional
-        Amplitude of the wave function. Defaults to 1.
+        amplitude of the wave function, defaults to 1.0
     initial_phase : float, optional
-        Initial phase of the wave function. Defaults to 0.0.
+        initial phase of the wave function, defaults to 0.0
     """
 
     def __init__(
         self,
-        sfreq=500,
-        sine_freq=50,
-        amplitude: float = 1.0,
-        initial_phase: float = 0.0,
+        sfreq: Optional[int] = 500,
+        sine_freq: Optional[float] = 50.0,
+        amplitude: Optional[float] = 1.0,
+        initial_phase: Optional[float] = 0.0,
     ):
         super().__init__()
         self.set_metadata(
@@ -51,35 +48,49 @@ class SineGenerator(DataStreamMET4FOF):
         )
 
     def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
-        """A simple sine wave generator"""
-        value = amplitude * np.sin(2 * np.pi * sine_freq * time + initial_phase)
-        return value
+        """A simple sine wave generator
+
+        Parameters
+        ----------
+        time : Union[List, DataFrame, np.ndarray]
+            the time stamps at which to evaluate the function
+        sine_freq : float
+            frequency of wave function
+        amplitude : float
+            amplitude of the wave function
+        initial_phase : float
+            initial phase of the wave function
+
+        Returns
+        -------
+        np.ndarray
+            the sine values of the specified curve at ``time``
+        """
+        return amplitude * np.sin(2 * np.pi * sine_freq * time + initial_phase)
 
 
 class CosineGenerator(DataStreamMET4FOF):
-    """
-    Built-in class of cosine wave generator which inherits all
-    methods and attributes from :class:`DataStreamMET4FOF`.
-    :func:`cosine_wave_function` is a custom defined function which has a required
-    keyword ``time`` as argument and any number of
-    optional additional arguments (e.g ``cosine_freq``) to be supplied to the
-    :meth:`.DataStreamMET4FOF.set_generator_function`.
+    """Streaming cosine wave generator
 
     Parameters
     ----------
-    sfreq : int
+    sfreq : int, optional
         sampling frequency which determines the time step when :meth:`.next_sample`
-        is called
-    cosine_freq : int
-        frequency of wave function
+        is called, defaults to 500
+    cosine_freq : float, optional
+        frequency of wave function, defaults to 50.0
     amplitude : float, optional
-        Amplitude of the wave function. Defaults to 1.0.
+            amplitude of the wave function, defaults to 1.0
     initial_phase : float, optional
-        Initial phase of the wave function. Defaults to 0.0.
+            initial phase of the wave function, defaults to 0.0
     """
 
     def __init__(
-        self, sfreq=500, cosine_freq=50, amplitude: float = 1, initial_phase: float = 0
+        self,
+        sfreq: Optional[int] = 500,
+        cosine_freq: Optional[float] = 50.0,
+        amplitude: Optional[float] = 1.0,
+        initial_phase: Optional[float] = 0.0,
     ):
         super().__init__()
         self.set_metadata(
@@ -99,12 +110,29 @@ class CosineGenerator(DataStreamMET4FOF):
         )
 
     def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
-        """A simple cosine wave generator"""
+        """A simple cosine wave generator
+
+        Parameters
+        ----------
+        time : Union[List, DataFrame, np.ndarray]
+            the time stamps at which to evaluate the function
+        cosine_freq : float
+            frequency of wave function
+        amplitude : float
+                amplitude of the wave function
+        initial_phase : float
+                initial phase of the wave function
+
+        Returns
+        -------
+        np.ndarray
+            the cosine values of the specified curve at ``time``
+        """
         value = amplitude * np.cos(2 * np.pi * cosine_freq * time + initial_phase)
         return value
 
 
-class StaticSineGeneratorWithJitter(DataStreamMET4FOF):
+class StaticSineWithJitterGenerator(DataStreamMET4FOF):
     r"""Represents a fixed length sine signal with jitter
 
     Parameters
@@ -118,6 +146,7 @@ class StaticSineGeneratorWithJitter(DataStreamMET4FOF):
     """
 
     def __init__(self, num_cycles=1000, jitter_std=0.02):
+        super().__init__()
         timestamps = np.arange(0, np.pi * num_cycles, 0.1)
         timestamps_with_jitter = np.random.normal(loc=timestamps, scale=jitter_std)
         signal_values_at_timestamps = np.sin(timestamps_with_jitter)

@@ -5,7 +5,7 @@ from agentMET4FOF.agents.signal_agents import NoiseAgent, SineGeneratorAgent
 from agentMET4FOF.network import AgentNetwork
 
 
-def demonstrate_generator_agent_use():
+def demonstrate_noise_agent_use():
     agent_network = AgentNetwork(backend="mesa")
 
     sine_agent = agent_network.add_agent(
@@ -28,4 +28,4 @@ def demonstrate_generator_agent_use():
 
 
 if __name__ == "__main__":
-    demonstrate_generator_agent_use()
+    demonstrate_noise_agent_use()

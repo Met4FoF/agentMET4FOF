@@ -3,20 +3,23 @@ import numpy as np
 from agentMET4FOF.agents import MonitorAgent
 from agentMET4FOF.agents.signal_agents import (
     SineGeneratorAgent,
-    StaticSineGeneratorWithJitterAgent,
+    StaticSineWithJitterGeneratorAgent,
 )
 from agentMET4FOF.network import AgentNetwork
 
 
-def demonstrate_generator_agent_use():
+def demonstrate_sine_with_jitter_agent_use():
     agent_network = AgentNetwork(backend="mesa")
 
     sine_agent = agent_network.add_agent(
         name="Clean sine signal", agentType=SineGeneratorAgent
     )
-    sine_agent.init_parameters(sfreq=395, sine_freq=2 * np.pi)
+    sine_agent.init_parameters(
+        sfreq=10,
+        sine_freq=np.reciprocal(2 * np.pi),
+    )
     jitter_agent = agent_network.add_agent(
-        name="Sine signal with jitter", agentType=StaticSineGeneratorWithJitterAgent
+        name="Sine signal with jitter", agentType=StaticSineWithJitterGeneratorAgent
     )
     jitter_agent.init_parameters(jitter_std=0.05)
     monitor_agent = agent_network.add_agent(
@@ -32,4 +35,4 @@ def demonstrate_generator_agent_use():
 
 
 if __name__ == "__main__":
-    demonstrate_generator_agent_use()
+    demonstrate_sine_with_jitter_agent_use()

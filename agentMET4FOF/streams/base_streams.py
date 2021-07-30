@@ -287,33 +287,45 @@ class DataStreamMET4FOF:
         self.reset()
 
     def all_samples(self) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
-        """
-        Returns all the samples in the data stream
+        """Return all the samples in the data stream
 
         Returns
         -------
-        samples : Dict
-            ``{'x': current_sample_x, 'y': current_sample_y}``
+        Dict[str, Union[List, DataFrame, np.ndarray]]
+            all samples in the form::
 
+            dict like {
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
+            }
         """
         return self.next_sample(-1)
 
-    def next_sample(self, batch_size: int = 1):
-        """
-        Fetches the latest ``batch_size`` samples from the iterables: ``quantities``,
-        ``time`` and ``target``. This advances the internal pointer ``_sample_idx`` by
-        ``batch_size``.
+    def next_sample(
+        self, batch_size: Optional[int] = 1
+    ) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
+        """Fetch the latest samples from the ``quantities``, ``time`` and ``target``
 
         Parameters
         ----------
-        batch_size : int
-            number of batches to get from data stream
+        batch_size : int, optional
+            number of batches to get from data stream, defaults to 1
 
         Returns
         -------
-        samples : Dict
-            ``{'time':current_sample_time, 'quantities':current_sample_quantities,
-            'target':current_sample_target}``
+        Dict[str, Union[List, DataFrame, np.ndarray]]
+            latest samples in the form::
+
+            dict like {
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
+            }
         """
 
         if self._data_source_type == "function":
@@ -322,21 +334,27 @@ class DataStreamMET4FOF:
             return self._next_sample_data_source(batch_size)
 
     def _next_sample_data_source(
-        self, batch_size: int = 1
+        self, batch_size: Optional[int] = 1
     ) -> Dict[str, Union[List, DataFrame, np.ndarray]]:
-        """
-        Internal method for fetching latest samples from a dataset.
+        """Internal method for fetching latest samples from a dataset
 
         Parameters
         ----------
-        batch_size : int
-            number of batches to get from data stream
+        batch_size : int, optional
+            number of batches to get from data stream, defaults to 1
 
         Returns
         -------
-        samples : Dict
-            ``{'quantities':current_sample_quantities, 'target':current_sample_target}``
+        Dict[str, Union[List, DataFrame, np.ndarray]]
+            latest samples in the form::
 
+            dict like {
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "target": <target labels as a list, np.ndarray or pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
+            }
         """
         if batch_size < 0:
             batch_size = self._quantities.shape[0]
@@ -375,7 +393,9 @@ class DataStreamMET4FOF:
         }
 
     def reset(self):
+        """Set the sample count to zero to prepare for new extractions"""
         self._sample_idx = 0
 
-    def has_more_samples(self):
+    def has_more_samples(self) -> bool:
+        """Tell if there are more samples to extract"""
         return self._sample_idx < self._n_samples
