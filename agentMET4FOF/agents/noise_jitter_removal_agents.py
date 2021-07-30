@@ -716,14 +716,6 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
         self.Nc = Nc
         self.Q = Q
 
-    @staticmethod
-    def njr(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q) -> object:
-        analyse_fun = MCMCMH_NJ(
-            fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q
-        )
-        yhat1 = analyse_fun.AnalyseSignalN()
-        return yhat1
-
     def on_received_message(self, message):
         if isinstance(message["data"], dict):
             ddata = message["data"]["quantities"]
@@ -731,7 +723,7 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
             ddata = message["data"]
         self.ydata = np.append(self.ydata, ddata)
         if np.size(self.ydata) == self.N:
-            t = self.njr(
+            analyse_fun = MCMCMH_NJ(
                 self.fs,
                 self.ydata,
                 self.N,
@@ -746,5 +738,5 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
                 self.Nc,
                 self.Q,
             )
-            self.send_output(self.ydata[7] - t)
+            self.send_output(self.ydata[7] - analyse_fun.AnalyseSignalN())
             self.ydata = self.ydata[1 : self.N]
