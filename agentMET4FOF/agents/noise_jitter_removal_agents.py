@@ -35,9 +35,9 @@ class MCMCMHNJ:
         self.Q = Q
 
     def AnalyseSignalN(self):
-        """
-        Analyse signal to remove noise and jitter providing signal estimates with associated
-        uncertainty. Uses normalised independent variable
+        """Analyse signal to remove noise and jitter providing signal estimates
+
+        Associated uncertainty. Uses normalised independent variable.
         """
 
         # Initialisation
@@ -47,17 +47,17 @@ class MCMCMHNJ:
 
         # Setting initial variables
         n = (self.N - 1) // 2
-        # Covariance matric for signal values
+        # Covariance matrix for signal values
         Vmat = np.zeros((np.multiply(2, self.N) - 1, np.multiply(2, self.N) - 1))
-        # Sensitivtity vecotrs
+        # Sensitivity vectors
         cvec = np.zeros(n, self.N)
-        # Sensitivtity matrix
+        # Sensitivity matrix
         Cmat = np.zeros((self.N, np.multiply(2, self.N) - 1))
         # Initial signal estimate
         yhat0 = np.full((m, 1), np.nan)
         # Final signal estimate
         yhat = np.full((m, 1), np.nan)
-        # Uncertainty infromation for estimates
+        # Uncertainty information for estimates
         vyhat = np.full((m, self.N), np.nan)
         # Consistency matrix
         R = np.full((m, 1), np.nan)
@@ -88,12 +88,12 @@ class MCMCMHNJ:
             # Extract data in window
             datay = self.ydata[L : L + self.N]
 
-            # Inital polynomial approximation
+            # Initial polynomial approximation
             p = np.polyfit(datax, datay, 3)
             pval = np.polyval(p, datax)
             yhat0[k] = pval[n]
 
-            # Applying algortithm to remove noise and jitter
+            # Applying algorithm to remove noise and jitter
             [yhat[k], ck, vark, R[k]] = MCMCMHNJ.NJAlgorithm(
                 self, datax, datay, p, pval
             )
@@ -103,20 +103,20 @@ class MCMCMHNJ:
                 Vmat[L - 1, L - 1] = vark
 
             # for windows n+1 to 2n, continue building the covariance matrix Vmat and
-            # start stroing the sensitivtity vectors ck in cvec
+            # start storing the sensitivity vectors ck in cvec
             elif n < L < np.multiply(2, n) + 1:
                 Vmat[L - 1, L - 1] = vark
                 cvec[L - n - 1, :] = ck
 
             # For windows between 2n+1 and 4n, continue to build Vmat and cvec, and
-            # start building the sensitivtity matrix Cmat from the sensitivtity
-            # vecotrs. Also, evaluate uncertainties for pervious estimates.
+            # start building the sensitivity matrix Cmat from the sensitivity
+            # vectors. Also, evaluate uncertainties for previous estimates.
             elif np.multiply(2, n) < L < np.multiply(4, n) + 2:
 
                 Vmat[L - 1, L - 1] = vark
-                # Count for building sensitivtity matrix
+                # Count for building sensitivity matrix
                 iC = L - np.multiply(2, n)
-                # Start building sensitivtity matrix from cvec
+                # Start building sensitivity matrix from cvec
                 Cmat[iC - 1, :] = np.concatenate(
                     (np.zeros((1, iC - 1)), cvec[0, :], np.zeros((1, self.N - iC))),
                     axis=None,
@@ -171,7 +171,7 @@ class MCMCMHNJ:
 
         return yhat[k]
 
-    def NJAlgorithm(self, datax, datay, p0, p0x):
+    def NJAlgorithm(self, datax, data_y, p0, p0x):
         """Noise and Jitter Removal Algorithm
 
         Iterative scheme that preprocesses data to reduce the effects of noise and
@@ -183,7 +183,7 @@ class MCMCMHNJ:
         * Jagan et al. [Jagan2020]_
         """
 
-        # Initialisatio
+        # Initialisation
         iter_ = 0
         delta = np.multiply(2, self.tol)
 
@@ -193,7 +193,7 @@ class MCMCMHNJ:
         k = np.int64(n + 1)
         t = np.array([np.power(datax[k], 3), np.power(datax[k], 2), datax[k], 1])
 
-        # Deisgn Matrix
+        # Design Matrix
         X = np.array(
             [
                 np.power(datax, 3) + 3 * np.multiply(np.power(self.jitterSD, 2), datax),
@@ -204,10 +204,10 @@ class MCMCMHNJ:
         )
         X = X.T
 
-        # Iterative algortithm
+        # Iterative algorithm
         while delta >= self.tol:
             # Increment number of iterations
-            iter_ = iter_ + 1
+            iter_ += 1
 
             # Step 2 - Polynomial fitting over window
             pd = np.polyder(p0)
@@ -229,11 +229,11 @@ class MCMCMHNJ:
             # Calculating polynomial coeffs
             Xt = np.matmul(np.diagflat(w), X)
             C = np.matmul(np.linalg.pinv(Xt), np.diagflat(w))
-            datay = datay.T
-            p1 = np.matmul(C, datay)
+            data_y = data_y.T
+            p1 = np.matmul(C, data_y)
             p1x = np.polyval(p1, datax)
 
-            # Step 5 - stablise process
+            # Step 5 - stabilise process
             delta = np.max(np.abs(p1x - p0x))
             p0 = p1
             p0x = p1x
@@ -244,23 +244,25 @@ class MCMCMHNJ:
 
         # Evaluate outputs
         c = np.matmul(t, C)
-        yhat = np.matmul(c, datay)
+        y_hat = np.matmul(c, data_y)
         pd = np.polyder(p0)
         pdx = np.polyval(pd, datax[k])
         vk = np.power(self.jitterSD, 2) * np.power(pdx, 2) + np.power(self.noiseSD, 2)
         R = np.power(
-            np.linalg.norm(np.matmul(np.diagflat(w), (datay - np.matmul(X, p0)))), 2
+            np.linalg.norm(np.matmul(np.diagflat(w), (data_y - np.matmul(X, p0)))), 2
         )
 
-        return yhat, c, vk, R
+        return y_hat, c, vk, R
 
     @staticmethod
-    def mcmcm_main(datay, datax, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
+    def mcmcm_main(data_y, data_x, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
 
         at0 = np.array((1, 1, 1, 1, np.log(1 / s0w ** 2), np.log(1 / s0t ** 2)))
-        # function that evaluates the log of the target distribution at given parameter values
-        tar = lambda at: MCMCMHNJ.tar_at(at, datay, datax, m0w, s0w, m0t, s0t)
-        # function that evaluates the negative log of the target distribution to evaluate MAP estimates
+        # function that evaluates the log of the target distribution at given parameter
+        # values
+        tar = lambda at: MCMCMHNJ.tar_at(at, data_y, data_x, m0w, s0w, m0t, s0t)
+        # function that evaluates the negative log of the target distribution to
+        # evaluate MAP estimates
         mapp = lambda at: -tar(at)
 
         res = minimize(mapp, at0)
@@ -320,7 +322,8 @@ class MCMCMHNJ:
         prior_phi1 = (m0t / 2) * np.log(phi1) - phi1 * m0t * s0t ** 2 / 2
         prior_phi2 = (m0w / 2) * np.log(phi2) - phi2 * m0w * s0w ** 2 / 2
 
-        # function that evaluates the cubic function with user specified cubic parameters
+        # function that evaluates the cubic function with user specified cubic
+        # parameters
         fun = lambda aa: MCMCMHNJ.fgh_cubic(aa, x)
 
         # cubic, expectation and variance
@@ -358,13 +361,13 @@ class MCMCMHNJ:
         f2(m,N):                Second derivative of cubic
         """
 
-        # length of data and number of paramaters
+        # length of data and number of parameters
         m = t.size
 
         # design matrix
         C = np.array([np.ones(m), t, t ** 2, t ** 3])
 
-        # derivate info
+        # derivative info
         C1 = np.array([np.ones(m), 2 * t, 3 * t ** 2])
         C2 = np.array([2 * np.ones(m), 6 * t])
 
@@ -377,23 +380,24 @@ class MCMCMHNJ:
 
     @staticmethod
     def ln_gauss_pdf_v(x, mu, sigma):
-        """
-        -------------------------------------------------------------------------
-        Log of the Gaussian pdf
-        -------------------------------------------------------------------------
+        """Log of the Gaussian pdf
+
         KJ, LRW, PMH
         Version 2020-03-12
-        --------------------------------------------------------------------------
-        Inputs:
-        x(m,1):                 Points at which pdf is to be evaluated
 
-        mu:                     Mean of distribution
+        Parameters
+        ----------
+        x
+            (m,1) Points at which pdf is to be evaluated
+        mu
+            Mean of distribution
+        sigma
+            Standard deviation of the distribution
 
-        sigma:                  Standard deviation of the distribution
-
-        Output:
-        logf:                   Log of the Gaussian pdf at x with mean mu and
-                                std sigma
+        Returns
+        -------
+        logf
+            Log of the Gaussian pdf at x with mean mu and std sigma
         """
 
         try:
@@ -416,27 +420,28 @@ class MCMCMHNJ:
 
     @staticmethod
     def jumprwg(A, L):
-        """
-        jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random
-        walk algorithm
-        -------------------------------------------------------------------------
+        """Jumping distribution for the Metropolis Hastings Gaussian random walk
+
         KJ, LRW, PMH
         Version 2020-04-22
-        -------------------------------------------------------------------------
-        Inputs:
-        A(n,N): Samples at the current iteration
 
-        L(n,n): Cholesky factor of variance of parameter vector.
+        Parameters
+        ----------
+        A(n,N)
+            Samples at the current iteration
+        L(n,n)
+            Cholesky factor of variance of parameter vector.
 
-        Outputs:
-        As(n,N): Proposed parameter array which is randomly sampled from the
-        jumping distribution
-
-        dp0: The difference between the logarithm of the jumping distribution
-        associated with moving from A(:,j) to As(:,j) and that associated with
-        moving from As(:,j) to A(:,j), up to an additive constant.
-        log P0(a|as) - log P0(as|a)
-
+        Returns
+        -------
+        As(n,N)
+            Proposed parameter array which is randomly sampled from the jumping
+            distribution
+        dp0
+            The difference between the logarithm of the jumping distribution
+            associated with moving from A(:,j) to As(:,j) and that associated with
+            moving from As(:,j) to A(:,j), up to an additive constant.
+            log P0(a|as) - log P0(as|a)
         """
         # Number of parameters and parallel chains
         n, N = A.shape
@@ -447,58 +452,60 @@ class MCMCMHNJ:
         # proposed draw from a Gaussian distribution with mean A and variance LL'
         As = A + np.matmul(L, e)
 
-        # For a Gaussian random walk, since log P0(a|as) = log P0(as|a), dp0 will always be zero
+        # For a Gaussian random walk, since log P0(a|as) = log P0(as|a), dp0 will
+        # always be zero
         dp0 = np.zeros(N)
 
         return As, dp0
 
     @staticmethod
     def mcmcmh(M, N, M0, Q, A0, tar, jump):
-        """
-        mcmcmh: Metrolopolis-Hasting MCMC algorithm generating N chains of length
-        M for a parameter vector A of length n.
+        """Metrolopolis-Hasting MCMC algorithm generating N chains of length M
 
         For details about the algorithm please refer to:
         Gelman A, Carlin JB, Stern HS, Dunson DB, Vehtari A, Rubin DB.
         Bayesian data analysis. CRC press; 2013 Nov 1.
-        -------------------------------------------------------------------------
+
         KJ, LRW, PMH
         Version 2020-04-22
-        -------------------------------------------------------------------------
-        Inputs:
-        M: Length of the chains.
 
-        N: Number of chains.
+        Parameters
+        ----------
+        M
+            Length of the chains
+        N
+            Number of chains
+        M0
+            Burn in period
+        Q
+            (nQ,1) Percentiles 0 <= Q(k) <= 100
+        A0
+            (n,N) Array of feasible starting points: the target distribution
+            evaluated at A0(:,j) is strictly positive.
 
-        M0: Burn in period.
-
-        Q(nQ,1): Percentiles 0 <= Q(k) <= 100.
-
-        A0(n,N): Array of feasible starting points: the target distribution
-        evaluated at A0(:,j) is strictly positive.
-
-        Outputs:
-
-        S(2+nQ,n): Summary of A - mean, standard deviation and percentile limits,
-        where the percentile limits are given by Q.
-
-        aP(N,1): Acceptance percentages for AA calculated for each chain.
-
-        Rh(n,1): Estimate of convergence. Theoretically Rh >= 1, and the closer
-        to 1, the more evidence of convergence.
-
-        Ne(n,1): Estimate of the number of effective number of independent draws.
-
-        AA(M,N,n): Array storing the chains: A(i,j,k) is the kth element of the
-        parameter vector stored as the ith member of the jth chain.
-        AA(1,j,:) = A0(:,j).
-
-        IAA(M,N): Acceptance indices. IAA(i,j) = 1 means that the proposal
-        as(n,1) generated at the ith step of the jth chain was accepted so
-        that AA(i,j,:) = as. IAA(i,j) = 0 means that the proposal as(n,1)
-        generated at the ith step of the jth chain was rejected so that
-        AA(i,j,:) = AA(i-1,j,:), i > 1. The first set of proposal coincide with
-        A0 are all accepted, so IAA(1,j) = 1.
+        Returns
+        -------
+        S(2+nQ,n)
+            Summary of A - mean, standard deviation and percentile limits, where the
+            percentile limits are given by Q
+        aP(N,1)
+            Acceptance percentages for AA calculated for each chain
+        Rh(n,1)
+            Estimate of convergence. Theoretically Rh >= 1, and the closer to 1,
+            the more evidence of convergence
+        Ne(n,1)
+            Estimate of the number of effective number of independent draws
+        AA(M,N,n)
+            Array storing the chains: A(i,j,k) is the kth element of the
+            parameter vector stored as the ith member of the jth chain
+            AA(1,j,:) = A0(:,j)
+        IAA(M,N)
+            Acceptance indices. IAA(i,j) = 1 means that the proposal
+            as(n,1) generated at the ith step of the jth chain was accepted so
+            that AA(i,j,:) = as. IAA(i,j) = 0 means that the proposal as(n,1)
+            generated at the ith step of the jth chain was rejected so that
+            AA(i,j,:) = AA(i-1,j,:), i > 1. The first set of proposal coincide with
+            A0 are all accepted, so IAA(1,j) = 1.
         """
         A0 = np.array(A0)
         Q = np.array(Q)
@@ -511,8 +518,8 @@ class MCMCMHNJ:
         # Initialising output arrays
         AA = np.empty((M, N, n))
         IAA = np.zeros((M, N))
-        Rh = np.empty((n))
-        Ne = np.empty((n))
+        Rh = np.empty(n)
+        Ne = np.empty(n)
         S = np.empty((2 + nQ, n))
 
         # starting values of the sample and associated log of target density
@@ -573,26 +580,28 @@ class MCMCMHNJ:
 
     @staticmethod
     def mcmcci(A, M0):
-        """
-        mcmcci: MCMC convergence indices for multiple chains.
-        ----------------------------------------------------------------------------
+        """MCMC convergence indices for multiple chains
+
         KJ, LRW, PMH
 
         Version 2020-04-22
 
-        ----------------------------------------------------------------------------
-        Inputs:
-        A(M, N): Chain samples, N chains of length M.
+        Parameters
+        ----------
+        A
+            (M, N) Chain samples, N chains of length M
+        M0
+            Length of burn-in, M > M0 >= 0.
 
-        M0: Length of burn-in, M > M0 >= 0.
+        Returns
+        -------
+        Rhat
+            Convergence index. Rhat is expected to be greater than 1. The closer
+            Rhat is to 1, the better the convergence.
+        Neff
+            Estimate of the effective number of independent draws. Neff is
+            expected to be less than (M-M0)*N.
 
-        Outputs:
-        Rhat: Convergence index. Rhat is expected to be greater than 1. The closer
-        Rhat is to 1, the better the convergence.
-
-        Neff: Estimate of the effective number of independent draws. Neff is
-        expected to be less than (M-M0)*N.
-        ----------------------------------------------------------------------------
         Note: If the calculated value of Rhat is < 1, then Rhat is set to 1 and Neff
         set to (M-M0)*N, their limit values.
 
@@ -640,27 +649,28 @@ class MCMCMHNJ:
 
     @staticmethod
     def mcsums(A, M0, Q):
-        """
-        mcsums: Summary information from MC samples.
-        -------------------------------------------------------------------------
+        """Summary information from MC samples
+
         KJ, LRW, PMH
         Version 2020-04-22
 
-        -------------------------------------------------------------------------
-        Inputs:
-        A(M,N): An array that stores samples of size M x N.
+        Parameters
+        ----------
+        A
+            An (M,N) array that stores samples of size M x N
+        M0
+            Burn-in period with M > M0 >= 0
+        Q
+            (nQ,1) Percentiles specifications, 0 <= Q(l) <= 100
 
-        M0: Burn-in period with M > M0 >= 0.
-
-        Q(nQ,1): Percentiles specifications, 0 <= Q(l) <= 100.
-
-        Outputs:
-        abar(n,1): Mean for each sample.
-
-        s(n,1): Standard deviation for sample.
-
-        aQ(nQ,n): Percentiles corresponding to Q.
-
+        Returns
+        -------
+        abar(n,1)
+            Mean for each sample
+        s(n,1)
+            Standard deviation for sample
+        aQ(nQ,n)
+            Percentiles corresponding to Q
         """
         # Size of samples after burn-in
         A = np.array(A)
