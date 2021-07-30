@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.0 (2021-07-30)
+### Feature
+* **NoiseJitterRemovalAgent:** Introduce an agent to reduce the amount of noise and jitter in streamed sensor values ([`4349548`](https://github.com/Met4FoF/agentMET4FOF/commit/4349548fd0402c7cdbc661ba5a440ba14f7ee312))
+* **SineWithJitter:** Introduce a streaming data stream of a sine signal with jitter and the corresponding agent ([`b6ca636`](https://github.com/Met4FoF/agentMET4FOF/commit/b6ca636fc7eeae693819bd82893328d3e838fdd0))
+
+### Refactor
+* **Dashboard:** Rename `Dashboard.is_port_available` to `Dashboard.is_port_at_ip_available` ([`25a9700`](https://github.com/Met4FoF/agentMET4FOF/commit/25a970013e9a08fc1b9a154562754300e03c6a98))
+
+### Documentation
+* **README:** Introduce link and note about noise and jitter removal tutorial ([`59cc55e`](https://github.com/Met4FoF/agentMET4FOF/commit/59cc55e04302f0302ff931eb59285f7b066411c8))
+* **signal_streams:** Improve docstrings and type hints ([`a7e0007`](https://github.com/Met4FoF/agentMET4FOF/commit/a7e0007fcd460458d629546c99d68ef1f2079c11))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.11.0...v0.12.0)**
+
 ## v0.11.0 (2021-07-29)
 ### Feature
 * **Plots:** Adapt dashboard such that all agents of types `MonitorAgent` and `MetrologicalMonitorAgent` get plotted regardless of their name ([`67a2544`](https://github.com/Met4FoF/agentMET4FOF/commit/67a25448f1709fbf8a5f9a4b6991d0c1fccb740f))
