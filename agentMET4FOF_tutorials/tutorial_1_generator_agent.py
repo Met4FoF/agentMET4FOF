@@ -1,9 +1,11 @@
+from time import sleep
+
 import numpy as np
 
 from agentMET4FOF.agents import AgentNetwork, MonitorAgent, SineGeneratorAgent
 
 
-def demonstrate_generator_agent_use():
+def demonstrate_generator_agent_use() -> AgentNetwork:
     # Start agent network server.
     agent_network = AgentNetwork()
 
@@ -38,4 +40,6 @@ def demonstrate_generator_agent_use():
 
 
 if __name__ == "__main__":
-    demonstrate_generator_agent_use()
+    signal_demo_network = demonstrate_generator_agent_use()
+    sleep(60)
+    signal_demo_network.shutdown()
