@@ -4,8 +4,8 @@ import numpy as np
 
 
 class SineGenerator(DataStreamMET4FOF):
-    """
-    Built-in class of sine wave generator.
+    """Copy of the built-in class of a streaming sine wave generator
+
     `sfreq` is sampling frequency which determines the time step when next_sample is called
     `F` is frequency of wave function
     `sine_wave_function` is a custom defined function which has a required keyword `time` as argument and any number of optional additional arguments (e.g `F`).
