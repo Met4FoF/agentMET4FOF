@@ -1,7 +1,11 @@
+from typing import Any, Dict
+
+import numpy as np
+
 from .base_agents import AgentMET4FOF
 from ..streams.signal_streams import SineGenerator, StaticSineGeneratorWithJitter
 
-__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent"]
+__all__ = ["SineGeneratorAgent", "StaticSineGeneratorWithJitterAgent", "NoiseAgent"]
 
 
 class SineGeneratorAgent(AgentMET4FOF):
@@ -57,13 +61,19 @@ class StaticSineGeneratorWithJitterAgent(AgentMET4FOF):
 
     _sine_stream: StaticSineGeneratorWithJitter
 
-    def init_parameters(self):
+    def init_parameters(self, jitter_std=0.02):
         """Initialize the input data
 
         Initialize the static input data as an instance of the
         :class:`StaticSineGeneratorWithJitter` class.
+
+        Parameters
+        ----------
+        jitter_std : float, optional
+            the standard deviation of the distribution to randomly draw jitter from,
+            defaults to 0.02
         """
-        self._sine_stream = StaticSineGeneratorWithJitter()
+        self._sine_stream = StaticSineGeneratorWithJitter(jitter_std=jitter_std)
 
     def agent_loop(self):
         """Model the agent's behaviour
@@ -77,5 +87,49 @@ class StaticSineGeneratorWithJitterAgent(AgentMET4FOF):
 
 
 class NoiseAgent(AgentMET4FOF):
-    def on_received_message(self, message):
-        raise NotImplementedError
+    r"""An agent adding white noise to the incoming signal
+
+    Parameters
+    ----------
+    noise_std : float, optional
+        the standard deviation of the distribution to randomly draw noise from,
+        defaults to 0.05
+    """
+    _noise_std: float
+
+    @property
+    def noise_std(self):
+        return self._noise_std
+
+    def init_parameters(self, noise_std=0.05):
+        """Initialize the noise's standard deviation
+
+        Parameters
+        ----------
+        noise_std : float, optional
+            the standard deviation of the distribution to randomly draw noise from,
+            defaults to 0.05
+        """
+        self._noise_std = noise_std
+
+    def on_received_message(self, message: Dict[str, Any]):
+        """Add noise to the received message's data
+
+        Parameters
+        ----------
+        message : Dictionary
+            The message received is in form::
+
+            dict like {
+                "from": "<valid agent name>"
+                "data": <time series data as a list, np.ndarray or pd.Dataframe>,
+                "senderType": <any subclass of AgentMet4FoF>,
+                "channel": "<channel name>"
+                }
+        """
+        if self.current_state == "Running":
+            noisy_data = np.random.normal(
+                loc=message["data"],
+                scale=self._noise_std,
+            )
+            self.send_output(noisy_data)

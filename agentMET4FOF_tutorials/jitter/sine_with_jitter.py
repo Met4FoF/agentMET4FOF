@@ -1,11 +1,11 @@
 import numpy as np
 
-from agentMET4FOF.agents import (
-    AgentNetwork,
-    MonitorAgent,
+from agentMET4FOF.agents import MonitorAgent
+from agentMET4FOF.agents.signal_agents import (
     SineGeneratorAgent,
+    StaticSineGeneratorWithJitterAgent,
 )
-from agentMET4FOF.agents.signal_agents import StaticSineGeneratorWithJitterAgent
+from agentMET4FOF.network import AgentNetwork
 
 
 def demonstrate_generator_agent_use():
@@ -18,7 +18,10 @@ def demonstrate_generator_agent_use():
     jitter_agent = agent_network.add_agent(
         name="Sine signal with jitter", agentType=StaticSineGeneratorWithJitterAgent
     )
-    monitor_agent = agent_network.add_agent(agentType=MonitorAgent)
+    jitter_agent.init_parameters(jitter_std=0.05)
+    monitor_agent = agent_network.add_agent(
+        name="Compare clean signal and signal with jitter", agentType=MonitorAgent
+    )
 
     agent_network.bind_agents(sine_agent, monitor_agent)
     agent_network.bind_agents(jitter_agent, monitor_agent)

@@ -2,11 +2,7 @@ import numpy as np
 
 from .base_streams import DataStreamMET4FOF
 
-__all__ = [
-    "SineGenerator",
-    "CosineGenerator",
-    "StaticSineGeneratorWithJitter"
-]
+__all__ = ["SineGenerator", "CosineGenerator", "StaticSineGeneratorWithJitter"]
 
 
 class SineGenerator(DataStreamMET4FOF):
@@ -122,7 +118,7 @@ class StaticSineGeneratorWithJitter(DataStreamMET4FOF):
     """
 
     def __init__(self, num_cycles=1000, jitter_std=0.02):
-        xnn = np.arange(0, np.pi * num_cycles, 0.1)
-        xjitter = np.random.normal(loc=xnn, scale=jitter_std, size=np.size(xnn))
-        xn = np.sin(xjitter)
-        self.set_data_source(quantities=xn, time=xnn)
+        timestamps = np.arange(0, np.pi * num_cycles, 0.1)
+        timestamps_with_jitter = np.random.normal(loc=timestamps, scale=jitter_std)
+        signal_values_at_timestamps = np.sin(timestamps_with_jitter)
+        self.set_data_source(quantities=signal_values_at_timestamps, time=timestamps)
