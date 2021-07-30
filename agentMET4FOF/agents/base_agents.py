@@ -225,7 +225,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             print(e)
             return 1
 
-    def init_agent_loop(self, loop_wait: Optional[int] = None):
+    def init_agent_loop(self, loop_wait: Optional[float] = None):
         """
         Initiates the agent loop, which iterates every `loop_wait` seconds
 
@@ -234,7 +234,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         Parameters
         ----------
         loop_wait : int, optional
-            The wait between each iteration of the loop
+            The wait between each iteration of the loop, defaults to 1.0
         """
 
         # most default: loop wait has not been set in init_parameters() not

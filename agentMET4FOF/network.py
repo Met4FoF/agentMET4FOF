@@ -174,7 +174,7 @@ class AgentNetwork:
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
             ip_addr: Optional[str] = None,
-            loop_wait: Optional[bool] = None,
+            loop_wait: Optional[float] = None,
             **kwargs,
         ):
             try:
@@ -217,7 +217,7 @@ class AgentNetwork:
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
             ip_addr: Optional[str] = None,
-            loop_wait: Optional[bool] = None,
+            loop_wait: Optional[float] = None,
             **kwargs,
         ):
             new_agent = run_agent(
@@ -938,14 +938,14 @@ class AgentNetwork:
 
     def add_agent(
         self,
-        name=" ",
-        agentType: Type[AgentMET4FOF] = AgentMET4FOF,
-        log_mode=True,
-        buffer_size=1000,
-        ip_addr=None,
-        loop_wait=None,
+        name: Optional[str] = " ",
+        agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+        log_mode: Optional[bool] = True,
+        buffer_size: Optional[int] = 1000,
+        ip_addr: Optional[str] = None,
+        loop_wait: Optional[int] = None,
         **kwargs,
-    ):
+    ) -> Type[AgentMET4FOF]:
         """
         Instantiates a new agent in the network.
 
@@ -954,11 +954,21 @@ class AgentNetwork:
         name : str, optional
             Unique name of agent, defaults to the agent's class name.
         agentType : Type[AgentMET4FOF] or subclass of AgentMET4FOF, optional
-            Agent class to be instantiated in the network. Defaults to
+            Agent class to be instantiated in the network, defaults to
             :py:class:`AgentMET4FOF`
         log_mode : bool, optional
-            Determines if messages will be logged to background Logger Agent.
-            Defaults to ``True``.
+            Determines if messages will be logged to background Logger Agent,
+            defaults to ``True``
+        buffer_size : int, optional
+            The total number of elements to be stored in the agent :attr:`buffer`,
+            defaults to 1.000
+        ip_addr : str, optional
+            IP Address of the Agent Network address to connect to. By default, it will
+            match that of the ip_addr, assuming the Dashboard and Agent Network are run
+            on the same machine with same IP address.
+        loop_wait : float, optional
+            The wait between each iteration of the loop, defaults to the
+            :func:`AgentMET4FOF.init_agent_loop` default
 
         Returns
         -------

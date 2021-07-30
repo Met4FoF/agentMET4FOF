@@ -34,7 +34,7 @@ class AgentBuffer:
     buffer : dict of iterables or dict of dicts of iterables
         The buffer can be a dict of iterables, or a dict of dict of iterables for nested
         named data. The keys are the names of agents.
-    buffer_size :
+    buffer_size : int
         The total number of elements to be stored in the agent :attr:`buffer`
     supported_datatypes : list of types
         List of all types supported and thus properly handled by the buffer. Defaults to
@@ -42,12 +42,12 @@ class AgentBuffer:
         :class:`DataFrame <Pandas:pandas.DataFrame>`
     """
 
-    def __init__(self, buffer_size: int = 1000):
+    def __init__(self, buffer_size: Optional[int] = 1000):
         """Initialise a new agent buffer object
 
         Parameters
         ----------
-        buffer_size: int
+        buffer_size: int, optional
             Length of buffer allowed.
         """
         self.buffer = {}
