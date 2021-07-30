@@ -7,8 +7,9 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 """### mcmcci: MCMC convergence indices for multiple chains."""
 
-def mcmcci(A,M0):
-    '''
+
+def mcmcci(A, M0):
+    """
     mcmcci: MCMC convergence indices for multiple chains.
     ----------------------------------------------------------------------------
     KJ, LRW, PMH
@@ -32,7 +33,7 @@ def mcmcci(A,M0):
     set to (M-M0)*N, their limit values.
 
     Note: If N = 1 or M0 > M-2, Rhat = 0; Neff = 0.
-    '''
+    """
     A = np.array(A)
 
     M, N = A.shape
@@ -48,35 +49,38 @@ def mcmcci(A,M0):
         Mt = M - M0
 
         # Chain mean and mean of means
-        asub = A[M0:,:]
-        ad = np.mean(asub,axis = 0)
+        asub = A[M0:, :]
+        ad = np.mean(asub, axis=0)
         add = asub.mean()
 
         # Within group standard deviation
-        ss = np.std(asub,axis = 0)
+        ss = np.std(asub, axis=0)
 
         # Between groups variance.
         dd = np.square(ad - add)
-        B = (Mt*np.sum(dd))/(N-1)
+        B = (Mt * np.sum(dd)) / (N - 1)
 
         # Within groups variance.
-        W = np.sum(np.square(ss))/N
+        W = np.sum(np.square(ss)) / N
 
         # V plus
-        Vp = (Mt-1)*W/Mt + B/Mt
+        Vp = (Mt - 1) * W / Mt + B / Mt
 
         # Convergence statistic, effective number of independent samples
-        Rhat = np.sqrt(Vp/W)
-        Neff = Mt*N*Vp/B
+        Rhat = np.sqrt(Vp / W)
+        Neff = Mt * N * Vp / B
 
-        Rhat = np.maximum(Rhat,1)
-        Neff = np.minimum(Neff,Mt*N)
+        Rhat = np.maximum(Rhat, 1)
+        Neff = np.minimum(Neff, Mt * N)
 
     return Rhat, Neff
 
+
 """### mcsums: Summary information from MC samples."""
-def mcsums(A,M0,Q):
-    '''
+
+
+def mcsums(A, M0, Q):
+    """
     mcsums: Summary information from MC samples.
     -------------------------------------------------------------------------
     KJ, LRW, PMH
@@ -97,13 +101,13 @@ def mcsums(A,M0,Q):
 
     aQ(nQ,n): Percentiles corresponding to Q.
 
-    '''
+    """
     # Size of samples after burn-in
     A = np.array(A)
 
     M, N = A.shape
 
-    m = (M - M0)*N
+    m = (M - M0) * N
 
     # Initialise percentile vector
     nQ = Q.size
@@ -118,13 +122,16 @@ def mcsums(A,M0,Q):
     s = np.std(aaj)
 
     # Percentiles of samples
-    aQ = np.percentile(aaj,Q)
+    aQ = np.percentile(aaj, Q)
 
     return abar, s, aQ
 
+
 """### Cubic function and its first and second derivative"""
-def fgh_cubic(alpha,t):
-    '''
+
+
+def fgh_cubic(alpha, t):
+    """
     -------------------------------------------------------------------------
     Cubic function and its first and second derivative
     -------------------------------------------------------------------------
@@ -142,29 +149,31 @@ def fgh_cubic(alpha,t):
     f1(m,N):                Derivative of cubic
 
     f2(m,N):                Second derivative of cubic
-    '''
+    """
 
     # length of data and number of paramaters
     m = t.size
 
     # design matrix
-    C = np.array([np.ones(m), t, t**2, t**3])
+    C = np.array([np.ones(m), t, t ** 2, t ** 3])
 
     # derivate info
-    C1 = np.array([np.ones(m), 2*t, 3*t**2])
-    C2 = np.array([2*np.ones(m), 6*t])
+    C1 = np.array([np.ones(m), 2 * t, 3 * t ** 2])
+    C2 = np.array([2 * np.ones(m), 6 * t])
 
     # cubic and derivatives
-    f = np.matmul(C.T,alpha)
-    f1 = np.matmul(C1.T,alpha[1:])
-    f2 = np.matmul(C2.T,alpha[2:])
+    f = np.matmul(C.T, alpha)
+    f1 = np.matmul(C1.T, alpha[1:])
+    f2 = np.matmul(C2.T, alpha[2:])
 
     return f, f1, f2
 
+
 """### Log of the gaussian pdf"""
 
-def ln_gauss_pdf_v(x,mu,sigma):
-    '''
+
+def ln_gauss_pdf_v(x, mu, sigma):
+    """
     -------------------------------------------------------------------------
     Log of the Gaussian pdf
     -------------------------------------------------------------------------
@@ -181,33 +190,32 @@ def ln_gauss_pdf_v(x,mu,sigma):
     Output:
     logf:                   Log of the Gaussian pdf at x with mean mu and
                             std sigma
-    '''
-
+    """
 
     try:
-      # When inputs are high dimensional arrays/matrices
-      xx = np.matlib.repmat(x,mu.shape[1],1)
-      xx = xx.T
-      logk = - np.log(2*math.pi)/2 - np.log(sigma)
-      logp = -((xx - mu)**2)/(2*sigma**2)
-      # Log of the Gaussian PDF
-      logf = logk + logp
+        # When inputs are high dimensional arrays/matrices
+        xx = np.matlib.repmat(x, mu.shape[1], 1)
+        xx = xx.T
+        logk = -np.log(2 * math.pi) / 2 - np.log(sigma)
+        logp = -((xx - mu) ** 2) / (2 * sigma ** 2)
+        # Log of the Gaussian PDF
+        logf = logk + logp
 
     except IndexError:
-      # When inputs are vectors
-      logk = - np.log(2*math.pi)/2 - np.log(sigma)
-      logp = -((x - mu)**2)/(2*sigma**2)
-      # Log of the Gaussian PDF
-      logf = logk + logp
+        # When inputs are vectors
+        logk = -np.log(2 * math.pi) / 2 - np.log(sigma)
+        logp = -((x - mu) ** 2) / (2 * sigma ** 2)
+        # Log of the Gaussian PDF
+        logf = logk + logp
 
     return logf
 
 
-
 """###mcmcmh: Metrolopolis-Hasting MCMC algorithm generating N chains of length M for a parameter vector A of length n."""
 
+
 def mcmcmh(M, N, M0, Q, A0, tar, jump):
-    '''
+    """
     mcmcmh: Metrolopolis-Hasting MCMC algorithm generating N chains of length
     M for a parameter vector A of length n.
 
@@ -252,7 +260,7 @@ def mcmcmh(M, N, M0, Q, A0, tar, jump):
     generated at the ith step of the jth chain was rejected so that
     AA(i,j,:) = AA(i-1,j,:), i > 1. The first set of proposal coincide with
     A0 are all accepted, so IAA(1,j) = 1.
-    '''
+    """
     A0 = np.array(A0)
     Q = np.array(Q)
     # number of parameters for which samples are to be drawn
@@ -261,14 +269,12 @@ def mcmcmh(M, N, M0, Q, A0, tar, jump):
     # number of percentiles to be evaluated
     nQ = Q.size
 
-
     # Initialising output arrays
     AA = np.empty((M, N, n))
     IAA = np.zeros((M, N))
     Rh = np.empty((n))
     Ne = np.empty((n))
     S = np.empty((2 + nQ, n))
-
 
     # starting values of the sample and associated log of target density
     aq = A0
@@ -280,7 +286,6 @@ def mcmcmh(M, N, M0, Q, A0, tar, jump):
     if sum(Id) < N:
         print("Initial values must be feasible for all chains")
         return None
-
 
     # Run the chains in parallel
     for q in range(M):
@@ -308,34 +313,34 @@ def mcmcmh(M, N, M0, Q, A0, tar, jump):
         # Store Metropolis Hastings sample
         AA[q, :, :] = np.transpose(aq)
 
-
     # acceptance probabilities for each chain
-    aP = 100*np.sum(IAA,0)/M
+    aP = 100 * np.sum(IAA, 0) / M
 
     # Convergence and summary statistics for each of the n parameters
     for j in range(n):
         # test convergence
-        RN = mcmcci(np.squeeze(AA[:,:,j]), M0)
+        RN = mcmcci(np.squeeze(AA[:, :, j]), M0)
         Rh[j] = RN[0]
         Ne[j] = RN[1]
 
         # provide summary information
-        asq = np.squeeze(AA[:,:,j])
-        SS = mcsums(asq,M0,Q)
-        S[0,j] = SS[0]
-        S[1,j] = SS[1]
-        S[2:,j] = SS[2]
+        asq = np.squeeze(AA[:, :, j])
+        SS = mcsums(asq, M0, Q)
+        S[0, j] = SS[0]
+        S[1, j] = SS[1]
+        S[2:, j] = SS[2]
 
     return S, aP, Rh, Ne, AA, IAA
 
-class MCMCMH_NJ():
-    '''
+
+class MCMCMH_NJ:
+    """
     Bayesian Noise and jitter reduction algorithm. MCMC used to determine the noise and jitter variances.
     Noise and jitter variances are then used in an iterative algorithm to remove the noise and jitter from the signal
-    '''
+    """
 
     def __init__(self, fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
-        'Setting initial variables'
+        "Setting initial variables"
 
         # variables for AnalyseSignalN and NJAlgorithm
         self.fs = fs
@@ -357,10 +362,10 @@ class MCMCMH_NJ():
         # self.noiseSD = outs[1]
 
     def AnalyseSignalN(self):
-        '''
+        """
         Analyse signal to remove noise and jitter providing signal estimates with associated
         uncertainty. Uses normalised independent variable
-        '''
+        """
 
         # Initialisation
         self.N = np.int64(self.N)  # Converting window length integer to int64 format
@@ -387,8 +392,18 @@ class MCMCMH_NJ():
         # Values of normalised independent variables
         datax = np.divide(np.arange(-n, n + 1), self.fs)
 
-        outs = self.mcmcm_main(self.ydata, datax, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc,
-                                                self.M0, self.Nc, self.Q)
+        outs = self.mcmcm_main(
+            self.ydata,
+            datax,
+            self.m0w,
+            self.s0w,
+            self.m0t,
+            self.s0t,
+            self.Mc,
+            self.M0,
+            self.Nc,
+            self.Q,
+        )
         self.jitterSD = outs[0]
         self.noiseSD = outs[1]
         # Loop through indices L of window
@@ -400,14 +415,16 @@ class MCMCMH_NJ():
             k = L + n
             # print(k)
             # Extract data in window
-            datay = self.ydata[L:L + self.N]
+            datay = self.ydata[L : L + self.N]
             # Inital polynomial approximation
             p = np.polyfit(datax, datay, 3)
             pval = np.polyval(p, datax)
             yhat0[k] = pval[n]
 
             # Applying algortithm to remove noise and jitter
-            [yhat[k], ck, vark, R[k]] = MCMCMH_NJ.NJAlgorithm(self, datax, datay, p, pval)
+            [yhat[k], ck, vark, R[k]] = MCMCMH_NJ.NJAlgorithm(
+                self, datax, datay, p, pval
+            )
             print(yhat[k])
             # First n windows, start building the covariance matrix Vmat for the data
             if L < n + 1:
@@ -419,7 +436,6 @@ class MCMCMH_NJ():
                 Vmat[L - 1, L - 1] = vark
                 cvec[L - n - 1, :] = ck
 
-
             # For windows between 2n+1 and 4n, continue to build Vmat and cvec, and start building the sensitivtity
             # matrix Cmat from the sensitivtity vecotrs. Also, evaluate uncertainties for pervious estimates.
             elif L > np.multiply(2, n) and L < np.multiply(4, n) + 2:
@@ -428,8 +444,10 @@ class MCMCMH_NJ():
                 # Count for building sensitivtity matrix
                 iC = L - np.multiply(2, n)
                 # Start building sensitivtity matrix from cvec
-                Cmat[iC - 1, :] = np.concatenate((np.zeros((1, iC - 1)), cvec[0, :], np.zeros((1, self.N - iC))),
-                                                 axis=None)
+                Cmat[iC - 1, :] = np.concatenate(
+                    (np.zeros((1, iC - 1)), cvec[0, :], np.zeros((1, self.N - iC))),
+                    axis=None,
+                )
 
                 # Removing the first row of cvec and shift every row up one - creating
                 # empty last row
@@ -437,16 +455,15 @@ class MCMCMH_NJ():
                 cvec[-1, :] = 0
                 # Update empty last row
                 cvec[n - 1, :] = ck
-                Cmatk = Cmat[0:iC, 1:self.N - 1 + iC]
+                Cmatk = Cmat[0:iC, 1 : self.N - 1 + iC]
 
                 # Continue building Vmat
-                Vmatk = Vmat[1:self.N - 1 + iC, 1:self.N - 1 + iC]
+                Vmatk = Vmat[1 : self.N - 1 + iC, 1 : self.N - 1 + iC]
                 V = np.matmul(np.matmul(Cmatk, Vmatk), np.transpose(Cmatk))
                 vhempty = np.empty((1, self.N - iC))
                 vhempty[:] = np.nan
                 # Begin building vyhat
                 vyhat[L, :] = np.concatenate((vhempty, V[iC - 1, :]), axis=None)
-
 
             # For the remaining windows, update Vmat, Cmat and cvec. Continue to
             # evaluate the uncertainties for previous estimates.
@@ -455,13 +472,18 @@ class MCMCMH_NJ():
                 Vmat = np.delete(Vmat, 0, axis=0)
                 Vmat = np.delete(Vmat, 0, axis=1)
                 Vmatzeros = np.zeros([Vmat.shape[0] + 1, Vmat.shape[1] + 1])
-                Vmatzeros[:Vmat.shape[0], :Vmat.shape[1]] = Vmat
+                Vmatzeros[: Vmat.shape[0], : Vmat.shape[1]] = Vmat
                 Vmat = Vmatzeros
                 Vmat[2 * self.N - 2, 2 * self.N - 2] = vark
 
                 # Building updated Cmat matrix
-                Cmat_old = np.concatenate((Cmat[1:self.N, 1:2 * self.N - 1], np.zeros([self.N - 1, 1])), axis=1)
-                Cmat_new = np.concatenate((np.zeros([1, self.N - 1]), cvec[0, :]), axis=None)
+                Cmat_old = np.concatenate(
+                    (Cmat[1 : self.N, 1 : 2 * self.N - 1], np.zeros([self.N - 1, 1])),
+                    axis=1,
+                )
+                Cmat_new = np.concatenate(
+                    (np.zeros([1, self.N - 1]), cvec[0, :]), axis=None
+                )
                 Cmat = np.concatenate((Cmat_old, Cmat_new[:, None].T), axis=0)
 
                 # Update cvec
@@ -474,15 +496,15 @@ class MCMCMH_NJ():
 
         L += 1
 
-        return (yhat[k])
+        return yhat[k]
 
     def NJAlgorithm(self, datax, datay, p0, p0x):
-        '''
+        """
         Noise and Jitter Removal Algorithm- Iterative scheme that preprocesses data to reduce the effects of
         noise and jitter, resulting in an estimate of the true signal along with its associated uncertainty.
 
         Refer paper for details: https://ieeexplore.ieee.org/document/9138266
-        '''
+        """
 
         # Initialisatio
         iter_ = 0
@@ -494,8 +516,14 @@ class MCMCMH_NJ():
         k = np.int64(n + 1)
         t = np.array([np.power(datax[k], 3), np.power(datax[k], 2), datax[k], 1])
         # Deisgn Matrix
-        X = np.array([np.power(datax, 3) + 3 * np.multiply(np.power(self.jitterSD, 2), datax),
-                      np.power(datax, 2) + np.power(self.jitterSD, 2), datax, np.ones(np.size(datax))])
+        X = np.array(
+            [
+                np.power(datax, 3) + 3 * np.multiply(np.power(self.jitterSD, 2), datax),
+                np.power(datax, 2) + np.power(self.jitterSD, 2),
+                datax,
+                np.ones(np.size(datax)),
+            ]
+        )
         X = X.T
 
         # Iterative algortithm
@@ -509,8 +537,15 @@ class MCMCMH_NJ():
 
             # Step 4
             # Weight calculation
-            w = np.divide(1, [np.sqrt(np.power(self.jitterSD, 2) * np.power(pdx, 2)
-                                      + np.power(self.noiseSD, 2))])
+            w = np.divide(
+                1,
+                [
+                    np.sqrt(
+                        np.power(self.jitterSD, 2) * np.power(pdx, 2)
+                        + np.power(self.noiseSD, 2)
+                    )
+                ],
+            )
             w = w.T
 
             # Calculating polynomial coeffs
@@ -526,7 +561,7 @@ class MCMCMH_NJ():
             p0x = p1x
 
             if iter_ == self.niter:
-                print('Maximum number of iterations reached')
+                print("Maximum number of iterations reached")
                 break
 
         # Evaluate outputs
@@ -535,7 +570,9 @@ class MCMCMH_NJ():
         pd = np.polyder(p0)
         pdx = np.polyval(pd, datax[k])
         vk = np.power(self.jitterSD, 2) * np.power(pdx, 2) + np.power(self.noiseSD, 2)
-        R = np.power(np.linalg.norm(np.matmul(np.diagflat(w), (datay - np.matmul(X, p0)))), 2)
+        R = np.power(
+            np.linalg.norm(np.matmul(np.diagflat(w), (datay - np.matmul(X, p0)))), 2
+        )
 
         return yhat, c, vk, R
 
@@ -567,7 +604,7 @@ class MCMCMH_NJ():
 
     @staticmethod
     def tar_at(at, y, x, m0w, s0w, m0t, s0t):
-        '''
+        """
         -------------------------------------------------------------------------
         Target dist for noise and jitter posterior dist
         -------------------------------------------------------------------------
@@ -587,7 +624,7 @@ class MCMCMH_NJ():
 
         Output:
         T:                      Log of the posterior distribution
-        '''
+        """
 
         # Size of parameter vector
         at = np.array(at)
@@ -624,9 +661,10 @@ class MCMCMH_NJ():
         return T
 
     """### jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random walk algorithm"""
+
     @staticmethod
     def jumprwg(A, L):
-        '''
+        """
         jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random
         walk algorithm
         -------------------------------------------------------------------------
@@ -647,7 +685,7 @@ class MCMCMH_NJ():
         moving from As(:,j) to A(:,j), up to an additive constant.
         log P0(a|as) - log P0(as|a)
 
-        '''
+        """
         # Number of parameters and parallel chains
         n, N = A.shape
 
@@ -662,9 +700,25 @@ class MCMCMH_NJ():
 
         return As, dp0
 
+
 ########################################
 class NoiseJitterRemovalAgent(AgentMET4FOF):
-    def init_parameters(self, fs=100, ydata = np.array([]),  N=15, niter=100, tol=1e-9, m0w = 10, s0w = 0.0005, m0t = 10, s0t = 0.0002*100/8, Mc=5000, M0=100, Nc=100, Q=50 ):
+    def init_parameters(
+        self,
+        fs=100,
+        ydata=np.array([]),
+        N=15,
+        niter=100,
+        tol=1e-9,
+        m0w=10,
+        s0w=0.0005,
+        m0t=10,
+        s0t=0.0002 * 100 / 8,
+        Mc=5000,
+        M0=100,
+        Nc=100,
+        Q=50,
+    ):
         self.fs = fs
         self.ydata = ydata
         self.N = N
@@ -681,7 +735,9 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
 
     @staticmethod
     def njr(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q) -> object:
-        analyse_fun = MCMCMH_NJ(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q)
+        analyse_fun = MCMCMH_NJ(
+            fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q
+        )
         yhat1 = analyse_fun.AnalyseSignalN()
         return yhat1
 
@@ -692,6 +748,20 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
             ddata = message["data"]
         self.ydata = np.append(self.ydata, ddata)
         if np.size(self.ydata) == self.N:
-            t = self.njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
+            t = self.njr(
+                self.fs,
+                self.ydata,
+                self.N,
+                self.niter,
+                self.tol,
+                self.m0w,
+                self.s0w,
+                self.m0t,
+                self.s0t,
+                self.Mc,
+                self.M0,
+                self.Nc,
+                self.Q,
+            )
             self.send_output(self.ydata[7] - t)
-            self.ydata = self.ydata[1:self.N]
+            self.ydata = self.ydata[1 : self.N]
