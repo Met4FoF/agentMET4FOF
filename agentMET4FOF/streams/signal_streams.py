@@ -1,10 +1,15 @@
-from typing import Optional
+from typing import Dict, Optional
 
 import numpy as np
 
 from .base_streams import DataStreamMET4FOF
 
-__all__ = ["SineGenerator", "CosineGenerator", "StaticSineWithJitterGenerator"]
+__all__ = [
+    "SineGenerator",
+    "CosineGenerator",
+    "SineWithJitterGenerator",
+    "StaticSineWithJitterGenerator",
+]
 
 
 class SineGenerator(DataStreamMET4FOF):
@@ -151,3 +156,74 @@ class StaticSineWithJitterGenerator(DataStreamMET4FOF):
         timestamps_with_jitter = np.random.normal(loc=timestamps, scale=jitter_std)
         signal_values_at_timestamps = np.sin(timestamps_with_jitter)
         self.set_data_source(quantities=signal_values_at_timestamps, time=timestamps)
+
+
+class SineWithJitterGenerator(SineGenerator):
+    r"""Represents a streamed sine signal with jitter
+
+    Parameters
+    ----------
+    sfreq : int, optional
+        sampling frequency which determines the time step when :meth:`.next_sample`
+        is called, defaults to 10
+    sine_freq : float, optional
+        frequency of wave function, defaults to :math:`\frac{1}{2 \pi}`
+    amplitude : float, optional
+        amplitude of the wave function, defaults to 1.0
+    initial_phase : float, optional
+        initial phase of the wave function, defaults to 0.0
+    jitter_std : float, optional
+        the standard deviation of the distribution to randomly draw jitter from,
+        defaults to 0.02
+    """
+
+    _jitter_std: float
+
+    @property
+    def jitter_std(self):
+        """The standard deviation of the distribution to randomly draw jitter from"""
+        return self._jitter_std
+
+    def __init__(
+        self,
+        sfreq: Optional[int] = 10,
+        sine_freq: Optional[float] = np.reciprocal(2 * np.pi),
+        amplitude: Optional[float] = 1.0,
+        initial_phase: Optional[float] = 0.0,
+        jitter_std: Optional[float] = 0.02,
+    ):
+        self._jitter_std = jitter_std
+        super().__init__(
+            sfreq=sfreq,
+            sine_freq=sine_freq,
+            amplitude=amplitude,
+            initial_phase=initial_phase,
+        )
+
+    def _next_sample_generator(
+        self, batch_size: Optional[int] = 1
+    ) -> Dict[str, np.ndarray]:
+        """Generate the next batch of samples from the sine function with jitter
+
+        Parameters
+        ----------
+        batch_size : int, optional
+            number of batches to get from data stream, defaults to 1
+
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            latest samples of the sine signal with jitter in the form::
+
+            dict like {
+                "quantities": <time series data as np.ndarray>,
+                "time": <time stamps as np.ndarray>
+            }
+        """
+        sine_signal_with_time_stamps = super()._next_sample_generator()
+
+        sine_signal_with_time_stamps["time"] = np.random.normal(
+            loc=sine_signal_with_time_stamps["time"], scale=self.jitter_std
+        )
+
+        return sine_signal_with_time_stamps

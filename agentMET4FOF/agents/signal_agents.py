@@ -4,7 +4,11 @@ import numpy as np
 import pandas as pd
 
 from .base_agents import AgentMET4FOF
-from ..streams.signal_streams import SineGenerator, StaticSineWithJitterGenerator
+from ..streams.signal_streams import (
+    SineGenerator,
+    SineWithJitterGenerator,
+    StaticSineWithJitterGenerator,
+)
 
 __all__ = ["SineGeneratorAgent", "StaticSineWithJitterGeneratorAgent", "NoiseAgent"]
 
@@ -92,6 +96,7 @@ class StaticSineWithJitterGeneratorAgent(AgentMET4FOF):
 
 class NoiseAgent(AgentMET4FOF):
     """An agent adding white noise to the incoming signal"""
+
     _noise_std: float
 
     @property
@@ -155,3 +160,57 @@ class NoiseAgent(AgentMET4FOF):
                     data_in_message["quantities"]
                 )
                 self.send_output(fully_assembled_resulting_data)
+
+
+class SineWithJitterGeneratorAgent(SineGeneratorAgent):
+    """An agent streaming a sine signal
+
+    Takes samples from the :py:mod:`SineWithJitterGenerator` and pushes them sample by
+    sample to connected agents via its output channel.
+    """
+
+    def init_parameters(
+        self,
+        sfreq: Optional[int] = 10,
+        sine_freq: Optional[float] = np.reciprocal(2 * np.pi),
+        amplitude: Optional[float] = 1.0,
+        initial_phase: Optional[float] = 0.0,
+        jitter_std: Optional[float] = 0.02,
+    ):
+        """Initialize the input data
+
+        Initialize the input data stream as an instance of the
+        :class:`SineWithJitterGenerator` class.
+
+        Parameters
+        ----------
+        sfreq : int, optional
+            sampling frequency which determines the time step when :meth:`.next_sample`
+            is called, defaults to 10
+        sine_freq : float, optional
+            frequency of the generated sine wave, defaults to :math:`\frac{1}{2 \pi}`
+        amplitude : float, optional
+            amplitude of the generated sine wave, defaults to 1.0
+        initial_phase : float, optional
+            initial phase (at t=0) of the generated sine wave, defaults to 0.0
+        jitter_std : float, optional
+            the standard deviation of the distribution to randomly draw jitter from,
+            defaults to 0.02
+        """
+        self._sine_stream = SineWithJitterGenerator(
+            sfreq=sfreq,
+            sine_freq=sine_freq,
+            amplitude=amplitude,
+            initial_phase=initial_phase,
+            jitter_std=jitter_std,
+        )
+
+    def agent_loop(self):
+        """Model the agent's behaviour
+
+        On state *Running* the agent will extract sample by sample the input data
+        streams content and push it via invoking :meth:`AgentMET4FOF.send_output`.
+        """
+        if self.current_state == "Running":
+            sine_data = self._sine_stream.next_sample()
+            self.send_output(sine_data)
