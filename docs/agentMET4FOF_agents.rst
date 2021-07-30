@@ -28,8 +28,8 @@ Metrologically enabled base agents
     :private-members:
 
 
-Metrological agents to reduce redundancy
-----------------------------------------
+A metrologically enabled agent to reduce redundancy
+---------------------------------------------------
 .. automodule:: agentMET4FOF.agents.metrological_redundancy_agents
     :members:
     :private-members:
