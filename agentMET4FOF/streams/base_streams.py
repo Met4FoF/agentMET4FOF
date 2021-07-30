@@ -215,9 +215,27 @@ class DataStreamMET4FOF:
             self._generator_function = generator_function
         return self._generator_function
 
-    def _next_sample_generator(self, batch_size: int = 1) -> Dict[str, np.ndarray]:
-        """
-        Internal method for generating a batch of samples from the generator function.
+    def _next_sample_generator(
+        self, batch_size: Optional[int] = 1
+    ) -> Dict[str, np.ndarray]:
+        """Internal method to generate a batch of samples from the generator function
+
+        Parameters
+        ----------
+        batch_size : int, optional
+            number of batches to get from data stream, defaults to 1
+
+        Returns
+        -------
+        Dict[str, Union[List, DataFrame, np.ndarray]]
+            latest samples in the form::
+
+            dict like {
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
+            }
         """
         time: np.ndarray = (
             np.arange(self._sample_idx, self._sample_idx + batch_size, 1) / self.sfreq
