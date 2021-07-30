@@ -88,7 +88,7 @@ class MCMCMH_NJ:
             k = L + n
             # print(k)
             # Extract data in window
-            datay = self.ydata[L: L + self.N]
+            datay = self.ydata[L : L + self.N]
             # Inital polynomial approximation
             p = np.polyfit(datax, datay, 3)
             pval = np.polyval(p, datax)
@@ -683,7 +683,6 @@ class MCMCMH_NJ:
         return abar, s, aQ
 
 
-########################################
 class NoiseJitterRemovalAgent(AgentMET4FOF):
     def init_parameters(
         self,
