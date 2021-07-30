@@ -14,6 +14,9 @@ class MCMCMHNJ:
     MCMC used to determine the noise and jitter variances. Noise and jitter variances
     are then used in an iterative algorithm to remove the noise and jitter from the
     signal.
+
+    For a more detailed description of the individual methods are provided in a `wiki
+    <https://github.com/Met4FoF/npl-jitter-noise-removal-mcmc#description-of-the-functions>`_
     """
 
     def __init__(self, fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
