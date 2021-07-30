@@ -3,8 +3,7 @@ import numpy as np
 import numpy.matlib
 from scipy.optimize import minimize
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams.signal_streams import StaticSineGeneratorWithJitter
+from agentMET4FOF.agents import AgentMET4FOF
 
 """### mcmcci: MCMC convergence indices for multiple chains."""
 
@@ -822,47 +821,3 @@ class NJRemoved(AgentMET4FOF):
             t = njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
             self.send_output(self.ydata[7] - t)
             self.ydata = self.ydata[1:self.N]
-
-
-class SineGeneratorAgent(AgentMET4FOF):
-    def init_parameters(self):
-        self.stream = StaticSineGeneratorWithJitter()
-
-    def agent_loop(self):
-        if self.current_state == "Running":
-            sine_data = self.stream.next_sample()  # dictionary
-            self.send_output(sine_data['quantities'])
-
-def main():
-    # start agent network server
-    agentNetwork = AgentNetwork(backend="mesa")
-    # init agents
-
-    gen_agent = agentNetwork.add_agent(agentType=SineGeneratorAgent)
-
-    njremove_agent = agentNetwork.add_agent(agentType=NJRemoved)
-
-    monitor_agent = agentNetwork.add_agent(agentType=MonitorAgent)
-    monitor_agent2 = agentNetwork.add_agent(agentType=MonitorAgent)
-
-
-    # connect agents : We can connect multiple agents to any particular agent
-
-    agentNetwork.bind_agents(gen_agent, njremove_agent)
-
-    # connect
-    agentNetwork.bind_agents(gen_agent, monitor_agent)
-
-    # agentNetwork.bind_agents(njremove_agent, moitor_agent2)
-
-    agentNetwork.bind_agents(njremove_agent, monitor_agent2)
-
-    # set all agents states to "Running"
-    agentNetwork.set_running_state()
-
-    # allow for shutting down the network after execution
-    return agentNetwork
-
-
-if __name__ == '__main__':
-    main()
