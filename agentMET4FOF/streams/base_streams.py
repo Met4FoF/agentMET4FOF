@@ -168,12 +168,21 @@ class DataStreamMET4FOF:
         Parameters
         ----------
         time : Union[List, DataFrame, np.ndarray]
+            the time stamps at which to evaluate the function
+
+        Returns
+        -------
+        np.ndarray
+            :math:`f(x) = \sin (2 \pi \cdot \text{self.sfreq} \cdot x)` evaluated
+            at ``time``
         """
-        value = np.sin(2 * np.pi * self.F * time)
-        return value
+        return np.sin(2 * np.pi * self.sfreq * time)
 
     def set_generator_function(
-        self, generator_function: Callable = None, sfreq: int = None, **kwargs: Any
+        self,
+        generator_function: Optional[Callable] = None,
+        sfreq: Optional[int] = 50,
+        **kwargs: Any
     ):
         """
         Sets the data source to a generator function. By default, this function resorts
@@ -184,11 +193,11 @@ class DataStreamMET4FOF:
 
         Parameters
         ----------
-        generator_function : Callable
+        generator_function : Callable, optional
             A generator function which takes in at least one argument ``time`` which
             will be used in :func:`next_sample`. Parameters of the function can be
             fixed by providing additional arguments such as the wave frequency.
-        sfreq : int
+        sfreq : int, optional
             Sampling frequency.
         **kwargs : Any
             Any additional keyword arguments to be supplied to the generator function.
@@ -206,18 +215,34 @@ class DataStreamMET4FOF:
         # resort to default wave generator if one is not supplied
         if generator_function is None:
             warnings.warn(
-                "No uncertainty generator function specified. Setting to default ("
-                "sine wave)."
+                "No generator function specified. Setting to default (sine wave)."
             )
-            self.F = 50
             self._generator_function = self._default_generator_function
         else:
             self._generator_function = generator_function
         return self._generator_function
 
-    def _next_sample_generator(self, batch_size: int = 1) -> Dict[str, np.ndarray]:
-        """
-        Internal method for generating a batch of samples from the generator function.
+    def _next_sample_generator(
+        self, batch_size: Optional[int] = 1
+    ) -> Dict[str, np.ndarray]:
+        """Internal method to generate a batch of samples from the generator function
+
+        Parameters
+        ----------
+        batch_size : int, optional
+            number of batches to get from data stream, defaults to 1
+
+        Returns
+        -------
+        Dict[str, Union[List, DataFrame, np.ndarray]]
+            latest samples in the form::
+
+            dict like {
+                "quantities": <time series data as a list, np.ndarray or
+                    pd.Dataframe>,
+                "time": <time stamps as a list, np.ndarray or pd.Dataframe of
+                    float or np.datetime64>
+            }
         """
         time: np.ndarray = (
             np.arange(self._sample_idx, self._sample_idx + batch_size, 1) / self.sfreq
