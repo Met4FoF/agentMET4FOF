@@ -1,8 +1,8 @@
 from agentMET4FOF.agents.base_agents import MonitorAgent
 from agentMET4FOF.agents.noise_jitter_removal_agents import NoiseJitterRemovalAgent
 from agentMET4FOF.agents.signal_agents import (
-    StaticSineWithJitterGeneratorAgent,
     NoiseAgent,
+    StaticSineWithJitterGeneratorAgent,
 )
 from agentMET4FOF.network import AgentNetwork
 
