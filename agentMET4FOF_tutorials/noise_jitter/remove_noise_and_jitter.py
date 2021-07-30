@@ -2,7 +2,7 @@ from agentMET4FOF.agents.base_agents import MonitorAgent
 from agentMET4FOF.agents.noise_jitter_removal_agents import NoiseJitterRemovalAgent
 from agentMET4FOF.agents.signal_agents import (
     NoiseAgent,
-    StaticSineWithJitterGeneratorAgent,
+    SineWithJitterGeneratorAgent,
 )
 from agentMET4FOF.network import AgentNetwork
 
@@ -13,7 +13,7 @@ def demonstrate_noise_jitter_removal_agent():
     # init agents
 
     sine_with_jitter_agent = agentNetwork.add_agent(
-        agentType=StaticSineWithJitterGeneratorAgent
+        agentType=SineWithJitterGeneratorAgent
     )
 
     noise_agent = agentNetwork.add_agent(agentType=NoiseAgent)
