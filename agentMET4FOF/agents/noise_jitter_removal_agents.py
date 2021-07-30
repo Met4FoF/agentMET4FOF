@@ -686,7 +686,10 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
         return yhat1
 
     def on_received_message(self, message):
-        ddata = message['data']
+        if isinstance(message["data"], dict):
+            ddata = message["data"]["quantities"]
+        else:
+            ddata = message["data"]
         self.ydata = np.append(self.ydata, ddata)
         if np.size(self.ydata) == self.N:
             t = self.njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
