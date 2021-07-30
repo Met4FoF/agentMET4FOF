@@ -22,3 +22,11 @@ Working with signals carrying redundant information
 
    agentMET4FOF_tutorials/redundancy/redundancy_agent_four_signals.ipynb
    agentMET4FOF_tutorials/redundancy/redundancy_agent_one_signal.ipynb
+
+Reducing noise and jitter in signals
+====================================
+
+.. toctree::
+   :maxdepth: 3
+
+   agentMET4FOF_tutorials/noise_jitter/remove_noise_and_jitter.ipynb
