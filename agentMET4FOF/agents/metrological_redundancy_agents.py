@@ -41,15 +41,15 @@ class RedundancyAgent(MetrologicalAgent):
 
     Please refer to other sections in this documentation for more information. A
     scientific publication explaining the ideas behind this agent can be found in
-    [Kok2020_1]_. Related work can be found in [Kok2020_2]_.
+    [Kok20201]_. Related work can be found in [Kok20202]_.
 
     The usage of the Redundancy Agent is illustrated with two examples contained in
     :ref:`two tutorials <redundancy_tutorials>`.
 
     References
     ----------
-    * Kok and Harris [Kok2020_1]_
-    * Kok and Harris [Kok2020_2]_
+    * Kok and Harris [Kok20201]_
+    * Kok and Harris [Kok20202]_
     """
 
     metadata: MetaData

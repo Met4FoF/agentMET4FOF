@@ -7,7 +7,9 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MCMCMH_NJ:
-    """ This is the main class that implements the Bayesian Noise and jitter reduction algorithm
+    """ This is the main class that implements the Bayesian Noise and jitter reduction
+
+    It is used by the :class:`NoiseJitterRemovalAgent`.
 
     MCMC used to determine the noise and jitter variances. Noise and jitter variances
     are then used in an iterative algorithm to remove the noise and jitter from the
@@ -100,14 +102,15 @@ class MCMCMH_NJ:
             if L < n + 1:
                 Vmat[L - 1, L - 1] = vark
 
-            # for windows n+1 to 2n, continue building the covariance matrix Vmat and start stroing the
-            # sensitivtity vectors ck in cvec
+            # for windows n+1 to 2n, continue building the covariance matrix Vmat and
+            # start stroing the sensitivtity vectors ck in cvec
             elif n < L < np.multiply(2, n) + 1:
                 Vmat[L - 1, L - 1] = vark
                 cvec[L - n - 1, :] = ck
 
-            # For windows between 2n+1 and 4n, continue to build Vmat and cvec, and start building the sensitivtity
-            # matrix Cmat from the sensitivtity vecotrs. Also, evaluate uncertainties for pervious estimates.
+            # For windows between 2n+1 and 4n, continue to build Vmat and cvec, and
+            # start building the sensitivtity matrix Cmat from the sensitivtity
+            # vecotrs. Also, evaluate uncertainties for pervious estimates.
             elif np.multiply(2, n) < L < np.multiply(4, n) + 2:
 
                 Vmat[L - 1, L - 1] = vark
@@ -169,11 +172,15 @@ class MCMCMH_NJ:
         return yhat[k]
 
     def NJAlgorithm(self, datax, datay, p0, p0x):
-        """
-        Noise and Jitter Removal Algorithm- Iterative scheme that preprocesses data to reduce the effects of
-        noise and jitter, resulting in an estimate of the true signal along with its associated uncertainty.
+        """Noise and Jitter Removal Algorithm
 
-        Refer paper for details: https://ieeexplore.ieee.org/document/9138266
+        Iterative scheme that preprocesses data to reduce the effects of noise and
+        jitter, resulting in an estimate of the true signal along with its associated
+        uncertainty.
+
+        References
+        ----------
+        * Jagan et al. [Jagan2020]_
         """
 
         # Initialisatio
