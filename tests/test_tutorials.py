@@ -4,6 +4,9 @@ from agentMET4FOF_tutorials.noise_jitter.generate_sine_with_jitter import (
 from agentMET4FOF_tutorials.noise_jitter.add_noise_to_existing_signal import (
     demonstrate_noise_agent_use,
 )
+from agentMET4FOF_tutorials.noise_jitter.remove_noise_and_jitter import (
+    demonstrate_noise_jitter_removal_agent,
+)
 from agentMET4FOF_tutorials.redundancy.redundancy_agent_four_signals import (
     demonstrate_redundancy_agent_four_signals as four_signal_redundancy,
 )
@@ -71,3 +74,7 @@ def test_noise_agent_demo_executability():
 
 def test_sine_with_jitter_demo_executability():
     demonstrate_sine_with_jitter_agent_use().shutdown()
+
+
+def test_remove_noise_and_jitter_demo_executability():
+    demonstrate_noise_jitter_removal_agent().shutdown()
