@@ -54,7 +54,7 @@ class AgentDashboard:
 
         """
         super(AgentDashboard, self).__init__()
-        if self.is_port_available(ip_addr, port):
+        if self.is_port_at_ip_available(ip_addr, port):
             if dashboard_modules is not None and dashboard_modules is not False:
 
                 #initialise the dashboard layout and its control here
@@ -166,8 +166,8 @@ class AgentDashboard:
                     return [dashboard_layout.get_layout()]
         return app
 
-    def is_port_available(self, ip_addr, _port):
-        """Check if desired ip and port are available."""
+    def is_port_at_ip_available(self, ip_addr: str, _port: int) -> bool:
+        """Check if desired port at ip is available"""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             # Set timeout to wait for response on ip:port.
             sock.settimeout(1)
