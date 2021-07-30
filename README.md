@@ -172,6 +172,7 @@ get you started as quick as possible. You will find tutorials on how to set up:
 - [an advanced pipeline with multichannel signals](https://agentmet4fof.readthedocs.io/en/latest/agentMET4FOF_tutorials/tutorial_3_multi_channel.html)
 - [a simple metrological datastream](https://agentmet4fof.readthedocs.io/en/latest/agentMET4FOF_tutorials/tutorial_4_metrological_streams.html)
 - [pipelines to determine redundancy in sensor networks](https://agentmet4fof.readthedocs.io/en/latest/tutorials.html#working-with-signals-carrying-redundant-information)
+- [a pipeline to reduce noise and jitter in sensor readings](https://agentmet4fof.readthedocs.io/en/latest/tutorials.html#reducing-noise-and-jitter-in-signals)
 
 … and [more](https://agentmet4fof.readthedocs.io/en/latest/tutorials.html)!
 
