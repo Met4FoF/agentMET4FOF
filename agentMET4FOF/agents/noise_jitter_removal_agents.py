@@ -75,7 +75,6 @@ def mcmcci(A,M0):
     return Rhat, Neff
 
 """### mcsums: Summary information from MC samples."""
-
 def mcsums(A,M0,Q):
     '''
     mcsums: Summary information from MC samples.
@@ -123,47 +122,7 @@ def mcsums(A,M0,Q):
 
     return abar, s, aQ
 
-"""### jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random walk algorithm"""
-
-def jumprwg(A, L):
-    '''
-    jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random
-    walk algorithm
-    -------------------------------------------------------------------------
-    KJ, LRW, PMH
-    Version 2020-04-22
-    -------------------------------------------------------------------------
-    Inputs:
-    A(n,N): Samples at the current iteration
-
-    L(n,n): Cholesky factor of variance of parameter vector.
-
-    Outputs:
-    As(n,N): Proposed parameter array which is randomly sampled from the
-    jumping distribution
-
-    dp0: The difference between the logarithm of the jumping distribution
-    associated with moving from A(:,j) to As(:,j) and that associated with
-    moving from As(:,j) to A(:,j), up to an additive constant.
-    log P0(a|as) - log P0(as|a)
-
-    '''
-    # Number of parameters and parallel chains
-    n, N = A.shape
-
-    # random draw from a Gaussian distribution
-    e = np.random.normal(0, 1, size=(n,N))
-
-    # proposed draw from a Gaussian distribution with mean A and variance LL'
-    As = A + np.matmul(L,e)
-
-    # For a Gaussian random walk, since log P0(a|as) = log P0(as|a), dp0 will always be zero
-    dp0 = np.zeros(N)
-
-    return As, dp0
-
 """### Cubic function and its first and second derivative"""
-
 def fgh_cubic(alpha,t):
     '''
     -------------------------------------------------------------------------
@@ -243,65 +202,7 @@ def ln_gauss_pdf_v(x,mu,sigma):
 
     return logf
 
-"""### Target dist for noise and jitter posterior dist"""
 
-def tar_at(at, y, x, m0w, s0w, m0t, s0t):
-    '''
-    -------------------------------------------------------------------------
-    Target dist for noise and jitter posterior dist
-    -------------------------------------------------------------------------
-    KJ, LRW, PMH
-    Version 2020-04-22
-    --------------------------------------------------------------------------
-    Inputs:
-    at(n+2,N):              Parameters alpha, log(1/tau^2) and log(1/w^2)
-
-    y(m,1):                 Signal
-
-    x(m,1):                 time at which signal was recorded
-
-    s0w and s0t:            prior estimates of tau and omega
-
-    m0w and m0t:            degree of belief in prior estimates for tau and omega
-
-    Output:
-    T:                      Log of the posterior distribution
-    '''
-
-    # Size of parameter vector
-    at = np.array(at)
-    p = at.shape[0]
-
-    # Number of alphas
-    n = p - 2
-
-    # Extract parameters
-    alpha = at[0:n]
-    phi1 = np.exp(at[-2])
-    phi2 = np.exp(at[-1])
-    taus = np.ones(phi1.shape)/np.sqrt(phi1)
-    omegas = np.ones(phi2.shape)/np.sqrt(phi2)
-
-    # Gamma priors for phis
-    prior_phi1 = (m0t/2)*np.log(phi1) - phi1*m0t*s0t**2/2
-    prior_phi2 = (m0w/2)*np.log(phi2) - phi2*m0w*s0w**2/2
-
-
-    # function that evaluates the cubic function with user specified cubic parameters
-    fun = lambda aa: fgh_cubic(aa, x)
-
-    # cubic, expectation and variance
-    [st,st1,st2] = fun(alpha)
-    expect = st + 0.5*(taus**2)*st2
-    vari = (taus**2)*(st1**2) + omegas**2
-
-    # Likelihood
-    lik = sum(ln_gauss_pdf_v(y,expect,np.sqrt(vari)))
-
-    # Posterior
-    T = lik + prior_phi1 + prior_phi2
-
-    return T
 
 """###mcmcmh: Metrolopolis-Hasting MCMC algorithm generating N chains of length M for a parameter vector A of length n."""
 
@@ -427,57 +328,6 @@ def mcmcmh(M, N, M0, Q, A0, tar, jump):
 
     return S, aP, Rh, Ne, AA, IAA
 
-def mcmcm_main(datay, datax, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
-
-  at0 = np.array((1,1,1,1, np.log(1/s0w**2), np.log(1/s0t**2)))
-  # function that evaluates the log of the target distribution at given parameter values
-  tar = lambda at: tar_at(at, datay, datax, m0w, s0w, m0t, s0t)
-  # function that evaluates the negative log of the target distribution to evaluate MAP estimates
-  mapp = lambda at: -tar(at)
-
-  res = minimize(mapp, at0)
-  pars = res.x
-  V = res.hess_inv
-  L = np.linalg.cholesky(V)
-
-
-  # Function that draws sample from a Gaussian random walk jumping distribution
-  jump = lambda A: jumprwg(A, L)
-
-
-  rr = np.random.normal(0,1,size=(6,Nc))
-
-  A0 = np.matlib.repmat(pars.T,Nc,1).T + np.matmul(L,rr)
-
-
-  sam = mcmcmh(Mc,Nc,M0,Q,A0,tar,jump)
-  return 1/np.sqrt(np.exp(sam[0][0,-2:]))
-
-# Decaying exponential
-def DecayExpFunction(a, b, f, x):
-    '''
-    decaying exponential function evaluated at x with parameters a, b and f
-    '''
-    return a * np.exp(-b * x) * np.sin(2 * np.pi * f * x)
-
-
-# Decaying exponential - first derivative
-def DecayExpFunction1der(a, b, f, x):
-    '''
-    first derviative of the decaying exponential function evaluated at x with parameters a, b and f
-    '''
-    return a * np.exp(-b * x) * ((2 * np.pi * f) * np.cos(2 * np.pi * f * x) - b * np.sin(2 * np.pi * f * x))
-
-
-# Decaying exponential - second derivative
-def DecayExpFunction2der(a, b, f, x):
-    '''
-    second derviative of the decaying exponential function evaluated at x with parameters a, b and f
-    '''
-    return a * np.exp(-b * x) * ((-np.power((2 * np.pi * f), 2)) * np.sin(2 * np.pi * f * x)
-                                 - ((4 * b * np.pi * f) * np.cos(2 * np.pi * f * x)) + b * np.sin(2 * np.pi * f * x))
-
-
 class MCMCMH_NJ():
     '''
     Bayesian Noise and jitter reduction algorithm. MCMC used to determine the noise and jitter variances.
@@ -537,7 +387,7 @@ class MCMCMH_NJ():
         # Values of normalised independent variables
         datax = np.divide(np.arange(-n, n + 1), self.fs)
 
-        outs =  mcmcm_main(self.ydata, datax, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc,
+        outs = self.mcmcm_main(self.ydata, datax, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc,
                                                 self.M0, self.Nc, self.Q)
         self.jitterSD = outs[0]
         self.noiseSD = outs[1]
@@ -689,81 +539,128 @@ class MCMCMH_NJ():
 
         return yhat, c, vk, R
 
+    @staticmethod
+    def mcmcm_main(datay, datax, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
 
-def random_gaussian_whrand(M, mu, sigma, istate1, istate2):
-    '''
-    Generates random numbers from a Gaussian Distribution using the Wichmann–Hill random number generator
+        at0 = np.array((1, 1, 1, 1, np.log(1 / s0w ** 2), np.log(1 / s0t ** 2)))
+        # function that evaluates the log of the target distribution at given parameter values
+        tar = lambda at: MCMCMH_NJ.tar_at(at, datay, datax, m0w, s0w, m0t, s0t)
+        # function that evaluates the negative log of the target distribution to evaluate MAP estimates
+        mapp = lambda at: -tar(at)
 
-    Inputs:
-    M:        Number of random numbers required
-    mu:       Mean of the Gaussian
-    sigma:    Std of the Gaussian
-    istate1:  vector of 4 integers
-    istate2:  vector of 4 different integers
+        res = minimize(mapp, at0)
+        pars = res.x
+        V = res.hess_inv
+        L = np.linalg.cholesky(V)
 
-    Output:
-    xdist:    Random Gaussian vector of size M
-    '''
-    mn = 0
-    ndist = np.zeros(M)
-    while mn < M:
-        rr1 = whrand(istate1, 1)
-        rr2 = whrand(istate2, 1)
+        # Function that draws sample from a Gaussian random walk jumping distribution
+        jump = lambda A: MCMCMH_NJ.jumprwg(A, L)
 
-        v1, istate1 = rr1
-        v2, istate2 = rr2
+        rr = np.random.normal(0, 1, size=(6, Nc))
 
-        if mn < M:
-            ndist[mn] = math.sqrt(-2 * math.log(v1)) * math.cos(2 * math.pi * v2)
-            mn = mn + 1
+        A0 = np.matlib.repmat(pars.T, Nc, 1).T + np.matmul(L, rr)
 
-        if mn < M:
-            ndist[mn] = math.sqrt(-2 * math.log(v1)) * math.sin(2 * math.pi * v2)
-            mn = mn + 1
+        sam = mcmcmh(Mc, Nc, M0, Q, A0, tar, jump)
+        return 1 / np.sqrt(np.exp(sam[0][0, -2:]))
 
-        xdist = mu + sigma * ndist
+    """### Target dist for noise and jitter posterior dist"""
 
-    return xdist, istate1, istate2
+    @staticmethod
+    def tar_at(at, y, x, m0w, s0w, m0t, s0t):
+        '''
+        -------------------------------------------------------------------------
+        Target dist for noise and jitter posterior dist
+        -------------------------------------------------------------------------
+        KJ, LRW, PMH
+        Version 2020-04-22
+        --------------------------------------------------------------------------
+        Inputs:
+        at(n+2,N):              Parameters alpha, log(1/tau^2) and log(1/w^2)
 
+        y(m,1):                 Signal
 
-def whrand(istate, N):
-    '''
-    Generates uniform random numbers between 0 and 1 using the Wichmann–Hill random number generator
+        x(m,1):                 time at which signal was recorded
 
-    Inputs:
-    istate:  vector of 4 integers
-    N:       Number of random numbers required
+        s0w and s0t:            prior estimates of tau and omega
 
-    Outputs:
-    r:       Vector uniform random numbers of size M
-    istate:  Output vector of 4 integers
-    '''
+        m0w and m0t:            degree of belief in prior estimates for tau and omega
 
-    # Constants
-    a = np.array([11600, 47003, 23000, 33000])
-    b = np.array([185127, 45688, 93368, 65075])
-    c = np.array([10379, 10479, 19423, 8123])
-    d = np.array([456, 420, 300, 0]) + 2147483123
+        Output:
+        T:                      Log of the posterior distribution
+        '''
 
-    r = np.zeros(N)
-    for i in range(N):
-        # Update states
-        for j in range(4):
-            istate[j] = a[j] * np.mod(istate[j], b[j]) - c[j] * np.fix(istate[j] / b[j])
-            if istate[j] < 0:
-                istate[j] = istate[j] + d[j]
+        # Size of parameter vector
+        at = np.array(at)
+        p = at.shape[0]
 
-        # Evaluate random number
-        w = np.sum(np.divide(istate, d))
-        r[i] = np.remainder(w, 1)
+        # Number of alphas
+        n = p - 2
 
-    return r, istate
+        # Extract parameters
+        alpha = at[0:n]
+        phi1 = np.exp(at[-2])
+        phi2 = np.exp(at[-1])
+        taus = np.ones(phi1.shape) / np.sqrt(phi1)
+        omegas = np.ones(phi2.shape) / np.sqrt(phi2)
 
-def njr(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
-    analyse_fun = MCMCMH_NJ(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q)
-    yhat1= analyse_fun.AnalyseSignalN()
-    return yhat1
+        # Gamma priors for phis
+        prior_phi1 = (m0t / 2) * np.log(phi1) - phi1 * m0t * s0t ** 2 / 2
+        prior_phi2 = (m0w / 2) * np.log(phi2) - phi2 * m0w * s0w ** 2 / 2
 
+        # function that evaluates the cubic function with user specified cubic parameters
+        fun = lambda aa: fgh_cubic(aa, x)
+
+        # cubic, expectation and variance
+        [st, st1, st2] = fun(alpha)
+        expect = st + 0.5 * (taus ** 2) * st2
+        vari = (taus ** 2) * (st1 ** 2) + omegas ** 2
+
+        # Likelihood
+        lik = sum(ln_gauss_pdf_v(y, expect, np.sqrt(vari)))
+
+        # Posterior
+        T = lik + prior_phi1 + prior_phi2
+
+        return T
+
+    """### jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random walk algorithm"""
+    @staticmethod
+    def jumprwg(A, L):
+        '''
+        jumprwg: Jumping distribution for the Metropolis Hastings Gaussian random
+        walk algorithm
+        -------------------------------------------------------------------------
+        KJ, LRW, PMH
+        Version 2020-04-22
+        -------------------------------------------------------------------------
+        Inputs:
+        A(n,N): Samples at the current iteration
+
+        L(n,n): Cholesky factor of variance of parameter vector.
+
+        Outputs:
+        As(n,N): Proposed parameter array which is randomly sampled from the
+        jumping distribution
+
+        dp0: The difference between the logarithm of the jumping distribution
+        associated with moving from A(:,j) to As(:,j) and that associated with
+        moving from As(:,j) to A(:,j), up to an additive constant.
+        log P0(a|as) - log P0(as|a)
+
+        '''
+        # Number of parameters and parallel chains
+        n, N = A.shape
+
+        # random draw from a Gaussian distribution
+        e = np.random.normal(0, 1, size=(n, N))
+
+        # proposed draw from a Gaussian distribution with mean A and variance LL'
+        As = A + np.matmul(L, e)
+
+        # For a Gaussian random walk, since log P0(a|as) = log P0(as|a), dp0 will always be zero
+        dp0 = np.zeros(N)
+
+        return As, dp0
 
 ########################################
 class NoiseJitterRemovalAgent(AgentMET4FOF):
@@ -782,11 +679,16 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
         self.Nc = Nc
         self.Q = Q
 
+    @staticmethod
+    def njr(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q) -> object:
+        analyse_fun = MCMCMH_NJ(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q)
+        yhat1 = analyse_fun.AnalyseSignalN()
+        return yhat1
 
     def on_received_message(self, message):
         ddata = message['data']
         self.ydata = np.append(self.ydata, ddata)
         if np.size(self.ydata) == self.N:
-            t = njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
+            t = self.njr(self.fs, self.ydata, self.N, self.niter, self.tol, self.m0w, self.s0w, self.m0t, self.s0t, self.Mc, self.M0,self.Nc, self.Q)
             self.send_output(self.ydata[7] - t)
             self.ydata = self.ydata[1:self.N]
