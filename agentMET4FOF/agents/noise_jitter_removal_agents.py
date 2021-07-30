@@ -6,7 +6,7 @@ from scipy.optimize import minimize
 from agentMET4FOF.agents import AgentMET4FOF
 
 
-class MCMCMH_NJ:
+class MCMCMHNJ:
     """ This is the main class that implements the Bayesian Noise and jitter reduction
 
     It is used by the :class:`NoiseJitterRemovalAgent`.
@@ -94,7 +94,7 @@ class MCMCMH_NJ:
             yhat0[k] = pval[n]
 
             # Applying algortithm to remove noise and jitter
-            [yhat[k], ck, vark, R[k]] = MCMCMH_NJ.NJAlgorithm(
+            [yhat[k], ck, vark, R[k]] = MCMCMHNJ.NJAlgorithm(
                 self, datax, datay, p, pval
             )
 
@@ -259,7 +259,7 @@ class MCMCMH_NJ:
 
         at0 = np.array((1, 1, 1, 1, np.log(1 / s0w ** 2), np.log(1 / s0t ** 2)))
         # function that evaluates the log of the target distribution at given parameter values
-        tar = lambda at: MCMCMH_NJ.tar_at(at, datay, datax, m0w, s0w, m0t, s0t)
+        tar = lambda at: MCMCMHNJ.tar_at(at, datay, datax, m0w, s0w, m0t, s0t)
         # function that evaluates the negative log of the target distribution to evaluate MAP estimates
         mapp = lambda at: -tar(at)
 
@@ -269,13 +269,13 @@ class MCMCMH_NJ:
         L = np.linalg.cholesky(V)
 
         # Function that draws sample from a Gaussian random walk jumping distribution
-        jump = lambda A: MCMCMH_NJ.jumprwg(A, L)
+        jump = lambda A: MCMCMHNJ.jumprwg(A, L)
 
         rr = np.random.normal(0, 1, size=(6, Nc))
 
         A0 = np.matlib.repmat(pars.T, Nc, 1).T + np.matmul(L, rr)
 
-        sam = MCMCMH_NJ.mcmcmh(Mc, Nc, M0, Q, A0, tar, jump)
+        sam = MCMCMHNJ.mcmcmh(Mc, Nc, M0, Q, A0, tar, jump)
         return 1 / np.sqrt(np.exp(sam[0][0, -2:]))
 
     @staticmethod
@@ -321,7 +321,7 @@ class MCMCMH_NJ:
         prior_phi2 = (m0w / 2) * np.log(phi2) - phi2 * m0w * s0w ** 2 / 2
 
         # function that evaluates the cubic function with user specified cubic parameters
-        fun = lambda aa: MCMCMH_NJ.fgh_cubic(aa, x)
+        fun = lambda aa: MCMCMHNJ.fgh_cubic(aa, x)
 
         # cubic, expectation and variance
         [st, st1, st2] = fun(alpha)
@@ -329,7 +329,7 @@ class MCMCMH_NJ:
         vari = (taus ** 2) * (st1 ** 2) + omegas ** 2
 
         # Likelihood
-        lik = sum(MCMCMH_NJ.ln_gauss_pdf_v(y, expect, np.sqrt(vari)))
+        lik = sum(MCMCMHNJ.ln_gauss_pdf_v(y, expect, np.sqrt(vari)))
 
         # Posterior
         T = lik + prior_phi1 + prior_phi2
@@ -338,9 +338,9 @@ class MCMCMH_NJ:
 
     @staticmethod
     def fgh_cubic(alpha, t):
-        """
-        -------------------------------------------------------------------------
-        Cubic function and its first and second derivative
+        """Cubic function and its first and second derivative
+
+
         -------------------------------------------------------------------------
         KJ, LRW, PMH
         Version 2020-04-22
@@ -558,13 +558,13 @@ class MCMCMH_NJ:
         # Convergence and summary statistics for each of the n parameters
         for j in range(n):
             # test convergence
-            RN = MCMCMH_NJ.mcmcci(np.squeeze(AA[:, :, j]), M0)
+            RN = MCMCMHNJ.mcmcci(np.squeeze(AA[:, :, j]), M0)
             Rh[j] = RN[0]
             Ne[j] = RN[1]
 
             # provide summary information
             asq = np.squeeze(AA[:, :, j])
-            SS = MCMCMH_NJ.mcsums(asq, M0, Q)
+            SS = MCMCMHNJ.mcsums(asq, M0, Q)
             S[0, j] = SS[0]
             S[1, j] = SS[1]
             S[2:, j] = SS[2]
@@ -725,7 +725,7 @@ class NoiseJitterRemovalAgent(AgentMET4FOF):
             ddata = message["data"]
         self.ydata = np.append(self.ydata, ddata)
         if np.size(self.ydata) == self.N:
-            analyse_fun = MCMCMH_NJ(
+            analyse_fun = MCMCMHNJ(
                 self.fs,
                 self.ydata,
                 self.N,
