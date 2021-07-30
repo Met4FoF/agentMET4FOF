@@ -1,7 +1,7 @@
-from agentMET4FOF_tutorials.jitter.sine_with_jitter import (
+from agentMET4FOF_tutorials.noise_jitter.generate_sine_with_jitter import (
     demonstrate_sine_with_jitter_agent_use,
 )
-from agentMET4FOF_tutorials.noise.sine_with_noise import (
+from agentMET4FOF_tutorials.noise_jitter.add_noise_to_existing_signal import (
     demonstrate_noise_agent_use,
 )
 from agentMET4FOF_tutorials.redundancy.redundancy_agent_four_signals import (
