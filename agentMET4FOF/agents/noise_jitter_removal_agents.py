@@ -7,7 +7,7 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MCMCMHNJ:
-    """ This is the main class that implements the Bayesian Noise and jitter reduction
+    """This is the main class that implements the Bayesian Noise and jitter reduction
 
     It is used by the :class:`NoiseJitterRemovalAgent`.
 
@@ -285,26 +285,34 @@ class MCMCMHNJ:
 
     @staticmethod
     def tar_at(at, y, x, m0w, s0w, m0t, s0t):
-        """
-        -------------------------------------------------------------------------
-        Target dist for noise and jitter posterior dist
-        -------------------------------------------------------------------------
-        KJ, LRW, PMH
-        Version 2020-04-22
-        --------------------------------------------------------------------------
-        Inputs:
-        at(n+2,N):              Parameters alpha, log(1/tau^2) and log(1/w^2)
+        """Target dist for noise and jitter posterior dist
 
-        y(m,1):                 Signal
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
+        Version 2020-07-30
 
-        x(m,1):                 time at which signal was recorded
+        Parameters
+        ----------
+        at
+            (n+2,N) Parameters alpha, log(1/tau^2) and log(1/w^2)
 
-        s0w and s0t:            prior estimates of tau and omega
+        y
+            (m,1) Signal
 
-        m0w and m0t:            degree of belief in prior estimates for tau and omega
+        x
+            (m,1) time at which signal was recorded
+        m0w
+            degree of belief in prior estimate for omega
+        s0w
+            prior estimate of omega
+        m0t
+            degree of belief in prior estimate for tau
+        s0t
+            prior estimate of tau
 
-        Output:
-        T:                      Log of the posterior distribution
+        Returns
+        -------
+        T
+            Log of the posterior distribution
         """
 
         # Size of parameter vector
@@ -346,22 +354,27 @@ class MCMCMHNJ:
     def fgh_cubic(alpha, t):
         """Cubic function and its first and second derivative
 
-
-        -------------------------------------------------------------------------
-        KJ, LRW, PMH
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-04-22
-        -------------------------------------------------------------------------
-        Inputs:
-        alpha(4,N):             Alpha parameters
 
-        t(m,1):                 Times
+        Parameters
+        ----------
+        alpha
+            (4,N) Alpha parameters
 
-        Outputs:
-        f(m,N):                 Cubic function
+        t
+            (m,1) Times
 
-        f1(m,N):                Derivative of cubic
+        Returns
+        -------
+        f
+            (m,N) Cubic function
 
-        f2(m,N):                Second derivative of cubic
+        f1
+            (m,N) Derivative of cubic
+
+        f2
+            (m,N) Second derivative of cubic
         """
 
         # length of data and number of parameters
@@ -385,7 +398,7 @@ class MCMCMHNJ:
     def ln_gauss_pdf_v(x, mu, sigma):
         """Log of the Gaussian pdf
 
-        KJ, LRW, PMH
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-03-12
 
         Parameters
@@ -425,7 +438,7 @@ class MCMCMHNJ:
     def jumprwg(A, L):
         """Jumping distribution for the Metropolis Hastings Gaussian random walk
 
-        KJ, LRW, PMH
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-04-22
 
         Parameters
@@ -469,7 +482,7 @@ class MCMCMHNJ:
         Gelman A, Carlin JB, Stern HS, Dunson DB, Vehtari A, Rubin DB.
         Bayesian data analysis. CRC press; 2013 Nov 1.
 
-        KJ, LRW, PMH
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-04-22
 
         Parameters
@@ -585,8 +598,7 @@ class MCMCMHNJ:
     def mcmcci(A, M0):
         """MCMC convergence indices for multiple chains
 
-        KJ, LRW, PMH
-
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-04-22
 
         Parameters
@@ -654,7 +666,7 @@ class MCMCMHNJ:
     def mcsums(A, M0, Q):
         """Summary information from MC samples
 
-        KJ, LRW, PMH
+        KJ, LRW, PMH, Anupam Prasad Vedurmudi, Björn Ludwig
         Version 2020-04-22
 
         Parameters
