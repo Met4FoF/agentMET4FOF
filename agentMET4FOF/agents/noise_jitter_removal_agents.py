@@ -7,13 +7,15 @@ from agentMET4FOF.agents import AgentMET4FOF
 
 
 class MCMCMH_NJ:
-    """
-    Bayesian Noise and jitter reduction algorithm. MCMC used to determine the noise and jitter variances.
-    Noise and jitter variances are then used in an iterative algorithm to remove the noise and jitter from the signal
+    """Bayesian Noise and jitter reduction algorithm
+
+    MCMC used to determine the noise and jitter variances. Noise and jitter variances
+    are then used in an iterative algorithm to remove the noise and jitter from the
+    signal.
     """
 
     def __init__(self, fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
-        "Setting initial variables"
+        """Setting initial variables"""
 
         # variables for AnalyseSignalN and NJAlgorithm
         self.fs = fs
