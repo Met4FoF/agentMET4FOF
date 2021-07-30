@@ -766,7 +766,7 @@ def njr(fs, ydata, N, niter, tol, m0w, s0w, m0t, s0t, Mc, M0, Nc, Q):
 
 
 ########################################
-class NJRemoved(AgentMET4FOF):
+class NoiseJitterRemovalAgent(AgentMET4FOF):
     def init_parameters(self, fs=100, ydata = np.array([]),  N=15, niter=100, tol=1e-9, m0w = 10, s0w = 0.0005, m0t = 10, s0t = 0.0002*100/8, Mc=5000, M0=100, Nc=100, Q=50 ):
         self.fs = fs
         self.ydata = ydata
