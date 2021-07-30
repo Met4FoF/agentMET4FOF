@@ -126,10 +126,10 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
 
         Feeds ``default`` data into the buffer as a dictionary::
 
-        dict like {
-            "data": message["data"],
-            "metadata": message["metadata"],
-        }
+            dict like {
+                "data": message["data"],
+                "metadata": message["metadata"],
+            }
 
         and hands over 'plot' data to plot memory.
 
