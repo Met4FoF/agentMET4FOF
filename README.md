@@ -29,6 +29,8 @@
 
 # Multi-Agent System for IIoT
 
+![agentMET4FOF logo](docs/logo.svg)
+
 <p align="justify">
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
 analysis and processing of both static data sets and data streams with IIoT 
