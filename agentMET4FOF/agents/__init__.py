@@ -1,5 +1,5 @@
 """This package provides access to all agents included in agentMET4FOF"""
-from .base_agents import AgentMET4FOF, MonitorAgent
+from .base_agents import AgentMET4FOF, DataStreamAgent, MonitorAgent
 from .metrological_base_agents import (
     MetrologicalAgent,
     MetrologicalMonitorAgent,
@@ -13,6 +13,7 @@ __all__ = [
     "AgentBuffer",
     "AgentMET4FOF",
     "AgentNetwork",
+    "DataStreamAgent",
     "MetrologicalAgent",
     "MetrologicalAgentBuffer",
     "MetrologicalMonitorAgent",
