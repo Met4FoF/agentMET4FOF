@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v0.12.1 (2021-08-27)
+### Fix
+* **DataStreamAgent:** Insert missing legacy import for agents.DataStreamAgent ([`302f61a`](https://github.com/Met4FoF/agentMET4FOF/commit/302f61ac7ac1ce976df3308999cafe6cde8a5643))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.12.0...v0.12.1)**
+
 ## v0.12.0 (2021-07-30)
 ### Feature
 * **NoiseJitterRemovalAgent:** Introduce an agent to reduce the amount of noise and jitter in streamed sensor values ([`4349548`](https://github.com/Met4FoF/agentMET4FOF/commit/4349548fd0402c7cdbc661ba5a440ba14f7ee312))
