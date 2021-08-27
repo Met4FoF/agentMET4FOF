@@ -4,6 +4,7 @@ def test_legacy_imports():
         AgentBuffer,
         AgentMET4FOF,
         AgentNetwork,
+        DataStreamAgent,
         MonitorAgent,
         SineGeneratorAgent,
     )
