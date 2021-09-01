@@ -90,7 +90,7 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                                                     children=[
                                                         LayoutHelper.html_button(
                                                             icon="restore",
-                                                            text="Export JPG",
+                                                            text="Export png",
                                                             id="cyto-button-export",
                                                         )
                                                     ],
