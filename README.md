@@ -146,6 +146,11 @@ Some notable features of agentMET4FOF include :
   - View and change the agents' parameters
   - View the agents' outputs as plotly or matplotlib plots or generate and embed your 
     own images  
+- Generic streams and agents that can be used as starting points in simulations
+  - A sine generator with an associated agent
+  - A generator for a sine signal with jitter dynamically or with fixed length
+  - A white noise agent
+  - A metrologically enabled sine generator agent which also handles measurement uncertainties
 
 ## 📈The agentMET4FOF dashboard
 
