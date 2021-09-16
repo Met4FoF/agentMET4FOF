@@ -197,7 +197,8 @@ jobs:
           command: |
             source $HOME/conda/etc/profile.d/conda.sh
             conda activate agentMET4FOF
-            tox | tee --append test-results/agentMET4FOF.log
+            pytest -v --cov=. --junitxml=test-results/junit.xml . \
+              | tee --append test-results/agentMET4FOF.log
       - store_test_artifacts_and_results
 
   test_against_setup:
