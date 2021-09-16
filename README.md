@@ -1,3 +1,4 @@
+<img src="https://www.ptb.de/empir2018/fileadmin/documents/empir/Met4FoF/images/AM4FoF_Logo.svg" alt="agentMET4FOF logo">
 <p align="center">
   <!-- CircleCI Tests -->
   <a href="https://circleci.com/gh/Met4FoF/agentMET4FOF"><img alt="CircleCI pipeline
