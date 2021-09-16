@@ -251,8 +251,8 @@ take a look at the [project board](https://github.com/Met4FoF/agentMET4FOF/proje
 ## 🖋Citation
 
 If you publish results obtained with the help of agentMET4FOF, please cite the linked
-[![](https://zenodo.org/badge/DOI/10.5281/zenodo.4560344.svg)
-](https://doi.org/10.5281/zenodo.4560344).
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.4560343.svg)
+](https://doi.org/10.5281/zenodo.4560343).
 
 ## 💎Acknowledgement
 
