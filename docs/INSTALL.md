@@ -87,7 +87,6 @@ supplied or your own Jupyter notebooks and even the dashboard can be
 visited in the browser after its launch. The following steps are required for this.
 
 1. [Install Docker](#install-docker)
-1. Pull and launch the agentMET4FOF Docker image either to
 1. a) [Start a container from the image for local use](#start-a-container-from-the-image-for-local-use)
    
    b) [Deploy the containerized agents via a webserver](#deploy-the-containerized-agents-via-a-webserver)
@@ -101,9 +100,9 @@ once you completed the Docker installation.
 
 ### Start a container from the image for local use
 
-You can download and launch [the _Docker image
+You can download and launch the [Docker image
 ](https://hub.docker.com/p/met4fof/agentmet4fof) straight away with Docker's built-in 
-`run` command
+[`run`](https://docs.docker.com/engine/reference/run/) command
 
 ```bash
 > docker run -p 8888:8888 -p 8050:8050 --rm met4fof/agentMET4FOF
