@@ -88,7 +88,6 @@ workflows:
           context:
             - Docker pulls
             - Docker publishing for agents
-            - CircleCI agentMET4FOF docker publishing
           requires:
             - test_image
           filters:
@@ -398,22 +397,7 @@ jobs:
             fi
 
       - run:
-          name: Install the GitHub cli 'gh'
+          name: Push image
           command: |
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
-                sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) \
-                signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
-                https://cli.github.com/packages stable main" | \
-                sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-            sudo apt-get update
-            sudo apt-get install gh
-
-      - run:
-          name: Upload current image
-          command: |
-            gh release upload --repo \
-              ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
-              ${CIRCLE_TAG} \
-              tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
-              image for agentMET4FOF Jupyter Notebook server"
+            docker login --username $DOCKER_USER --password $DOCKER_PASS
+            docker push $DOCKER_USER/$IMAGE_NAME:$TAG
