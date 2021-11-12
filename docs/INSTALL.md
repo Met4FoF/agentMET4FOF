@@ -87,8 +87,6 @@ supplied or your own Jupyter notebooks and even the dashboard can be
 visited in the browser after its launch. The following steps are required for this.
 
 1. [Install Docker](#install-docker)
-1. [Download and import the agentMET4FOF Docker image
-   ](#download-and-import-the-agentMET4FOF-docker-image)
 1. a) [Start a container from the image for local use](#start-a-container-from-the-image-for-local-use)
    
    b) [Deploy the containerized agents via a webserver](#deploy-the-containerized-agents-via-a-webserver)
@@ -100,22 +98,14 @@ The [official Docker documentation
 Please continue with [the next step](#download-and-import-the-agentMET4FO-docker-image),
 once you completed the Docker installation.
 
-### Download and import the agentMET4FOF Docker image
-
-You can download [the _Docker image for agentMET4FOF Jupyter Notebook server_ as one of
-the release assets](https://github.com/Met4FoF/agentMET4FOF/releases/latest), import it
-locally with
-
-```bash
-> docker load -i LOCAL\PATH\TO\DOWNLOADS\tagged_docker_image_agentMET4FOF_jupyter.tar.gz
-```
-
 ### Start a container from the image for local use
 
-After importing the image, you can launch it straight away with
+You can download and launch the [Docker image
+](https://hub.docker.com/p/met4fof/agentmet4fof) straight away with Docker's built-in 
+[`run`](https://docs.docker.com/engine/reference/run/) command
 
 ```bash
-> docker run -p 8888:8888 -p 8050:8050 --rm agentmet4fof
+> docker run -p 8888:8888 -p 8050:8050 --rm met4fof/agentMET4FOF
 ```
 
 In this command's output you will find the usual Jupyter Notebook token 
@@ -134,11 +124,11 @@ http://agent.domain.com/YOUR_FOLDER_NAME_OF_CHOICE.
 
 #### Start the container with the dashboard at a subfolder
 
-Launch the container with
+Download and launch the container with
 
 ```bash
 > docker run -p 8888:8888 -p 8050:8050 --rm  \ 
---env DASH_URL_BASE_PATHNAME=/YOUR_FOLDER_NAME_OF_CHOICE/ agentmet4fof
+--env DASH_URL_BASE_PATHNAME=/YOUR_FOLDER_NAME_OF_CHOICE/ met4fof/agentMET4FOF
 ```
 
 This ensures, that the dashboard will be reachable under whatever domain you are

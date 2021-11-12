@@ -26,6 +26,9 @@
   <!-- Contributor Covenant -->
   <a href="https://github.com/Met4FoF/agentMET4FOF/blob/develop/CODE_OF_CONDUCT.md">
     <img src="https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg" alt="Contributor Covenant"></a>
+  <!-- Docker Hub -->
+  <a href="https://hub.docker.com/r/met4fof/agentmet4fof">
+    <img src="https://img.shields.io/docker/pulls/met4fof/agentmet4fof.svg" alt="Docker Hub badge"></a>
 </p>
 
 # Multi-Agent System for IIoT

@@ -74,7 +74,7 @@ workflows:
             - Docker publishing for agents
           filters:
             tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
       - test_image:
           context:
             - Docker pulls
@@ -83,17 +83,16 @@ workflows:
             - build_image
           filters:
             tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
       - retag_and_deploy_image:
           context:
             - Docker pulls
             - Docker publishing for agents
-            - CircleCI agentMET4FOF docker publishing
           requires:
             - test_image
           filters:
             tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
             branches:
               ignore: /.*/
 
@@ -388,32 +387,17 @@ jobs:
           name: Retag image with corresponding version number and store new archive
           command: |
             version=$(docker run --rm ${IMAGE_NAME}:latest \
-              python -c "from agentMET4FOF import __version__;print(__version__)")
+              python -c "from agentMET4FOF import __version__;print(__version__)") \
+              || true
             if [ $CIRCLE_TAG = v$version ]; then
               docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
-              docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
-                gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
+              docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:latest
             else
               exit 1
             fi
 
       - run:
-          name: Install the GitHub cli 'gh'
+          name: Push image
           command: |
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
-                sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) \
-                signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
-                https://cli.github.com/packages stable main" | \
-                sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-            sudo apt-get update
-            sudo apt-get install gh
-
-      - run:
-          name: Upload current image
-          command: |
-            gh release upload --repo \
-              ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} \
-              ${CIRCLE_TAG} \
-              tagged_docker_image_agentMET4FOF_jupyter.tar.gz#"Docker \
-              image for agentMET4FOF Jupyter Notebook server"
+            docker login --username $DOCKERHUB_USER --password $DOCKERHUB_PASSWORD
+            docker push $ORG_NAME/$IMAGE_NAME
