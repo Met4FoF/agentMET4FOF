@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.0 (2021-11-12)
+### Feature
+* **Docker:** Transfer image to Docker Hub for more convenient usage ([`14aff5f`](https://github.com/Met4FoF/agentMET4FOF/commit/14aff5f49487a30bc0743da89613256054e8eac5))
+
+### Documentation
+* **Docker:** Update documentation to reflect new image location ([`753f461`](https://github.com/Met4FoF/agentMET4FOF/commit/753f46138af7dd1400fa8ef16ed0d04f58481f77))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.12.2...v0.13.0)**
+
 ## v0.12.1 (2021-08-27)
 ### Fix
 * **DataStreamAgent:** Insert missing legacy import for agents.DataStreamAgent ([`302f61a`](https://github.com/Met4FoF/agentMET4FOF/commit/302f61ac7ac1ce976df3308999cafe6cde8a5643))
