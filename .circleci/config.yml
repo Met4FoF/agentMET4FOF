@@ -391,8 +391,6 @@ jobs:
               || true
             if [ $CIRCLE_TAG = v$version ]; then
               docker tag ${IMAGE_NAME} ${ORG_NAME}/${IMAGE_NAME}:$version
-              docker save ${ORG_NAME}/${IMAGE_NAME}:$version | \
-                gzip > tagged_docker_image_agentMET4FOF_jupyter.tar.gz
             else
               exit 1
             fi
