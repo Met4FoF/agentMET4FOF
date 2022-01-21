@@ -89,7 +89,7 @@ iniconfig==1.1.1
     # via pytest
 invoke==1.6.0
     # via python-semantic-release
-ipython==7.25.0
+ipython==7.31.1
     # via -r dev-requirements.in
 ipython-genutils==0.2.0
     # via
