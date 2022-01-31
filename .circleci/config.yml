@@ -97,14 +97,6 @@ workflows:
               ignore: /.*/
 
 commands:
-  create_venv:
-    description: "Create venv"
-    steps:
-      - run:
-          name: Create venv
-          command: |
-            python -m venv venv
-
   create_result_folder:
     description: "Create test-result folder"
     steps:
@@ -123,7 +115,6 @@ commands:
       - run:
           name: Run tests
           command: |
-            source venv/bin/activate
             tox | tee --append test-results/agentMET4FOF.log
       - when:
           condition: << parameters.send_cov >>
@@ -131,7 +122,6 @@ commands:
             - run:
                 name: Upload coverage report
                 command: |
-                  source venv/bin/activate
                   curl -s https://codecov.io/bash > codecov;
                   VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
                   for i in 1 256 512
@@ -155,11 +145,9 @@ commands:
   install_all_deps:
     description: "Install dependencies"
     steps:
-      - create_venv
       - run:
           name: Install dependencies
           command: |
-            source venv/bin/activate
             pip install -r requirements.txt -r dev-requirements.txt
 
 jobs:
@@ -213,21 +201,10 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - create_venv
-      - restore_cache:
-          keys:
-            - v4-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-            - v4-setup-dependencies-
       - run:
           name: Install dependencies
           command: |
-            source venv/bin/activate
-            python -m pip install --upgrade tox
-      - save_cache:
-          paths:
-            - ./venv
-          key: >-
-            v4-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            pip install --upgrade tox
       - run_venv_tests:
           send_cov: true
 
@@ -236,22 +213,11 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - create_venv
-      - restore_cache:
-          keys:
-            - v6-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            - v6-venv-dependencies-
       - run:
           name: Install dependencies
           command: |
-            source venv/bin/activate
-            python -m pip --upgrade pip tox
-            python -m pip -r requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: >-
-            v6-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            pip --upgrade pip tox
+            pip -r requirements.txt
       - run_venv_tests
 
   preview_release:
@@ -266,7 +232,6 @@ jobs:
             unset CIRCLE_PULL_REQUEST CIRCLE_PULL_REQUESTS CI_PULL_REQUEST \
               CI_PULL_REQUESTS
             export CIRCLE_BRANCH=develop
-            source venv/bin/activate
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             echo "
@@ -292,7 +257,6 @@ jobs:
       - run:
           name: Run semantic-release publish
           command: |
-            source venv/bin/activate
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             semantic-release publish
@@ -308,7 +272,7 @@ jobs:
       - run:
           name: Install repo2docker
           command: |
-            python3 -m pip install chardet jupyter-repo2docker
+            pip install chardet jupyter-repo2docker
 
       - run:
           name: Build image
