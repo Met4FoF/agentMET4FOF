@@ -97,6 +97,14 @@ workflows:
               ignore: /.*/
 
 commands:
+  create_venv:
+    description: "Create venv"
+    steps:
+      - run:
+          name: Create venv
+          command: |
+            python -m venv venv
+
   create_result_folder:
     description: "Create test-result folder"
     steps:
@@ -147,10 +155,10 @@ commands:
   install_all_deps:
     description: "Install dependencies"
     steps:
+      - create_venv
       - run:
           name: Install dependencies
           command: |
-            python -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt -r dev-requirements.txt
 
@@ -205,6 +213,7 @@ jobs:
     steps:
       - checkout
       - create_result_folder
+      - create_venv
       - restore_cache:
           keys:
             - v3-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
@@ -212,7 +221,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            python -m venv venv
             source venv/bin/activate
             pip install --upgrade tox
       - save_cache:
@@ -228,6 +236,7 @@ jobs:
     steps:
       - checkout
       - create_result_folder
+      - create_venv
       - restore_cache:
           keys:
             - v6-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
@@ -235,7 +244,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            python -m venv venv
             source venv/bin/activate
             pip install --upgrade pip tox
             pip install -r requirements.txt
