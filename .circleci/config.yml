@@ -216,8 +216,8 @@ jobs:
       - create_venv
       - restore_cache:
           keys:
-            - v3-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-            - v3-setup-dependencies-
+            - v4-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            - v4-setup-dependencies-
       - run:
           name: Install dependencies
           command: |
@@ -227,7 +227,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v3-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            v4-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
       - run_venv_tests:
           send_cov: true
 
