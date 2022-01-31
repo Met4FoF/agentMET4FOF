@@ -150,7 +150,7 @@ commands:
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
+            python -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt -r dev-requirements.txt
 
@@ -212,7 +212,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
+            python -m venv venv
             source venv/bin/activate
             pip install --upgrade tox
       - save_cache:
@@ -235,7 +235,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
+            python -m venv venv
             source venv/bin/activate
             pip install --upgrade pip tox
             pip install -r requirements.txt
