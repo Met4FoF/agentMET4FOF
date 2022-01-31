@@ -174,8 +174,8 @@ jobs:
             echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
       - restore_cache:
           keys:
-            - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            - v1-conda-dependencies-
+            - v2-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v2-conda-dependencies-
       - run:
           name: Create or update environment
           command: |
@@ -190,7 +190,7 @@ jobs:
           paths:
             - /home/circleci/conda/envs/
           key: >-
-            v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v2-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
       - run:
           name: Run tests
           command: |
@@ -207,8 +207,8 @@ jobs:
       - create_result_folder
       - restore_cache:
           keys:
-            - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-            - v2-setup-dependencies-
+            - v3-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            - v3-setup-dependencies-
       - run:
           name: Install dependencies
           command: |
@@ -219,7 +219,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
+            v3-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
       - run_venv_tests:
           send_cov: true
 
@@ -230,8 +230,8 @@ jobs:
       - create_result_folder
       - restore_cache:
           keys:
-            - v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            - v5-venv-dependencies-
+            - v6-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v6-venv-dependencies-
       - run:
           name: Install dependencies
           command: |
@@ -243,7 +243,7 @@ jobs:
           paths:
             - ./venv
           key: >-
-            v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v6-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
       - run_venv_tests
 
   preview_release:
