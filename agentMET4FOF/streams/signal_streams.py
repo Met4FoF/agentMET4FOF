@@ -52,7 +52,8 @@ class SineGenerator(DataStreamMET4FOF):
             initial_phase=initial_phase,
         )
 
-    def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
+    @staticmethod
+    def sine_wave_function(time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator
 
         Parameters
@@ -114,7 +115,8 @@ class CosineGenerator(DataStreamMET4FOF):
             initial_phase=initial_phase,
         )
 
-    def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
+    @staticmethod
+    def cosine_wave_function(time, cosine_freq, amplitude, initial_phase):
         """A simple cosine wave generator
 
         Parameters
