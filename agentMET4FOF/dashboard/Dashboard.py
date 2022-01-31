@@ -5,8 +5,7 @@ from time import sleep
 from wsgiref.simple_server import make_server
 
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 from multiprocess.context import Process
 
 from .Dashboard_Control import _Dashboard_Control
