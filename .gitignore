@@ -28,5 +28,6 @@ docs/CODE_OF_CONDUCT.md
 
 # Test clutter #
 ################
-test-reports/
+test-results/
 .hypothesis/
+.coverage*
