@@ -340,7 +340,7 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/$subfolder_name/  | \
-                grep '{"url_base_pathname": "/dashboard_subfolder/", "requests_pathname_prefix": "/dashboard_subfolder/"'
+                grep '{"url_base_pathname":"/dashboard_subfolder/","requests_pathname_prefix":"/dashboard_subfolder/"'
 
   retag_and_deploy_image:
     executor: image_dealer
