@@ -30,8 +30,8 @@ class SineGenerator(DataStreamMET4FOF):
 
     def __init__(
         self,
-        sfreq: Optional[int] = 500,
-        sine_freq: Optional[float] = 50.0,
+        sfreq: Optional[int] = 100,
+        sine_freq: Optional[float] = 2 * np.pi,
         amplitude: Optional[float] = 1.0,
         initial_phase: Optional[float] = 0.0,
     ):
@@ -92,8 +92,8 @@ class CosineGenerator(DataStreamMET4FOF):
 
     def __init__(
         self,
-        sfreq: Optional[int] = 500,
-        cosine_freq: Optional[float] = 50.0,
+        sfreq: Optional[int] = 100,
+        cosine_freq: Optional[float] = 2 * np.pi,
         amplitude: Optional[float] = 1.0,
         initial_phase: Optional[float] = 0.0,
     ):
