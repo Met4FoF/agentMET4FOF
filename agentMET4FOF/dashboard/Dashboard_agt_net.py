@@ -1,11 +1,10 @@
 import warnings
 
 import dash
-import dash_core_components as dcc
 import dash_cytoscape as cyto
-import dash_html_components as html
 import networkx as nx
 import visdcc
+from dash import dcc, html
 from dash.dependencies import ClientsideFunction
 from dash.exceptions import PreventUpdate
 
@@ -18,8 +17,8 @@ from .LayoutHelper import (
     extract_param_dropdown,
     get_param_dash_component,
 )
-from ..agents.metrological_base_agents import MetrologicalMonitorAgent
 from ..agents.base_agents import MonitorAgent
+from ..agents.metrological_base_agents import MetrologicalMonitorAgent
 
 
 class Dashboard_agt_net(Dashboard_Layout_Base):

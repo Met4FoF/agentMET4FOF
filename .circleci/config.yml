@@ -8,21 +8,21 @@ executors:
   tester:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.10
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
   publisher:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.10
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
   builder:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:3.9
+      - image: cimg/python:3.10
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
@@ -115,7 +115,6 @@ commands:
       - run:
           name: Run tests
           command: |
-            source venv/bin/activate
             tox | tee --append test-results/agentMET4FOF.log
       - when:
           condition: << parameters.send_cov >>
@@ -123,7 +122,6 @@ commands:
             - run:
                 name: Upload coverage report
                 command: |
-                  source venv/bin/activate
                   curl -s https://codecov.io/bash > codecov;
                   VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
                   for i in 1 256 512
@@ -150,8 +148,6 @@ commands:
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
-            source venv/bin/activate
             pip install -r requirements.txt -r dev-requirements.txt
 
 jobs:
@@ -174,8 +170,8 @@ jobs:
             echo 'export PATH=$HOME/conda/bin:$PATH' >> $BASH_ENV
       - restore_cache:
           keys:
-            - v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            - v1-conda-dependencies-
+            - v2-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            - v2-conda-dependencies-
       - run:
           name: Create or update environment
           command: |
@@ -190,7 +186,7 @@ jobs:
           paths:
             - /home/circleci/conda/envs/
           key: >-
-            v1-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
+            v2-conda-dependencies-{{ checksum "environment.yml" }}-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
       - run:
           name: Run tests
           command: |
@@ -205,21 +201,10 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - restore_cache:
-          keys:
-            - v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
-            - v2-setup-dependencies-
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
-            source venv/bin/activate
             pip install --upgrade tox
-      - save_cache:
-          paths:
-            - ./venv
-          key: >-
-            v2-setup-dependencies-{{ checksum "setup.py" }}-{{ checksum "dev-requirements.txt" }}
       - run_venv_tests:
           send_cov: true
 
@@ -228,22 +213,11 @@ jobs:
     steps:
       - checkout
       - create_result_folder
-      - restore_cache:
-          keys:
-            - v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
-            - v5-venv-dependencies-
       - run:
           name: Install dependencies
           command: |
-            python3 -m venv venv
-            source venv/bin/activate
             pip install --upgrade pip tox
             pip install -r requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: >-
-            v5-venv-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "dev-requirements.txt" }}
       - run_venv_tests
 
   preview_release:
@@ -258,7 +232,6 @@ jobs:
             unset CIRCLE_PULL_REQUEST CIRCLE_PULL_REQUESTS CI_PULL_REQUEST \
               CI_PULL_REQUESTS
             export CIRCLE_BRANCH=develop
-            source venv/bin/activate
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             echo "
@@ -284,7 +257,6 @@ jobs:
       - run:
           name: Run semantic-release publish
           command: |
-            source venv/bin/activate
             git config --global user.name "semantic-release (via CircleCI)"
             git config --global user.email "bjoern.ludwig@ptb.de"
             semantic-release publish
@@ -300,7 +272,7 @@ jobs:
       - run:
           name: Install repo2docker
           command: |
-            python3 -m pip install chardet jupyter-repo2docker
+            pip install chardet jupyter-repo2docker
 
       - run:
           name: Build image
@@ -368,7 +340,7 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/$subfolder_name/  | \
-                grep '{"url_base_pathname": "/dashboard_subfolder/", "requests_pathname_prefix": "/dashboard_subfolder/"'
+                grep '{"url_base_pathname":"/dashboard_subfolder/","requests_pathname_prefix":"/dashboard_subfolder/"'
 
   retag_and_deploy_image:
     executor: image_dealer

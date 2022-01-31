@@ -27,7 +27,9 @@ class SineGeneratorAgent(AgentMET4FOF):
 
     _sine_stream: SineGenerator
 
-    def init_parameters(self, sfreq=500, sine_freq=5, amplitude=1, initial_phase=0):
+    def init_parameters(
+        self, sfreq=100, sine_freq=2 * np.pi, amplitude=1.0, initial_phase=0.0
+    ):
         """Initialize the input data
 
         Initialize the input data stream as an instance of the :class:`SineGenerator`

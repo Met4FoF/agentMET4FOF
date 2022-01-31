@@ -17,7 +17,7 @@ def demonstrate_generator_agent_use() -> AgentNetwork:
         name="Custom Sine generator", agentType=SineGeneratorAgent
     )
     custom_sine_agent.init_parameters(
-        sfreq=50,
+        sfreq=75,
         sine_freq=np.pi,
         amplitude=0.75,
     )

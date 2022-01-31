@@ -1,8 +1,8 @@
 #Abstract Base class for every `page` in the dashboard
 #Note the Agent network page, and the ML_Experiment extension page are derived from this base class
 
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import dcc, html
+
 
 class Dashboard_Layout_Base():
     def __init__(self, app):

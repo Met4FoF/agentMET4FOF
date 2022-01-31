@@ -8,8 +8,11 @@ from agentMET4FOF.agents import (
 
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
-        data = self.divide_by_two(message["data"])
-        self.send_output(data)
+        message["data"]["quantities"] = self.divide_by_two(
+            message["data"]["quantities"]
+        )
+
+        self.send_output(message)
 
     # Define simple math functions.
     @staticmethod

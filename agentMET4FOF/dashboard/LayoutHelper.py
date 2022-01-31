@@ -1,12 +1,10 @@
 from typing import Dict, Union
 
-import dash_html_components as html
-import dash_core_components as dcc
-import dash_table
 import networkx as nx
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
+from dash import dash_table, dcc, html
 from plotly.graph_objs import Scatter
 
 

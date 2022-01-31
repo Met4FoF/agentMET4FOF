@@ -30,8 +30,8 @@ class SineGenerator(DataStreamMET4FOF):
 
     def __init__(
         self,
-        sfreq: Optional[int] = 500,
-        sine_freq: Optional[float] = 50.0,
+        sfreq: Optional[int] = 100,
+        sine_freq: Optional[float] = 2 * np.pi,
         amplitude: Optional[float] = 1.0,
         initial_phase: Optional[float] = 0.0,
     ):
@@ -40,8 +40,8 @@ class SineGenerator(DataStreamMET4FOF):
             "SineGenerator",
             "time",
             "s",
-            ("Voltage"),
-            ("V"),
+            "Voltage",
+            "V",
             "Simple sine wave generator",
         )
         self.set_generator_function(
@@ -52,7 +52,8 @@ class SineGenerator(DataStreamMET4FOF):
             initial_phase=initial_phase,
         )
 
-    def sine_wave_function(self, time, sine_freq, amplitude, initial_phase):
+    @staticmethod
+    def sine_wave_function(time, sine_freq, amplitude, initial_phase):
         """A simple sine wave generator
 
         Parameters
@@ -92,8 +93,8 @@ class CosineGenerator(DataStreamMET4FOF):
 
     def __init__(
         self,
-        sfreq: Optional[int] = 500,
-        cosine_freq: Optional[float] = 50.0,
+        sfreq: Optional[int] = 100,
+        cosine_freq: Optional[float] = 2 * np.pi,
         amplitude: Optional[float] = 1.0,
         initial_phase: Optional[float] = 0.0,
     ):
@@ -102,8 +103,8 @@ class CosineGenerator(DataStreamMET4FOF):
             "CosineGenerator",
             "time",
             "s",
-            ("Voltage"),
-            ("V"),
+            "Voltage",
+            "V",
             "Simple cosine wave generator",
         )
         self.set_generator_function(
@@ -114,7 +115,8 @@ class CosineGenerator(DataStreamMET4FOF):
             initial_phase=initial_phase,
         )
 
-    def cosine_wave_function(self, time, cosine_freq, amplitude, initial_phase):
+    @staticmethod
+    def cosine_wave_function(time, cosine_freq, amplitude, initial_phase):
         """A simple cosine wave generator
 
         Parameters

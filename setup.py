@@ -78,9 +78,6 @@ setup(
         "mesa",
         "multiprocess",
         "visdcc",
-        "click<8,>=7",  # This unfortunately is needed as of now, due to a constraint
-        # from our development dependency python-semantic-release. As soon as they
-        # drop that exact constraint, we should also do that.
     ],
     extras_require={"tutorials": ["notebook", "PyDynamic"]},
     python_requires=">=3.8",
@@ -93,9 +90,9 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     cmdclass={"verify": VerifyVersionCommand},
 )
