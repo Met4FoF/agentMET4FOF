@@ -40,8 +40,8 @@ class SineGenerator(DataStreamMET4FOF):
             "SineGenerator",
             "time",
             "s",
-            ("Voltage"),
-            ("V"),
+            "Voltage",
+            "V",
             "Simple sine wave generator",
         )
         self.set_generator_function(
@@ -102,8 +102,8 @@ class CosineGenerator(DataStreamMET4FOF):
             "CosineGenerator",
             "time",
             "s",
-            ("Voltage"),
-            ("V"),
+            "Voltage",
+            "V",
             "Simple cosine wave generator",
         )
         self.set_generator_function(
