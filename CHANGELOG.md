@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.1 (2022-02-01)
+### Fix
+* **tutorial2:** Repair math agent in tutorial 2 ([`8cdc12e`](https://github.com/Met4FoF/agentMET4FOF/commit/8cdc12ebdc5d4a1792d9b1c1b3a72d9c721cbf3c))
+
+### Refactor
+* **signal_streams:** Turn wave methods into static methods in SineGenerator and CosineGenerator ([`9d24259`](https://github.com/Met4FoF/agentMET4FOF/commit/9d24259b9d9e240a2ca90f9a07542cef0527db1d))
+* **signal_streams:** Remove unneeded parenthesis in SineGenerator and CosineGenerator ([`dce0d86`](https://github.com/Met4FoF/agentMET4FOF/commit/dce0d864629a254338729f02916bb37926fa696e))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.13.0...v0.13.1)**
+
 ## v0.13.0 (2021-11-12)
 ### Feature
 * **Docker:** Transfer image to Docker Hub for more convenient usage ([`14aff5f`](https://github.com/Met4FoF/agentMET4FOF/commit/14aff5f49487a30bc0743da89613256054e8eac5))
