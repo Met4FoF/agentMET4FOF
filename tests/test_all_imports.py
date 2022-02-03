@@ -26,7 +26,17 @@ def test_metrological_signal_agents_import():
 
 def test_signal_agents_import():
     from agentMET4FOF.agents.signal_agents import (
+        NoiseAgent,
         SineGeneratorAgent,
+        SineWithJitterGeneratorAgent,
+        StaticSineWithJitterGeneratorAgent,
+    )
+
+
+def test_noise_jitter_removal_agents_import():
+    from agentMET4FOF.agents.noise_jitter_removal_agents import (
+        NoiseJitterRemovalAgent,
+        MCMCMHNJ,
     )
 
 
@@ -51,9 +61,30 @@ def test_base_agents_imports():
     )
 
 
+def test_metrological_redundancy_agents_imports():
+    from agentMET4FOF.agents.metrological_redundancy_agents import (
+        RedundancyAgent,
+    )
+
+
+def test_base_streams_import():
+    from agentMET4FOF.streams.base_streams import (
+        DataStreamMET4FOF,
+    )
+
+
 def test_metrological_base_streams_import():
     from agentMET4FOF.streams.metrological_base_streams import (
         MetrologicalDataStreamMET4FOF,
+    )
+
+
+def test_signal_streams_import():
+    from agentMET4FOF.streams.signal_streams import (
+        SineGenerator,
+        CosineGenerator,
+        SineWithJitterGenerator,
+        StaticSineWithJitterGenerator,
     )
 
 
@@ -69,6 +100,9 @@ def test_dashboard_import():
         Dashboard,
         Dashboard_agt_net,
         Dashboard_Control,
+        Dashboard_layout_base,
+        default_network_stylesheet,
+        LayoutHelper,
     )
 
 
@@ -81,4 +115,12 @@ def test_tutorials_import():
         tutorial_5_coalition,
         tutorial_6_mesa_backend,
         tutorial_7_generic_metrological_agent,
+    )
+
+
+def test_utils_import():
+    from agentMET4FOF.utils import (
+        AgentBuffer,
+        Backend,
+        MetrologicalAgentBuffer,
     )

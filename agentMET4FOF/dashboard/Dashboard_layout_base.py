@@ -1,15 +1,15 @@
-#Abstract Base class for every `page` in the dashboard
-#Note the Agent network page, and the ML_Experiment extension page are derived from this base class
+# Abstract Base class for every `page` in the dashboard
+# Note the Agent network page, and the ML_Experiment extension page are derived from this base class
 
 from dash import dcc, html
 
 
-class Dashboard_Layout_Base():
+class Dashboard_Layout_Base:
     def __init__(self, app):
         self.app = app
         self.set_layout_name()
 
-    def set_layout_name(self,id="agt-net", title="Agent Network"):
+    def set_layout_name(self, id="agt-net", title="Agent Network"):
 
         """
         Unique name for each layout. Should set this to be hard-coded and not intended for users to modify it.
@@ -23,11 +23,13 @@ class Dashboard_Layout_Base():
             Display title on the top header tab of dashboard
         """
         self.id = id
-        self.title=title
+        self.title = title
 
     @property
     def dcc_tab(self):
-        return dcc.Tab(id=self.id+"-tab", value=self.id,label=self.title, children=[])
+        return dcc.Tab(
+            id=self.id + "-tab", value=self.id, label=self.title, children=[]
+        )
 
     def get_layout(self) -> html.Div:
         """
@@ -40,7 +42,7 @@ class Dashboard_Layout_Base():
         """
         return 0
 
-    def prepare_callbacks(self,app):
+    def prepare_callbacks(self, app):
         """
         Prepares the dash plotly callbacks to the plotly app
 
@@ -50,4 +52,3 @@ class Dashboard_Layout_Base():
 
         """
         return 0
-

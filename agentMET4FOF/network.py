@@ -15,6 +15,8 @@ from .dashboard.default_network_stylesheet import default_agent_network_styleshe
 
 __all__ = ["AgentNetwork"]
 
+from .utils import Backend
+
 
 class AgentNetwork:
     """Object for starting a new Agent Network or connect to an existing Agent Network
@@ -32,7 +34,7 @@ class AgentNetwork:
         """
 
         def init_parameters(
-            self, ns=None, backend="osbrain", mesa_model=None, log_mode=True
+            self, ns=None, backend=Backend.OSBRAIN, mesa_model=None, log_mode=True
         ):
             self.backend = backend
             self.states = {0: "Idle", 1: "Running", 2: "Pause", 3: "Stop"}
@@ -43,7 +45,7 @@ class AgentNetwork:
             self.coalitions = []
             self.log_mode = log_mode
 
-            if backend == "mesa":
+            if backend == Backend.MESA:
                 self.mesa_model = mesa_model
 
         def start_mesa_timer(self, mesa_update_interval):
@@ -85,7 +87,8 @@ class AgentNetwork:
             """Ensure that name does not contain invalid characters
 
             osBrain does not allow spaces in agents' names, so we replace them by
-            underscores.
+            underscores. Mesa does not allow a single space as name, so we replace
+            that as well by an underscore.
 
             Parameters
             ----------
@@ -96,10 +99,10 @@ class AgentNetwork:
             Returns
             -------
             str
-                the cleaned version of the name, i.e. for ``backend == 'osbrain'``
-                without spaces
+                the cleaned version of the name, i.e. for ``backend == Backend.OSBRAIN``
+                without spaces and for ``backend == Backend.MESA`` not a single space
             """
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN or name == " ":
                 return name.replace(" ", "_")
             return name
 
@@ -118,7 +121,7 @@ class AgentNetwork:
                 the provided name can be found
             """
             name_to_search_for = self._transform_string_into_valid_name(agent_name)
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN:
                 try:
                     return self.ns.proxy(name_to_search_for)
                 except NamingError as e:
@@ -126,7 +129,7 @@ class AgentNetwork:
                         f"{self.get_agent.__name__}(agent_name='{name_to_search_for}') "
                         f"failed: {e}"
                     )
-            elif self.backend == "mesa":
+            else:  # self.backend == Backend.MESA:
                 return self.mesa_model.get_agent(name_to_search_for)
 
         def get_agentType_count(self, agent_type: Type[AgentMET4FOF]) -> int:
@@ -169,7 +172,7 @@ class AgentNetwork:
 
         def add_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -181,13 +184,13 @@ class AgentNetwork:
                 if ip_addr is None:
                     ip_addr = "0.0.0.0"
 
-                if name == " ":
+                if name is None:
                     new_name = self.generate_module_name_byType(agentType)
                 else:
                     new_name = self.generate_module_name_byUnique(name)
 
                 # actual instantiation of agent, depending on backend
-                if self.backend == "osbrain":
+                if self.backend == Backend.OSBRAIN:
                     new_agent = self._add_osbrain_agent(
                         name=self._transform_string_into_valid_name(new_name),
                         agentType=agentType,
@@ -197,7 +200,7 @@ class AgentNetwork:
                         loop_wait=loop_wait,
                         **kwargs,
                     )
-                elif self.backend == "mesa":
+                elif self.backend == Backend.MESA:
                     # handle osbrain and mesa here
                     new_agent = self._add_mesa_agent(
                         name=self._transform_string_into_valid_name(new_name),
@@ -212,7 +215,7 @@ class AgentNetwork:
 
         def _add_osbrain_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -236,7 +239,7 @@ class AgentNetwork:
 
         def _add_mesa_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -294,7 +297,7 @@ class AgentNetwork:
                     if name not in concatenate_exclude_names_with_anyway_invisibles()
                 ]
 
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN:
                 return return_osbrain_agents()
 
             if exclude_names is None:
@@ -522,7 +525,7 @@ class AgentNetwork:
         dashboard_update_interval=3,
         dashboard_max_monitors=10,
         dashboard_port=8050,
-        backend="osbrain",
+        backend=Backend.OSBRAIN,
         mesa_update_interval=0.1,
         network_stylesheet=default_agent_network_stylesheet,
         **dashboard_kwargs,
@@ -530,15 +533,15 @@ class AgentNetwork:
         """
         Parameters
         ----------
-        ip_addr: str
+        ip_addr : str
             Ip address of server to connect/start
-        port: int
+        port : int
             Port of server to connect/start
-        connect: bool
+        connect : bool
             False sets Agent network to connect mode and will connect to specified
             address, True (Default) sets Agent network to initially try to connect
             and if it cant find one, it will start a new server at specified address
-        log_filename: str
+        log_filename : str
             Name of log file, acceptable csv format. It will be saved locally,
             in the same folder as the python script in which this AgentNetwork is
             instantiated on.
@@ -555,13 +558,16 @@ class AgentNetwork:
             Due to complexity in managing and instantiating dynamic figures,
             a maximum number of monitors is specified first and only the each
             Monitor Agent will occupy one of these figures.
-        dashboard_port: int
+        dashboard_port : int
             Port of the dashboard to be hosted on. By default is port 8050.
+        backend : Backend
+            the backend to use for either simulating, debugging or local
+            high-performance execution with Mesa or osBrain. See tutorial 6 for details.
         **dashboard_kwargs
             Additional key words to be passed in initialising the dashboard
         """
 
-        self.backend = backend
+        self.backend = AgentMET4FOF.validate_backend(backend)
         self.ip_addr = ip_addr
         self.port = port
         self._controller = None
@@ -580,20 +586,15 @@ class AgentNetwork:
             self.save_logfile = False
 
         # handle different choices of backends
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             if connect:
                 self.connect(ip_addr, port)
             else:
                 self.connect(ip_addr, port)
                 if self.ns == 0:
                     self.start_server_osbrain(ip_addr, port)
-        elif self.backend == "mesa":
+        else:  # self.backend == Backend.MESA
             self.start_server_mesa()
-        else:
-            raise NotImplementedError(
-                "Backend has not been implemented. Valid choices are 'osbrain' and "
-                "'mesa'."
-            )
 
         if isinstance(dashboard_extensions, list) == False:
             dashboard_extensions = [dashboard_extensions]
@@ -618,11 +619,11 @@ class AgentNetwork:
             dashboard_params.update(dashboard_kwargs)
 
             # Initialize dashboard process/thread.
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN:
                 from .dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
-            elif self.backend == "mesa":
+            else:  # self.backend == Backend.MESA
                 from .dashboard.Dashboard import AgentDashboardThread
 
                 self.dashboard_proc = AgentDashboardThread(**dashboard_params)
@@ -924,7 +925,7 @@ class AgentNetwork:
             self._get_controller().get_agent(agent_name)
             for agent_name in all_agent_names
         ]
-        if self.backend == "mesa":
+        if self.backend == Backend.MESA:
             return {agent for agent in all_agents if isinstance(agent, only_type)}
 
         return {
@@ -938,7 +939,7 @@ class AgentNetwork:
 
     def add_agent(
         self,
-        name: Optional[str] = " ",
+        name: Optional[str] = None,
         agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
         log_mode: Optional[bool] = True,
         buffer_size: Optional[int] = 1000,
@@ -1033,9 +1034,9 @@ class AgentNetwork:
         # Shutdown the nameserver.
         # This leaves some process clutter in the process list, but the actual
         # processes are ended.
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             self._get_controller().get_attr("ns").shutdown()
-        elif self.backend == "mesa":
+        else:  # self.backend == Backend.MESA
             self._get_controller().stop_mesa_timer()
             self.mesa_model.shutdown()
 
@@ -1047,7 +1048,7 @@ class AgentNetwork:
             # ensuring the proper termination of the dash.Dash app.
             self.dashboard_proc.terminate()
             # Then wait for the termination of the actual thread or at least finish the
-            # execution of the join method in case of the "Mesa" backend. See #163
+            # execution of the join method in case of the Mesa backend. See #163
             # for the search for a proper solution to this issue.
             self.dashboard_proc.join(timeout=10)
         return 0

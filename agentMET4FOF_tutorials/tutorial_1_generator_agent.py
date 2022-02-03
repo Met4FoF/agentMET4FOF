@@ -13,14 +13,20 @@ def demonstrate_generator_agent_use() -> AgentNetwork:
     default_sine_agent = agent_network.add_agent(
         name="Default Sine generator", agentType=SineGeneratorAgent
     )
+
+    # Custom parameters of the specified agentType can either be handed over as **kwargs
+    # in the network instance's add_agent() method, or...
     custom_sine_agent = agent_network.add_agent(
-        name="Custom Sine generator", agentType=SineGeneratorAgent
-    )
-    custom_sine_agent.init_parameters(
+        name="Custom Sine generator",
+        agentType=SineGeneratorAgent,
         sfreq=75,
         sine_freq=np.pi,
+    )
+    # ... in a separate call of the agent instance's init_parameters() method.
+    custom_sine_agent.init_parameters(
         amplitude=0.75,
     )
+
     monitor_agent = agent_network.add_agent(
         name="Showcase a default and a customized sine signal", agentType=MonitorAgent
     )

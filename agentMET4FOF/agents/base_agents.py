@@ -1,6 +1,7 @@
 import base64
 import datetime
 import time
+import warnings
 from collections import deque
 from io import BytesIO
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -23,6 +24,8 @@ __all__ = [
     "MonitorAgent",
 ]
 
+from ..utils import Backend
+
 
 class AgentMET4FOF(MesaAgent, osBrainAgent):
     """
@@ -40,12 +43,12 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         serializer=None,
         transport=None,
         attributes=None,
-        backend="osbrain",
+        backend=Backend.OSBRAIN,
         mesa_model=None,
     ):
-        self.backend = backend.lower()
+        self.backend = self.validate_backend(backend)
 
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             self._remove_methods(MesaAgent)
             osBrainAgent.__init__(
                 self,
@@ -56,18 +59,42 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
                 attributes=attributes,
             )
 
-        elif self.backend == "mesa":
+        elif self.backend == Backend.MESA:
             MesaAgent.__init__(self, name, mesa_model)
             self._remove_methods(osBrainAgent)
             self.init_mesa(name)
             self.unique_id = name
             self.name = name
             self.mesa_model = mesa_model
-        else:
-            raise NotImplementedError(
-                "Backend has not been implemented. Valid choices are 'osbrain' and "
-                "'mesa'."
+
+    @staticmethod
+    def validate_backend(backend: Union[str, Backend]) -> Backend:
+        if isinstance(backend, str):
+            if backend.lower() == "osbrain":
+                actual_backend = Backend.OSBRAIN
+            elif backend.lower() == "mesa":
+                actual_backend = Backend.MESA
+            else:
+                raise AgentMET4FOF.raise_not_implemented_backend()
+            warnings.warn(
+                f"The backend was specified using the string '{backend}'"
+                f"but should be specified as one of {tuple(Backend)}. These "
+                f"constants can and should be imported using "
+                f"'from agentMET4FOF.utils import Backend'. The "
+                f"string-based initialization might be removed any time. Please switch "
+                f"instantly to {actual_backend}.",
+                DeprecationWarning,
             )
+            return actual_backend
+        if backend not in Backend:
+            raise AgentMET4FOF.raise_not_implemented_backend()
+        return backend
+
+    @staticmethod
+    def raise_not_implemented_backend():
+        return NotImplementedError(
+            f"Backend has not been implemented. Valid choices are {tuple(Backend)}."
+        )
 
     def init_mesa(self, name):
         # MESA Specific parameters
@@ -168,7 +195,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.buffer_size = buffer_size
         self.buffer = self.init_buffer(self.buffer_size)
 
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             self.PubAddr_alias = self.name + "_PUB"
             self.PubAddr = self.bind("PUB", alias=self.PubAddr_alias, transport="tcp")
 
@@ -190,7 +217,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         self.log_info("RESET AGENT STATE")
         self.buffer.clear()
 
-    def init_parameters(self):
+    def init_parameters(self, **kwargs):
         """
         User provided function to initialize parameters of choice.
         """
@@ -211,9 +238,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         """
         try:
             if self.log_mode:
-                if self.backend == "osbrain":
+                if self.backend == Backend.OSBRAIN:
                     super().log_info(message)
-                elif self.backend == "mesa":
+                elif self.backend == Backend.MESA:
                     message = "[%s] (%s): %s" % (
                         datetime.datetime.utcnow(),
                         self.name,
@@ -226,38 +253,29 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             return 1
 
     def init_agent_loop(self, loop_wait: Optional[float] = None):
-        """
-        Initiates the agent loop, which iterates every `loop_wait` seconds
+        """Initiates the agent loop, which iterates every `loop_wait` seconds
 
         Stops every timers and initiate a new loop.
 
         Parameters
         ----------
-        loop_wait : int, optional
+        loop_wait : float, optional
             The wait between each iteration of the loop, defaults to 1.0
         """
+        if loop_wait is None:
+            if self.loop_wait is None:
+                self.loop_wait = 1.0
+        else:
+            self.loop_wait = loop_wait
 
-        # most default: loop wait has not been set in init_parameters() not
-        # init_agent_loop()
-        if self.loop_wait is None and loop_wait is None:
-            set_loop_wait = 1.0
-        # init_agent_loop overrides loop_wait parameter
-        elif loop_wait is not None:
-            set_loop_wait = loop_wait
-        # otherwise assume init_parameters() have set loop_wait
-        elif self.loop_wait is not None:
-            set_loop_wait = self.loop_wait
-        self.loop_wait = set_loop_wait
-
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             self.stop_all_timers()
 
         # check if agent_loop is overridden by user
         if self.__class__.agent_loop == AgentMET4FOF.agent_loop:
             return 0
-        else:
-            if self.backend == "osbrain":
-                self.each(self.loop_wait, self.__class__.agent_loop)
+        if self.backend == Backend.OSBRAIN:
+            self.each(self.loop_wait, self.__class__.agent_loop)
         return 0
 
     def stop_agent_loop(self):
@@ -323,7 +341,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     def buffer_store(self, agent_from: str, data=None, concat_axis=0):
         """
-        Updates data stored in `self.buffer` with the received message
+        Updates data stored in ``self.buffer`` with the received message
 
         Checks if sender agent has sent any message before
         If it did,then append, otherwise create new entry for it
@@ -333,9 +351,10 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         agent_from : str
             Name of agent sender
         data
-            Any supported data which can be stored in dict as buffer. See AgentBuffer
-            for more information.
-
+            Any supported data which can be stored in dict as buffer. See
+            :class:`AgentBuffer` for details for more information.
+        concat_axis : int, optional
+            axis to concatenate on with the buffering for numpy arrays. Default is 0.
         """
 
         self.buffer.store(agent_from=agent_from, data=data, concat_axis=concat_axis)
@@ -378,9 +397,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             "channel": channel,
         }
 
-    def _is_type_message(self, data):
-        """
-        Internal method to check if the data carries signature of an agent message type
+    @staticmethod
+    def _is_type_message(data: Any) -> bool:
+        """Internal method to check if the data carries signature of an agent message
 
         Parameters
         ----------
@@ -427,10 +446,10 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         start_time_pack = time.time()
         packed_data = self.pack_data(data, channel=channel)
 
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             self.send(self.PubAddr, packed_data, topic=channel)
 
-        elif self.backend == "mesa":
+        elif self.backend == Backend.MESA:
             for key, value in self.Outputs.items():
                 # if output agent has subscribed to a list of channels,
                 # we check whether `channel` is subscribed in that list
@@ -647,7 +666,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             output_agent.set_attr(Inputs=temp_updated_inputs)
 
             # connect socket for osbrain
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN:
                 self.Outputs_agent_channels.update(
                     {output_agent.get_attr("name"): channel}
                 )
@@ -720,7 +739,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             new_inputs.pop(self.name, None)
             output_agent.set_attr(Inputs=new_inputs)
 
-            if self.backend == "osbrain":
+            if self.backend == Backend.OSBRAIN:
                 output_agent.unsubscribe(
                     self.PubAddr_alias,
                     topic=self.Outputs_agent_channels[output_agent_id],
@@ -872,9 +891,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         return filtered_attr
 
     def shutdown(self):
-        if self.backend == "osbrain":
+        if self.backend == Backend.OSBRAIN:
             osBrainAgent.shutdown(self)
-        elif self.backend == "mesa":
+        else:  # self.backend == Backend.MESA:
             self.mesa_model.schedule.remove(self)
             del self
 
