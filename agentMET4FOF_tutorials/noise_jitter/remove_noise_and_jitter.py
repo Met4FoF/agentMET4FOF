@@ -5,11 +5,12 @@ from agentMET4FOF.agents.signal_agents import (
     SineWithJitterGeneratorAgent,
 )
 from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.utils import Backend
 
 
 def demonstrate_noise_jitter_removal_agent():
     # start agent network server
-    agentNetwork = AgentNetwork(backend="mesa")
+    agentNetwork = AgentNetwork(backend=Backend.MESA)
     # init agents
 
     sine_with_jitter_agent = agentNetwork.add_agent(

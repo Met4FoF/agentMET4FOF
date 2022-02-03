@@ -1,12 +1,15 @@
+from time import sleep
+
 from agentMET4FOF.agents.base_agents import (
     MonitorAgent,
 )
 from agentMET4FOF.agents.signal_agents import NoiseAgent, SineGeneratorAgent
 from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.utils import Backend
 
 
 def demonstrate_noise_agent_use():
-    agent_network = AgentNetwork(backend="mesa")
+    agent_network = AgentNetwork(backend=Backend.MESA)
 
     sine_agent = agent_network.add_agent(
         name="Clean sine signal", agentType=SineGeneratorAgent
@@ -28,4 +31,6 @@ def demonstrate_noise_agent_use():
 
 
 if __name__ == "__main__":
-    demonstrate_noise_agent_use()
+    noisy_network = demonstrate_noise_agent_use()
+    sleep(60)
+    noisy_network.shutdown()

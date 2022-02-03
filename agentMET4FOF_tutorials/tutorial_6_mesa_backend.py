@@ -1,10 +1,11 @@
 from agentMET4FOF.agents import AgentNetwork, MonitorAgent, SineGeneratorAgent
+from agentMET4FOF.utils import Backend
 
 
 def demonstrate_mesa_backend():
 
     # Start agent network and specify backend via the corresponding keyword parameter.
-    _agent_network = AgentNetwork(backend="mesa")
+    _agent_network = AgentNetwork(backend=Backend.MESA)
 
     # Initialize agents by adding them to the agent network.
     sine_agent = _agent_network.add_agent(agentType=SineGeneratorAgent)

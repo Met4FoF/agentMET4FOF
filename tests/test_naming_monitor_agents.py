@@ -7,6 +7,7 @@ from hypothesis.strategies import characters
 
 from agentMET4FOF.agents import AgentMET4FOF
 from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.utils import Backend
 
 
 @given(
@@ -15,7 +16,7 @@ from agentMET4FOF.network import AgentNetwork
     )
 )
 def test_naming_agents_for_mesa(name):
-    agent_network = AgentNetwork(dashboard_modules=False, backend="mesa")
+    agent_network = AgentNetwork(dashboard_modules=False, backend=Backend.MESA)
 
     agent = agent_network.add_agent(name=name, agentType=AgentMET4FOF)
     assert agent_network.get_agent(name).name == agent.name == name

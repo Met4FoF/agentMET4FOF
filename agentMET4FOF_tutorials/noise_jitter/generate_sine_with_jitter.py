@@ -7,10 +7,11 @@ from agentMET4FOF.agents.signal_agents import (
     StaticSineWithJitterGeneratorAgent,
 )
 from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.utils import Backend
 
 
 def demonstrate_sine_with_jitter_agent_use():
-    agent_network = AgentNetwork(backend="mesa")
+    agent_network = AgentNetwork(backend=Backend.MESA)
 
     sine_agent = agent_network.add_agent(
         name="Clean sine signal", agentType=SineGeneratorAgent

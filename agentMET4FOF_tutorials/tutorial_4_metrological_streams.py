@@ -4,6 +4,7 @@ from agentMET4FOF.metrological_streams import (
     MetrologicalDataStreamMET4FOF,
     MetrologicalSineGenerator,
 )
+from agentMET4FOF.utils import Backend
 
 
 class MetrologicalSineGeneratorAgent(MetrologicalAgent):
@@ -46,7 +47,7 @@ class MetrologicalSineGeneratorAgent(MetrologicalAgent):
 def demonstrate_metrological_stream():
 
     # start agent network server
-    agent_network = AgentNetwork(backend="mesa")
+    agent_network = AgentNetwork(backend=Backend.MESA)
 
     # Initialize signal generating class outside of agent framework.
     signal = MetrologicalSineGenerator()

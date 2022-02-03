@@ -46,25 +46,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         backend=Backend.OSBRAIN,
         mesa_model=None,
     ):
-        if backend not in Backend:
-            if backend.lower() == "osbrain":
-                self.backend = Backend.OSBRAIN
-            elif backend.lower() == "mesa":
-                self.backend = Backend.MESA
-            else:
-                raise NotImplementedError(
-                    "Backend has not been implemented. Valid choices are"
-                    f"{tuple(Backend)}."
-                )
-            warnings.warn(
-                f"The backend was specified using the string '{backend}'"
-                f"but should be specified as one of {tuple(Backend)}. These "
-                f"constants can and should be imported using "
-                f"'from agentMET4FOF.utils import Backend'. The "
-                f"string-based initialization might be removed any time. Please switch "
-                f"instantly.",
-                DeprecationWarning,
-            )
+        self.backend = self.validate_backend(backend)
 
         if self.backend == Backend.OSBRAIN:
             self._remove_methods(MesaAgent)
@@ -84,6 +66,35 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             self.unique_id = name
             self.name = name
             self.mesa_model = mesa_model
+
+    @staticmethod
+    def validate_backend(backend: Union[str, Backend]) -> Backend:
+        if isinstance(backend, str):
+            if backend.lower() == "osbrain":
+                actual_backend = Backend.OSBRAIN
+            elif backend.lower() == "mesa":
+                actual_backend = Backend.MESA
+            else:
+                raise AgentMET4FOF.raise_not_implemented_backend()
+            warnings.warn(
+                f"The backend was specified using the string '{backend}'"
+                f"but should be specified as one of {tuple(Backend)}. These "
+                f"constants can and should be imported using "
+                f"'from agentMET4FOF.utils import Backend'. The "
+                f"string-based initialization might be removed any time. Please switch "
+                f"instantly to {actual_backend}.",
+                DeprecationWarning,
+            )
+            return actual_backend
+        if backend not in Backend:
+            raise AgentMET4FOF.raise_not_implemented_backend()
+        return backend
+
+    @staticmethod
+    def raise_not_implemented_backend():
+        return NotImplementedError(
+            f"Backend has not been implemented. Valid choices are {tuple(Backend)}."
+        )
 
     def init_mesa(self, name):
         # MESA Specific parameters
