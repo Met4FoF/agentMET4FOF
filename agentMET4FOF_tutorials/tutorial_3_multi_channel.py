@@ -60,7 +60,7 @@ def main():
 
     # connect agents : We can connect multiple agents to any particular agent
     # However the agent needs to implement handling multiple inputs
-    agentNetwork.bind_agents(gen_agent, multi_math_agent, channel=["sine","cosine"])
+    agentNetwork.bind_agents(gen_agent, multi_math_agent, channel=["sine", "cosine"])
     agentNetwork.bind_agents(multi_math_agent, monitor_agent)
 
     # set all agents states to "Running"

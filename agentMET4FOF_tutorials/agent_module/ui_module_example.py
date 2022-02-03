@@ -14,7 +14,7 @@ class ParameterisedSineGeneratorAgent(AgentMET4FOF):
     # dictionary of possible parameter options for init
     # every {key:iterable} will be displayed on the dashboard as a dropdown
     # NOTE: Currently supports keyword arguments only.
-    parameter_choices = {"amplitude": {0,1,2,3,4,5,6}, "frequency": {1,2,3}}
+    parameter_choices = {"amplitude": {0, 1, 2, 3, 4, 5, 6}, "frequency": {1, 2, 3}}
     stylesheet = "ellipse"
 
     def init_parameters(self, amplitude=1.0, frequency=0.5):

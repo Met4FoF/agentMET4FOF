@@ -11,7 +11,7 @@ from agentMET4FOF.streams import DataStreamMET4FOF
 class GaussianShock(DataStreamMET4FOF):
     """Class generating signals from PyDynamic's shocklike gaussian pulse"""
 
-    def __init__(self, sfreq=.5, t0=50, sigma=10, m0=100, noise=0.0):
+    def __init__(self, sfreq=0.5, t0=50, sigma=10, m0=100, noise=0.0):
         super().__init__()
         self.set_generator_function(
             generator_function=shocklikeGaussian,

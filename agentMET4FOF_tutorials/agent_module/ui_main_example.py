@@ -16,9 +16,10 @@ def demonstrate_generator_agent_use():
 
     coalition = agent_network.add_coalition(agents=[])
 
-    agent_network.add_coalition_agent(name=coalition.name,agents=[sine_agent])
+    agent_network.add_coalition_agent(name=coalition.name, agents=[sine_agent])
 
     return agent_network
+
 
 if __name__ == "__main__":
     demonstrate_generator_agent_use()

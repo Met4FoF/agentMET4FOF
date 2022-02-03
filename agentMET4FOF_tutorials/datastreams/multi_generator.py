@@ -1,10 +1,11 @@
-#We show how multiple DataStreamMET4FOF classes can be created and embedded within an Agent
-#Three generators are created : Sine, sawtooth and square waves.
-#This can be for example when multiple sensors are required to be simulated.
+# We show how multiple DataStreamMET4FOF classes can be created and embedded within an Agent
+# Three generators are created : Sine, sawtooth and square waves.
+# This can be for example when multiple sensors are required to be simulated.
 from scipy import signal
 from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
 from agentMET4FOF.streams import DataStreamMET4FOF
 import numpy as np
+
 
 class SineGenerator(DataStreamMET4FOF):
     """
@@ -15,14 +16,25 @@ class SineGenerator(DataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+
+    def __init__(self, sfreq=500, F=5):
         super().__init__()
-        self.set_metadata("SineGenerator","time","s",("Voltage"),("V"),"Simple sine wave generator")
-        self.set_generator_function(generator_function=self.sine_wave_function, sfreq=sfreq, F=F)
+        self.set_metadata(
+            "SineGenerator",
+            "time",
+            "s",
+            ("Voltage"),
+            ("V"),
+            "Simple sine wave generator",
+        )
+        self.set_generator_function(
+            generator_function=self.sine_wave_function, sfreq=sfreq, F=F
+        )
 
     def sine_wave_function(self, time, F=50):
-        value = np.sin(2*np.pi*F*time)
+        value = np.sin(2 * np.pi * F * time)
         return value
+
 
 class SawToothGenerator(DataStreamMET4FOF):
     """
@@ -32,14 +44,25 @@ class SawToothGenerator(DataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+
+    def __init__(self, sfreq=500, F=5):
         super().__init__()
-        self.set_metadata("SawToothGenerator","time","s",("Voltage"),("V"), "Simple sawtooth generator using scipy function")
-        self.set_generator_function(generator_function=self.sawtooth_wave_function, sfreq=sfreq, F=F)
+        self.set_metadata(
+            "SawToothGenerator",
+            "time",
+            "s",
+            ("Voltage"),
+            ("V"),
+            "Simple sawtooth generator using scipy function",
+        )
+        self.set_generator_function(
+            generator_function=self.sawtooth_wave_function, sfreq=sfreq, F=F
+        )
 
     def sawtooth_wave_function(self, time, F):
         value = signal.sawtooth(2 * np.pi * F * time)
         return value
+
 
 class SquareGenerator(DataStreamMET4FOF):
     """
@@ -49,14 +72,25 @@ class SquareGenerator(DataStreamMET4FOF):
     to be supplied to the `set_generator_function`
 
     """
-    def __init__(self,sfreq = 500, F=5):
+
+    def __init__(self, sfreq=500, F=5):
         super().__init__()
-        self.set_metadata("SquareGenerator","time","s",("Voltage"),("V"), "Simple square wave generator using scipy functio")
-        self.set_generator_function(generator_function=self.square_wave_function, sfreq=sfreq, F=F)
+        self.set_metadata(
+            "SquareGenerator",
+            "time",
+            "s",
+            ("Voltage"),
+            ("V"),
+            "Simple square wave generator using scipy functio",
+        )
+        self.set_generator_function(
+            generator_function=self.square_wave_function, sfreq=sfreq, F=F
+        )
 
     def square_wave_function(self, time, F):
         value = signal.square(2 * np.pi * F * time)
         return value
+
 
 class MultiGeneratorAgent(AgentMET4FOF):
     """
@@ -88,7 +122,14 @@ class MultiGeneratorAgent(AgentMET4FOF):
             sine_data = self._sine_stream.next_sample()
             sawtooth_data = self._sawtooth_stream.next_sample()
             square_data = self._square_stream.next_sample()
-            self.send_output({"sine":sine_data["quantities"], "sawtooth":sawtooth_data["quantities"], "square": square_data["quantities"]})
+            self.send_output(
+                {
+                    "sine": sine_data["quantities"],
+                    "sawtooth": sawtooth_data["quantities"],
+                    "square": square_data["quantities"],
+                }
+            )
+
 
 def demonstrate_generator_agent_use():
     # Start agent network server.

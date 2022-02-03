@@ -17,10 +17,22 @@ class AgentDashboard:
     Optional to run the dashboard on a separate IP by providing the right parameters. See example for an implementation of a separate run of dashboard to connect to an existing agent network. If there is no existing agent network, error will show up.
     An internal _Dashboard_Control object is instantiated inside this object, which manages access to the AgentNetwork.
     """
-    def __init__(self, dashboard_modules=[], dashboard_layouts=[],
-                 dashboard_update_interval = 3, max_monitors=10, ip_addr="0.0.0.0",
-                 port=8050, agentNetwork="127.0.0.1", agent_ip_addr=3333,
-                 agent_port=None, network_stylesheet=[], hide_default_edge=True, **kwargs):
+
+    def __init__(
+        self,
+        dashboard_modules=[],
+        dashboard_layouts=[],
+        dashboard_update_interval=3,
+        max_monitors=10,
+        ip_addr="0.0.0.0",
+        port=8050,
+        agentNetwork="127.0.0.1",
+        agent_ip_addr=3333,
+        agent_port=None,
+        network_stylesheet=[],
+        hide_default_edge=True,
+        **kwargs,
+    ):
         """
         Parameters
         ----------
@@ -56,22 +68,42 @@ class AgentDashboard:
         if self.is_port_at_ip_available(ip_addr, port):
             if dashboard_modules is not None and dashboard_modules is not False:
 
-                #initialise the dashboard layout and its control here
+                # initialise the dashboard layout and its control here
                 self.ip_addr = ip_addr
                 self.port = port
-                self.external_stylesheets = ['https://fonts.googleapis.com/icon?family=Material+Icons', 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css']
-                self.external_scripts = ['https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js']
+                self.external_stylesheets = [
+                    "https://fonts.googleapis.com/icon?family=Material+Icons",
+                    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css",
+                ]
+                self.external_scripts = [
+                    "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
+                ]
                 self.app = self.init_app_layout(
-                    update_interval_seconds=dashboard_update_interval,max_monitors=max_monitors, dashboard_layouts=dashboard_layouts, network_stylesheet=network_stylesheet, hide_default_edge=hide_default_edge, **kwargs)
-                self.app.dashboard_ctrl = _Dashboard_Control(modules=dashboard_modules,agent_ip_addr=agent_ip_addr,agent_port=agent_port,agentNetwork=agentNetwork)
+                    update_interval_seconds=dashboard_update_interval,
+                    max_monitors=max_monitors,
+                    dashboard_layouts=dashboard_layouts,
+                    network_stylesheet=network_stylesheet,
+                    hide_default_edge=hide_default_edge,
+                    **kwargs,
+                )
+                self.app.dashboard_ctrl = _Dashboard_Control(
+                    modules=dashboard_modules,
+                    agent_ip_addr=agent_ip_addr,
+                    agent_port=agent_port,
+                    agentNetwork=agentNetwork,
+                )
                 # Spawn a very simple WSGI server.
-                self._server = make_server(host=self.ip_addr, port=self.port, app=self.app.server)
+                self._server = make_server(
+                    host=self.ip_addr, port=self.port, app=self.app.server
+                )
 
         else:
-            print(f"Dashboard or something else is running on: {ip_addr}:{port}. If "
-                  f"you cannot access the dashboard in your browser, try initializing "
-                  f"your agent network with any other port AgentNetwork([...], "
-                  f"port=<OTHER_PORT_THAN_{port}>).")
+            print(
+                f"Dashboard or something else is running on: {ip_addr}:{port}. If "
+                f"you cannot access the dashboard in your browser, try initializing "
+                f"your agent network with any other port AgentNetwork([...], "
+                f"port=<OTHER_PORT_THAN_{port}>)."
+            )
 
     def run(self):
         """This is actually executed on calling start() and brings up the server"""
@@ -103,9 +135,15 @@ class AgentDashboard:
             sep="",
         )
 
-    def init_app_layout(self,update_interval_seconds=3, max_monitors=10,
-                        dashboard_layouts=[],
-                        network_stylesheet=[], hide_default_edge=True, **kwargs):
+    def init_app_layout(
+        self,
+        update_interval_seconds=3,
+        max_monitors=10,
+        dashboard_layouts=[],
+        network_stylesheet=[],
+        hide_default_edge=True,
+        **kwargs,
+    ):
         """
         Initialises the overall dash app "layout" which has two sub-pages (Agent network and ML experiment)
 
@@ -122,47 +160,72 @@ class AgentDashboard:
         -------
         app : Dash app object
         """
-        app = dash.Dash(__name__,
-                        external_stylesheets=self.external_stylesheets,
-                        external_scripts=self.external_scripts
-                        )
+        app = dash.Dash(
+            __name__,
+            external_stylesheets=self.external_stylesheets,
+            external_scripts=self.external_scripts,
+        )
         app.network_stylesheet = network_stylesheet
         app.update_interval_seconds = update_interval_seconds
         app.num_monitors = max_monitors
         app.hide_default_edge = hide_default_edge
 
         for key in kwargs.keys():
-            setattr(app,key,kwargs[key])
+            setattr(app, key, kwargs[key])
 
-        #initialise dashboard layout objects
-        self.dashboard_layouts = [dashboard_layout(app) for dashboard_layout in dashboard_layouts]
+        # initialise dashboard layout objects
+        self.dashboard_layouts = [
+            dashboard_layout(app) for dashboard_layout in dashboard_layouts
+        ]
 
-        app.layout = html.Div(children=[
-                #header
-                html.Nav([
-                    html.Div([
-                        html.A("Met4FoF Agent Testbed", className="brand-logo center"),
-                        html.Ul([
-                        ], className="right hide-on-med-and-down")
-                    ], className="nav-wrapper container")
-                ], className="light-blue lighten-1"),
-                dcc.Tabs(id="main-tabs", value="agt-net", children=[
-                    dashboard_layout.dcc_tab for dashboard_layout in self.dashboard_layouts
-                ]),
-                html.Div(id="page-div",children=[
-                dashboard_layout.get_layout() for dashboard_layout in self.dashboard_layouts
-                ]),
-        ])
+        app.layout = html.Div(
+            children=[
+                # header
+                html.Nav(
+                    [
+                        html.Div(
+                            [
+                                html.A(
+                                    "Met4FoF Agent Testbed",
+                                    className="brand-logo center",
+                                ),
+                                html.Ul([], className="right hide-on-med-and-down"),
+                            ],
+                            className="nav-wrapper container",
+                        )
+                    ],
+                    className="light-blue lighten-1",
+                ),
+                dcc.Tabs(
+                    id="main-tabs",
+                    value="agt-net",
+                    children=[
+                        dashboard_layout.dcc_tab
+                        for dashboard_layout in self.dashboard_layouts
+                    ],
+                ),
+                html.Div(
+                    id="page-div",
+                    children=[
+                        dashboard_layout.get_layout()
+                        for dashboard_layout in self.dashboard_layouts
+                    ],
+                ),
+            ]
+        )
 
         for dashboard_layout in self.dashboard_layouts:
             dashboard_layout.prepare_callbacks(app)
 
-        @app.callback([dash.dependencies.Output('page-div', 'children')],
-                      [dash.dependencies.Input('main-tabs', 'value')])
+        @app.callback(
+            [dash.dependencies.Output("page-div", "children")],
+            [dash.dependencies.Input("main-tabs", "value")],
+        )
         def render_content(tab):
             for dashboard_layout in self.dashboard_layouts:
                 if dashboard_layout.id == tab:
                     return [dashboard_layout.get_layout()]
+
         return app
 
     def is_port_at_ip_available(self, ip_addr: str, _port: int) -> bool:
@@ -192,29 +255,29 @@ class AgentDashboardThread(AgentDashboard, Thread):
     """Represents an agent dashboard for the Mesa backend"""
 
     def __init__(
-            self,
-            dashboard_modules=[],
-            dashboard_layouts=[],
-            dashboard_update_interval=3,
-            max_monitors=10,
-            ip_addr="127.0.0.1",
-            port=8050,
-            agentNetwork="127.0.0.1",
-            agent_ip_addr=3333,
-            agent_port=None,
-            **kwargs
+        self,
+        dashboard_modules=[],
+        dashboard_layouts=[],
+        dashboard_update_interval=3,
+        max_monitors=10,
+        ip_addr="127.0.0.1",
+        port=8050,
+        agentNetwork="127.0.0.1",
+        agent_ip_addr=3333,
+        agent_port=None,
+        **kwargs,
     ):
         super(AgentDashboardThread, self).__init__(
             dashboard_modules=dashboard_modules,
             dashboard_layouts=dashboard_layouts,
-            dashboard_update_interval = dashboard_update_interval,
+            dashboard_update_interval=dashboard_update_interval,
             max_monitors=max_monitors,
             ip_addr=ip_addr,
             port=port,
             agentNetwork=agentNetwork,
             agent_ip_addr=agent_ip_addr,
             agent_port=agent_port,
-            **kwargs
+            **kwargs,
         )
         # Make sure, we are actually able to stop the server running from outside by
         # calling terminate() later.
