@@ -37,3 +37,12 @@ def test_naming_agents_for_osbrain(agent_network):
         == agent.get_attr("name")
         == random_name.replace(" ", "_")
     )
+
+
+def test_naming_a_mesa_agents_with_a_single_space():
+    agent_network = AgentNetwork(dashboard_modules=False, backend=Backend.MESA)
+
+    agent = agent_network.add_agent(name=" ", agentType=AgentMET4FOF)
+    assert agent_network.get_agent("_").name == agent.name == "_"
+
+    agent_network.shutdown()

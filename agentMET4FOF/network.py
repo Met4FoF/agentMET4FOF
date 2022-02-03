@@ -172,7 +172,7 @@ class AgentNetwork:
 
         def add_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -184,7 +184,7 @@ class AgentNetwork:
                 if ip_addr is None:
                     ip_addr = "0.0.0.0"
 
-                if name == " ":
+                if name is None:
                     new_name = self.generate_module_name_byType(agentType)
                 else:
                     new_name = self.generate_module_name_byUnique(name)
@@ -215,7 +215,7 @@ class AgentNetwork:
 
         def _add_osbrain_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -239,7 +239,7 @@ class AgentNetwork:
 
         def _add_mesa_agent(
             self,
-            name: Optional[str] = " ",
+            name: Optional[str] = None,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
@@ -939,7 +939,7 @@ class AgentNetwork:
 
     def add_agent(
         self,
-        name: Optional[str] = " ",
+        name: Optional[str] = None,
         agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
         log_mode: Optional[bool] = True,
         buffer_size: Optional[int] = 1000,
