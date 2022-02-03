@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.2 (2022-02-03)
+### Fix
+* **#266:** Correct Mesa agents' names if only one space ([`263b07a`](https://github.com/Met4FoF/agentMET4FOF/commit/263b07ace484a482e2ba2f48ead210391c2f3d13))
+
+### Refactor
+* **Backend:** Switch to Backend enums to avoid errors with wrong initialization ([`08f769c`](https://github.com/Met4FoF/agentMET4FOF/commit/08f769cc475334e3250d0514e471dad835125aa1))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.13.1...v0.13.2)**
+
 ## v0.13.1 (2022-02-01)
 ### Fix
 * **tutorial2:** Repair math agent in tutorial 2 ([`8cdc12e`](https://github.com/Met4FoF/agentMET4FOF/commit/8cdc12ebdc5d4a1792d9b1c1b3a72d9c721cbf3c))
