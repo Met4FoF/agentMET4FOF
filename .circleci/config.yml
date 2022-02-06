@@ -282,7 +282,7 @@ jobs:
             set +e
             gh pr list --head=$NEW_BRANCH | grep $NEW_BRANCH
             if [ $? -eq 1 ]; then
-                set -e((
+                set -e
                 gh pr create --base=develop --title "Update deps" \
                   --body "This PR provides recompiled deps for all outdated \
                   package versions. It was opened after the commited deps \
