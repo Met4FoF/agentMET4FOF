@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # agentMET4FOF documentation build configuration file, created from PyDynamic
 # draft on Fri Jul 12 10:31:35 2019.
@@ -54,26 +53,20 @@ html_theme_options = {
 # documentation available inside our docs.
 intersphinx_mapping = {
     "Python": ("https://docs.python.org/3", None),
-    "pd": ("http://pandas.pydata.org/pandas-docs/dev", None),
-    "SciPy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "PyDynamic": (
-        "https://pydynamic.readthedocs.io/en/latest/",
-        None,
-    ),
+    "pd": ("https://pandas.pydata.org/pandas-docs/dev", None),
+    "SciPy": ("https://scipy.github.io/devdocs/", None),
+    "PyDynamic": ("https://pydynamic.readthedocs.io/en/latest/", None),
     "time-series-metadata": (
         "https://time-series-metadata.readthedocs.io/en/latest/",
         None,
     ),
-    "np": (
-        "https://numpy.org/doc/stable/",
-        None,
-    ),
+    "np": ("https://numpy.org/doc/stable/", None),
     "time-series-buffer": (
         "https://time-series-buffer.readthedocs.io/en/latest/",
         None,
     ),
 }
-# We keep the objects.inv files in our docs folder to get hints on how to specify the
+# We keep the objects.inv files in our doc's folder to get hints on how to specify the
 # cross-references. More on the topic can be found here:
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html
 # The objects.inv we gathered by the command:
@@ -103,7 +96,8 @@ for file_from_root in md_files_from_root_into_docs:
         os.path.join(os.path.dirname(__file__), file_from_root),
     )
 
-# Copy over all other specified folders from repository tree.
+
+# Copy over all others specified folders from repository tree.
 def make_path_dict(source: str, destination: str) -> dict:
     # Function to construct the desired dict structure for the folders to copy.
     return {"source": source, "destination": destination}
@@ -321,13 +315,13 @@ htmlhelp_basename = "agentMe4FoFdoc"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    # 'preamble': '',
     # Latex figure (float) alignment
-    #'figure_align': 'htbp',
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

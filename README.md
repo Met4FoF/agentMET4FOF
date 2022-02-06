@@ -9,7 +9,7 @@
   </a>
   <!-- CodeCov(erage) -->
   <a href="https://codecov.io/gh/Met4FoF/agentMET4FOF">
-    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/master/graph/badge.svg?token=ofAPdSudLy" alt="CodeCov badge"/>
+    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/develop/graph/badge.svg?token=ofAPdSudLy" alt="CodeCov badge"/>
   </a>
   <!-- PyPI Version -->
   <a href="https://pypi.org/project/agentmet4fof">

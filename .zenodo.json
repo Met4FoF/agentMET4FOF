@@ -1,0 +1,56 @@
+{
+  "upload_type": "software",
+  "communities": [
+    {
+      "identifier": "met4fof"
+    }
+  ],
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Ludwig, Björn",
+      "affiliation": "Physikalisch-Technische Bundesanstalt",
+      "orcid": "0000-0002-5910-9137"
+    },
+    {
+      "name": "Bang, Xiang Yong",
+      "affiliation": "University of Cambridge, Institute for Manufacturing"
+    },
+    {
+      "name": "Prasad, Anupam",
+      "affiliation": "Physikalisch-Technische Bundesanstalt",
+      "orcid": "0000-0001-5193-0070"
+    },
+    {
+      "name": "Lulic, Haris",
+      "affiliation": "(IMBiH) Institute of Metrology of Bosnia and Herzegovina"
+    },
+    {
+      "name": "Gruber, Maximilian",
+      "affiliation": "Physikalisch-Technische Bundesanstalt",
+      "orcid": "0000-0002-3718-7919"
+    },
+    {
+      "name": "Kok, Gertjan",
+      "affiliation": "VSL",
+      "orcid": "0000-0002-4441-856X"
+    }
+  ],
+  "license": {
+    "id": "LGPL-3.0+",
+    "title": "GNU Lesser General Public License v3.0 or later",
+    "url": "https://opensource.org/licenses/LGPL-3.0"
+  },
+  "keywords": [
+    "Digitalization",
+    "EMPIR",
+    "European Union (EU)",
+    "Metrology",
+    "Sensor Network",
+    "Met4FoF",
+    "IIoT",
+    "Agent-Based Model",
+    "Multi-agent system"
+  ],
+  "language": "eng"
+}

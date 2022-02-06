@@ -33,8 +33,52 @@ executors:
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
+  gh_releaser:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 workflows:
+
+  check_for_upgraded_deps:
+    triggers:
+      - schedule:
+          cron: "0 0 1 * *"
+          filters:
+            branches:
+              only: /develop/
+    jobs:
+      - test_with_updated_deps:
+          context:
+            - Docker pulls
+      - commit_push_open_pr:
+          requires:
+            - test_with_updated_deps
+          context:
+            - Docker pulls
+            - GitHub pushes to BjoernLudwigPTB's public_repos
+
+  nightly_test:
+    triggers:
+      - schedule:
+          cron: "0 0 8,15,22 * *"
+          filters:
+            branches:
+              only: /develop/
+    jobs:
+      - test_against_venv:
+          context:
+            - Docker pulls
+      - test_against_conda:
+          context:
+            - Docker pulls
+      - test_against_setup:
+          context:
+            - Docker pulls
+
   test_and_deploy:
     jobs:
       - test_against_venv:
@@ -150,7 +194,107 @@ commands:
           command: |
             pip install -r requirements.txt -r dev-requirements.txt
 
+  check_for_new_deps_compilation:
+    description: "Check for new deps' compilation."
+    steps:
+    - run:
+        name: Abort if no new deps were compiled
+        command: |
+          git add .
+          set +e
+          git status | grep modified
+          if [ $? -ne 0 ]; then
+              set -e
+              echo "No updated deps. Nothing to test and commit. We are all good."
+              circleci-agent step halt
+          fi
+
 jobs:
+
+  test_with_updated_deps:
+
+    executor:
+      name: tester
+
+    steps:
+      - checkout
+      - create_result_folder
+      - run:
+          name: Recompile and sync deps
+          command: |
+            pip install --upgrade pip pip-tools tox
+            python -m piptools compile --upgrade --extra=tutorials
+            python -m piptools compile --upgrade dev-requirements.in
+            python -m piptools sync requirements.txt dev-requirements.txt
+      - check_for_new_deps_compilation
+      - run_venv_tests
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - requirements.txt
+            - dev-requirements.txt
+
+  commit_push_open_pr:
+    executor:
+      name: gh_releaser
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "93:e5:20:36:94:74:6f:e2:33:f6:91:07:4c:b4:89:1a"
+      - checkout
+      - attach_workspace:
+          at: .
+      - check_for_new_deps_compilation
+      - run:
+          name: Set new branch name to 'recompile_deps'
+          command: echo 'export NEW_BRANCH=recompile_deps' >> $BASH_ENV
+      - run:
+          name: Create and checkout new branch if not already on and add changes
+          command: |
+            if [ ${NEW_BRANCH} != ${CIRCLE_BRANCH} ]; then
+                git checkout -b ${NEW_BRANCH}
+            fi
+      - run:
+          name: Commit and push changes
+          command: |
+            git config --global user.name "Bjoern Ludwig (via CircleCI)"
+            git config --global user.email "bjoern.ludwig@ptb.de"
+            git commit -am \
+              "build(deps): recompile Python (dev) deps on $(date)"
+            git push -fu origin  ${NEW_BRANCH}
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL \
+              https://cli.github.com/packages/githubcli-archive-keyring.gpg |\
+              sudo dd of=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) \
+              signed-by=/etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg]\
+              https://cli.github.com/packages stable main" | \
+              sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh
+      - run:
+          name: Check for an existing PR or create one
+          command: |
+            set +e
+            gh pr list --head=$NEW_BRANCH | grep $NEW_BRANCH
+            if [ $? -eq 1 ]; then
+                set -e
+                gh pr create --base=develop --title "Update deps" \
+                  --body "This PR provides recompiled deps for all outdated \
+                  package versions. It was opened after the commited deps \
+                  were succesfully compiled and all tests passed with the \
+                  new versions. It should be merged as soon as possible to \
+                  avoid any security issues due to outdated dependencies."
+            else
+                set -e
+                echo "There already was a PR opened earlier. The 
+                  current changes were force pushed into the existing branch."
+            fi
+
   test_against_conda:
     executor: tester
     steps:
