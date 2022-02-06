@@ -61,24 +61,24 @@ workflows:
             - Docker pulls
             - GitHub pushes to BjoernLudwigPTB's public_repos
 
-#  nightly_test:
+  nightly_test:
 #    triggers:
 #      - schedule:
 #          cron: "0 0 8,15,22 * *"
 #          filters:
 #            branches:
 #              only: /develop/
-#    jobs:
-#      - test_against_venv:
-#          context:
-#            - Docker pulls
-#      - test_against_conda:
-#          context:
-#            - Docker pulls
-#      - test_against_setup:
-#          context:
-#            - Docker pulls
-#
+    jobs:
+      - test_against_venv:
+          context:
+            - Docker pulls
+      - test_against_conda:
+          context:
+            - Docker pulls
+      - test_against_setup:
+          context:
+            - Docker pulls
+
 #  test_and_deploy:
 #    jobs:
 #      - test_against_venv:
