@@ -165,7 +165,7 @@ networkx==2.6.3
     #   mesa
 notebook==6.4.8
     # via agentMET4FOF (setup.py)
-numpy==1.22.1
+numpy==1.22.2
     # via
     #   agentMET4FOF (setup.py)
     #   matplotlib
@@ -248,7 +248,7 @@ pyzmq==22.3.0
     #   osbrain
 requests==2.27.1
     # via cookiecutter
-scipy==1.7.3
+scipy==1.8.0
     # via
     #   agentMET4FOF (setup.py)
     #   pydynamic
