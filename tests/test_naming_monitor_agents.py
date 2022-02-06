@@ -19,7 +19,9 @@ def test_naming_agents_for_mesa(name):
     agent_network = AgentNetwork(dashboard_modules=False, backend=Backend.MESA)
 
     agent = agent_network.add_agent(name=name, agentType=AgentMET4FOF)
-    assert agent_network.get_agent(name).name == agent.name == name
+    assert agent_network.get_agent(name).name == agent.name == name or (
+        name == " " and agent_network.get_agent("_").name == agent.name == "_"
+    )
 
     agent_network.shutdown()
 
