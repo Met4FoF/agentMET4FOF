@@ -44,12 +44,12 @@ executors:
 workflows:
 
   check_for_upgraded_deps:
-    triggers:
-      - schedule:
-          cron: "0 0 1 * *"
-          filters:
-            branches:
-              only: /develop/
+#    triggers:
+#      - schedule:
+#          cron: "0 0 1 * *"
+#          filters:
+#            branches:
+#              only: /develop/
     jobs:
       - test_with_updated_deps:
           context:
@@ -62,12 +62,12 @@ workflows:
             - GitHub pushes to BjoernLudwigPTB's public_repos
 
   nightly_test:
-    triggers:
-      - schedule:
-          cron: "0 0 8,15,22 * *"
-          filters:
-            branches:
-              only: /develop/
+#    triggers:
+#      - schedule:
+#          cron: "0 0 8,15,22 * *"
+#          filters:
+#            branches:
+#              only: /develop/
     jobs:
       - test_against_venv:
           context:
@@ -79,66 +79,66 @@ workflows:
           context:
             - Docker pulls
 
-  test_and_deploy:
-    jobs:
-      - test_against_venv:
-          context:
-            - Docker pulls
-      - test_against_conda:
-          context:
-            - Docker pulls
-      - test_against_setup:
-          context:
-            - Docker pulls
-      - preview_release:
-          context:
-            - Docker pulls
-          requires:
-            - test_against_venv
-            - test_against_conda
-            - test_against_setup
-      - confirm_previewed_release_actions:
-          type: approval
-          requires:
-            - preview_release
-            - test_image
-          filters:
-            branches:
-              only: /develop/
-      - release:
-          context:
-            - Docker pulls
-            - pypi.org publishing for agentMET4FOF
-            - GitHub pushes to BjoernLudwigPTB's public_repos
-          requires:
-            - confirm_previewed_release_actions
-      - build_image:
-          context:
-            - Docker pulls
-            - Docker publishing for agents
-          filters:
-            tags:
-              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
-      - test_image:
-          context:
-            - Docker pulls
-            - Docker publishing for agents
-          requires:
-            - build_image
-          filters:
-            tags:
-              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
-      - retag_and_deploy_image:
-          context:
-            - Docker pulls
-            - Docker publishing for agents
-          requires:
-            - test_image
-          filters:
-            tags:
-              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
-            branches:
-              ignore: /.*/
+#  test_and_deploy:
+#    jobs:
+#      - test_against_venv:
+#          context:
+#            - Docker pulls
+#      - test_against_conda:
+#          context:
+#            - Docker pulls
+#      - test_against_setup:
+#          context:
+#            - Docker pulls
+#      - preview_release:
+#          context:
+#            - Docker pulls
+#          requires:
+#            - test_against_venv
+#            - test_against_conda
+#            - test_against_setup
+#      - confirm_previewed_release_actions:
+#          type: approval
+#          requires:
+#            - preview_release
+#            - test_image
+#          filters:
+#            branches:
+#              only: /develop/
+#      - release:
+#          context:
+#            - Docker pulls
+#            - pypi.org publishing for agentMET4FOF
+#            - GitHub pushes to BjoernLudwigPTB's public_repos
+#          requires:
+#            - confirm_previewed_release_actions
+#      - build_image:
+#          context:
+#            - Docker pulls
+#            - Docker publishing for agents
+#          filters:
+#            tags:
+#              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
+#      - test_image:
+#          context:
+#            - Docker pulls
+#            - Docker publishing for agents
+#          requires:
+#            - build_image
+#          filters:
+#            tags:
+#              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
+#      - retag_and_deploy_image:
+#          context:
+#            - Docker pulls
+#            - Docker publishing for agents
+#          requires:
+#            - test_image
+#          filters:
+#            tags:
+#              only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
+#            branches:
+#              ignore: /.*/
 
 commands:
   create_result_folder:
