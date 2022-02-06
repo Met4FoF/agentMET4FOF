@@ -217,13 +217,14 @@ jobs:
       name: tester
 
     steps:
+      - checkout
       - create_result_folder
       - run:
           name: Recompile and sync deps
           command: |
             pip install --upgrade pip pip-tools tox
             python -m piptools compile --upgrade --extra=tutorials
-            python -m piptools --upgrade dev-requirements.in
+            python -m piptools compile --upgrade dev-requirements.in
             python -m piptools sync requirements.txt dev-requirements.txt
       - check_for_new_deps_compilation
       - run_venv_tests
@@ -278,7 +279,7 @@ jobs:
             set +e
             gh pr list --head=$NEW_BRANCH | grep $NEW_BRANCH
             if [ $? -eq 1 ]; then
-                set -e
+                set -e((
                 gh pr create --base=develop --title "Update deps" \
                   --body "This PR provides recompiled deps for all outdated \
                   package versions. It was opened after the commited deps \
