@@ -16,10 +16,10 @@ attrs==21.4.0
     # via jsonschema
 backcall==0.2.0
     # via ipython
+beautifulsoup4==4.10.0
+    # via nbconvert
 binaryornot==0.4.4
     # via cookiecutter
-black==22.1.0
-    # via ipython
 bleach==4.1.0
     # via nbconvert
 brotli==1.0.9
@@ -30,11 +30,10 @@ cffi==1.15.0
     # via argon2-cffi-bindings
 chardet==4.0.0
     # via binaryornot
-charset-normalizer==2.0.11
+charset-normalizer==2.0.12
     # via requests
-click==8.0.3
+click==8.1.2
     # via
-    #   black
     #   cookiecutter
     #   flask
     #   mesa
@@ -44,7 +43,7 @@ cookiecutter==1.7.3
     # via mesa
 cycler==0.11.0
     # via matplotlib
-dash==2.1.0
+dash==2.3.1
     # via
     #   agentMET4FOF (setup.py)
     #   dash-cytoscape
@@ -56,7 +55,7 @@ dash-html-components==2.0.0
     # via dash
 dash-table==5.0.0
     # via dash
-debugpy==1.5.1
+debugpy==1.6.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -70,31 +69,29 @@ entrypoints==0.4
     # via
     #   jupyter-client
     #   nbconvert
-executing==0.8.2
+executing==0.8.3
     # via stack-data
-flask==2.0.2
+flask==2.1.1
     # via
     #   dash
     #   flask-compress
-flask-compress==1.10.1
+flask-compress==1.11
     # via dash
 future==0.18.2
     # via uncertainties
 idna==3.3
     # via requests
-ipykernel==6.8.0
+ipykernel==6.11.0
     # via notebook
-ipython==8.0.1
+ipython==8.2.0
     # via ipykernel
 ipython-genutils==0.2.0
-    # via
-    #   nbformat
-    #   notebook
-itsdangerous==2.0.1
+    # via notebook
+itsdangerous==2.1.2
     # via flask
 jedi==0.18.1
     # via ipython
-jinja2==3.0.3
+jinja2==3.1.1
     # via
     #   cookiecutter
     #   flask
@@ -106,12 +103,12 @@ jinja2-time==0.2.0
     # via cookiecutter
 jsonschema==4.4.0
     # via nbformat
-jupyter-client==7.1.2
+jupyter-client==7.2.1
     # via
     #   ipykernel
     #   nbclient
     #   notebook
-jupyter-core==4.9.1
+jupyter-core==4.9.2
     # via
     #   jupyter-client
     #   nbconvert
@@ -119,10 +116,12 @@ jupyter-core==4.9.1
     #   notebook
 jupyterlab-pygments==0.1.2
     # via nbconvert
-kiwisolver==1.3.2
+kiwisolver==1.4.2
     # via matplotlib
-markupsafe==2.0.1
-    # via jinja2
+markupsafe==2.1.1
+    # via
+    #   jinja2
+    #   nbconvert
 matplotlib==3.2.2
     # via
     #   agentMET4FOF (setup.py)
@@ -142,13 +141,11 @@ mpmath==1.2.1
     # via sympy
 multiprocess==0.70.12.2
     # via agentMET4FOF (setup.py)
-mypy-extensions==0.4.3
-    # via black
-nbclient==0.5.10
+nbclient==0.5.13
     # via nbconvert
-nbconvert==6.4.1
+nbconvert==6.4.5
     # via notebook
-nbformat==5.1.3
+nbformat==5.2.0
     # via
     #   nbclient
     #   nbconvert
@@ -159,13 +156,13 @@ nest-asyncio==1.5.4
     #   jupyter-client
     #   nbclient
     #   notebook
-networkx==2.6.3
+networkx==2.7.1
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
-notebook==6.4.8
+notebook==6.4.10
     # via agentMET4FOF (setup.py)
-numpy==1.22.2
+numpy==1.22.3
     # via
     #   agentMET4FOF (setup.py)
     #   matplotlib
@@ -179,7 +176,7 @@ osbrain==0.6.5
     # via agentMET4FOF (setup.py)
 packaging==21.3
     # via bleach
-pandas==1.4.0
+pandas==1.4.1
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
@@ -188,15 +185,11 @@ pandocfilters==1.5.0
     # via nbconvert
 parso==0.8.3
     # via jedi
-pathspec==0.9.0
-    # via black
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-platformdirs==2.4.1
-    # via black
-plotly==5.5.0
+plotly==5.6.0
     # via
     #   agentMET4FOF (setup.py)
     #   dash
@@ -204,8 +197,10 @@ poyo==0.5.0
     # via cookiecutter
 prometheus-client==0.13.1
     # via notebook
-prompt-toolkit==3.0.26
+prompt-toolkit==3.0.28
     # via ipython
+psutil==5.9.0
+    # via ipykernel
 ptyprocess==0.7.0
     # via
     #   pexpect
@@ -214,7 +209,7 @@ pure-eval==0.2.2
     # via stack-data
 pycparser==2.21
     # via cffi
-pydynamic==2.1.1
+pydynamic==2.1.2
     # via agentMET4FOF (setup.py)
 pygments==2.11.2
     # via
@@ -235,11 +230,11 @@ python-dateutil==2.8.2
     #   jupyter-client
     #   matplotlib
     #   pandas
-python-slugify==5.0.2
+python-slugify==6.1.1
     # via cookiecutter
-pytz==2021.3
+pytz==2022.1
     # via pandas
-pywavelets==1.2.0
+pywavelets==1.3.0
     # via pydynamic
 pyzmq==22.3.0
     # via
@@ -262,15 +257,17 @@ six==1.16.0
     #   cookiecutter
     #   plotly
     #   python-dateutil
-stack-data==0.1.4
+soupsieve==2.3.1
+    # via beautifulsoup4
+stack-data==0.2.0
     # via ipython
-sympy==1.9
+sympy==1.10.1
     # via pydynamic
 tenacity==8.0.1
     # via plotly
-terminado==0.13.1
+terminado==0.13.3
     # via notebook
-testpath==0.5.0
+testpath==0.6.0
     # via nbconvert
 text-unidecode==1.3
     # via python-slugify
@@ -280,8 +277,6 @@ time-series-buffer==0.1.4b0
     #   pydynamic
 time-series-metadata==0.1.1
     # via agentMET4FOF (setup.py)
-tomli==2.0.0
-    # via black
 tornado==6.1
     # via
     #   ipykernel
@@ -289,7 +284,7 @@ tornado==6.1
     #   mesa
     #   notebook
     #   terminado
-tqdm==4.62.3
+tqdm==4.63.1
     # via mesa
 traitlets==5.1.1
     # via
@@ -304,15 +299,15 @@ traitlets==5.1.1
     #   notebook
 uncertainties==3.1.6
     # via time-series-buffer
-urllib3==1.26.8
+urllib3==1.26.9
     # via requests
-visdcc==0.0.40
+visdcc==0.0.50
     # via agentMET4FOF (setup.py)
 wcwidth==0.2.5
     # via prompt-toolkit
 webencodings==0.5.1
     # via bleach
-werkzeug==2.0.2
+werkzeug==2.1.0
     # via flask
 
 # The following packages are considered to be unsafe in a requirements file:
