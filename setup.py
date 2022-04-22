@@ -1,61 +1,55 @@
-# -*- coding: utf-8 -*-
-"""
-Install agentMET4FOF in Python path.
-"""
+"""Install agentMET4FOF in Python path"""
+import codecs
+from os import path
 
-import os
-import sys
-
-from setuptools import setup, find_packages
-from setuptools.command.install import install
-
-# Get release version from agentMET4FOF/__init__.py
-from agentMET4FOF import __version__ as VERSION
+from setuptools import find_packages, setup
 
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-
-def readme():
-    """Print long description"""
-    with open("README.md") as f:
+def get_readme():
+    this_directory = path.abspath(path.dirname(__file__))
+    with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
         return f.read()
 
 
-class VerifyVersionCommand(install):
-    """Custom command to verify that the git tag matches our version"""
+def read(rel_path):
+    here = path.abspath(path.dirname(__file__))
+    with codecs.open(path.join(here, rel_path), "r") as fp:
+        return fp.read()
 
-    description = "Verify that the git tag matches our version"
 
-    def run(self):
-        tag = os.getenv("CIRCLE_TAG")
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
-        if tag != VERSION:
-            info = "Git tag: {0} does not match the version of this app: " "{1}".format(
-                tag, VERSION
-            )
-            sys.exit(info)
 
+current_release_version = get_version("agentMET4FOF/__init__.py")
 
 setup(
     name="agentMET4FOF",
-    version=VERSION,
+    version=current_release_version,
     description="A software package for the integration of metrological input "
     "into an agent-based system for the consideration of measurement "
     "uncertainty in current industrial manufacturing processes.",
-    long_description=readme(),
+    long_description=get_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/bangxiangyong/agentMET4FOF",
+    url="https://github.com/Met4FoF/agentMET4FOF",
+    download_url="https://github.com/Met4FoF/agentMET4FOF/releases/download/v{0}/"
+    "agentMET4FOF-{0}.tar.gz".format(current_release_version),
     author="Bang Xiang Yong, Björn Ludwig, Anupam Prasad Vedurmudi, "
     "Maximilian Gruber, Haris Lulic",
     author_email="bxy20@cam.ac.uk",
     keywords="uncertainty metrology MAS agent-based agents",
     packages=find_packages(exclude=["tests"]),
     project_urls={
-        "Documentation": "https://agentmet4fof.readthedocs.io/",
-        "Source": "https://github.com/bangxiangyong/agentMET4FOF",
-        "Tracker": "https://github.com/bangxiangyong/agentMET4FOF/issues",
+        "Documentation": "https://agentmet4fof.readthedocs.io/en/"
+        f"v{current_release_version}/",
+        "Source": "https://github.com/Met4FoF/agentMET4FOF/tree/"
+        f"v{current_release_version}/",
+        "Tracker": "https://github.com/Met4FoF/agentMET4FOF/issues",
     },
     install_requires=[
         "numpy",
@@ -93,6 +87,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Operating System :: OS Independent",
     ],
-    cmdclass={"verify": VerifyVersionCommand},
 )
