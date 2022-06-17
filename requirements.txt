@@ -162,7 +162,7 @@ networkx==2.8.2
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
-notebook==6.4.11
+notebook==6.4.12
     # via agentMET4FOF (setup.py)
 numpy==1.22.4
     # via
