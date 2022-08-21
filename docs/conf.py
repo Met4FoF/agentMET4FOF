@@ -173,7 +173,7 @@ version = "0.13.2"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -396,3 +396,8 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+# A list of warning types to suppress arbitrary warning messages. This is especially
+# needed, since there seems to be no fix for this:
+# https://github.com/IQSS/dataverse/issues/3391#issuecomment-268610980
+suppress_warnings = ["epub.unknown_project_files"]
