@@ -33,7 +33,8 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
 
     Behavioral functions for users to provide are init_parameters, agent_loop and
     on_received_message. Communicative functions are bind_output, unbind_output and
-    send_output.
+    send_output. To learn more about the idea behind multi-agent systems (MAS) see
+    [Bang2019]_.
     """
 
     def __init__(
