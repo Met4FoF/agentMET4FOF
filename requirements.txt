@@ -136,7 +136,7 @@ matplotlib-inline==0.1.3
     #   ipython
 mesa==1.0.0
     # via agentMET4FOF (setup.py)
-mistune==0.8.4
+mistune==2.0.3
     # via nbconvert
 mpld3==0.5.8
     # via agentMET4FOF (setup.py)
