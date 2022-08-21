@@ -1,6 +1,8 @@
+-c ../requirements.txt
+
 sphinx
 nbsphinx
 recommonmark
 sphinx_rtd_theme
 ipython
-docutils<0.18
+docutils
