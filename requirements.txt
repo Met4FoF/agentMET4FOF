@@ -146,7 +146,7 @@ multiprocess==0.70.13
     # via agentMET4FOF (setup.py)
 nbclient==0.6.6
     # via nbconvert
-nbconvert==6.5.0
+nbconvert==6.5.1
     # via notebook
 nbformat==5.4.0
     # via
