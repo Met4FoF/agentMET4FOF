@@ -69,7 +69,7 @@ defusedxml==0.7.1
     # via
     #   -c requirements.txt
     #   nbconvert
-distlib==0.3.5
+distlib==0.3.6
     # via virtualenv
 docutils==0.17.1
     # via
@@ -139,7 +139,7 @@ jsonschema==4.14.0
     # via
     #   -c requirements.txt
     #   nbformat
-jupyter-client==7.3.4
+jupyter-client==7.3.5
     # via
     #   -c requirements.txt
     #   nbclient
