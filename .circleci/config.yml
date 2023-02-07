@@ -114,14 +114,14 @@ workflows:
       - build_image:
           context:
             - Docker pulls
-            - Docker publishing for agents
+            - Docker agents image specs
           filters:
             tags:
               only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
       - test_image:
           context:
             - Docker pulls
-            - Docker publishing for agents
+            - Docker agents image specs
           requires:
             - build_image
           filters:
@@ -129,7 +129,7 @@ workflows:
               only: /^v([1-9][0-9]*!)?(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*((a|b|rc)(0|[1-9][0-9]*))?(\.post(0|[1-9][0-9]*))?(\.dev(0|[1-9][0-9]*))?$/
       - retag_and_deploy_image:
           context:
-            - Docker pulls
+            - Docker agents image specs
             - Docker publishing for agents
           requires:
             - test_image
