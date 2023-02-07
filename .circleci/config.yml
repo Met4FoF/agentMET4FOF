@@ -57,7 +57,6 @@ workflows:
             - test_with_updated_deps
           context:
             - Docker pulls
-            - GitHub pushes to BjoernLudwigPTB's public_repos
 
   nightly_test:
     when:
@@ -108,7 +107,6 @@ workflows:
           context:
             - Docker pulls
             - pypi.org publishing for agentMET4FOF
-            - GitHub pushes to BjoernLudwigPTB's public_repos
           requires:
             - confirm_previewed_release_actions
       - build_image:
