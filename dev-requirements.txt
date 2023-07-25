@@ -43,6 +43,10 @@ certifi==2023.7.22
     # via
     #   -c requirements.txt
     #   requests
+cffi==1.15.1
+    # via
+    #   -c requirements.txt
+    #   cryptography
 chardet==5.1.0
     # via
     #   -c requirements.txt
@@ -61,18 +65,14 @@ click-log==0.4.0
     # via python-semantic-release
 colorama==0.4.6
     # via
-    #   -c requirements.txt
-    #   click
-    #   ipython
-    #   pytest
-    #   sphinx
     #   tox
-    #   tqdm
     #   twine
 commonmark==0.9.1
     # via recommonmark
 coverage[toml]==7.2.7
     # via pytest-cov
+cryptography==41.0.2
+    # via secretstorage
 decorator==5.1.1
     # via
     #   -c requirements.txt
@@ -151,6 +151,10 @@ jedi==0.18.2
     # via
     #   -c requirements.txt
     #   ipython
+jeepney==0.8.0
+    # via
+    #   keyring
+    #   secretstorage
 jinja2==3.1.2
     # via
     #   -c requirements.txt
@@ -235,6 +239,10 @@ parso==0.8.3
     #   jedi
 pathspec==0.11.1
     # via black
+pexpect==4.8.0
+    # via
+    #   -c requirements.txt
+    #   ipython
 pickleshare==0.7.5
     # via
     #   -c requirements.txt
@@ -264,10 +272,18 @@ psutil==5.9.5
     # via
     #   -c requirements.txt
     #   -r dev-requirements.in
+ptyprocess==0.7.0
+    # via
+    #   -c requirements.txt
+    #   pexpect
 pure-eval==0.2.2
     # via
     #   -c requirements.txt
     #   stack-data
+pycparser==2.21
+    # via
+    #   -c requirements.txt
+    #   cffi
 pygments==2.15.1
     # via
     #   -c requirements.txt
@@ -298,12 +314,6 @@ pytz==2023.3
     # via
     #   -c requirements.txt
     #   babel
-pywin32==306
-    # via
-    #   -c requirements.txt
-    #   jupyter-core
-pywin32-ctypes==0.2.2
-    # via keyring
 pyzmq==25.1.0
     # via
     #   -c requirements.txt
@@ -337,6 +347,8 @@ rpds-py==0.9.2
     #   -c requirements.txt
     #   jsonschema
     #   referencing
+secretstorage==3.3.3
+    # via keyring
 semver==2.13.0
     # via python-semantic-release
 six==1.16.0
