@@ -73,7 +73,7 @@ setup(
         "multiprocess",
         "visdcc",
     ],
-    extras_require={"tutorials": ["notebook", "PyDynamic"]},
+    extras_require={"tutorials": ["notebook", "PyDynamic", "ipython<=8.13.0"]},
     python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
