@@ -482,7 +482,7 @@ jobs:
             docker run --network container:agents \
                 appropriate/curl --retry 10 --retry-delay 1 \
                 --retry-connrefused http://127.0.0.1:8050/${SUBFOLDER_NAME}/  | \
-                grep '{<script src="/dashboard_subfolder/'
+                grep '<script src="/dashboard_subfolder/'
 
   retag_and_deploy_image:
     executor: image_dealer
