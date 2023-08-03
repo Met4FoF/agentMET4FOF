@@ -11,7 +11,7 @@ formats: all
 build:
     os: "ubuntu-20.04"
     tools:
-      python: "3.10"
+      python: "3.11"
 
 # Python environment to build the docs for installing the package
 python:
