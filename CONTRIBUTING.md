@@ -218,9 +218,8 @@ Regarding comments in the code we recommend to invest 45 minutes for the PyCon D
 
 We use [_pip-tools_](https://pypi.org/project/pip-tools/) for dependency management.
 The root folder contains a _requirements.txt_ and a _dev-requirements.txt_
-for the default Python version. _pip-tools_' command `pip-compile` finds
-the right versions from the dependencies listed in _setup.py_ and is manually run by the
-maintainers regularly.
+for Python 3.11. _pip-tools_' command `pip-compile` finds the right versions from the
+dependencies listed in _setup.py_ and is manually run by the maintainers regularly.
 
 ## Licensing
 
