@@ -74,7 +74,7 @@ setup(
         "visdcc",
     ],
     extras_require={
-        "tutorials": ["notebook", "PyDynamic", "ipython<=8.13.0"],
+        "tutorials": ["notebook", "PyDynamic"],
         "dev": [
             "black[jupyter]",
             "pytest",
