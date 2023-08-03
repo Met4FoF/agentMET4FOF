@@ -56,12 +56,7 @@ click==8.1.6
     #   uvicorn
 cloudpickle==2.2.1
     # via osbrain
-colorama==0.4.6
-    # via
-    #   click
-    #   ipython
-    #   tqdm
-comm==0.1.3
+comm==0.1.4
     # via
     #   ipykernel
     #   ipywidgets
@@ -81,7 +76,7 @@ dash-html-components==2.0.0
     # via dash
 dash-table==5.0.0
     # via dash
-debugpy==1.6.7
+debugpy==1.6.8
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -151,7 +146,7 @@ json5==0.9.14
     # via jupyterlab-server
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.18.4
+jsonschema[format-nongpl]==4.18.6
     # via
     #   jupyter-events
     #   jupyterlab-server
@@ -286,6 +281,8 @@ pandocfilters==1.5.0
     # via nbconvert
 parso==0.8.3
     # via jedi
+pexpect==4.8.0
+    # via ipython
 pickleshare==0.7.5
     # via ipython
 platformdirs==3.10.0
@@ -300,6 +297,10 @@ prompt-toolkit==3.0.39
     # via ipython
 psutil==5.9.5
     # via ipykernel
+ptyprocess==0.7.0
+    # via
+    #   pexpect
+    #   terminado
 pure-eval==0.2.2
     # via stack-data
 pycparser==2.21
@@ -331,13 +332,6 @@ pytz==2023.3
     # via pandas
 pywavelets==1.4.1
     # via pydynamic
-pywin32==306
-    # via jupyter-core
-pywinpty==2.0.11
-    # via
-    #   jupyter-server
-    #   jupyter-server-terminals
-    #   terminado
 pyyaml==6.0.1
     # via
     #   cookiecutter
