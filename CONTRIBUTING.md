@@ -149,7 +149,7 @@ module that is appropriately named.
 In case you add a new feature you generally follow the pattern:
 
 - read through and follow this contribution advices and tips, especially regarding 
-  the [advised tool](#advised-toolset) set and [coding style](#coding-style)
+  the [advised tool set](#advised-toolset) and [coding style](#coding-style)
 - open an according issue to submit a feature request and get in touch with other
   agentMET4FOF developers and users
 - fork the repository or update the _develop_ branch of your fork and create an
@@ -224,4 +224,5 @@ maintainers regularly.
 
 ## Licensing
 
-All contributions are released under agentMET4FOF's [GNU Lesser General Public License v3.0](https://github.com/Met4FoF/agentMET4FOF/blob/develop/licence.md).
+All contributions are released under agentMET4FOF's [GNU Lesser General Public License
+v3.0](https://github.com/Met4FoF/agentMET4FOF/blob/develop/licence.md).
