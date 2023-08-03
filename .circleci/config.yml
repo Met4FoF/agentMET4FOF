@@ -8,21 +8,21 @@ executors:
   tester:
     working_directory: ~/repo
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.11
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
   publisher:
     working_directory: ~/repo
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.11
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
   builder:
     working_directory: ~/repo
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.11
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
@@ -222,7 +222,10 @@ jobs:
           command: |
             pip install --upgrade pip pip-tools tox
             python -m piptools compile --upgrade --extra=tutorials
-            python -m piptools compile --upgrade dev-requirements.in
+            python -m piptools compile --upgrade --extra=tutorials --extra=dev \
+                --extra=docs --output-file dev-requirements.txt
+            python -m piptools compile --upgrade --extra=tutorials --extra=docs \
+                --output-file docs/sphinx-requirements.txt
             python -m piptools sync requirements.txt dev-requirements.txt
       - check_for_new_deps_compilation
       - run_venv_tests
@@ -232,6 +235,7 @@ jobs:
           paths:
             - requirements.txt
             - dev-requirements.txt
+            - docs/sphinx-requirements.txt
 
   commit_push_open_pr:
     executor:

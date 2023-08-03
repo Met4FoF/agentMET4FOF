@@ -149,7 +149,7 @@ module that is appropriately named.
 In case you add a new feature you generally follow the pattern:
 
 - read through and follow this contribution advices and tips, especially regarding 
-  the [advised tool](#advised-toolset) set and [coding style](#coding-style)
+  the [advised tool set](#advised-toolset) and [coding style](#coding-style)
 - open an according issue to submit a feature request and get in touch with other
   agentMET4FOF developers and users
 - fork the repository or update the _develop_ branch of your fork and create an
@@ -157,7 +157,7 @@ In case you add a new feature you generally follow the pattern:
 - decide which package and module your feature should be integrated into
 - if there is no suitable package or module, create a new one and a corresponding
   module in the _tests_ subdirectory with the same name prefixed by _test__
-- if new dependencies are introduced, add them to _setup.py_ or _dev-requirements.in_
+- if new dependencies are introduced, add them to _setup.py_
 - during development write tests in alignment with existing test modules, for example
   [_test_addremove_metrological_agents_](https://github.com/Met4FoF/agentMET4FOF/blob/develop/tests/test_addremove_metrological_agents.py)
 - write docstrings in the
@@ -218,10 +218,10 @@ Regarding comments in the code we recommend to invest 45 minutes for the PyCon D
 
 We use [_pip-tools_](https://pypi.org/project/pip-tools/) for dependency management.
 The root folder contains a _requirements.txt_ and a _dev-requirements.txt_
-for the supported Python version. _pip-tools_' command `pip-compile` finds
-the right versions from the dependencies listed in _setup.py_ and the
-_dev-requirements.in_ and is manually run by the maintainers regularly.
+for Python 3.11. _pip-tools_' command `pip-compile` finds the right versions from the
+dependencies listed in _setup.py_ and is manually run by the maintainers regularly.
 
 ## Licensing
 
-All contributions are released under agentMET4FOF's [GNU Lesser General Public License v3.0](https://github.com/Met4FoF/agentMET4FOF/blob/develop/licence.md).
+All contributions are released under agentMET4FOF's [GNU Lesser General Public License
+v3.0](https://github.com/Met4FoF/agentMET4FOF/blob/develop/licence.md).

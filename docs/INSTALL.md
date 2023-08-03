@@ -4,6 +4,9 @@ As already mentioned in the README, agentMET4FOF can either be [installed as a P
 package](#install-agentmet4fof-as-a-python-package) or [launched in a Docker 
 container](#use-agentmet4fof-from-inside-a-docker-container).
 
+Note that agentMET4FOF is made for Python 3.8 or higher and should work best with
+Python 3.11.
+
 ## Install agentMET4FOF as a Python package
 
 The installation of agentMET4FOF is as straightforward as the Python ecosystem suggests.
@@ -95,7 +98,7 @@ visited in the browser after its launch. The following steps are required for th
 
 The [official Docker documentation
 ](https://docs.docker.com/get-started/#download-and-install-docker) guides you through.
-Please continue with [the next step](#download-and-import-the-agentMET4FO-docker-image),
+Please continue with [the next step](#start-a-container-from-the-image-for-local-use),
 once you completed the Docker installation.
 
 ### Start a container from the image for local use
