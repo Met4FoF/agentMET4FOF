@@ -97,7 +97,7 @@ visited in the browser after its launch. The following steps are required for th
 
 The [official Docker documentation
 ](https://docs.docker.com/get-started/#download-and-install-docker) guides you through.
-Please continue with [the next step](#download-and-import-the-agentMET4FO-docker-image),
+Please continue with [the next step](#start-a-container-from-the-image-for-local-use),
 once you completed the Docker installation.
 
 ### Start a container from the image for local use

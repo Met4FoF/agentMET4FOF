@@ -166,7 +166,7 @@ dashboard is printed to the console on every launch of an agent network.
 
 The following image is close to what you will find in your browser on execution of
 tutorial 2. For details on the tutorials visit our
-[video tutorial series](#video-tutorial-series).
+[video tutorial series](#screencast-series).
 
 ![](https://raw.githubusercontent.com/Met4FoF/agentMET4FOF/develop/docs/screenshot_met4fof.png)
 
@@ -223,7 +223,7 @@ There are different ways to run agentMET4FOF. Either:
    your browser](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#start-a-container-from-the-image-for-local-use)
    or even [deploy it over a proper webserver](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html#deploy-the-containerized-agents-via-a-webserver).
 
-In the [video tutorials series](#video-tutorial-series)
+In the [video tutorials series](#screencast-series)
 we guide you through every step of option 1. More detailed instructions on both 
 options you can find in the [installation 
 section of the docs](https://agentmet4fof.readthedocs.io/en/latest/INSTALL.html).
