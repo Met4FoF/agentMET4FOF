@@ -10,7 +10,7 @@ import matplotlib.figure
 import matplotlib.pyplot as plt
 import mpld3
 import numpy as np
-from mesa import Agent as MesaAgent
+from mesa import Agent as MesaAgent, Model as MesaModel
 from osbrain import Agent as osBrainAgent
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
@@ -45,7 +45,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         transport=None,
         attributes=None,
         backend=Backend.OSBRAIN,
-        mesa_model=None,
+        mesa_model=MesaModel,
     ):
         self.backend = self.validate_backend(backend)
 
@@ -494,12 +494,14 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         if channel not in self.output_channels_info.keys():
             if type(data) == dict:
                 nested_metadata = {
-                    key: {
-                        nested_dict_key: self._get_metadata(nested_dict_val)
-                        for nested_dict_key, nested_dict_val in data[key].items()
-                    }
-                    if isinstance(data[key], dict)
-                    else self._get_metadata(data[key])
+                    key: (
+                        {
+                            nested_dict_key: self._get_metadata(nested_dict_val)
+                            for nested_dict_key, nested_dict_val in data[key].items()
+                        }
+                        if isinstance(data[key], dict)
+                        else self._get_metadata(data[key])
+                    )
                     for key in data.keys()
                 }
                 self.output_channels_info.update({channel: nested_metadata})
@@ -875,14 +877,16 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             if key not in excludes and type(val).__name__ != "function"
         }
         filtered_attr = {
-            key: val
-            if (
-                type(val) == float
-                or type(val) == int
-                or type(val) == str
-                or key == "output_channels_info"
+            key: (
+                val
+                if (
+                    isinstance(val, float)
+                    or isinstance(val, int)
+                    or isinstance(val, str)
+                    or key == "output_channels_info"
+                )
+                else str(val)
             )
-            else str(val)
             for key, val in filtered_attr.items()
         }
         filtered_attr = {
