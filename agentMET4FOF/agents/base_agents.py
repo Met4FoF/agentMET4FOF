@@ -134,10 +134,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         return getattr(self, attr)
 
     def init_agent(self, buffer_size=1000, log_mode=True):
-        """
-        Internal initialization to setup the agent: mainly on setting the dictionary
-        of Inputs, Outputs, PubAddr. Calls user-defined `init_parameters()` upon
-        finishing.
+        """Internal initialization to set up the agent
+
+        This mainly sets the dictionaries of inputs, outputs and the public address.
 
         Attributes
         ----------
