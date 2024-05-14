@@ -875,14 +875,16 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             if key not in excludes and type(val).__name__ != "function"
         }
         filtered_attr = {
-            key: val
-            if (
-                type(val) == float
-                or type(val) == int
-                or type(val) == str
-                or key == "output_channels_info"
+            key: (
+                val
+                if (
+                    isinstance(val, float)
+                    or isinstance(val, int)
+                    or isinstance(val, str)
+                    or key == "output_channels_info"
+                )
+                else str(val)
             )
-            else str(val)
             for key, val in filtered_attr.items()
         }
         filtered_attr = {
