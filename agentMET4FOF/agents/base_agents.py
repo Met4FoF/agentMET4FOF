@@ -10,7 +10,7 @@ import matplotlib.figure
 import matplotlib.pyplot as plt
 import mpld3
 import numpy as np
-from mesa import Agent as MesaAgent
+from mesa import Agent as MesaAgent, Model as MesaModel
 from osbrain import Agent as osBrainAgent
 from plotly import tools as tls
 from plotly.graph_objs import Scatter
@@ -45,7 +45,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         transport=None,
         attributes=None,
         backend=Backend.OSBRAIN,
-        mesa_model=None,
+        mesa_model=MesaModel,
     ):
         self.backend = self.validate_backend(backend)
 
