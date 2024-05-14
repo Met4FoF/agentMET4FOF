@@ -494,12 +494,14 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         if channel not in self.output_channels_info.keys():
             if type(data) == dict:
                 nested_metadata = {
-                    key: {
-                        nested_dict_key: self._get_metadata(nested_dict_val)
-                        for nested_dict_key, nested_dict_val in data[key].items()
-                    }
-                    if isinstance(data[key], dict)
-                    else self._get_metadata(data[key])
+                    key: (
+                        {
+                            nested_dict_key: self._get_metadata(nested_dict_val)
+                            for nested_dict_key, nested_dict_val in data[key].items()
+                        }
+                        if isinstance(data[key], dict)
+                        else self._get_metadata(data[key])
+                    )
                     for key in data.keys()
                 }
                 self.output_channels_info.update({channel: nested_metadata})
