@@ -2,6 +2,30 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.3 (2024-05-15)
+
+### Fix
+
+* **base_agents:** Fix Mesa model instantiation after upstream change ([`3f25f43`](https://github.com/Met4FoF/agentMET4FOF/commit/3f25f43dfe739f0e823045fdc52df8a101252c94))
+
+### Refactor
+
+* **base_agents:** Blacken ([`8fa0baf`](https://github.com/Met4FoF/agentMET4FOF/commit/8fa0baf5e3358ebd1eeb974194ff683deae997a6))
+* **base_agents:** Change type checks to isinstance() ([`f9d3f3b`](https://github.com/Met4FoF/agentMET4FOF/commit/f9d3f3b4bfb9046ffe411a5090cbb4447e0d201b))
+* **INSTALL.md:** Correct typo ([`70c03b9`](https://github.com/Met4FoF/agentMET4FOF/commit/70c03b916d82a447b7200406c9cea0f4bccb8b83))
+* **simple_generator:** Correct some wrong left over text ([`75d7980`](https://github.com/Met4FoF/agentMET4FOF/commit/75d79804a62a209641be993fd9133603dca24529))
+* **simple_generator:** Rename tutorial for plotting a self-made signal ([`caf6605`](https://github.com/Met4FoF/agentMET4FOF/commit/caf66056c9bda5045d541c851077c2e7ffa76fa1))
+* **UMLs:** Exchange UML URLs by GitHub raw URLs ([`0d81603`](https://github.com/Met4FoF/agentMET4FOF/commit/0d816035847188777646d2998a3527fd848f8071))
+* **base_agents:** Introduce citation into class docstring for AgentMET4FOF ([`5b31f52`](https://github.com/Met4FoF/agentMET4FOF/commit/5b31f5210f2603ebc7e68ecf559521112f1cdda1))
+
+### Documentation
+
+* **init_agent:** Fix misleading comment in docstring about calling sequence ([`6eeb0fa`](https://github.com/Met4FoF/agentMET4FOF/commit/6eeb0fa65e7789e6bd0a16cc837a053139e7d4d0))
+* **Python version:** Clarify that default is Python 3.11 ([`dcd54ea`](https://github.com/Met4FoF/agentMET4FOF/commit/dcd54ea501b12dd112290c7508b871b777bed13f))
+* **tutorials:** Introduce simple_generator tutorial into docs ([`dd838a2`](https://github.com/Met4FoF/agentMET4FOF/commit/dd838a28a50d80c922740490e0182508d33d80ca))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.13.2...v0.13.3)**
+
 ## v0.13.2 (2022-02-03)
 ### Fix
 * **#266:** Correct Mesa agents' names if only one space ([`263b07a`](https://github.com/Met4FoF/agentMET4FOF/commit/263b07ace484a482e2ba2f48ead210391c2f3d13))
