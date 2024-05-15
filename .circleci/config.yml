@@ -108,6 +108,7 @@ workflows:
           context:
             - Docker pulls
             - pypi.org publishing for agentMET4FOF
+            - GitHub pushes to BjoernLudwigPTB's public_repos
           requires:
             - confirm_previewed_release_actions
       - build_image:
