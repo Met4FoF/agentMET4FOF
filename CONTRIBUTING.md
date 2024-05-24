@@ -136,11 +136,11 @@ For examples please checkout the
 
 ###  Testing
 
-We strive to increase [our code coverage](https://codecov.io/gh/Met4FoF/agentMET4FOF)
-with every change introduced. This requires that every new feature and every change to 
-existing features is accompanied by appropriate _pytest_ testing. We test the basic
-components for correctness and, if necessary, the integration into the big picture.
-It is usually sufficient to create [appropriately named](https://docs.pytest.org/en/latest/goodpractices.html#conventions-for-python-test-discovery)
+We strive to increase our code coverage with every change introduced. This requires 
+that every new feature and every change to existing features is accompanied by 
+appropriate _pytest_ testing. We test the basic components for correctness and, if 
+necessary, the integration into the big picture. It is usually sufficient to create 
+[appropriately named](https://docs.pytest.org/en/latest/goodpractices.html#conventions-for-python-test-discovery)
 methods in one of the existing modules in the subfolder test. If necessary add a new
 module that is appropriately named.
 
