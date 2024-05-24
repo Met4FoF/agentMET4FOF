@@ -7,10 +7,6 @@
   <a href="https://agentmet4fof.readthedocs.io/">
     <img src="https://readthedocs.org/projects/agentmet4fof/badge/?version=latest" alt="ReadTheDocs badge">
   </a>
-  <!-- CodeCov(erage) -->
-  <a href="https://codecov.io/gh/Met4FoF/agentMET4FOF">
-    <img src="https://codecov.io/gh/Met4FoF/agentMET4FOF/branch/develop/graph/badge.svg?token=ofAPdSudLy" alt="CodeCov badge"/>
-  </a>
   <!-- PyPI Version -->
   <a href="https://pypi.org/project/agentmet4fof">
     <img src="https://img.shields.io/pypi/v/agentmet4fof.svg?label=release&color=blue&style=flat-square" alt="pypi">
