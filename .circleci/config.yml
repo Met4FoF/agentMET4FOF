@@ -227,6 +227,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "41:e2:e1:e7:a9:a3:8d:62:d9:19:6f:71:fe:f6:20:c1"
+            - "jW7ito3wfAqfwDSwQsAM+jI5BG6HX5JhRyTm3C9kPFo"
       - checkout
       - attach_workspace:
           at: .
@@ -243,8 +244,8 @@ jobs:
       - run:
           name: Commit and push changes
           command: |
-            git config --global user.name "Bjoern Ludwig (via CircleCI)"
-            git config --global user.email "bjoern.ludwig@ptb.de"
+            git config --global user.name "anupam-prasad"
+            git config --global user.email "anupam.13@gmail.com"
             git commit -am \
               "build(deps): recompile Python (dev) deps on $(date)"
             git push -fu origin  ${NEW_BRANCH}
