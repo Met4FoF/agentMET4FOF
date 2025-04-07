@@ -1,10 +1,8 @@
 import math
 import numpy as np
-import numpy.matlib
 from scipy.optimize import minimize
 
 from agentMET4FOF.agents import AgentMET4FOF
-
 
 class MCMCMHNJ:
     """This is the main class that implements the Bayesian Noise and jitter reduction
@@ -278,7 +276,7 @@ class MCMCMHNJ:
 
         rr = np.random.normal(0, 1, size=(6, Nc))
 
-        A0 = np.matlib.repmat(pars.T, Nc, 1).T + np.matmul(L, rr)
+        A0 = np.tile(pars.T, (Nc, 1)).T + np.matmul(L, rr)
 
         sam = MCMCMHNJ.mcmcmh(Mc, Nc, M0, Q, A0, tar, jump)
         return 1 / np.sqrt(np.exp(sam[0][0, -2:]))
@@ -418,7 +416,7 @@ class MCMCMHNJ:
 
         try:
             # When inputs are high dimensional arrays/matrices
-            xx = np.matlib.repmat(x, mu.shape[1], 1)
+            xx = np.tile(x, (mu.shape[1], 1))
             xx = xx.T
             logk = -np.log(2 * math.pi) / 2 - np.log(sigma)
             logp = -((xx - mu) ** 2) / (2 * sigma ** 2)
