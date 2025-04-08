@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-blinker==1.9.0
+blinker
     # via flask
 certifi==2025.1.31
     # via requests
@@ -53,7 +53,7 @@ matplotlib==3.10.1
     # via
     #   agentMET4FOF (setup.py)
     #   mpld3
-mesa<3
+mesa<3.1
     # via agentMET4FOF (setup.py)
 mpld3==0.5.10
     # via agentMET4FOF (setup.py)
