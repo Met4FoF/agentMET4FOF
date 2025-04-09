@@ -410,10 +410,13 @@ pywin32==310 ; platform_system == "Windows"
     # via
     #   agentMET4FOF (setup.py)
     #   jupyter-core
-pywin32-ctypes==0.2.3
-    # via keyring
-pywinpty==2.0.15
+pywin32-ctypes==0.2.3 ; platform_system == "Windows"
     # via
+    #   agentMET4FOF (setup.py)
+    #   keyring
+pywinpty==2.0.15 ; platform_system == "Windows"
+    # via
+    #   agentMET4FOF (setup.py)
     #   jupyter-server
     #   jupyter-server-terminals
     #   terminado
