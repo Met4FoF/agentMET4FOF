@@ -75,6 +75,7 @@ setup(
             "pytest",
             "pytest-cov",
             "pytest-timeout",
+            "pywin32 ; platform_system=='Windows'",
             "requests",
             "psutil",
             "sphinx",
