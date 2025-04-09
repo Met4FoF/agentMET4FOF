@@ -55,6 +55,12 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
+        #<3.3.0",  # Version 3.3 caused an error. Details you can find in
+        # docs/matplotlib3.3_pytest_error_log
+        # Actually the mpl_to_plotly feature is considered
+        # deprecated from version 3.3 on. See
+        # https://github.com/plotly/plotly.py/issues/1568
+        # for more details.
         "pandas",
         "osbrain",
         "dash",
@@ -75,9 +81,6 @@ setup(
             "pytest",
             "pytest-cov",
             "pytest-timeout",
-            "pywin32 ; platform_system=='Windows'",
-            "pywin32-ctypes ; platform_system=='Windows'",
-            "pywinpty ; platform_system=='Windows'",
             "requests",
             "psutil",
             "sphinx",
