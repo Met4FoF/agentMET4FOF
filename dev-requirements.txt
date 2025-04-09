@@ -406,8 +406,10 @@ pytz==2025.2
     # via pandas
 pywavelets==1.8.0
     # via pydynamic
-pywin32==310
-    # via jupyter-core
+pywin32==310 ; platform_system == "Windows"
+    # via
+    #   agentMET4FOF (setup.py)
+    #   jupyter-core
 pywin32-ctypes==0.2.3
     # via keyring
 pywinpty==2.0.15
