@@ -1,4 +1,5 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.streams import SineGenerator, CosineGenerator
 
 

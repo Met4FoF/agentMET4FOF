@@ -4,7 +4,7 @@
 # All agents imported will be then available via the dashboard UI
 # Note also, the exposed and tunable parameters in the `ParameterisedSineGeneratorAgent` are defined in the class
 
-from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.utils import Backend
 from agentMET4FOF_tutorials.agent_module import ui_module_example
 from agentMET4FOF_tutorials.tutorial_1_generator_agent import SineGeneratorAgent

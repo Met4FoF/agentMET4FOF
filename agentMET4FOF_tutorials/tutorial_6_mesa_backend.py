@@ -1,4 +1,5 @@
-from agentMET4FOF.agents import AgentNetwork, MonitorAgent, SineGeneratorAgent
+from agentMET4FOF.agents import MonitorAgent, SineGeneratorAgent
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.utils import Backend
 
 

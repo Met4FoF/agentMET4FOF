@@ -3,11 +3,11 @@ def test_legacy_imports():
     from agentMET4FOF.agents import (
         AgentBuffer,
         AgentMET4FOF,
-        AgentNetwork,
         DataStreamAgent,
         MonitorAgent,
         SineGeneratorAgent,
     )
+    from agentMET4FOF.network import AgentNetwork
     from agentMET4FOF.streams import DataStreamMET4FOF, SineGenerator, CosineGenerator
 
 
