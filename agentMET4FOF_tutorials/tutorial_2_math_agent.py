@@ -1,11 +1,10 @@
 from agentMET4FOF.agents import (
     AgentMET4FOF,
-    AgentNetwork,
     MonitorAgent,
     SineGeneratorAgent,
 )
 
-
+from agentMET4FOF.network import AgentNetwork
 class MathAgent(AgentMET4FOF):
     def on_received_message(self, message):
         message["data"]["quantities"] = self.divide_by_two(

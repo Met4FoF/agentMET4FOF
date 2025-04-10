@@ -6,13 +6,13 @@ from .metrological_base_agents import (
 )
 from .metrological_signal_agents import MetrologicalGeneratorAgent
 from .signal_agents import SineGeneratorAgent
-from ..network import AgentNetwork
+# from ..network import AgentNetwork
 from ..utils.buffer import AgentBuffer, MetrologicalAgentBuffer
 
 __all__ = [
     "AgentBuffer",
     "AgentMET4FOF",
-    "AgentNetwork",
+    # "AgentNetwork",
     "DataStreamAgent",
     "MetrologicalAgent",
     "MetrologicalAgentBuffer",

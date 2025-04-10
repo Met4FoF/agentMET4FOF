@@ -1,6 +1,6 @@
 import time
 
-from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.agents.base_agents import MonitorAgent
 from tests.conftest import GeneratorAgent
 
