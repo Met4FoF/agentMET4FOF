@@ -61,7 +61,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             )
 
         elif self.backend == Backend.MESA:
-            MesaAgent.__init__(self, name, mesa_model)
+            MesaAgent.__init__(self, model=mesa_model, unique_id=int.from_bytes(name.encode(), 'little'))
             self._remove_methods(osBrainAgent)
             self.init_mesa(name)
             self.unique_id = name
