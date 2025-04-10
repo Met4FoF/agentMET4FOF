@@ -17,7 +17,7 @@ np.random.seed(123)
 @pytest.fixture(scope="function")
 def agent_network():
     # Create an agent network and shut it down after usage.
-    a_network = AgentNetwork(dashboard_modules=False)
+    a_network = AgentNetwork(dashboard_modules=False, ip_addr="127.0.0.1")
     yield a_network
     a_network.shutdown()
 

@@ -1,4 +1,4 @@
-from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
 from agentMET4FOF.metrological_streams import (
     MetrologicalDataStreamMET4FOF,
