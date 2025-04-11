@@ -236,7 +236,7 @@ python-slugify==8.0.4
     # via cookiecutter
 pytz==2025.2
     # via pandas
-pywin32==310 ; platform_system == "Windows"
+pywin32==310
     # via jupyter-core
 pyyaml==6.0.2
     # via

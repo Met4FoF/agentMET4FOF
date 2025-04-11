@@ -5,8 +5,7 @@ from threading import Timer
 from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import networkx as nx
-from mesa import Agent as MesaAgent, Model
-from mesa.time import BaseScheduler
+from mesa import Agent as MesaAgent, Model as MesaModel
 from osbrain import NSProxy, Proxy, run_agent, run_nameserver
 from Pyro4.errors import NamingError
 
@@ -130,7 +129,7 @@ class AgentNetwork:
                         f"failed: {e}"
                     )
             else:  # self.backend == Backend.MESA:
-                return self.mesa_model.get_agent(name_to_search_for)
+                return next((x for x in self.mesa_model.agents if x.name == name_to_search_for), None)
 
         def get_agentType_count(self, agent_type: Type[AgentMET4FOF]) -> int:
             num_count = 1
@@ -246,11 +245,11 @@ class AgentNetwork:
             **kwargs,
         ):
             new_agent = agentType(
-                name=name, backend=self.backend, mesa_model=self.mesa_model
+                name=name, backend=self.backend
             )
             new_agent.init_parameters(**kwargs)
             new_agent.init_agent(buffer_size=buffer_size, log_mode=log_mode)
-            new_agent = self.mesa_model.add_agent(new_agent)
+            self.mesa_model.register_agent(new_agent)
             return new_agent
 
         def get_agents_stylesheets(self, agent_names: List[str]) -> List:
@@ -301,10 +300,10 @@ class AgentNetwork:
                 return return_osbrain_agents()
 
             if exclude_names is None:
-                return self.mesa_model.agents()
+                return self.mesa_model.agents
 
             return [
-                name for name in self.mesa_model.agents() if name not in exclude_names
+                name for name in self.mesa_model.agents if name not in exclude_names
             ]
 
         def update_networkx(self):
@@ -458,33 +457,6 @@ class AgentNetwork:
                     self.save_cycles += 1
                 except:
                     raise Exception
-
-    class MesaModel(Model):
-        """A MESA Model"""
-
-        def __init__(self):
-            self.schedule = BaseScheduler(self)
-
-        def add_agent(self, agent: MesaAgent):
-            self.schedule.add(agent)
-            return agent
-
-        def get_agent(self, agentName: str) -> Optional[AgentMET4FOF]:
-            agent = next((x for x in self.schedule.agents if x.name == agentName), None)
-            return agent
-
-        def step(self):
-            """Advance the model by one step."""
-            self.schedule.step()
-
-        def agents(self):
-            return [agent.name for agent in self.schedule.agents]
-
-        def shutdown(self):
-            """Shutdown entire MESA model with all agents and schedulers"""
-            for agent in self.agents():
-                agent_obj = self.get_agent(agent)
-                agent_obj.shutdown()
 
     class Coalition:
         """
@@ -684,7 +656,7 @@ class AgentNetwork:
 
     def start_server_mesa(self):
         """Starts a new AgentNetwork for Mesa"""
-        self.mesa_model = self.MesaModel()
+        self.mesa_model = MesaModel()
         self._controller = self._AgentController(
             name="AgentController", backend=self.backend
         )
@@ -1038,7 +1010,9 @@ class AgentNetwork:
             self._get_controller().get_attr("ns").shutdown()
         else:  # self.backend == Backend.MESA
             self._get_controller().stop_mesa_timer()
-            self.mesa_model.shutdown()
+            # self.mesa_model.shutdown()
+            for agent in self.agents():
+                agent.shutdown()
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
