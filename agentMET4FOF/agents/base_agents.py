@@ -45,7 +45,6 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         transport=None,
         attributes=None,
         backend=Backend.OSBRAIN,
-        mesa_model=MesaModel,
     ):
         self.backend = self.validate_backend(backend)
 
@@ -61,12 +60,13 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             )
 
         elif self.backend == Backend.MESA:
-            MesaAgent.__init__(self, model=mesa_model, unique_id=int.from_bytes(name.encode(), 'little'))
+            self.mesa_model = MesaModel()
+            self.mesa_agent = MesaAgent.__init__(self, model=self.mesa_model)
             self._remove_methods(osBrainAgent)
-            self.init_mesa(name)
-            self.unique_id = name
+            self.init_mesa(name=name, uid=int.from_bytes(name.encode(), 'little'))
             self.name = name
-            self.mesa_model = mesa_model
+            self.unique_id = int.from_bytes(name.encode(), 'little')
+
 
     @staticmethod
     def validate_backend(backend: Union[str, Backend]) -> Backend:
@@ -97,11 +97,11 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             f"Backend has not been implemented. Valid choices are {tuple(Backend)}."
         )
 
-    def init_mesa(self, name):
+    def init_mesa(self, name, uid):
         # MESA Specific parameters
         self.mesa_message_queue = deque([])
-        self.unique_id = name
         self.name = name
+        self.unique_id = uid
 
     def step(self):
         """
@@ -898,7 +898,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         if self.backend == Backend.OSBRAIN:
             osBrainAgent.shutdown(self)
         else:  # self.backend == Backend.MESA:
-            self.mesa_model.schedule.remove(self)
+            self.remove()
             del self
 
 
