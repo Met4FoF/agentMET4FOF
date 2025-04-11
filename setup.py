@@ -64,7 +64,7 @@ setup(
         "time-series-buffer",
         "time-series-metadata",
         "mpld3",
-        "mesa<3",
+        "mesa",
         "multiprocess",
         "visdcc",
     ],
