@@ -8,8 +8,8 @@ from tests.conftest import test_timeout
 num_samples = 10
 
 # prepare dummy data stream
-datastream_x = list(np.arange(num_samples))
-datastream_y = list(np.arange(num_samples))
+datastream_x = np.arange(num_samples).tolist()
+datastream_y = np.arange(num_samples).tolist()
 datastream_y.reverse()
 
 print(datastream_x)
