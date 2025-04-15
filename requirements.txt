@@ -285,9 +285,9 @@ pytz==2025.2
     # via pandas
 pywavelets==1.8.0
     # via pydynamic
-pywin32==310
+pywin32==310 ; platform_system == "Windows"
     # via jupyter-core
-pywinpty==2.0.15
+pywinpty==2.0.15 ; platform_system == "Windows"
     # via
     #   jupyter-server
     #   jupyter-server-terminals
