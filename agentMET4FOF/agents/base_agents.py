@@ -60,13 +60,12 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             )
 
         elif self.backend == Backend.MESA:
-            self.mesa_model = MesaModel()
-            self.mesa_agent = MesaAgent.__init__(self, model=self.mesa_model)
-            self._remove_methods(osBrainAgent)
-            self.init_mesa(name=name, uid=int.from_bytes(name.encode(), 'little'))
             self.name = name
             self.unique_id = int.from_bytes(name.encode(), 'little')
-
+            self.mesa_model = MesaModel()
+            self.mesa_agent = super().__init__(model=self.mesa_model)
+            self._remove_methods(osBrainAgent)
+            self.init_mesa(name=name, uid=int.from_bytes(name.encode(), 'little'))
 
     @staticmethod
     def validate_backend(backend: Union[str, Backend]) -> Backend:
