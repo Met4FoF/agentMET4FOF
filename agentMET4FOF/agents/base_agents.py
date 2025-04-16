@@ -45,6 +45,7 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
         transport=None,
         attributes=None,
         backend=Backend.OSBRAIN,
+        mesa_model=None,
     ):
         self.backend = self.validate_backend(backend)
 
@@ -60,8 +61,15 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             )
 
         elif self.backend == Backend.MESA:
-            self.mesa_model = MesaModel()
-            self.mesa_agent = MesaAgent.__init__(self, model=self.mesa_model)
+            self.name = name
+            self.unique_id = int.from_bytes(name.encode(), 'little')
+            if mesa_model is None:
+                self.mesa_model = MesaModel()
+                warnings.warn('No Model specified for Mesa agent. Creating new Model', UserWarning)
+            else:
+                self.mesa_model = mesa_model
+
+            self.mesa_agent = super().__init__(model=self.mesa_model)
             self._remove_methods(osBrainAgent)
             self.init_mesa(name=name, uid=int.from_bytes(name.encode(), 'little'))
             self.name = name

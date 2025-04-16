@@ -44,8 +44,6 @@ class AgentNetwork:
             self.coalitions = []
             self.log_mode = log_mode
 
-            if backend == Backend.MESA:
-                self.mesa_model = mesa_model
 
         def start_mesa_timer(self, mesa_update_interval):
             class RepeatTimer:
@@ -166,7 +164,7 @@ class AgentNetwork:
                 agent_name
             )  # number of agents with same name
             if agent_copy_count > 1:
-                name += "(" + str(self.get_agent_name_count(agent_name)) + ")"
+                name += "(" + agent_copy_count + ")"
             return name
 
         def add_agent(
@@ -199,7 +197,7 @@ class AgentNetwork:
                         loop_wait=loop_wait,
                         **kwargs,
                     )
-                elif self.backend == Backend.MESA:
+                else: #if  self.backend == Backend.MESA:
                     # handle osbrain and mesa here
                     new_agent = self._add_mesa_agent(
                         name=self._transform_string_into_valid_name(new_name),
@@ -245,7 +243,7 @@ class AgentNetwork:
             **kwargs,
         ):
             new_agent = agentType(
-                name=name, backend=self.backend
+                name=name, backend=self.backend, mesa_model=self.mesa_model
             )
             new_agent.init_parameters(**kwargs)
             new_agent.init_agent(buffer_size=buffer_size, log_mode=log_mode)
@@ -280,30 +278,23 @@ class AgentNetwork:
             list[str]
                 requested names of agents
             """
+            invisible_agents = ["AgentController", "Logger"]
 
-            def return_osbrain_agents():
-                invisible_agents = ["AgentController", "Logger"]
-
-                def concatenate_exclude_names_with_anyway_invisibles():
-                    if exclude_names is None:
-                        return invisible_agents
-                    else:
-                        return exclude_names + invisible_agents
-
-                return [
-                    name
-                    for name in self.ns.agents()
-                    if name not in concatenate_exclude_names_with_anyway_invisibles()
-                ]
-
-            if self.backend == Backend.OSBRAIN:
-                return return_osbrain_agents()
 
             if exclude_names is None:
-                return self.mesa_model.agents
+                exclude_names = invisible_agents
+            else:
+                exclude_names += invisible_agents
 
-            return [
-                name for name in self.mesa_model.agents if name not in exclude_names
+            if self.backend == Backend.OSBRAIN:
+                return  [
+                    name
+                    for name in self.ns.agents()
+                    if name not in exclude_names
+                ]
+            else:
+                return [
+                ag.name for ag in self.mesa_model.agents if ag.name not in exclude_names
             ]
 
         def update_networkx(self):
@@ -539,6 +530,7 @@ class AgentNetwork:
             Additional key words to be passed in initialising the dashboard
         """
 
+        self.mesa_model = None
         self.backend = AgentMET4FOF.validate_backend(backend)
         self.ip_addr = ip_addr
         self.port = port
@@ -565,7 +557,8 @@ class AgentNetwork:
                 self.connect(ip_addr, port)
                 if self.ns == 0:
                     self.start_server_osbrain(ip_addr, port)
-        else:  # self.backend == Backend.MESA
+        else: # self.backend == Backend.MESA
+            self.mesa_model = MesaModel(seed=2)
             self.start_server_mesa()
 
         if isinstance(dashboard_extensions, list) == False:
@@ -656,9 +649,8 @@ class AgentNetwork:
 
     def start_server_mesa(self):
         """Starts a new AgentNetwork for Mesa"""
-        self.mesa_model = MesaModel()
         self._controller = self._AgentController(
-            name="AgentController", backend=self.backend
+            name="AgentController", backend=self.backend, mesa_model=self.mesa_model
         )
         self._controller.init_parameters(
             backend=self.backend, mesa_model=self.mesa_model
