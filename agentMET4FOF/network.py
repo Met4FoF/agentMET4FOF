@@ -5,9 +5,9 @@ from threading import Timer
 from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import networkx as nx
-from mesa import Agent as MesaAgent, Model as MesaModel
-from osbrain import NSProxy, Proxy, run_agent, run_nameserver
 from Pyro4.errors import NamingError
+from mesa import Model as MesaModel
+from osbrain import NSProxy, Proxy, run_agent, run_nameserver
 
 from .agents.base_agents import AgentMET4FOF
 from .dashboard.default_network_stylesheet import default_agent_network_stylesheet
@@ -172,8 +172,8 @@ class AgentNetwork:
         def add_agent(
             self,
             name: Optional[str] = None,
-            agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
+            agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             buffer_size: Optional[int] = 1000,
             ip_addr: Optional[str] = None,
             loop_wait: Optional[float] = None,
@@ -952,15 +952,9 @@ class AgentNetwork:
         if ip_addr is None:
             ip_addr = self.ip_addr
 
-        agent = self._get_controller().add_agent(
-            name=name,
-            agentType=agentType,
-            log_mode=log_mode,
-            buffer_size=buffer_size,
-            ip_addr=ip_addr,
-            loop_wait=loop_wait,
-            **kwargs,
-        )
+        agent = self._get_controller().add_agent(name=name, log_mode=log_mode, agentType=agentType,
+                                                 buffer_size=buffer_size, ip_addr=ip_addr, loop_wait=loop_wait,
+                                                 **kwargs)
 
         return agent
 
