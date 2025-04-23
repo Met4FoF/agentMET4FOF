@@ -996,9 +996,7 @@ class AgentNetwork:
             self._get_controller().get_attr("ns").shutdown()
         else:  # self.backend == Backend.MESA
             self._get_controller().stop_mesa_timer()
-            # self.mesa_model.shutdown()
-            for agent in self.agents():
-                agent.shutdown()
+            self.mesa_model.remove_all_agents()
 
         # Shutdown the dashboard if present.
         if self.dashboard_proc is not None:
