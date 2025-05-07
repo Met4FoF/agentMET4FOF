@@ -170,8 +170,8 @@ class AgentNetwork:
         def add_agent(
             self,
             name: Optional[str] = None,
-            log_mode: Optional[bool] = True,
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
+            log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
             ip_addr: Optional[str] = None,
             loop_wait: Optional[float] = None,
@@ -944,7 +944,7 @@ class AgentNetwork:
         if ip_addr is None:
             ip_addr = self.ip_addr
 
-        agent = self._get_controller().add_agent(name=name, log_mode=log_mode, agentType=agentType,
+        agent = self._get_controller().add_agent(name=name, agentType=agentType, log_mode=log_mode,
                                                  buffer_size=buffer_size, ip_addr=ip_addr, loop_wait=loop_wait,
                                                  **kwargs)
 
