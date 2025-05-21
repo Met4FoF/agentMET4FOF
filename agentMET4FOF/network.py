@@ -65,7 +65,7 @@ class AgentNetwork:
 
             self.mesa_update_interval = mesa_update_interval
             self.mesa_timer = RepeatTimer(
-                t=mesa_update_interval, repeat_function=self.mesa_model.step
+                t=mesa_update_interval, repeat_function=self.step_mesa_model
             )
             self.mesa_timer.start()
 
@@ -75,7 +75,7 @@ class AgentNetwork:
                 del self.mesa_timer
 
         def step_mesa_model(self):
-            self.mesa_model.step()
+            self.mesa_model.agents.do("step")
 
         def get_mesa_model(self):
             return self.mesa_model
