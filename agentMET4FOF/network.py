@@ -558,7 +558,7 @@ class AgentNetwork:
                 if self.ns == 0:
                     self.start_server_osbrain(ip_addr, port)
         else: # self.backend == Backend.MESA
-            self.mesa_model = MesaModel(seed=2)
+            self.mesa_model = MesaModel()
             self.start_server_mesa()
 
         if isinstance(dashboard_extensions, list) == False:
