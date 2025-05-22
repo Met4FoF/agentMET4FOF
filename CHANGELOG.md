@@ -2,6 +2,44 @@
 
 <!--next-version-placeholder-->
 
+## v0.13.4 (2025-05-22)
+
+### Fix
+
+* **network:** Network shutdown updated for mesa 3.1 ([`07bbac7`](https://github.com/Met4FoF/agentMET4FOF/commit/07bbac77c6db9f627e85047e723a45836af6722a))
+* **test_memory_monitor_agent:** Fixed failing tests due to dtype mismatch ([`9015130`](https://github.com/Met4FoF/agentMET4FOF/commit/90151308ca3a5ab63bb2a5512e1955a81928b4b3))
+* **network:** Mesa 3.1 compatibility update. subclass MesaModel in AgentNetwork made redundant ([`beff208`](https://github.com/Met4FoF/agentMET4FOF/commit/beff20874aa1488e93e130600455b7ca597af22c))
+* **tutorials:** Restructured to fix circular imports re agentnetwork ([`bf78922`](https://github.com/Met4FoF/agentMET4FOF/commit/bf7892267dfabc0314b84ac50c7a933c8e03414b))
+* **deps:** Plotly conflict resolved ([`19ba393`](https://github.com/Met4FoF/agentMET4FOF/commit/19ba39388964842db3895d2531b06f2ef7671d51))
+* **test_memory_monitor_agent:** Fixed failing tests due to dtype mismatch ([`d7d6f64`](https://github.com/Met4FoF/agentMET4FOF/commit/d7d6f64d7bc1f57bc61a699568dd71ef256c9ea0))
+* **network:** Mesa 3.1 compatibility update. subclass MesaModel in AgentNetwork made redundant ([`b7b9e4a`](https://github.com/Met4FoF/agentMET4FOF/commit/b7b9e4a71084e2bc8b21d22b3bebbc1c02e8793e))
+* **tutorials:** Restructured to fix circular imports re agentnetwork ([`c5644f3`](https://github.com/Met4FoF/agentMET4FOF/commit/c5644f394cdb6222367eca3ee3a3cdb07d72f60e))
+* **deps:** Plotly conflict resolved ([`70adf8f`](https://github.com/Met4FoF/agentMET4FOF/commit/70adf8f91151f7ad82ceaa74bcade64d25b49c43))
+* **test_memory_monitor_agent:** Fixed failing tests due to dtype mismatch ([`54e51bb`](https://github.com/Met4FoF/agentMET4FOF/commit/54e51bb5ec4cb47db03236d19c310b6ccbb86427))
+
+### Refactor
+
+* **conf:** Revert manual version number change ([`7746c41`](https://github.com/Met4FoF/agentMET4FOF/commit/7746c416e5e47ce392d470a7937a3d97b59bf3a4))
+* **conf:** Bump version number to 0.14.0 ([`4db2181`](https://github.com/Met4FoF/agentMET4FOF/commit/4db2181c112fbf4e5cac2a492d084bc6dc679f02))
+* **__init__:** Bump version number to 0.14.0 ([`b3c9740`](https://github.com/Met4FoF/agentMET4FOF/commit/b3c97408f34d73281a2194e97a1d2cefaeba4c95))
+* **network:** Removed seed from mesa model definition ([`bed8947`](https://github.com/Met4FoF/agentMET4FOF/commit/bed8947d8f91809e9027d38fccadf20dc68f2a29))
+* **network:** Updated step functions for mesa compatibility ([`4d0c67c`](https://github.com/Met4FoF/agentMET4FOF/commit/4d0c67cde9618c1f8b8239e264aff03992e442e3))
+* **base_agents:** Readded accidentally deleted line ([`74d251f`](https://github.com/Met4FoF/agentMET4FOF/commit/74d251f6ffd50aca0927aa14eb1596279a04406b))
+* **network:** Restored order of arguments in method add_agent ([`9fb7cb7`](https://github.com/Met4FoF/agentMET4FOF/commit/9fb7cb724979ce30609f5701e4da1cc8f76f6be7))
+* **tutorials:** Imports updated ([`baefa12`](https://github.com/Met4FoF/agentMET4FOF/commit/baefa12d483b159c7f4d05464dc05c61df04acba))
+* **agents.__init__:** Removed commented lines ([`d141615`](https://github.com/Met4FoF/agentMET4FOF/commit/d141615b374d6525396ac257cbb6ef85b47eebc0))
+* **network:** Removed unnecessary mesaagent import ([`6c03c4e`](https://github.com/Met4FoF/agentMET4FOF/commit/6c03c4eb2d68ce0cd9b08dc522895ac63c6069e3))
+* **requirements:** Platform system specified for pywin packages ([`c4520cd`](https://github.com/Met4FoF/agentMET4FOF/commit/c4520cdf1f1258b3c38704b1a34466f4faa06de8))
+* **requirements:** Updated to latest possible versions ([`2556cda`](https://github.com/Met4FoF/agentMET4FOF/commit/2556cdaf52d47fbedf759e93d775dcf6c97d8763))
+* **base_agents:** Mesa>3 conflict with MesaAgent init resolved ([`5f0de53`](https://github.com/Met4FoF/agentMET4FOF/commit/5f0de53fd6e2038a8edfedabb574701ccc02c734))
+* **requirements:** Platform specified for windows specific packages ([`8259e88`](https://github.com/Met4FoF/agentMET4FOF/commit/8259e8884d7a5162301b09a88502934ce4fbeba6))
+* **conftest:** Localhost address removed from conftest for docker compatibility ([`e8b1d26`](https://github.com/Met4FoF/agentMET4FOF/commit/e8b1d26f8db2f124789138147b28548bf9754c8b))
+* **requirements:** Platform specified for windows specific packages ([`e9f09f8`](https://github.com/Met4FoF/agentMET4FOF/commit/e9f09f87f84c9a66c278c29b36c6ebeadd785a1f))
+* **conftest:** Localhost address removed from conftest for docker compatibility ([`48d1238`](https://github.com/Met4FoF/agentMET4FOF/commit/48d1238de4761c32c3afe1c1b4bed7baf27c7811))
+* **noise_jitter_removal_agents:** Typo in agentmet4fof import corrected ([`1365432`](https://github.com/Met4FoF/agentMET4FOF/commit/136543229f2cb7d672717b92938626c992536b13))
+
+**[See all commits in this version](https://github.com/Met4FoF/agentMET4FOF/compare/v0.13.3...v0.13.4)**
+
 ## v0.13.3 (2024-05-15)
 
 ### Fix
