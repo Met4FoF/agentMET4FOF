@@ -1,4 +1,4 @@
-from agentMET4FOF.agents import AgentNetwork
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.metrological_agents import MetrologicalAgent, MetrologicalMonitorAgent
 from agentMET4FOF.metrological_streams import (
     MetrologicalDataStreamMET4FOF,
@@ -61,7 +61,7 @@ def demonstrate_metrological_stream():
 
     # Initialize metrologically enabled plotting agent.
     monitor_agent = agent_network.add_agent(
-        "Metrological plot including measurement uncertainties",
+        name="Metrological plot including measurement uncertainties",
         agentType=MetrologicalMonitorAgent,
         buffer_size=50,
     )
