@@ -44,7 +44,7 @@ in the section <!--suppress HtmlUnknownAnchorTarget --><a href="#about">About</a
   - [handle both static data sets and online data streams](#tutorials)
   - [consider measurement uncertainties as well as metadata with the provided message system](#tutorials)
 - [installable as a Python package or ready-to-deploy Docker image](#installation)
-- comes bundled with [several introductary and advanced tutorials](#tutorials)
+- comes bundled with [several introductory and advanced tutorials](#tutorials)
 - accompanied by [several use cases with close-to-industry IIoT applications in 
   our GitHub organisation](https://github.com/Met4FoF?q=agentMET4FOF&type=&language=&sort=)
 - comprehensive and ever-growing [documentation](#documentation-and-screencasts)
