@@ -188,6 +188,49 @@ class MetrologicalDataStreamMET4FOF(DataStreamMET4FOF):
 
         return np.concatenate((_time, _time_unc, _value, _value_unc), axis=1)
 
+    def _next_sample_data_source(
+        self, batch_size: Optional[int] = 1
+    ) -> np.ndarray:
+        """Internal method for fetching latest samples from a dataset.
+        Overrides :meth:`.DataStreamMET4FOF._next_sample_data_source`. Adds
+        time uncertainty ``ut`` and measurement uncertainty ``uv`` to sample
+
+        """
+        if batch_size < 0:
+            batch_size = self._quantities.shape[0]
+
+        self._sample_idx += batch_size
+
+        try:
+            self._current_sample_quantities = self._quantities[
+                self._sample_idx - batch_size : self._sample_idx
+            ]
+
+            # if target is available
+            if self._target is not None:
+                self._current_sample_target = self._target[
+                    self._sample_idx - batch_size : self._sample_idx
+                ]
+            else:
+                self._current_sample_target = None
+
+            # if time is available
+            if self._time is not None:
+                self._current_sample_time = self._time[
+                    self._sample_idx - batch_size : self._sample_idx
+                ]
+            else:
+                self._current_sample_time = None
+        except IndexError:
+            self._current_sample_quantities = None
+            self._current_sample_target = None
+            self._current_sample_time = None
+
+        _time_unc, _value_unc = (np.full_like(self._current_sample_time, fill_value=self.time_unc),
+                                            np.full_like(self._current_sample_quantities, fill_value=self.value_unc))
+
+        return np.concatenate((self._current_sample_time, _time_unc, self._current_sample_quantities, _value_unc), axis=1)
+
     @property
     def value_unc(self) -> Union[float, Iterable[float]]:
         """Union[float, Iterable[float]]: uncertainties associated with the values"""
