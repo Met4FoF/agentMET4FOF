@@ -27,7 +27,7 @@
     <img src="https://img.shields.io/docker/pulls/met4fof/agentmet4fof.svg" alt="Docker Hub badge"></a>
 </p>
 
-# Multi-Agent System for IIoT
+# Multi-Agent System for IIot
 
 <p align="justify">
 agentMET4FOF is an implementation of a multi-agent system for agent-based 
