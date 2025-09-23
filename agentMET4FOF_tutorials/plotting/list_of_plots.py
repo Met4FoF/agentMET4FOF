@@ -4,7 +4,8 @@
 # This also demonstrates the limitation of the 3 types of plotting mechanisms chosen
 
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib

@@ -1,6 +1,8 @@
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
 from agentMET4FOF.streams import DataStreamMET4FOF
 import numpy as np
+from agentMET4FOF.network import AgentNetwork
+
 
 
 class SineGenerator(DataStreamMET4FOF):

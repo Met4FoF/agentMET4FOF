@@ -3,8 +3,9 @@
 # Also, we do not need to explicitly clear the entire buffer content, since the buffer's oldest content will be
 # automatically removed when we call buffer.store if the buffer is filled.
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF,MonitorAgent
 from agentMET4FOF.streams import SineGenerator
+from agentMET4FOF.network import AgentNetwork
 import numpy as np
 
 

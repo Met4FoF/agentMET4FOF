@@ -8,8 +8,9 @@
 # while any number of additional user-defined keyword arguments can be supplied arbitrarily
 # The function needs to return either a single plotly figure, or a list of plotly figures.
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
 from agentMET4FOF.streams import SineGenerator
+from agentMET4FOF.network import AgentNetwork
 
 import numpy as np
 import plotly.graph_objs as go
