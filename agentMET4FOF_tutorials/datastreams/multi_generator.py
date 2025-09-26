@@ -1,11 +1,12 @@
 # We show how multiple DataStreamMET4FOF classes can be created and embedded within an Agent
 # Three generators are created : Sine, sawtooth and square waves.
 # This can be for example when multiple sensors are required to be simulated.
+import numpy as np
 from scipy import signal
-from agentMET4FOF.agents import AgentMET4FOF,  MonitorAgent
+
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
 from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.streams import DataStreamMET4FOF
-import numpy as np
 
 
 class SineGenerator(DataStreamMET4FOF):

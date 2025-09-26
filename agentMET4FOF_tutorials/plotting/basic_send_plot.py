@@ -12,11 +12,12 @@
 # Update: To use `send_plot`, make sure you have connected the MonitorAgent to the "plot" channel of the
 # `input`/`source` agent
 
-from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
-from agentMET4FOF.network import AgentNetwork
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
+
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
 
 matplotlib.use("Agg")
 

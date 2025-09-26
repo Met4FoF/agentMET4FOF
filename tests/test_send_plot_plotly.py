@@ -7,7 +7,7 @@ from tests.conftest import GeneratorAgent
 
 def test_send_plot():
     # start agent network server
-    agentNetwork = AgentNetwork(dashboard_modules=False)
+    agentNetwork = AgentNetwork(dashboard_modules=False, ip_addr="127.0.0.1")
 
     # init agents
     gen_agent = agentNetwork.add_agent(agentType=GeneratorAgent)

@@ -22,9 +22,8 @@
 # Note that due to the agents' asynchronous activity, the length of values can differ.
 
 from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
 from agentMET4FOF.network import AgentNetwork
-
+from agentMET4FOF.streams import SineGenerator
 
 
 class SineGeneratorAgent(AgentMET4FOF):

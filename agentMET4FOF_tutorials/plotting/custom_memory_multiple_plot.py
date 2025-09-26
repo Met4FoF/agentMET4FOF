@@ -3,13 +3,14 @@
 # Specifically, in the custom plot funciton, we return a list of go.Scatter() objects instead of a single scatter.
 # In order to illustrate the different traces, we add noise to each scatter traces.
 
-from agentMET4FOF.agents import AgentMET4FOF,  MonitorAgent
-from agentMET4FOF.streams import SineGenerator
-from agentMET4FOF.network import AgentNetwork
+from datetime import datetime
 
 import numpy as np
 import plotly.graph_objs as go
-from datetime import datetime
+
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.streams import SineGenerator
 
 
 def custom_create_monitor_graph(

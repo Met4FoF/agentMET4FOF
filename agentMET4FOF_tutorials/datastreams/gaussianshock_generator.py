@@ -1,11 +1,10 @@
 from PyDynamic.misc.testsignals import shocklikeGaussian
-from agentMET4FOF.network import AgentNetwork
-
 
 from agentMET4FOF.agents import (
     AgentMET4FOF,
     MonitorAgent,
 )
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.streams import DataStreamMET4FOF
 
 
