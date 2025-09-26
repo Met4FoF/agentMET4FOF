@@ -1,7 +1,7 @@
 import csv
+import platform
 import re
 import sys
-import platform
 from threading import Timer
 from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
@@ -19,7 +19,8 @@ from .utils import Backend
 
 
 def get_default_ip() -> str:
-    """Return localhost IP depending on OS."""
+    """Retrieves the platform OS and returns the localhost IP depending on OS.
+     Returns 12.0.0.1 for Windows and 0.0.0.0 for the rest"""
     if platform.system() == "Windows":
         return "127.0.0.1"
     else:
