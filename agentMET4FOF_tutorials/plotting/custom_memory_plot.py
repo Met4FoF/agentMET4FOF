@@ -8,12 +8,14 @@
 # while any number of additional user-defined keyword arguments can be supplied arbitrarily
 # The function needs to return either a single plotly figure, or a list of plotly figures.
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
-from agentMET4FOF.streams import SineGenerator
+from datetime import datetime
 
 import numpy as np
 import plotly.graph_objs as go
-from datetime import datetime
+
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
+from agentMET4FOF.streams import SineGenerator
 
 
 def custom_create_monitor_graph(data, sender_agent, xname="Time", yname="Y"):
