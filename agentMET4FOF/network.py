@@ -1,4 +1,5 @@
 import csv
+import platform
 import re
 import sys
 from threading import Timer
@@ -15,6 +16,15 @@ from .dashboard.default_network_stylesheet import default_agent_network_styleshe
 __all__ = ["AgentNetwork"]
 
 from .utils import Backend
+
+
+def get_default_ip() -> str:
+    """Retrieves the platform OS and returns the localhost IP depending on OS.
+     Returns 12.0.0.1 for Windows and 0.0.0.0 for the rest"""
+    if platform.system() == "Windows":
+        return "127.0.0.1"
+    else:
+        return "0.0.0.0"
 
 
 class AgentNetwork:
@@ -173,13 +183,13 @@ class AgentNetwork:
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
-            ip_addr: Optional[str] = None,
+            ip_addr: Optional[str] = get_default_ip(),
             loop_wait: Optional[float] = None,
             **kwargs,
         ):
             try:
                 if ip_addr is None:
-                    ip_addr = "0.0.0.0"
+                    ip_addr = get_default_ip()
 
                 if name is None:
                     new_name = self.generate_module_name_byType(agentType)
@@ -216,7 +226,7 @@ class AgentNetwork:
             agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
             log_mode: Optional[bool] = True,
             buffer_size: Optional[int] = 1000,
-            ip_addr: Optional[str] = None,
+            ip_addr: Optional[str] = get_default_ip(),
             loop_wait: Optional[float] = None,
             **kwargs,
         ):
@@ -479,7 +489,7 @@ class AgentNetwork:
 
     def __init__(
         self,
-        ip_addr="0.0.0.0",
+        ip_addr= get_default_ip(),
         port=3333,
         connect=False,
         log_filename="log_file.csv",
@@ -596,7 +606,7 @@ class AgentNetwork:
         else:
             self.dashboard_proc = None
 
-    def connect(self, ip_addr: Optional[str] = "127.0.0.1", port: Optional[int] = 3333):
+    def connect(self, ip_addr: Optional[str] = get_default_ip(), port: Optional[int] = 3333):
         """Connects to an existing agent network's name server for osBrain backend
 
         Parameters
@@ -616,7 +626,7 @@ class AgentNetwork:
             self.ns = 0
 
     def start_server_osbrain(
-        self, ip_addr: Optional[str] = "127.0.0.1", port: Optional[int] = 3333
+        self, ip_addr: Optional[str] = get_default_ip(), port: Optional[int] = 3333
     ):
         """Starts a new agent network's name server for osBrain
 
@@ -907,7 +917,7 @@ class AgentNetwork:
         agentType: Optional[Type[AgentMET4FOF]] = AgentMET4FOF,
         log_mode: Optional[bool] = True,
         buffer_size: Optional[int] = 1000,
-        ip_addr: Optional[str] = None,
+        ip_addr: Optional[str] = get_default_ip(),
         loop_wait: Optional[int] = None,
         **kwargs,
     ) -> Type[AgentMET4FOF]:

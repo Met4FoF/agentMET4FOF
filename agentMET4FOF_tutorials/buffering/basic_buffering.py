@@ -7,7 +7,8 @@
 # We show how we can read a single data from a sine generator, and store it in the agent buffer.
 # When the buffer is filled up (set buffer_size to 5 entries), we send out the buffer content to the MonitorAgent, and empty the buffer to receive new data.
 
-from agentMET4FOF.agents import AgentMET4FOF, AgentNetwork, MonitorAgent
+from agentMET4FOF.agents import AgentMET4FOF, MonitorAgent
+from agentMET4FOF.network import AgentNetwork
 from agentMET4FOF.streams import SineGenerator
 
 
