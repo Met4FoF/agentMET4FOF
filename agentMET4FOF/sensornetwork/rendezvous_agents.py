@@ -1,6 +1,6 @@
 from agentMET4FOF.agents import AgentMET4FOF
 import math
-from scipy.spatial.ckdtree import cKDTree
+from scipy.spatial import cKDTree
 import numpy as np
 
 
