@@ -15,7 +15,7 @@ class SensorOnPlatform(MetrologicalDataStreamMET4FOF):
     platform_name : str, optional
         name of the platform on which the sensing unit is located
     uncertainty : float
-        frequency of wave function, defaults to 50.0
+        measurement uncertainty of the sensor. usually found on calibration certificate or tech specs
     output_unit : str
         SI unit of the sensor output
     sensor_type : str, optional
