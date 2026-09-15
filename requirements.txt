@@ -4,100 +4,101 @@
 #
 #    pip-compile --extra=tutorials --output-file='.\requirements.txt' '.\setup.py'
 #
-anyio==4.9.0
+annotated-types==0.8.0
+    # via pydantic
+anyio==4.15.1
     # via
     #   httpx
     #   jupyter-server
-argon2-cffi==23.1.0
+argon2-cffi==25.1.0
     # via jupyter-server
-argon2-cffi-bindings==21.2.0
+argon2-cffi-bindings==26.1.0
     # via argon2-cffi
-arrow==1.3.0
+arrow==1.4.0
     # via isoduration
-asttokens==3.0.0
+asttokens==3.0.2
     # via stack-data
-async-lru==2.0.5
+async-lru==2.3.0
     # via jupyterlab
-attrs==25.3.0
+attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
-babel==2.17.0
+babel==2.18.0
     # via jupyterlab-server
-beautifulsoup4==4.13.3
+beautifulsoup4==4.15.0
     # via nbconvert
-bleach[css]==6.2.0
+bleach[css]==6.4.0
     # via nbconvert
 blinker==1.9.0
     # via flask
-certifi==2025.1.31
+certifi==2026.7.22
     # via
     #   httpcore
     #   httpx
     #   requests
-cffi==1.17.1
+cffi==2.1.1
     # via argon2-cffi-bindings
-charset-normalizer==3.4.1
+charset-normalizer==3.5.1
     # via requests
-click==8.1.8
+click==8.5.0
     # via flask
-cloudpickle==3.1.1
+cloudpickle==3.1.2
     # via osbrain
 colorama==0.4.6
     # via
-    #   click
     #   ipython
     #   tqdm
-comm==0.2.2
-    # via ipykernel
-contourpy==1.3.1
+comm==0.2.3
+    # via
+    #   dash
+    #   ipykernel
+contourpy==1.3.3
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
-dash==3.0.3
+dash==4.4.1
     # via
     #   agentMET4FOF (setup.py)
     #   dash-cytoscape
     #   visdcc
 dash-cytoscape==1.0.2
     # via agentMET4FOF (setup.py)
-debugpy==1.8.14
+debugpy==1.8.21
     # via ipykernel
-decorator==5.2.1
-    # via ipython
 defusedxml==0.7.1
     # via nbconvert
-dill==0.3.9
+dill==0.4.1
     # via
     #   multiprocess
     #   osbrain
-executing==2.2.0
+executing==2.2.1
     # via stack-data
-fastjsonschema==2.21.1
+fastjsonschema==2.22.2
     # via nbformat
-flask==3.0.3
+flask==3.1.3
     # via dash
-fonttools==4.57.0
+fonttools==4.65.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
-h11==0.14.0
+h11==0.16.0
     # via httpcore
-httpcore==1.0.8
+httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via jupyterlab
-idna==3.10
+idna==3.19
     # via
     #   anyio
     #   httpx
     #   jsonschema
     #   requests
-importlib-metadata==8.6.1
+importlib-metadata==9.0.1
     # via dash
-ipykernel==6.29.5
+ipykernel==7.3.0
     # via jupyterlab
-ipython==9.1.0
+ipython==9.17.1
     # via ipykernel
 ipython-pygments-lexers==1.1.1
     # via ipython
@@ -105,7 +106,9 @@ isoduration==20.11.0
     # via jsonschema
 itsdangerous==2.2.0
     # via flask
-jedi==0.19.2
+janus==2.0.0
+    # via dash
+jedi==0.20.0
     # via ipython
 jinja2==3.1.6
     # via
@@ -115,102 +118,110 @@ jinja2==3.1.6
     #   jupyterlab-server
     #   mpld3
     #   nbconvert
-json5==0.12.0
+json5==0.15.0
     # via jupyterlab-server
-jsonpointer==3.0.0
+jsonpointer==3.1.1
     # via jsonschema
-jsonschema[format-nongpl]==4.23.0
+jsonschema[format-nongpl]==4.26.0
     # via
     #   jupyter-events
     #   jupyterlab-server
     #   nbformat
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.9.1
     # via jsonschema
-jupyter-client==8.6.3
+jupyter-builder==1.2.3
+    # via
+    #   jupyterlab
+    #   notebook
+jupyter-client==8.10.0
     # via
     #   ipykernel
     #   jupyter-server
     #   nbclient
-jupyter-core==5.7.2
+jupyter-core==5.9.1
     # via
     #   ipykernel
+    #   jupyter-builder
     #   jupyter-client
     #   jupyter-server
     #   jupyterlab
     #   nbclient
     #   nbconvert
     #   nbformat
-jupyter-events==0.12.0
+jupyter-events==0.12.1
     # via jupyter-server
-jupyter-lsp==2.2.5
+jupyter-lsp==2.3.1
     # via jupyterlab
-jupyter-server==2.15.0
+jupyter-server==2.21.0
     # via
     #   jupyter-lsp
     #   jupyterlab
     #   jupyterlab-server
     #   notebook
     #   notebook-shim
-jupyter-server-terminals==0.5.3
+jupyter-server-terminals==0.5.4
     # via jupyter-server
-jupyterlab==4.4.0
+jupyterlab==4.6.3
     # via notebook
 jupyterlab-pygments==0.3.0
     # via nbconvert
-jupyterlab-server==2.27.3
+jupyterlab-server==2.28.0
     # via
     #   jupyterlab
     #   notebook
-kiwisolver==1.4.8
+kiwisolver==1.5.1
     # via matplotlib
-markupsafe==3.0.2
+lark==1.3.1
+    # via rfc3987-syntax
+markupsafe==3.0.3
     # via
+    #   flask
     #   jinja2
     #   nbconvert
     #   werkzeug
-matplotlib==3.10.1
+matplotlib==3.11.2
     # via
     #   agentMET4FOF (setup.py)
     #   mpld3
     #   pydynamic
-matplotlib-inline==0.1.7
+matplotlib-inline==0.2.2
     # via
     #   ipykernel
     #   ipython
-mesa==3.1.5
+mesa==3.3.1
     # via agentMET4FOF (setup.py)
-mistune==3.1.3
+mistune==3.3.4
     # via nbconvert
-mpld3==0.5.10
+mpld3==0.5.12
     # via agentMET4FOF (setup.py)
 mpmath==1.3.0
     # via sympy
-multiprocess==0.70.17
+multiprocess==0.70.19
     # via agentMET4FOF (setup.py)
-narwhals==1.35.0
+narwhals==2.26.0
     # via plotly
-nbclient==0.10.2
+nbclient==0.11.0
     # via nbconvert
-nbconvert==7.16.6
+nbconvert==7.17.1
     # via jupyter-server
-nbformat==5.10.4
+nbformat==5.11.1
     # via
     #   jupyter-server
     #   nbclient
     #   nbconvert
 nest-asyncio==1.6.0
-    # via
-    #   dash
-    #   ipykernel
-networkx==3.4.2
+    # via dash
+nest-asyncio2==1.7.2
+    # via ipykernel
+networkx==3.6.1
     # via agentMET4FOF (setup.py)
-notebook==7.4.0
+notebook==7.6.2
     # via agentMET4FOF (setup.py)
 notebook-shim==0.2.4
     # via
     #   jupyterlab
     #   notebook
-numpy==2.2.4
+numpy==2.4.6
     # via
     #   agentMET4FOF (setup.py)
     #   contourpy
@@ -225,7 +236,7 @@ osbrain==0.6.5
     # via agentMET4FOF (setup.py)
 overrides==7.7.0
     # via jupyter-server
-packaging==24.2
+packaging==26.3
     # via
     #   ipykernel
     #   jupyter-events
@@ -235,41 +246,47 @@ packaging==24.2
     #   matplotlib
     #   nbconvert
     #   plotly
-pandas==2.2.3
+pandas==3.0.5
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
     #   pydynamic
 pandocfilters==1.5.1
     # via nbconvert
-parso==0.8.4
+parso==0.8.7
     # via jedi
-pillow==11.2.1
+pillow==12.3.0
     # via matplotlib
-platformdirs==4.3.7
+platformdirs==4.11.8
     # via jupyter-core
-plotly==6.0.1
+plotly==7.0.0
     # via
     #   agentMET4FOF (setup.py)
     #   dash
-prometheus-client==0.21.1
+prometheus-client==0.26.0
     # via jupyter-server
-prompt-toolkit==3.0.51
+prompt-toolkit==3.0.53
     # via ipython
-psutil==7.0.0
-    # via ipykernel
-pure-eval==0.2.3
+psutil==7.2.2
+    # via
+    #   ipykernel
+    #   ipython
+pure-eval==0.2.4
     # via stack-data
-pycparser==2.22
+pycparser==3.0
     # via cffi
+pydantic==2.13.5
+    # via dash
+pydantic-core==2.46.5
+    # via pydantic
 pydynamic==2.5.1
     # via agentMET4FOF (setup.py)
-pygments==2.19.1
+pygments==2.21.0
     # via
     #   ipython
     #   ipython-pygments-lexers
     #   nbconvert
-pyparsing==3.2.3
+pyparsing==3.3.2
     # via matplotlib
 pyro4==4.82
     # via osbrain
@@ -279,37 +296,33 @@ python-dateutil==2.9.0.post0
     #   jupyter-client
     #   matplotlib
     #   pandas
-python-json-logger==3.3.0
+python-json-logger==4.2.0
     # via jupyter-events
-pytz==2025.2
-    # via pandas
-pywavelets==1.8.0
+pywavelets==1.9.0
     # via pydynamic
-pywin32==310 ; platform_system == "Windows"
-    # via jupyter-core
-pywinpty==2.0.15 ; platform_system == "Windows"
+pywinpty==3.0.5
     # via
     #   jupyter-server
     #   jupyter-server-terminals
     #   terminado
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via jupyter-events
-pyzmq==26.4.0
+pyzmq==27.2.0
     # via
     #   ipykernel
     #   jupyter-client
     #   jupyter-server
     #   osbrain
-referencing==0.36.2
+referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
     #   jupyter-events
-requests==2.32.3
+requests==2.34.2
     # via
     #   dash
     #   jupyterlab-server
-retrying==1.3.4
+retrying==1.4.2
     # via dash
 rfc3339-validator==0.1.4
     # via
@@ -319,31 +332,30 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rpds-py==0.24.0
+rfc3987-syntax==1.1.0
+    # via jsonschema
+rpds-py==2026.6.3
     # via
     #   jsonschema
     #   referencing
-scipy==1.15.2
+scipy==1.17.1
     # via
     #   agentMET4FOF (setup.py)
     #   mesa
     #   pydynamic
-send2trash==1.8.3
+send2trash==2.1.0
     # via jupyter-server
-serpent==1.41
+serpent==1.43
     # via pyro4
 six==1.17.0
     # via
     #   python-dateutil
-    #   retrying
     #   rfc3339-validator
-sniffio==1.3.1
-    # via anyio
-soupsieve==2.6
+soupsieve==2.9.2
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-sympy==1.13.3
+sympy==1.14.0
     # via pydynamic
 terminado==0.18.1
     # via
@@ -355,9 +367,9 @@ time-series-buffer==0.1.4b0
     #   pydynamic
 time-series-metadata==0.1.1
     # via agentMET4FOF (setup.py)
-tinycss2==1.4.0
+tinycss2==1.5.1
     # via bleach
-tornado==6.4.2
+tornado==6.5.9
     # via
     #   ipykernel
     #   jupyter-client
@@ -365,13 +377,13 @@ tornado==6.4.2
     #   jupyterlab
     #   notebook
     #   terminado
-tqdm==4.67.1
+tqdm==4.70.1
     # via mesa
-traitlets==5.14.3
+traitlets==5.16.1
     # via
-    #   comm
     #   ipykernel
     #   ipython
+    #   jupyter-builder
     #   jupyter-client
     #   jupyter-core
     #   jupyter-events
@@ -381,40 +393,47 @@ traitlets==5.14.3
     #   nbclient
     #   nbconvert
     #   nbformat
-types-python-dateutil==2.9.0.20241206
-    # via arrow
-typing-extensions==4.13.2
+typing-extensions==4.16.0
     # via
     #   anyio
     #   beautifulsoup4
     #   dash
     #   ipython
+    #   jupyter-client
+    #   jupyterlab
+    #   pydantic
+    #   pydantic-core
     #   referencing
-tzdata==2025.2
-    # via pandas
-uncertainties==3.2.2
+    #   typing-inspection
+typing-inspection==0.4.4
+    # via pydantic
+tzdata==2026.4
+    # via
+    #   arrow
+    #   pandas
+uncertainties==3.2.3
     # via time-series-buffer
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.4.0
+urllib3==2.7.0
     # via requests
 visdcc==0.0.63
     # via agentMET4FOF (setup.py)
-wcwidth==0.2.13
+wcwidth==0.8.3
     # via prompt-toolkit
-webcolors==24.11.1
+webcolors==25.10.0
     # via jsonschema
-webencodings==0.5.1
+webencodings==0.6.1
     # via
     #   bleach
     #   tinycss2
-websocket-client==1.8.0
+websocket-client==1.9.2
     # via jupyter-server
-werkzeug==3.0.6
+werkzeug==3.1.8
     # via
     #   dash
     #   flask
-zipp==3.21.0
+zipp==4.1.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
