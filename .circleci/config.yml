@@ -155,6 +155,7 @@ commands:
           name: Run tests
           command: |
             tox | tee --append test-results/agentMET4FOF.log
+          no_output_timeout: 15m
       - store_test_artifacts_and_results
 
   store_test_artifacts_and_results:
