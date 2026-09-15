@@ -300,7 +300,7 @@ python-json-logger==4.2.0
     # via jupyter-events
 pywavelets==1.9.0
     # via pydynamic
-pywinpty==3.0.5
+pywinpty==3.0.5 ; platform_system == "Windows"
     # via
     #   jupyter-server
     #   jupyter-server-terminals
