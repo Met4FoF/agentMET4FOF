@@ -362,7 +362,7 @@ jobs:
               CI_PULL_REQUESTS
             export CIRCLE_BRANCH=develop
             git config --global user.name "semantic-release (via CircleCI)"
-            git config --global user.email "anupam.vedurmudi@ptb.de"
+            git config --global user.email "anupam.13@gmail.com"
             echo "
             The changelog of the next release will contain:
             "
@@ -387,7 +387,7 @@ jobs:
           name: Run semantic-release publish
           command: |
             git config --global user.name "semantic-release (via CircleCI)"
-            git config --global user.email "anupam.vedurmudi@ptb.de"
+            git config --global user.email "anupam.13@gmail.com"
             semantic-release publish
           no_output_timeout: 15m
 
