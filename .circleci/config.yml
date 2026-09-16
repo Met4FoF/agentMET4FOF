@@ -227,8 +227,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "41:e2:e1:e7:a9:a3:8d:62:d9:19:6f:71:fe:f6:20:c1"
-            - "jW7ito3wfAqfwDSwQsAM+jI5BG6HX5JhRyTm3C9kPFo"
+            - "Pn8jWz6o4x+ef0xuKN+CKSc0h+QM6XPEpsiW6BnxU5U"
       - checkout
       - attach_workspace:
           at: .
@@ -380,7 +379,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "41:e2:e1:e7:a9:a3:8d:62:d9:19:6f:71:fe:f6:20:c1"
+            - "Pn8jWz6o4x+ef0xuKN+CKSc0h+QM6XPEpsiW6BnxU5U"
       - checkout
       - install_all_deps
       - run:
