@@ -377,16 +377,11 @@ jobs:
     executor:
       name: publisher
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:Pn8jWz6o4x+ef0xuKN+CKSc0h+QM6XPEpsiW6BnxU5U"
       - checkout
       - install_all_deps
       - run:
           name: Run semantic-release publish
           command: |
-            git config --global user.name "semantic-release (via CircleCI)"
-            git config --global user.email "anupam.13@gmail.com"
             semantic-release publish
           no_output_timeout: 15m
 
