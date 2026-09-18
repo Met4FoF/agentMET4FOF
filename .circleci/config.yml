@@ -382,6 +382,8 @@ jobs:
       - run:
           name: Run semantic-release publish
           command: |
+            git config --global user.name "semantic-release (via CircleCI)"
+            git config --global user.email "anupam.13@gmail.com"
             semantic-release publish
           no_output_timeout: 15m
 
