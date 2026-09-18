@@ -1,0 +1,107 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentMET4FOF"
+dynamic = ["version"]
+description = "A software package for the integration of metrological input into an agent-based system for the consideration of measurement uncertainty in current industrial manufacturing processes."
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["uncertainty", "metrology", "MAS", "agent-based", "agents"]
+authors = [
+    {name = "Bang Xiang Yong", email = "bxy20@cam.ac.uk"},
+    {name = "Björn Ludwig"},
+    {name = "Anupam Prasad Vedurmudi", email = "anupam.vedurmudi@ptb.de"},
+    {name = "Maximilian Gruber"},
+    {name = "Haris Lulić"},
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Topic :: Utilities",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pandas",
+    "osbrain",
+    "dash",
+    "dash_cytoscape",
+    "networkx",
+    "plotly",
+    "time-series-buffer",
+    "time-series-metadata",
+    "mpld3",
+    "mesa",
+    "multiprocess",
+    "visdcc",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Met4FoF/agentMET4FOF"
+"Documentation" = "https://agentmet4fof.readthedocs.io/en/"
+"Source" = "https://github.com/Met4FoF/agentMET4FOF/tree/"
+"Tracker" = "https://github.com/Met4FoF/agentMET4FOF/issues"
+
+[project.optional-dependencies]
+tutorials = [
+    "notebook",
+    "PyDynamic",
+]
+dev = [
+    "black[jupyter]",
+    "pytest",
+    "pytest-cov",
+    "pytest-timeout",
+    "pywin32 ; platform_system=='Windows'",
+    "pywin32-ctypes ; platform_system=='Windows'",
+    "pypyty ; platform_system=='Windows'",
+    "requests",
+    "psutil",
+    "sphinx",
+    "nbsphinx",
+    "recommonmark",
+    "sphinx_rtd_theme",
+    "ipython",
+    "tox",
+    "python-semantic-release<8",
+    "hypothesis",
+]
+docs = [
+    "sphinx",
+    "nbsphinx",
+    "recommonmark",
+    "sphinx_rtd_theme",
+    "ipython",
+    "docutils",
+]
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests*"] } }
+
+[tool.semantic_release]
+# Points to the __version__ variable in your package's __init__.py as seen in setup.py [1]
+version_variable = "agentMET4FOF/__init__.py:__version__"
+
+# The branch you are releasing from (usually 'main' or 'master')
+branch = "develop"
+
+# The target repository for the upload
+upload_to_repository = "pypi"
+
+# The command used to build the distribution files
+build_command = "python -m build"
