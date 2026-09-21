@@ -382,8 +382,7 @@ jobs:
       - run:
           name: Run semantic-release publish
           command: |
-            git config --global user.name "semantic-release (via CircleCI)"
-            git config --global user.email "anupam.13@gmail.com"
+            git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git
             semantic-release publish
           no_output_timeout: 15m
 
