@@ -244,7 +244,7 @@ jobs:
       - run:
           name: Commit and push changes
           command: |
-            git config --global user.name "anupam-prasad"
+            git config --global user.name "Circle CI Bot"
             git config --global user.email "anupam.13@gmail.com"
             git commit -am \
               "build(deps): recompile Python (dev) deps on $(date)"
@@ -377,17 +377,15 @@ jobs:
     executor:
       name: publisher
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:Pn8jWz6o4x+ef0xuKN+CKSc0h+QM6XPEpsiW6BnxU5U"
       - checkout
       - install_all_deps
       - run:
           name: Run semantic-release publish
           command: |
-            openssl aes-256-cbc -d -K $REPO_ENC_KEY -iv $REPO_ENC_IV -in git_deploy_key.enc -out /tmp/git_deploy_key
-            chmod 600 /tmp/git_deploy_key
-            echo "echo ${SSL_PASSPHRASE}" > /tmp/askpass && chmod +x /tmp/askpass
-            eval "$(ssh-agent -s)"
-            DISPLAY=":0.0" SSH_ASKPASS="/tmp/askpass" setsid ssh-add /tmp/git_deploy_key </dev/null
-            git config --global user.name "AgentMET4FOF CircleCI"
+            git config --global user.name "CircleCI Bot"
             git config --global user.email "anupam.13@gmail.com"
             semantic-release publish
 

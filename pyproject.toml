@@ -69,7 +69,7 @@ dev = [
     "pytest-timeout",
     "pywin32 ; platform_system=='Windows'",
     "pywin32-ctypes ; platform_system=='Windows'",
-    "pypyty ; platform_system=='Windows'",
+    "pywinpty ; platform_system=='Windows'",
     "requests",
     "psutil",
     "sphinx",
@@ -78,7 +78,7 @@ dev = [
     "sphinx_rtd_theme",
     "ipython",
     "tox",
-    "python-semantic-release<8",
+    "python-semantic-release",
     "hypothesis",
 ]
 docs = [
