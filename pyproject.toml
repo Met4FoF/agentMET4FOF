@@ -96,14 +96,11 @@ packages = { find = { exclude = ["tests*"] } }
 [tool.semantic_release]
 # Points to the __version__ variable in your package's __init__.py as seen in setup.py [1]
 version_variable = "agentMET4FOF/__init__.py:__version__"
-branch = "/develop/"
 upload_to_PyPI = true
 upload_to_release = true
-prerelease = false
-
 # The command used to build the distribution files
 build_command = "python -m build"
 
-[tool.semantic_release.branches.develop]
-match = "develop"
+[tool.semantic_release.branches]
+name = "develop"
 prerelease = true
