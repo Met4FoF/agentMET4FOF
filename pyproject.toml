@@ -94,7 +94,8 @@ docs = [
 packages = { find = { exclude = ["tests*"] } }
 
 [tool.semantic_release]
-version_variable = "agentMET4FOF/__init__.py:__version__"
+tag_format = "{version}"
+version_variables = ["agentMET4FOF/__init__.py:__version__"]
 upload_to_PyPI = true
 upload_to_release = true
 build_command = "python -m build"
