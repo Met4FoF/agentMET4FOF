@@ -1,0 +1,85 @@
+name: CI/CD Pipeline
+
+on:
+  # Equivalent to nightly_test and check_for_upgraded_deps schedules
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+  # Equivalent to test_and_deploy (non-scheduled triggers)
+  push:
+    branches:
+      - develop
+      - main
+    tags:
+      - 'v*' # Trigger release jobs on version tags
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+ # --- JOB: Dependency Update & Test ---
+  test_with_updated_deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Recompile and sync deps
+        run: |
+          pip install --upgrade pip pip-tools tox
+          python -m piptools compile --upgrade --extra=tutorials
+          python -m piptools compile --upgrade --extra=tutorials --extra=dev --extra=docs --output-file dev-requirements.txt
+          python -m piptools compile --upgrade --extra=tutorials --extra=docs --output-file docs/sphinx-requirements.txt
+          python -m piptools sync requirements.txt dev-requirements.txt
+
+      - name: Check for new deps compilation
+        id: check_deps
+        run: |
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No updated deps. Nothing to test."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run venv tests
+        if: steps.check_deps.outputs.changed == 'true'
+        run: tox | tee agentMET4FOF.log
+
+      - name: Upload artifacts
+        if: steps.check_deps.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-deps
+          path: |
+            requirements.txt
+            dev-requirements.txt
+            docs/sphinx-requirements.txt
+            
+  test_against_venv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install --upgrade pip tox && tox
+
+        # --- JOB: Preview Release ---
+  preview_release:
+    needs: test_against_venv
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-semantic-release
+      - run: |
+          git config --global user.name "semantic-release (via CircleCI)"
+          git config --global user.email "anupam.13@gmail.com"
+          semantic-release --unreleased changelog
+          semantic-release --noop publish
