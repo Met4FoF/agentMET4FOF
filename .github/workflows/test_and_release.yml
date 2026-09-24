@@ -7,12 +7,12 @@ on:
   # Equivalent to test_and_deploy (non-scheduled triggers)
   push:
     branches:
-      - /develop/
+      - develop
     tags:
       - 'v*' # Trigger release jobs on version tags
   pull_request:
     branches:
-      - /develop/
+      - develop
 
 jobs:
  # --- JOB: Dependency Update & Test ---
