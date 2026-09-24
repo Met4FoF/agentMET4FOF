@@ -103,3 +103,7 @@ prerelease = false
 
 # The command used to build the distribution files
 build_command = "python -m build"
+
+[tool.semantic_release.branches.develop]
+match = "develop"
+prerelease = true
