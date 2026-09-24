@@ -100,4 +100,5 @@ upload_to_release = true
 build_command = "python -m build"
 
 [tool.semantic_release.branches.develop]
+match = "develop"
 prerelease = true
