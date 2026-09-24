@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agentMET4FOF"
+version = "0.13.4"
 dynamic = ["version"]
 description = "A software package for the integration of metrological input into an agent-based system for the consideration of measurement uncertainty in current industrial manufacturing processes."
 readme = "README.md"
@@ -96,6 +97,7 @@ packages = { find = { exclude = ["tests*"] } }
 [tool.semantic_release]
 tag_format = "{version}"
 version_variables = ["agentMET4FOF/__init__.py:__version__"]
+version_toml = ["pyproject.toml:project.version"]
 upload_to_PyPI = true
 upload_to_release = true
 build_command = "python -m build"
