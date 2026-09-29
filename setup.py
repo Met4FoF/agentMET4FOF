@@ -86,7 +86,7 @@ setup(
             "sphinx_rtd_theme",
             "ipython",
             "tox",
-            "python-semantic-release<8",
+            "python-semantic-release",
             "hypothesis",
         ],
         "docs": [

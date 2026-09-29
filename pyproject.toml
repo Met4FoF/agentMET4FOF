@@ -100,9 +100,12 @@ upload_to_PyPI = true
 upload_to_release = true
 build_command = "python -m build"
 
-[tool.semantic_release.branches.develop]
+[tool.semantic_release.branches.main]
 match = "develop"
-prerelease = true
+prerelease = false
 
 [tool.semantic_release.remote]
 type = "github"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
