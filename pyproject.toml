@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agentMET4FOF"
-version = "0.13.4"
+version = "v0.13.4"
 description = "A software package for the integration of metrological input into an agent-based system for the consideration of measurement uncertainty in current industrial manufacturing processes."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -103,3 +103,6 @@ build_command = "python -m build"
 [tool.semantic_release.branches.develop]
 match = "develop"
 prerelease = true
+
+[tool.semantic_release.remote]
+type = "github"
