@@ -72,10 +72,12 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install python-semantic-release
       - run: |
+          pip install python-semantic-release
+          git config user.name "Github Actions"
+          git config user.email "anupam.13@gmail.com"
           semantic-release --noop publish
