@@ -84,3 +84,25 @@ jobs:
           git config user.name "Github Actions"
           git config user.email "anupam.13@gmail.com"
           semantic-release --noop publish
+
+  release:
+    needs: preview_release
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "action@github.com"
+          semantic-release publish -D commit_author="github-actions <action@github.com>"
+        # env:
+        #   GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        #   PyPI_TOKEN: ${{secrets.PyPI_TOKEN}}
