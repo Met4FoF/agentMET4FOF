@@ -103,7 +103,7 @@ jobs:
           pip install python-semantic-release
           git config --global user.name "github-actions"
           git config --global user.email "action@github.com"
-          semantic-release publish -D commit_author="github-actions <action@github.com>"
+          semantic-release publish
         # env:
         #   GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         #   PyPI_TOKEN: ${{secrets.PyPI_TOKEN}}
