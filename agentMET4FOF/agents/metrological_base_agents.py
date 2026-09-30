@@ -32,7 +32,7 @@ class MetrologicalAgent(AgentMET4FOF):
     """
     _output_data_maxlen: int
 
-    def init_parameters(self, input_data_maxlen=25, output_data_maxlen=25):
+    def init_parameters(self, input_data_maxlen: int = 25, output_data_maxlen:int = 25) -> None:
         super(MetrologicalAgent, self).init_parameters()
         self._input_data = {}
         self._input_data_maxlen = input_data_maxlen
@@ -98,6 +98,8 @@ class MetrologicalAgent(AgentMET4FOF):
 
                     # send data+metadata
                     self.send_output([data, metadata], channel=channel)
+
+        super().agent_loop()
 
     def pack_data(self, data, channel="default"):
 
@@ -205,6 +207,7 @@ class MetrologicalMonitorAgent(MetrologicalAgent):
                     error_y=dict(type="data", array=uv, visible=True),
                     mode="lines",
                     name=f"{y_label} ({sender_agent})",
+                    line=dict(width=5),
                 )
             else:
                 trace = go.Scatter()

@@ -62,7 +62,6 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             )
 
         elif self.backend == Backend.MESA:
-            self.name = name
 
             if mesa_model is None:
                 self.mesa_model = MesaModel()
@@ -73,9 +72,9 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             # generate unique id for agent using uuid library and initialize mesa agent
             self.init_mesa(name=name, uid=uuid.uuid4())
             # the following method uses mesa's internal method to initialize the agent for a given mesa model
-            self.mesa_agent = super().__init__(model=self.mesa_model)
-            self._remove_methods(osBrainAgent)
+            MesaAgent.__init__(self, model=self.mesa_model)
             self.name = name
+            self._remove_methods(osBrainAgent)
 
     @staticmethod
     def validate_backend(backend: Union[str, Backend]) -> Backend:
@@ -121,7 +120,13 @@ class AgentMET4FOF(MesaAgent, osBrainAgent):
             self.handle_process_data(self.mesa_message_queue.popleft())
 
         # proceed with user-defined agent-loop
-        self.agent_loop()
+        # checks if current_state attribute is present. strange bug when using MESA as it seems that
+        # the agent_loop method is called before init_parameters ?
+        if hasattr(self, "current_state"):
+            self.agent_loop()
+        else:
+            self.current_state = "Idle"
+            self.agent_loop()
 
     def _remove_methods(self, cls):
         """Remove methods from the other backends base class from the current agent"""

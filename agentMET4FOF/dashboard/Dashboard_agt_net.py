@@ -829,17 +829,20 @@ class Dashboard_agt_net(Dashboard_Layout_Base):
                         "title": {
                             "text": monitor_agent.get_attr("name"),
                             "y": y_title_offset,
-                            "x": 0.5,
+                            "x": 0.15,
                             "xanchor": "center",
                             "yanchor": "bottom",
+                            "yref": "paper",
+                            "automargin": True,
                         },
-                        "xaxis": {"title": {"text": x_label}},
-                        "yaxis": {"title": {"text": y_label}},
+                        "xaxis": {"title": {"text": x_label, "standoff":40}, "font": {"size": 30}, "automargin": True},
+                        "yaxis": {"title": {"text": y_label, "standoff":40}, "font": {"size": 30}, "automargin": True},
                         "uirevision": app.num_monitor,
                         "showlegend": True,
                         "legend": dict(
                             xanchor="auto", yanchor="bottom", x=1, y=1, orientation="h"
                         ),
+                    "font": {"size": 35},
                         # 'margin':dict(t=150)
                     },
                 }
