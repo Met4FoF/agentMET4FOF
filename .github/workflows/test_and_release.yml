@@ -81,8 +81,8 @@ jobs:
           python-version: '3.11'
       - run: |
           pip install python-semantic-release
-          git config user.name "Github Actions"
-          git config user.email "anupam.13@gmail.com"
+          git config --global user.name "Github Actions"
+          git config --global user.email "anupam.13@gmail.com"
           semantic-release --noop publish
 
   release:
