@@ -91,6 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,6 +105,6 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "action@github.com"
           semantic-release publish
-        # env:
-        #   GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         #   PyPI_TOKEN: ${{secrets.PyPI_TOKEN}}
