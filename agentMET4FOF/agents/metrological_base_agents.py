@@ -71,16 +71,19 @@ class MetrologicalAgent(AgentMET4FOF):
         # create storage for new output channels
         if channel not in self._output_data.keys():
             self._output_data[channel] = {
-                "metadata": metadata,
+                # Initialize metadata as a list.
+                # If metadata is None, start with an empty list.
+                "metadata": [metadata] if metadata is not None else [],
                 "buffer": TimeSeriesBuffer(maxlen=self._output_data_maxlen),
             }
+        # 2. Append metadata if provided
+        elif metadata is not None:
+            # Since we guaranteed metadata is a list during initialization,
+            # we can safely call .append()
+            self._output_data[channel]["metadata"].append(metadata)
 
-        if metadata is not None:
-            # update received metadata
-            self._output_data[channel]["metadata"] = metadata
-
+        # 3. Append received data
         if data is not None:
-            # append received data
             self._output_data[channel]["buffer"].add(data=data)
 
     def agent_loop(self):
